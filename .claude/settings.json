@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm --workspace frontend run *)",
+      "Bash(npm --workspace backend run *)"
+    ]
+  }
+}

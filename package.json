@@ -1,0 +1,7 @@
+{
+  "name": "real-time-stream",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": ["backend", "frontend"],
+  "engines": { "node": ">=22" }
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Real-time Stream Docs",
+  "theme": "mint",
+  "colors": { "primary": "#16A34A" },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Overview",
+        "groups": [{ "group": "Start Here", "pages": ["index", "quickstart", "CHANGELOG"] }]
+      },
+      {
+        "tab": "Planning",
+        "groups": [{ "group": "Phases", "pages": ["plans/master-plan", "plans/phase-01-project-setup"] }]
+      },
+      {
+        "tab": "AI Workflow",
+        "groups": [
+          { "group": "Workflow", "pages": ["ai-workflow", "dev/session-log", "templates/session-close"] },
+          { "group": "Work Logs", "pages": ["work-logs/2026-10-11-01-phase-01-agent-workflow"] }
+        ]
+      }
+    ]
+  }
+}

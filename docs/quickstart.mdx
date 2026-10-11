@@ -1,0 +1,20 @@
+---
+title: Cài đặt
+description: Cấu trúc và lệnh hiện có.
+---
+
+Yêu cầu Node.js 22.12+ và npm 10+. Từ thư mục gốc chạy `npm install` để cài cả hai npm workspaces.
+
+| Thư mục | Nội dung |
+| --- | --- |
+| backend | NestJS, LiveKit server SDK, Supabase, Socket.IO |
+| frontend | React/Vite, LiveKit components/client, Supabase, Socket.IO client |
+| supabase/migrations | Trống, dành cho migration khi được yêu cầu |
+| .codex | Cấu hình Codex và hướng dẫn |
+| .claude | Quyền Claude và skills từ dự án mẫu |
+| docs | Docs MDX, phase, session và work log |
+
+Khi cần cấu hình dịch vụ, copy `.env.example` thành `.env` ở từng workspace.
+Chỉ đặt secret ở backend. Hiện chưa có entry point hoặc lệnh dev/build/test.
+
+Docs dùng cấu trúc MDX/Mintlify giống dự án mẫu; chưa cài Mintlify CLI hoặc server docs.

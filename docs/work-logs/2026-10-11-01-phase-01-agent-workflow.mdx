@@ -1,0 +1,64 @@
+---
+title: 2026-10-11-01 — Agent Workflow
+description: Đóng phiên setup Codex, Claude và docs theo phase.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-10-11-01
+- Ngày: 2026-10-11, Asia/Saigon (+07:00). Không ghi nhận chính xác thời điểm bắt đầu.
+- Mốc đóng phiên: 2026-10-11T23:27:24+07:00; hoàn tất kiểm tra sau mốc này trong cùng phiên.
+- Agent: Codex
+- Phase: 01 — Project Setup
+- Kết quả phiên: Completed
+- Trạng thái phase: Done trong phạm vi setup khung.
+
+## Mục tiêu
+
+Đọc setup `.codex` và `.claude` của Petservice ở ổ D, áp dụng tương tự cho Real_time_stream và bắt buộc mỗi phiên đóng theo phase trong docs.
+Dự án mẫu thực tế nằm tại `D:/Pet_Sevice`.
+
+## Công việc hoàn thành
+
+- Đọc config, hướng dẫn agent, Claude permissions, roadmap và session log của dự án mẫu.
+- Tạo root `AGENTS.md`, `CLAUDE.md`, `.codex/config.toml`, `.codex/AGENTS.md`, `.claude/settings.json`.
+- Sao chép `.claude/skills/` nguyên gói từ mẫu, bao gồm frontend-design, canvas-design, brand-guidelines và tài nguyên/license đi kèm.
+- Thêm docs index, quickstart, AI workflow, master plan, Phase 01, session log, changelog, template và navigation.
+- Cập nhật README, .gitignore. Không thêm code ứng dụng.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm install ở phiên setup trước | Passed | 420 packages added; audit 0 vulnerabilities tại thời điểm chạy |
+| git status --short | Skipped | Lệnh xác nhận thư mục chưa là Git repository |
+| JSON config và docs navigation | Passed | Parse JSON và xác nhận toàn bộ page target tồn tại |
+| Bộ skills sao chép | Passed | Đối chiếu số file và SHA-256 với mẫu |
+| Source folders | Passed | Chỉ có .gitkeep, không có code ứng dụng |
+| Build/test ứng dụng | Skipped | Chưa có source hoặc scripts |
+| Mintlify validate | Skipped | Chưa cài Mintlify CLI; không tuyên bố đã validate MDX bằng Mintlify |
+| Runtime Codex/Claude | Skipped | Cần phiên agent mới để kiểm tra việc nạp config/instructions |
+
+## Quyết định
+
+- Không pin model cũ của dự án mẫu; giữ lựa chọn model của người dùng/app.
+- Chỉ dùng khóa runtime Codex được tài liệu chính thức mô tả; chuyển thông tin project/safety/commands vào hướng dẫn Markdown.
+- Loại bỏ quyền Claude gắn với đường dẫn Pet Service cũ và Prisma/đọc env; giữ quyền npm run phù hợp workspaces.
+- Không cài thêm Mintlify hoặc tạo mã hook vì yêu cầu hiện tại chỉ setup khung và workflow.
+- Quy tắc đóng phiên là hướng dẫn agent, không tự ghi log khi ứng dụng bị tắt đột ngột.
+
+## Blocker và phần chưa xong
+
+Không có blocker cho phạm vi setup. Chưa có code, schema, tài khoản cloud, dev/build scripts, deployment hoặc Git repository.
+Sandbox helper báo lỗi khởi tạo khi chạy shell sau khi thêm config; sao chép/kiểm tra hoàn tất bằng quyền thực thi được hệ thống duyệt.
+
+## Bước tiếp theo
+
+Phiên sau đọc master plan và log này. Chờ yêu cầu người dùng trước khi bắt đầu Phase 02 hoặc viết code.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

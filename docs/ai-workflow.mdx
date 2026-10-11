@@ -1,0 +1,36 @@
+---
+title: Quy trình AI
+description: Mở phiên, làm việc và đóng phiên theo phase.
+---
+
+## Mở phiên
+
+Đọc hướng dẫn agent, master plan, phase hiện tại và work log gần nhất.
+Xác định phạm vi được người dùng giao; ghi tiến trình đúng với hiện trạng thực tế.
+
+## Đóng phiên bắt buộc
+
+Mỗi phiên làm việc phải có work log riêng, kể cả chỉ sửa tài liệu/config.
+Tên file: `YYYY-MM-DD-NN-phase-XX-topic.mdx`, ngày giờ theo Asia/Saigon.
+NN là số thứ tự trong ngày, không ghi đè log cũ. Phiên chạm nhiều phase ghi tất cả phase liên quan.
+
+1. Ghi mục tiêu, kết quả, file thay đổi, kiểm tra và kết quả thực tế.
+2. Ghi quyết định, blocker, phần chưa xong và bước tiếp theo.
+3. Cập nhật phase page và master plan, liên kết work log.
+4. Thêm entry vào session log, cập nhật changelog và docs liên quan.
+5. Thêm trang mới vào docs.json; kiểm tra JSON, navigation và liên kết.
+6. Trả lời người dùng với kết quả, xác minh, trạng thái phase và việc còn lại.
+
+Đóng phiên không đồng nghĩa đóng phase. Phase chỉ Done khi đủ tiêu chí nghiệm thu.
+Các phase tương lai là kế hoạch dự kiến, chưa được phép tự triển khai.
+
+## Cơ chế áp dụng
+
+Codex đọc root AGENTS.md; Claude đọc CLAUDE.md, trong đó tham chiếu AGENTS.md.
+Đây là quy tắc dành cho agent, không phải hook tự động chạy khi ứng dụng bị đóng đột ngột.
+Nếu phiên bị ngắt, phiên sau phải ghi checkpoint còn thiếu bằng thông tin có thể xác minh.
+
+## Nguồn tham khảo
+
+Cấu trúc tham khảo từ `D:/Pet_Sevice`. Không copy đường dẫn, domain nghiệp vụ, Prisma/Express hay model cũ của dự án đó.
+Các khóa Codex được đối chiếu với [configuration reference](https://developers.openai.com/codex/config-reference/).

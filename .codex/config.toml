@@ -1,0 +1,4 @@
+# Keep the model selected by the user/application; do not pin the old sample model.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+# Project paths, commands and workflow rules live in AGENTS.md, not custom TOML keys.
