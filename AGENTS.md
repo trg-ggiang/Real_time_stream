@@ -1,19 +1,19 @@
 # Real-time Stream — Agent Instructions
 
 ## Scope and stack
-- Current scope: technology scaffold and documentation only. Do not add application code, UI, database schema, or service integrations until requested.
+- Current authorized scope: Module 1 — Media Connection PoC (NestJS token API and React/LiveKit meeting page), environment setup, tests and documentation. Do not implement database/auth, dynamic rooms, chat or club workflows until requested.
 - Backend: Node.js / NestJS. Frontend: React / Vite. Stream: LiveKit Cloud. Database: Supabase. Chat: Socket.IO over WebSocket.
-- `backend/src/` and `frontend/src/` are intentionally empty.
+- Source is organized as a NestJS livekit module and a frontend meeting feature. See `docs/modules/module-01-media-poc.mdx`.
 
 ## Session start
 1. Read `README.md`, this file, `.codex/AGENTS.md` (Codex) or `CLAUDE.md` (Claude), `docs/index.mdx`, `docs/ai-workflow.mdx`, `docs/plans/master-plan.mdx`, and `docs/dev/session-log.mdx`.
 2. Read the active phase and its latest work log before editing.
-3. Check `git status --short` if `.git` exists; this scaffold is not yet a Git repository. Preserve unrelated changes.
+3. Check `git status --short` if `.git` exists; the project now has a Git repository. Preserve unrelated changes.
 4. Inspect relevant files with `rg` before changing them. Follow the user's current authorized scope; a roadmap is not permission to implement future phases.
 
 ## Working rules
 - Use PowerShell-compatible commands. Install from root with `npm install`; use `npm --workspace backend ...` / `npm --workspace frontend ...` for workspace commands.
-- Only run scripts that exist in package.json. There are currently no dev/build/test scripts.
+- Only run scripts that exist in package.json. Root scripts include dev:backend, dev:frontend, typecheck, build and test.
 - Never hardcode or log credentials. Keep Supabase secret keys and LiveKit API secrets backend-only; never put secrets in `VITE_*` variables.
 - Before future Supabase schema/RLS/migration work, read the available Supabase Postgres best-practices skill.
 - Do not auto-commit, publish, or execute destructive Git/filesystem commands without user authorization.

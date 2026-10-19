@@ -1,0 +1,148 @@
+:root {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: #e9eef7;
+  background: #101827;
+  font-synthesis: none;
+  line-height: 1.6;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+}
+main {
+  width: min(1100px, 100%);
+  margin: auto;
+  padding: 56px 24px 24px;
+}
+header {
+  margin-bottom: 32px;
+}
+.eyebrow {
+  color: #93d8cb;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3.3rem);
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+  margin: 16px 0;
+}
+h2 {
+  font-size: 1.8rem;
+  line-height: 1.3;
+}
+.subtitle,
+.hint,
+footer {
+  color: #a9b8cc;
+}
+.join-card {
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid #344256;
+  border-radius: 20px;
+  background: #192537;
+  max-width: 740px;
+}
+.join-card p {
+  max-width: 60ch;
+}
+.badge {
+  border-radius: 24px;
+  background: #223f43;
+  color: #abecdb;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+button {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 12px 20px;
+  background: #9ce6ce;
+  color: #102a27;
+  cursor: pointer;
+}
+button:hover {
+  filter: brightness(0.93);
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+button:focus-visible {
+  outline: 3px solid #9dd0ff;
+  outline-offset: 4px;
+}
+button.secondary {
+  background: #26374c;
+  color: #e9eef7;
+  border-color: #52627a;
+}
+.join-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.notice {
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+.error {
+  background: #452c36;
+  color: #ffd9df;
+  border: 1px solid #986573;
+}
+.meeting-room {
+  border: 1px solid #344256;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.meeting-room [data-lk-theme] {
+  background: #192537;
+  padding: 16px;
+}
+.room-heading,
+.room-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.room-status {
+  color: #b2ddcf;
+  padding: 14px 0;
+  font-size: 0.9rem;
+}
+.video-grid {
+  height: min(60vh, 540px);
+  min-height: 280px;
+}
+footer {
+  margin-top: 24px;
+  font-size: 0.8rem;
+}
+@media (max-width: 600px) {
+  main {
+    padding: 28px 16px;
+  }
+  .video-grid {
+    height: 55vh;
+  }
+  .lk-control-bar {
+    flex-wrap: wrap;
+  }
+}

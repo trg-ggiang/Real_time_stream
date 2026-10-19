@@ -1,0 +1,18 @@
+---
+title: Bối cảnh dự án
+description: Mục tiêu sản phẩm và phạm vi Module 1.
+---
+
+Bản đầy đủ nằm tại `project_context.md` ở thư mục gốc, từ nội dung người dùng cung cấp ngày 2026-10-19.
+
+Nhóm 5 sinh viên phát triển nền tảng quản lý câu lạc bộ đại học, ưu tiên Meeting Module độc lập để phục vụ phỏng vấn, họp nội bộ và thảo luận nhóm.
+
+React/Vite đảm nhiệm giao diện; NestJS xử lý nghiệp vụ và ký token; LiveKit Cloud truyền media trực tiếp với trình duyệt. Supabase PostgreSQL dành cho dữ liệu ở module sau; Socket.IO qua WebSocket dành cho chat. Media không đi qua NestJS hoặc kênh chat.
+
+Module 1 kiểm chứng hai thiết bị cùng room cố định nhìn/nghe nhau, bật/tắt media và rời phòng. Cần identity riêng, token ký ở backend, remote audio/video, xử lý permission, autoplay, lifecycle và cleanup. Chưa cần database, đăng nhập, phòng động, waiting room, chat, screen sharing hoặc ghi hình.
+
+Đã có mã nguồn Module 1 và kiểm thử tự động; chưa có credentials hoặc kiểm chứng media thật. Mục tiêu 3–5 phòng, tối đa 20 participant và video khoảng 360p/15 FPS chưa được kiểm chứng.
+
+Bước tiếp theo: điền credentials LiveKit ở backend và nghiệm thu hai thiết bị, cả cùng Wi-Fi và hai mạng khác nhau; xem [Module 1](/modules/module-01-media-poc).
+
+[Phase 02](/plans/phase-02-requirements-architecture) đã chốt phạm vi PoC; Phase 04/05 đang In Progress và được triển khai trước database/auth theo context.

@@ -1,11 +1,49 @@
+# Dependencies, generated builds and test output (all workspaces)
 node_modules/
 dist/
-.env
-.env.*
+build/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Local environment files, including variants and editor backups.
+# Only the exact .env.example filename may be committed; keep real keys out.
+.env*
+*.env
+*.env.*
 !.env.example
+.envrc
+
+# Local secrets and private signing credentials
+.secrets/
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.keystore
+credentials.json
+service-account*.json
+service_account*.json
+
+# Runtime logs and diagnostic reports can contain request tokens
 *.log
+logs/
+report.*.json
+
+# OS and editor temporary files
 .DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# Local agent credentials, history and machine-specific overrides
 .codex/auth.json
 .codex/sessions/
 .codex/logs/
 .claude/settings.local.json
+
+# Agent instructions (AGENTS.md, CLAUDE.md, .codex/AGENTS.md, SKILL.md)
+# remain versioned. Do not ignore the entire .codex/ or .claude/ directory.

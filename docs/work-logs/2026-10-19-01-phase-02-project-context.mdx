@@ -1,0 +1,50 @@
+---
+title: 2026-10-19-01 — Project Context
+description: Ghi nhận context do người dùng cung cấp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-10-19-01
+- Ngày: 2026-10-19, Asia/Saigon (+07:00); không ghi nhận chính xác giờ bắt đầu.
+- Agent: Codex
+- Phase: 02 — Yêu cầu và kiến trúc
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đọc context, kiểm tra scaffold và tạo `project_context.md`.
+
+## Công việc hoàn thành
+
+Lưu đầy đủ nội dung nguồn, thêm ghi chú hiện trạng và phạm vi. Thêm trang docs tổng quan và phase 02. Cập nhật README, docs/index.mdx, docs/plans/master-plan.mdx, docs/dev/session-log.mdx, docs/CHANGELOG.mdx và docs/docs.json; tạo work log này. Không thêm mã ứng dụng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Đọc hướng dẫn, docs, context; rg files và nội dung | Passed | Hai src chỉ có .gitkeep; package.json không có scripts |
+| git status --short | Passed | Đã kiểm tra cuối phiên; giữ nguyên thay đổi ngoài phạm vi |
+| JSON, navigation và liên kết docs cục bộ | Passed | Python đã kiểm tra JSON, target docs tồn tại và nội dung nguồn UTF-8 giữ nguyên |
+| Đối chiếu nội dung nguồn và UTF-8 | Passed | Python đã kiểm tra JSON, target docs tồn tại và nội dung nguồn UTF-8 giữ nguyên |
+| Build/test, Mintlify | Skipped | Không có scripts ứng dụng; chưa cài CLI docs |
+
+## Quyết định và lý do
+
+Giữ nguyên nội dung nguồn để bảo toàn context; thêm ghi chú riêng phân biệt hiện trạng và kế hoạch. Vite và Socket.IO đã chọn trong scaffold. Không tự triển khai Module 1. Không sửa thứ tự roadmap cũ trong yêu cầu chỉ tạo tài liệu.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker trong phạm vi phiên. Chưa chốt ánh xạ phase/module, hợp đồng API và môi trường thử nghiệm; chưa có kết nối cloud hoặc benchmark. Phase 02 chưa hoàn tất.
+
+## Bước tiếp theo
+
+Khi có yêu cầu tiếp tục, đối chiếu master plan với context rồi lập kế hoạch chi tiết Module 1.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

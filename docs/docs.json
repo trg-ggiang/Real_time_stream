@@ -2,22 +2,63 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "Real-time Stream Docs",
   "theme": "mint",
-  "colors": { "primary": "#16A34A" },
+  "colors": {
+    "primary": "#16A34A"
+  },
   "navigation": {
     "tabs": [
       {
         "tab": "Overview",
-        "groups": [{ "group": "Start Here", "pages": ["index", "quickstart", "CHANGELOG"] }]
+        "groups": [
+          {
+            "group": "Start Here",
+            "pages": [
+              "index",
+              "quickstart",
+              "CHANGELOG",
+              "project-context",
+              "modules/module-01-media-poc"
+            ]
+          }
+        ]
       },
       {
         "tab": "Planning",
-        "groups": [{ "group": "Phases", "pages": ["plans/master-plan", "plans/phase-01-project-setup"] }]
+        "groups": [
+          {
+            "group": "Phases",
+            "pages": [
+              "plans/master-plan",
+              "plans/phase-01-project-setup",
+              "plans/phase-02-requirements-architecture",
+              "plans/phase-04-application-foundation",
+              "plans/phase-05-livekit-poc"
+            ]
+          }
+        ]
       },
       {
         "tab": "AI Workflow",
         "groups": [
-          { "group": "Workflow", "pages": ["ai-workflow", "dev/session-log", "templates/session-close"] },
-          { "group": "Work Logs", "pages": ["work-logs/2026-10-11-01-phase-01-agent-workflow"] }
+          {
+            "group": "Workflow",
+            "pages": [
+              "ai-workflow",
+              "dev/session-log",
+              "templates/session-close"
+            ]
+          },
+          {
+            "group": "Work Logs",
+            "pages": [
+              "work-logs/2026-10-11-01-phase-01-agent-workflow",
+              "work-logs/2026-10-19-01-phase-02-project-context",
+              "work-logs/2026-10-19-02-phase-05-media-poc",
+              "work-logs/2026-10-19-03-phase-05-local-api-proxy",
+              "work-logs/2026-10-19-04-phase-05-gitignore-secrets",
+              "work-logs/2026-10-19-05-phase-05-summary"
+            ]
+          }
         ]
       }
     ]

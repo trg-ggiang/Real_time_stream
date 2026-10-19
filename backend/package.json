@@ -4,11 +4,12 @@
   "private": true,
   "dependencies": {
     "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
-    "@nestjs/config": "^4.0.0",
-    "@nestjs/websockets": "^11.0.0",
     "@nestjs/platform-socket.io": "^11.0.0",
+    "@nestjs/throttler": "^6.7.1",
+    "@nestjs/websockets": "^11.0.0",
     "@supabase/supabase-js": "^2.0.0",
     "livekit-server-sdk": "^2.0.0",
     "reflect-metadata": "^0.2.0",
@@ -19,5 +20,12 @@
     "@nestjs/cli": "^11.0.0",
     "@types/node": "^22.0.0",
     "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.cjs"
   }
 }

@@ -1,20 +1,22 @@
 ---
 title: Cài đặt
-description: Cấu trúc và lệnh hiện có.
+description: Cài dependencies, cấu hình môi trường và chạy Module 1.
 ---
 
-Yêu cầu Node.js 22.12+ và npm 10+. Từ thư mục gốc chạy `npm install` để cài cả hai npm workspaces.
+Node.js 22.12+ và npm 10+. Chạy `npm install` tại root. Phiên triển khai đã kiểm tra Node 22.23.2 và npm 10.9.8.
 
-| Thư mục | Nội dung |
-| --- | --- |
-| backend | NestJS, LiveKit server SDK, Supabase, Socket.IO |
-| frontend | React/Vite, LiveKit components/client, Supabase, Socket.IO client |
-| supabase/migrations | Trống, dành cho migration khi được yêu cầu |
-| .codex | Cấu hình Codex và hướng dẫn |
-| .claude | Quyền Claude và skills từ dự án mẫu |
-| docs | Docs MDX, phase, session và work log |
+`backend/.env` và `frontend/.env` đã được tạo cục bộ, không được Git theo dõi. Trên máy mới, chỉ copy `.env.example` khi chưa có `.env`. Điền `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` ở backend. Supabase và Socket.IO chưa dùng trong Module 1.
 
-Khi cần cấu hình dịch vụ, copy `.env.example` thành `.env` ở từng workspace.
-Chỉ đặt secret ở backend. Hiện chưa có entry point hoặc lệnh dev/build/test.
+Chạy hai terminal từ root: `npm run dev:backend` và `npm run dev:frontend`. Mở `http://localhost:5173` hoặc `http://127.0.0.1:5173`. Để trống VITE_API_URL để dùng API proxy; API_PROXY_TARGET mặc định http://127.0.0.1:3000. API liveness: `http://localhost:3000/api/health`. Backend vẫn chạy khi thiếu credentials nhưng token endpoint trả 503.
 
-Docs dùng cấu trúc MDX/Mintlify giống dự án mẫu; chưa cài Mintlify CLI hoặc server docs.
+Kiểm tra: `npm run typecheck`, `npm test`, `npm run build`. Sau build: `npm --workspace backend start`. Preview frontend: `npm --workspace frontend run preview` (cổng 4173, hỗ trợ API proxy cùng origin).
+
+[Hướng dẫn Module 1](/modules/module-01-media-poc) có hợp đồng API, cấu hình HTTPS khi thử hai thiết bị và checklist nghiệm thu còn chờ.
+
+Docs dùng MDX/Mintlify, chưa cài/chạy CLI docs.
+
+## Chuẩn bị đưa lên Git
+
+Chỉ chia sẻ mẫu `.env.example` với key/secret trống; mỗi thành viên nhận credentials development riêng qua trình quản lý mật khẩu có chia sẻ hoặc kênh mã hóa riêng. Không commit `.env`, khóa riêng hoặc logs. `.gitignore` không tác động tới file đã tracked và không bảo vệ key hardcode trong source. Nếu key đã lộ, thu hồi/thay key.
+
+Phiên 2026-10-19-04 kiểm tra hai env không tracked, mẫu không chứa credentials và không thấy hai key LiveKit hiện tại trong candidate files, staging hoặc hai commit hiện có. Đây không phải kiểm toán toàn bộ secret hoặc key cũ.

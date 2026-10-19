@@ -1,0 +1,80 @@
+---
+title: Module 1 — Media Connection PoC
+description: Kiến trúc, token API, cấu hình và kiểm thử audio/video hai chiều.
+---
+
+## Trạng thái và phạm vi
+
+Đã triển khai mã nguồn; chưa nghiệm thu media thật. Phạm vi: một room cố định, Join/Leave, local/remote video, remote audio, camera/microphone, trạng thái kết nối và xử lý lỗi. Chưa thêm Supabase, auth, room động, chat, waiting room, screen sharing hoặc recording.
+
+## Kiến trúc và trách nhiệm
+
+Browser → token API NestJS → browser nhận token → LiveKit Cloud → publish/subscribe camera/microphone. NestJS không chuyển tiếp media.
+
+Backend là modular monolith: `config/environment.ts` kiểm tra cấu hình, `configure-app.ts` thiết lập HTTP, `livekit.controller.ts` xử lý endpoint và throttling, `livekit.service.ts` ký token. Đây là điểm bổ sung kiểm tra user/quyền vào room khi triển khai auth sau này.
+
+Frontend gom theo feature `meeting`: `services/token-api.ts` kiểm tra response HTTP, `hooks/use-meeting-session.ts` giữ token trong memory và chống Join trùng, `MeetingPage.tsx` hiển thị lobby, `components/MeetingRoom.tsx` dùng LiveKit room/hooks/controls. Room được lazy load sau khi cấp token; callback và options ổn định để tránh kết nối lại do rerender. SDK disconnect khi unmount và dọn media; session hook hủy token request khi Leave/unmount. Không lưu token vào localStorage.
+
+Dùng các component/SDK sẵn có để hạn chế tự xây lại track lifecycle. [LiveKitRoom](https://docs.livekit.io/reference/components/react/component/livekitroom/) cung cấp room context; [token grants](https://docs.livekit.io/frontends/reference/tokens-grants/) giới hạn quyền participant.
+
+## Hợp đồng HTTP
+
+`POST /api/livekit/token`, body không bắt buộc. Backend không dùng room, identity hoặc grant do client gửi.
+
+```json
+{
+  "serverUrl": "wss://your-project.livekit.cloud",
+  "roomName": "media-test-room",
+  "participantIdentity": "server-generated-uuid",
+  "token": "signed-livekit-jwt"
+}
+```
+
+200 kèm `Cache-Control: no-store`. Identity UUID mới mỗi lần Join; TTL mặc định 300 giây, cho phép cấu hình 60–600. Token chỉ cấp join room cố định, publish camera/microphone, subscribe; không cấp chat data, screen share hoặc admin. Hết hạn token giới hạn thời điểm kết nối ban đầu, không đồng nghĩa tự kết thúc cuộc gọi đang diễn ra.
+
+503 nếu thiếu URL/key/secret hoặc `POC_ENABLED` không bật. 429 nếu quá 10 request/phút/IP, có `Retry-After`. `GET /api/health` chỉ xác nhận tiến trình đang chạy, không kiểm chứng credentials/cloud.
+
+## Cấu hình
+
+`backend/.env`: `PORT=3000`, `HOST=127.0.0.1`, `FRONTEND_URL=http://localhost:5173`, `POC_ENABLED=true`, ba biến LiveKit, room name và TTL. URL LiveKit bắt buộc `wss://`; room name chỉ chữ, số, gạch nối/gạch dưới. Không log token hoặc credentials.
+
+`frontend/.env`: để trống `VITE_API_URL` và đặt `API_PROXY_TARGET=http://127.0.0.1:3000`. Vite dev/preview chuyển tiếp `/api` về backend; localhost và 127.0.0.1 đều gọi cùng origin frontend. Khi cần gọi backend khác origin, đặt VITE_API_URL tuyệt đối và FRONTEND_URL tương ứng. Các biến Supabase/Socket.IO/LiveKit URL frontend chưa được dùng trong Module 1. Không đưa API secret vào biến `VITE_*`.
+
+Endpoint chưa có authentication; CORS không thay thế authentication. Mặc định bind loopback, room cố định và rate limit trong memory chỉ phù hợp PoC một tiến trình. Khởi động với `NODE_ENV=production` và `POC_ENABLED=true` bị từ chối. Không dùng endpoint này làm cấp quyền phòng riêng tư.
+
+## Chạy và kiểm tra
+
+Từ root: `npm install`. Tạo `.env` từ mẫu nếu chưa có và điền credentials LiveKit ở backend. Chạy `npm run dev:backend` và `npm run dev:frontend` trong hai terminal. Mở `http://localhost:5173` hoặc `http://127.0.0.1:5173` với API proxy mặc định.
+
+`npm run typecheck`, `npm test`, `npm run build` chạy trên hai workspaces. Backend test dùng Node test runner, credentials giả và HTTP server cổng ngẫu nhiên, không gọi cloud. Frontend dùng Vitest/jsdom để kiểm tra session hook; chưa phải kiểm thử browser/media thật.
+
+Build backend xong chạy `npm --workspace backend start`. Frontend preview: `npm --workspace frontend run preview`, không cần đổi CORS origin khi dùng API proxy; nếu gọi API khác origin thì đặt FRONTEND_URL tương ứng. Luôn restart khi đổi backend env; restart Vite khi đổi frontend env.
+
+## Hai thiết bị và hai mạng
+
+Hai tab localhost chỉ kiểm tra ban đầu. Muốn dùng điện thoại hoặc mạng khác, cần URL HTTPS hợp lệ cho frontend và API, cấu hình `VITE_API_URL` thành HTTPS API và `FRONTEND_URL` đúng origin HTTPS frontend. Reverse proxy/tunnel do người vận hành cấu hình có thể chuyển tiếp về loopback; không tự mở port public trong phiên này. Không giả định IP LAN qua HTTP dùng được camera/microphone; trình duyệt yêu cầu secure context. Dùng môi trường thử nghiệm giới hạn truy cập, không phát hành public PoC không kiểm soát.
+
+## Checklist nghiệm thu thủ công còn chờ
+
+- [ ] Hai thiết bị nhận identity khác nhau, cùng room và kết nối Cloud thành công.
+- [ ] A thấy video B và B thấy video A; không chỉ local preview.
+- [ ] Audio nghe được hai chiều; thử nút bật âm thanh khi autoplay bị chặn.
+- [ ] Tắt camera ở A làm B thấy camera tắt; bật lại truyền hình tiếp.
+- [ ] Tắt microphone ở A làm B không nghe A; bật lại truyền âm tiếp.
+- [ ] Participant Join/Leave cập nhật tile và số người.
+- [ ] Leave/unmount ngắt room và giải phóng camera/microphone; Join lại được.
+- [ ] Từ chối quyền hoặc thiếu thiết bị hiển thị lỗi và không crash; thử bật lại sau khi sửa quyền.
+- [ ] Mất mạng/reconnect có trạng thái phù hợp; lỗi cuối cùng cho phép rời và Join mới.
+- [ ] Kiểm tra cùng Wi-Fi và hai mạng khác nhau, dùng tai nghe tránh vọng.
+
+## Giới hạn và mở rộng
+
+Chưa có credentials thật, test hai thiết bị, kiểm tra UI browser hoặc benchmark nhiều phòng. Build cảnh báo chunk SDK meeting lớn hơn 500 kB; đã lazy load để trang lobby không tải toàn bộ SDK ngay. Chưa tối ưu sâu trước khi có đo lường.
+
+Room policy/token service có thể bổ sung authorization; session API có thể chuyển sang meeting ID ở module phòng động. Không ràng buộc Meeting với Club/Interview; không thêm abstractions database hoặc distributed infrastructure khi PoC chưa cần.
+
+## Khắc phục lỗi không kết nối được backend
+
+Nếu token API trả 200 khi gọi trực tiếp nhưng frontend báo lỗi mạng, kiểm tra VITE_API_URL và origin. Cấu hình cũ gọi localhost:3000 từ trang 127.0.0.1:5173 bị CORS vì backend chỉ cho localhost:5173. Đã đổi mặc định sang `/api` qua Vite proxy; không mở rộng CORS wildcard. Nếu đổi env mà Vite chưa cập nhật, restart frontend và tải lại trang. Backend cần restart sau khi đổi .env.
+
+Phiên 2026-10-19-03 đã xác nhận token 200 qua cả hai địa chỉ frontend với env được người dùng điền. Việc ký token thành công chưa xác minh credentials được Cloud chấp nhận hoặc media hai chiều.

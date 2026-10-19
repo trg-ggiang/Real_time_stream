@@ -1,0 +1,48 @@
+---
+title: Phase 05 — Tích hợp LiveKit Cloud
+description: Theo dõi Module 1 trong phạm vi đã được giao.
+---
+
+Trạng thái: In Progress. Bắt đầu: 2026-10-19 (Asia/Saigon).
+
+## Mục tiêu và phạm vi
+
+Token giới hạn room/quyền/TTL, grid camera, audio renderer, controls và lifecycle. Chỉ triển khai Media Connection PoC; chưa thêm database, auth hoặc chat. Phase 03 được để sau PoC; không ánh xạ số phase với số module sản phẩm.
+
+## Tiêu chí nghiệm thu
+
+- [x] Có mã nguồn tách module/feature và cấu hình môi trường không commit secrets.
+- [x] TypeScript, build và kiểm thử tự động trong phạm vi PoC.
+- [x] Có hướng dẫn chạy, API contract và checklist hai thiết bị.
+- [ ] Xác minh giao diện trên browser thật, kiểm tra permission, Join/Leave và lifecycle.
+- [ ] Kết nối Cloud bằng credentials thật và media hai chiều trên hai thiết bị.
+
+## Kết quả và giới hạn
+
+Người dùng đã điền env LiveKit; token API trả 200 trực tiếp và qua proxy. Chưa xác minh credentials với Cloud, browser UI hoặc media thật; không đánh dấu Done. Hướng dẫn và quyết định tại [Module 1](/modules/module-01-media-poc).
+
+## Work log
+
+- [2026-10-19 — Media PoC](/work-logs/2026-10-19-02-phase-05-media-poc)
+
+## Bước tiếp theo
+
+Tải lại frontend, thử Join và thực hiện checklist nghiệm thu hai thiết bị trong tài liệu Module 1. Ghi bằng chứng trước khi đóng phase.
+
+## Cập nhật kết nối cục bộ
+
+Đã sửa API proxy tránh khác origin localhost/127.0.0.1; HTTP smoke hai địa chỉ thành công. Trạng thái vẫn In Progress.
+
+- [Work log sửa kết nối](/work-logs/2026-10-19-03-phase-05-local-api-proxy)
+
+## Chuẩn bị chia sẻ repository
+
+Đã mở rộng gitignore và kiểm tra key hiện tại không xuất hiện trong candidate files, staging hoặc hai commit được kiểm tra. Hai env không tracked; template giữ key/secret trống. Người dùng báo đã xử lý lỗi kết nối; chưa có bằng chứng đủ checklist media hai thiết bị nên phase vẫn In Progress.
+
+- [Gitignore và secrets](/work-logs/2026-10-19-04-phase-05-gitignore-secrets)
+
+## Tổng kết triển khai
+
+Bản tổng kết Markdown để review trên Git nằm tại `PHASE_05_SUMMARY.md` ở root. Tổng hợp công việc, xử lý lỗi, kiểm tra, bảo vệ credentials và việc còn lại. Agent instructions Markdown vẫn được phép Git theo dõi. Phase giữ In Progress.
+
+- [Phiên viết tổng kết](/work-logs/2026-10-19-05-phase-05-summary)

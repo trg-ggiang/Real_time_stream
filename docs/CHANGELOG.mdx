@@ -3,6 +3,45 @@ title: Changelog
 description: Lịch sử thay đổi dự án.
 ---
 
+## 2026-10-19 — Tổng kết phase
+
+- Thêm PHASE_05_SUMMARY.md: phạm vi, mã nguồn đã triển khai, lỗi đã xử lý, kiểm tra và phần chờ nghiệm thu.
+- Xác nhận hướng dẫn agent Markdown vẫn được phép commit; ghi chú trong gitignore, giữ nguyên bảo vệ env/secrets.
+
+## 2026-10-19 — Bảo vệ credentials trước push
+
+- Viết lại .gitignore theo nhóm: env/backup, secrets và private keys, logs, build/test output và agent local state.
+- Giữ .env.example được commit; xác nhận trường key/secret mẫu trống và .env không tracked.
+- Bổ sung hướng dẫn chia sẻ credentials trong nhóm; không commit hoặc push trong phiên.
+
+## 2026-10-19 — Sửa kết nối frontend/backend
+
+- Đổi mặc định frontend sang API cùng origin qua Vite dev/preview proxy; giữ tùy chọn API URL tuyệt đối.
+- Cập nhật frontend env cục bộ và mẫu, không sửa credentials backend hoặc mở CORS wildcard.
+- Xác nhận token API qua cả localhost và 127.0.0.1 trả 200; frontend tests và build đạt.
+
+## 2026-10-19 — Module 1
+
+- Tạo .env cục bộ cho BE/FE từ mẫu, bỏ qua Git và để trống service credentials.
+- Triển khai NestJS token API, kiểm tra env, health, CORS, shutdown và throttling.
+- Triển khai React/Vite meeting feature với Join/Leave, controls, video/audio, error handling và hủy request.
+- Thêm scripts typecheck/build/test, backend HTTP/JWT tests và frontend session tests.
+- Thêm @nestjs/throttler cho rate limiting; Vitest, jsdom và Testing Library cho frontend test.
+- Cập nhật docs vận hành, API contract, checklist nghiệm thu và thứ tự phase PoC trước database/auth.
+- Chưa nghiệm thu LiveKit/media hai thiết bị; Phase 04/05 In Progress.
+
+## 2026-10-19 — Project context
+
+- L?u context ??y ?? v?o `project_context.md`, b? sung ghi ch? hi?n tr?ng scaffold v? ph?m vi phi?n.
+- Th?m trang t?ng quan context, m? Phase 02 ? tr?ng th?i In Progress v? ghi nh?t k? phi?n.
+- Ch?a th?m code, schema, dependency ho?c k?t n?i d?ch v?.
+
+## 2026-10-19
+
+- Lưu context đầy đủ vào `project_context.md`, bổ sung ghi chú hiện trạng.
+- Thêm trang context, mở Phase 02 In Progress và cập nhật nhật ký phiên.
+- Chưa thêm code, schema, dependency hoặc tích hợp dịch vụ.
+
 ## 2026-10-11
 
 - Tạo npm workspaces với NestJS, React/Vite, LiveKit, Supabase và Socket.IO; cài dependencies.

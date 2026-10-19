@@ -1,25 +1,41 @@
 ---
 title: Master Plan
-description: Theo dõi dự án theo phase.
+description: Tiến trình phase và thứ tự triển khai theo context.
 ---
 
 ## Trạng thái hiện tại
 
-Phase 01 đã Done trong phạm vi chỉ setup khung. Chưa bắt đầu code ứng dụng.
-Các phase sau là đề xuất để theo dõi, cần yêu cầu của người dùng trước khi triển khai.
+Đã triển khai mã nguồn Module 1 — Media Connection PoC, chưa nghiệm thu kết nối LiveKit thật và hai thiết bị. Phase 02 đã hoàn thành phân tích trong phạm vi PoC; Phase 04/05 In Progress.
 
 | Phase | Nội dung | Trạng thái |
 | --- | --- | --- |
 | 01 | Khung công nghệ, agent config và docs | Done |
-| 02 | Chốt yêu cầu và kiến trúc | Todo |
+| 02 | Chốt yêu cầu và kiến trúc PoC | Done |
 | 03 | Supabase schema, auth và phân quyền | Todo |
-| 04 | NestJS API và React nền tảng | Todo |
-| 05 | Tích hợp LiveKit Cloud | Todo |
+| 04 | NestJS API và React nền tảng cho PoC | In Progress |
+| 05 | Tích hợp LiveKit Cloud | In Progress |
 | 06 | Chat WebSocket và lưu lịch sử | Todo |
 | 07 | Kiểm thử và chuẩn bị deployment | Todo |
 
-Chi tiết: [Phase 01](/plans/phase-01-project-setup).
-Phiên gần nhất: [Setup agent workflow](/work-logs/2026-10-11-01-phase-01-agent-workflow).
+## Thứ tự và phạm vi
 
-Mỗi phase khi bắt đầu phải có trang riêng: mục tiêu, phạm vi, tiêu chí nghiệm thu, trạng thái, work log và việc còn lại.
-Không đánh dấu Done dựa vào việc phiên đã kết thúc.
+Giữ nguyên số phase để bảo toàn lịch sử. Theo yêu cầu triển khai Module 1 ngày 2026-10-19 và context, thực hiện nền tảng API/React + LiveKit (04/05) trước database/auth (03). Phase 07 vẫn là kiểm thử/deployment toàn hệ thống, không ngăn kiểm thử từng module ngay trong phiên triển khai.
+
+Sau khi nghiệm thu PoC, module phòng động sẽ cần kế hoạch phase riêng; chưa triển khai vì chưa được giao. Các mục auth, chat, interview và club management tiếp tục là định hướng; không tự mở rộng scope.
+
+## Chi tiết và bằng chứng
+
+- [Phase 01](/plans/phase-01-project-setup)
+- [Phase 02](/plans/phase-02-requirements-architecture)
+- [Phase 04](/plans/phase-04-application-foundation)
+- [Phase 05](/plans/phase-05-livekit-poc)
+- [Thiết kế và nghiệm thu Module 1](/modules/module-01-media-poc)
+- Phiên gần nhất: [Tổng kết Phase 05](/work-logs/2026-10-19-05-phase-05-summary)
+
+## Bước tiếp theo
+
+Env đã được điền; token API qua Vite proxy trả 200 ở localhost và 127.0.0.1. Tải lại frontend và kiểm thử UI/media trên hai thiết bị theo checklist. Không đánh dấu Module 1 hoặc Phase 04/05 Done chỉ vì build/test cục bộ thành công.
+
+Đã chuẩn bị ignore và hướng dẫn chia sẻ credentials trước push; không tự commit/push. Phase 04/05 vẫn In Progress, chờ đủ nghiệm thu.
+
+Tổng kết đọc trên Git: `PHASE_05_SUMMARY.md` ở root. Phase 04/05 vẫn In Progress, chờ checklist nghiệm thu hai thiết bị.

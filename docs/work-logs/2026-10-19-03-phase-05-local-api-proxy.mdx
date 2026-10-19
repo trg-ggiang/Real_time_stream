@@ -1,0 +1,56 @@
+---
+title: 2026-10-19-03 — Local API Proxy
+description: Chẩn đoán và sửa đường kết nối frontend tới backend.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-10-19-03
+- Mốc đóng: 2026-10-19T10:10:53+07:00, Asia/Saigon. Không ghi nhận chính xác bắt đầu.
+- Agent: Codex
+- Phase: 04, 05
+- Kết quả phiên: Completed trong phạm vi sửa kết nối cục bộ
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng đã điền backend env nhưng frontend báo không kết nối được backend. Kiểm tra và sửa đường FE/BE, không in key/secret/token.
+
+## Công việc hoàn thành
+
+Kiểm tra listeners 3000/5173, chỉ báo presence của credentials. API trực tiếp trả 200; backend CORS chỉ cho localhost:5173 trong khi Vite dùng 127.0.0.1. Không có browser để xác nhận URL người dùng mở, nhưng cấu hình này tạo lỗi CORS khi dùng 127.0.0.1.
+
+Sửa frontend/vite.config.ts, frontend/src/features/meeting/services/token-api.ts, thêm token-api.test.ts, cập nhật frontend/.env.example và frontend/.env cục bộ sang API proxy. Giữ nguyên credentials backend. Cập nhật README, docs module guide/quickstart/index, phase 04/05, master plan, session log, changelog và docs.json.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| git status, rg, listeners, env metadata | Passed | Bảo toàn thay đổi cũ, không log secrets |
+| Token API trực tiếp | Passed | HTTP 200, presence token; không in token |
+| Token qua localhost:5173 và 127.0.0.1:5173 | Passed | Cả hai HTTP 200 với token qua proxy |
+| npm --workspace frontend test | Passed | 10 tests gồm relative API và URL tuyệt đối |
+| npm --workspace frontend run build | Passed | TypeScript + Vite; cảnh báo chunk SDK lớn vẫn còn |
+| Python dotenv import | Failed | Không có module; chuyển sang dotenv Node đã cài, không thêm dependency |
+| JSON/navigation/links/diff | Passed | Parse JSON, targets và links docs tồn tại; git diff --check đạt |
+| Backend tests | Skipped | Không sửa backend |
+| UI/Cloud/media hai thiết bị | Skipped | Không có browser session; ký token không xác minh Cloud/media |
+
+## Quyết định và lý do
+
+Same-origin API proxy cho dev/preview giải quyết khác origin cục bộ; không nới CORS wildcard. VITE_API_URL tuyệt đối vẫn hỗ trợ backend riêng. Proxy target cấu hình bằng API_PROXY_TARGET, không chứa secret. Backend/frontend của người dùng tiếp tục chạy, không dừng tiến trình có sẵn.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác nhận user Join thành công trên browser hoặc media Cloud. Phase 04/05 vẫn In Progress.
+
+## Bước tiếp theo
+
+Tải lại frontend, thử Join. Nếu Vite chưa nhận env/config mới, restart npm run dev:frontend. Nghiệm thu media hai thiết bị theo guide.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh
