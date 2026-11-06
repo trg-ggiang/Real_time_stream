@@ -1,0 +1,58 @@
+---
+title: 2026-11-06-05 — Kiểm tra và bàn giao Git
+description: Checkpoint trước commit và push nhánh feature theo yêu cầu người dùng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-06-05
+- Ngày: 2026-11-06, Asia/Saigon (+07:00); không ghi nhận chính xác bắt đầu.
+- Agent: Codex
+- Phase: 04, 05
+- Kết quả: Completed trong phạm vi kiểm tra/chuẩn bị tại checkpoint này; commit/push được thực hiện sau khi ghi log, kết quả được hậu kiểm bằng Git và báo trong phản hồi cuối.
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng yêu cầu kiểm tra status và thực hiện tạo nhánh, commit, push theo hướng dẫn đã thống nhất. Tên hợp lệ: feature/livekit-mockdata-cloudflare-tunnel. Commit message chính xác: update code cloudfare tunnel. Không merge main hoặc force push.
+
+## Công việc hoàn thành trước checkpoint
+
+Xác nhận ban đầu ở main, commit nền e2de0ad, remote origin là repository GitHub của dự án. Branch đích chưa có local/remote tại thời điểm kiểm tra. Tạo branch mới và giữ toàn bộ thay đổi hiện tại: npm tunnel scripts, PowerShell runner, hướng dẫn HTTPS và các tài liệu review/giải thích code. Không thay đổi business logic trong phiên Git này.
+
+Hai env thật không tracked. Quét giá trị credentials hiện tại trong tracked/unignored candidate files: không thấy trùng; không in giá trị ra output. Đây không phải kiểm toán toàn bộ lịch sử Git hoặc bằng chứng mọi loại secret đều không tồn tại.
+
+Changed files của phiên này: work log này, docs/docs.json, docs/dev/session-log.mdx, docs/plans/master-plan.mdx, docs/plans/phase-04-application-foundation.mdx, docs/plans/phase-05-livekit-poc.mdx, docs/CHANGELOG.mdx. Các thay đổi từ phiên trước được đưa vào cùng commit theo yêu cầu bàn giao hiện trạng workspace.
+
+## Kiểm tra
+
+| Lệnh/kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| git status/branch/remote/log, ls-remote branch đích | Passed | Ban đầu main; branch đích chưa tồn tại |
+| git ls-files hai env và quét candidate files | Passed | Env không tracked, không in credentials |
+| npm run typecheck | Passed | Backend và frontend |
+| npm test | Passed | Backend 2 tests, frontend 10 tests |
+| npm run build | Passed | Cả hai workspaces; meeting chunk trên 500 kB vẫn cảnh báo |
+| JSON/navigation/internal docs links, diff whitespace, PowerShell parser | Passed | Kiểm tra sau khi ghi checkpoint |
+| Stage review | Thực hiện sau checkpoint | Kiểm tra tên file và credentials trong staged content trước commit |
+| git commit và git push -u origin branch | Thực hiện sau checkpoint | Không ghi thành công trước khi chạy; hậu kiểm HEAD/remote/upstream/status ở phản hồi cuối |
+| Mintlify/browser/media/tunnel runtime | Skipped | Phiên bàn giao Git, không nghiệm thu mới hoặc thay runtime |
+
+## Quyết định và lý do
+
+Giữ message người dùng yêu cầu dù từ cloudfare khác cách viết Cloudflare. Tên nhánh dùng dạng hợp lệ không có dấu hai chấm/khoảng trắng. Tạo nhánh từ main hiện có để bao gồm code LiveKit nền và thay đổi tunnel/docs. Không sửa code ngoài scope hoặc tự tạo PR/merge.
+
+## Blocker và việc chưa hoàn thành ở checkpoint
+
+Không có blocker cho các kiểm tra local. Commit/push và xác minh remote là các bước kế tiếp sau khi checkpoint được stage; kết quả thực tế phải báo từ Git. Acceptance hai thiết bị/hai mạng vẫn còn chờ; Phase 04/05 không Done.
+
+## Bước tiếp theo
+
+Stage nội dung đã review, xác minh không có env/log/build output, commit với message đã chọn, push -u lên origin, so HEAD với remote ref và kiểm tra working tree sạch. Báo branch/commit/checks cho người dùng, không tự merge.
+
+## Checklist đóng phiên
+
+- [x] Ghi checkpoint trung thực trước hành động Git
+- [x] Cập nhật phase và master plan, session log, changelog
+- [x] Đăng ký navigation và ghi giới hạn kiểm tra
+- [x] Ghi bước hậu kiểm commit/push cần báo trong phản hồi cuối

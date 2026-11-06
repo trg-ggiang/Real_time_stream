@@ -1,0 +1,109 @@
+---
+title: Đọc code Module 1 theo luồng
+description: Bản đồ file, hàm và trạng thái từ khởi động tới Join/Leave.
+---
+
+## Thứ tự đọc
+
+Bản giải thích đầy đủ từng biến, trường cấu hình, props và từng hàm để trình bày cho cả nhóm nằm tại [Module 1 — Tài liệu giải thích code cho nhóm](/modules/module-01-team-guide). Trang hiện tại là bản đồ đọc ngắn hơn.
+
+1. Backend: main.ts → app.module.ts → config/environment.ts → configure-app.ts.
+2. Frontend: index.html → src/main.tsx → MeetingPage.tsx.
+3. Join: use-meeting-session.ts → token-api.ts → LivekitController → LivekitService.
+4. Media: MeetingRoom.tsx → LiveKitRoom → RoomContent.
+5. Leave: session.leave/endSession → unmount MeetingRoom → SDK disconnect.
+6. Vận hành: vite.config.ts, package.json và scripts/https-tunnel.ps1.
+
+Các đường dẫn frontend feature ở `frontend/src/features/meeting/`; backend module ở `backend/src/livekit/`. Chỉnh source trong src, không chỉnh dist hoặc source map sinh tự động.
+
+## Backend khởi động
+
+`backend/src/main.ts` là entry point. `bootstrap()` await NestFactory.create(AppModule), lấy ConfigService từ container, gọi configureApp rồi listen HOST/PORT. Catch ngoài cùng ghi lỗi chung và exitCode=1, tránh in env/secrets. `void` thể hiện không dùng giá trị Promise trả về; catch vẫn xử lý lỗi.
+
+`app.module.ts` khai báo module gốc, không tự xử lý HTTP. ConfigModule.forRoot nạp env, gọi validateEnvironment và cung cấp ConfigService toàn ứng dụng. ThrottlerModule đặt cửa sổ 60.000 ms/10 requests; guard ở controller mới áp dụng vào endpoint đó. LivekitModule đăng ký tính năng token, HealthController đăng ký health.
+
+`config/environment.ts`: validateEnvironment(env) nhận raw config, chuyển PORT/TTL sang number và POC_ENABLED thành boolean. Kiểm tra port 1–65535, frontend origin HTTP(S) không có path/trailing slash, LiveKit URL wss nếu được điền, TTL 60–600, room name 1–64 ký tự cho phép. Production + POC_ENABLED=true bị từ chối. Trả object mới giữ các env còn lại qua spread. Thiếu LiveKit credentials không ngăn API start; service trả 503 khi xin token. Type generic của ConfigService không tự chuyển string thành boolean; chuyển đổi xảy ra ở validation.
+
+`configure-app.ts`: configureApp(app) thêm prefix /api, cấu hình CORS một origin với GET/POST và bật shutdown hooks. Đây là cấu hình ứng dụng dùng chung cho entry point và backend tests.
+
+`health.controller.ts`: check() trả {status:'ok'} tại GET /api/health. Không gọi Cloud hoặc kiểm chứng API key.
+
+## Frontend khởi động
+
+`frontend/index.html` chứa root DOM và script main.tsx. Vite thay entry bằng bundle khi build.
+
+`frontend/src/main.tsx` import styles LiveKit và styles.css, tạo React root và render MeetingPage trong StrictMode. StrictMode có kiểm tra lifecycle thêm trong development, không phải cơ chế tạo participant.
+
+`MeetingPage.tsx`: useMeetingSession() cung cấp state và actions. credentials null hiển thị lobby; có credentials render MeetingRoom. Có credentials nghĩa là đã xin token, chưa khẳng định Cloud connected. lazy import trì hoãn tải code phòng; Suspense hiển thị trạng thái tải bundle, không phải trạng thái kết nối Cloud. Nút Join gọi session.join, Hủy/Rời dùng session.leave, kết thúc kết nối dùng session.endSession.
+
+`types.ts` định nghĩa JoinCredentials gồm token, serverUrl, roomName, participantIdentity. Interface là hợp đồng TypeScript, bị loại khi build và không xác thực JSON runtime.
+
+## Hook quản lý phiên
+
+`hooks/use-meeting-session.ts` tách logic khỏi giao diện. credentials/isJoining/error là state làm React rerender. pending và joined là refs thay đổi ngay mà không rerender.
+
+`join()` theo thứ tự:
+
+1. Nếu pending hoặc joined, không phát request trùng.
+2. Xóa lỗi cũ; kiểm tra secure context và mediaDevices. Bước này chưa xin quyền camera/mic.
+3. Tạo AbortController, lưu pending và bật isJoining; hẹn abort sau 15 giây.
+4. Await requestJoinCredentials(controller.signal).
+5. Nếu chưa abort, set joined=true và lưu credentials; MeetingPage chuyển sang MeetingRoom. joined ở đây là chốt chống Join lặp, không phải trạng thái LiveKit Connected.
+6. Catch chỉ cập nhật khi pending vẫn là controller của request này. Abort timeout, network TypeError và lỗi API có thông báo tương ứng.
+7. Finally luôn xóa timer; chỉ reset pending/isJoining nếu request vẫn là request hiện hành.
+
+Các phép so sánh controller tránh request cũ ghi đè request mới. Ví dụ Join A → Hủy → Join B: response/catch/finally của A không được làm thay đổi phiên B.
+
+`leave()` abort request nếu còn pending, xóa refs, credentials, loading và error. Hook không giữ Room instance, nên không tự gọi room.disconnect; React unmount component LiveKit khi credentials bị xóa.
+
+`endSession(message?)` gọi leave rồi set thông báo kết thúc. `useEffect` chỉ đăng ký cleanup abort request khi hook unmount. Cú pháp () => () => ... là effect trả về hàm cleanup, không abort ngay lúc mount.
+
+`useCallback` giữ tham chiếu các hàm ổn định theo dependencies. Ref đảm bảo callback đọc pending/joined hiện tại mà không cần đưa state đó vào dependencies.
+
+## Gọi API và ký token
+
+`services/token-api.ts`: requestJoinCredentials(signal) chuẩn hóa VITE_API_URL, bỏ dấu / cuối, POST /api/livekit/token với no-store và AbortSignal. HTTP 429/503 được đổi thành Error thân thiện; lỗi HTTP khác dùng thông báo chung. JSON được nhận là unknown, kiểm tra cấu trúc và kiểu cơ bản trước khi cast JoinCredentials. Cast không tự kiểm tra dữ liệu; validation nằm ở các if trước đó. File này không verify JWT hoặc quyết định quyền room.
+
+`livekit.module.ts` đăng ký controller và provider để Nest giải quyết dependency injection. Không chứa hàm nghiệp vụ.
+
+`livekit.controller.ts`: constructor nhận service từ Nest; @Controller('livekit') cùng prefix /api và @Post('token') tạo endpoint đầy đủ. @HttpCode(200), @Header no-store, @UseGuards(ThrottlerGuard) kiểm soát HTTP. createToken() chuyển việc cho service; không đọc body để tránh nhận quyền/room/identity do client đề xuất.
+
+`livekit.service.ts`: constructor nhận ConfigService. createJoinCredentials() kiểm tra bật PoC và đủ URL/key/secret; thiếu thì throw ServiceUnavailableException (503). Tạo UUID mới và đọc room cố định. AccessToken nhận API key/secret, identity và TTL; addGrant cấp roomJoin, publish camera/mic, subscribe, không publish data. toJwt() ký JWT bất đồng bộ. Trả token và thông tin kết nối, không trả secret. Hàm không gọi API Cloud để kiểm chứng credentials hoặc tạo bản ghi phòng trong database.
+
+TTL giới hạn thời gian token được dùng để bắt đầu kết nối; không phải timer đếm ngược tự kết thúc cuộc gọi trong UI. Backend và frontend đều khai báo JoinCredentials riêng, chưa dùng shared package.
+
+## MeetingRoom và SDK
+
+`components/MeetingRoom.tsx` có hai component cùng file: MeetingRoom thiết lập kết nối/callback, RoomContent đọc room context và render trạng thái/media/controls.
+
+`connectionLabels` ánh xạ enum ConnectionState sang nhãn. `roomOptions` nằm ngoài component để giữ object ổn định: adaptiveStream điều chỉnh nhận video theo vùng hiển thị, dynacast tạm dừng layer gửi không có subscriber sử dụng, capture mặc định h360/15fps. Đây là cấu hình mặc định, không bảo đảm độ phân giải thực tế cho mọi thiết bị.
+
+`MeetingRoom({credentials,onLeave,onEnded})` giữ error riêng cho thiết bị/kết nối. handleConnectionError và handleDeviceError đặt thông báo; handleDisconnected chuyển reason CLIENT_INITIATED thành kết thúc bình thường, các reason khác thành thông báo về lobby. Đây là xử lý khi đã disconnect, khác trạng thái SDK đang reconnect.
+
+`LiveKitRoom` nhận token/serverUrl, connect=true và audio/video=true. SDK khởi tạo room, kết nối, yêu cầu/bật thiết bị theo cấu hình và publish; quyền có thể bị người dùng từ chối. Component cung cấp Room context cho con. onError/onMediaDeviceFailure/onDisconnected nối SDK events về callbacks ứng dụng. roomName hiển thị là metadata từ response; quyền vào room thực sự nằm trong JWT.
+
+`RoomContent` phải nằm dưới LiveKitRoom để các hooks đọc context. useConnectionState cập nhật nhãn; useParticipants cập nhật danh sách/số người; useTracks lấy camera tracks với placeholder cho camera chưa bật. GridLayout bố trí track, ParticipantTile là mẫu tile được layout áp dụng. RoomAudioRenderer phát audio remote. StartAudio hỗ trợ người dùng kích hoạt audio nếu autoplay bị chặn. ControlBar điều khiển mic/cam/leave; screenShare/chat bị ẩn và grants cũng không cho screen share. saveUserChoices=false không lưu các lựa chọn thiết bị của thanh điều khiển theo cơ chế đó.
+
+## Kết thúc và lỗi
+
+Nút Rời phòng của ứng dụng gọi leave → credentials=null → React bỏ MeetingRoom → SDK disconnect/dọn media. Nút Leave trong ControlBar ngắt room qua SDK → onDisconnected → endSession → lobby. Mất kết nối cuối cùng cũng đi qua endSession với thông báo; trong lúc SDK còn reconnect, hooks chỉ cập nhật nhãn.
+
+Có hai vùng error: error của session hiện ở lobby, error của MeetingRoom hiện trong phòng. Token API timeout 15 giây chỉ áp dụng xin token, không phải timeout toàn bộ quá trình gọi LiveKit.
+
+## Vận hành và kiểm thử
+
+`vite.config.ts`: callback config đọc API_PROXY_ theo mode, tạo proxy /api dùng cho dev 5173 và preview 4173. Host loopback, strictPort ngăn tự đổi cổng. changeOrigin thay Host request tới backend, không thay LiveKit URL và không đưa proxy target vào browser như VITE_ variables.
+
+`styles.css` bố trí lobby, thông báo lỗi, phòng/video grid và responsive. Không quản lý media lifecycle.
+
+`package.json` root điều phối workspace scripts; backend package dùng Nest watch/tsc/Node test runner, frontend dùng Vite/TypeScript/Vitest. tsconfig quyết định compile/typecheck; dist là output, .js.map ánh xạ mã build về source để debug. Không chỉnh trực tiếp output.
+
+`scripts/https-tunnel.ps1`: Stop-OwnedProcess kiểm tra PID + thời điểm start trước khi dừng. Nhánh -Stop đọc state rồi dừng process đã ghi. Nhánh start chặn chạy trùng, build, tải/verify binary, dùng Wait-Http chờ dịch vụ HTTP 200. Start-Owned tạo process ẩn, log stdout/stderr và lưu ownership. Script dùng backend đang có hoặc start backend, start preview, start cloudflared với Host localhost:4173, đọc URL trong log và ghi session.json. Vòng lặp theo dõi tiến trình; finally phục hồi API_PROXY_TARGET và dọn process đã tạo. URL được in chưa phải phép kiểm chứng truy cập từ Internet; HTTP smoke là bước riêng.
+
+Tests: backend/test/livekit.test.cjs kiểm tra env, HTTP, JWT grants/identity/expiry, CORS và rate limit bằng credentials giả. token-api.test.ts mock fetch để kiểm tra URL API. use-meeting-session.test.tsx kiểm tra state, Join trùng, cancel/unmount, dữ liệu sai và secure context. Không có cuộc gọi media thật trong các tests này.
+
+## Nguồn SDK
+
+- [LiveKitRoom](https://docs.livekit.io/reference/components/react/component/livekitroom/)
+- [LiveKit React best practices](https://docs.livekit.io/reference/components/react/guide/)
+- [Audio rendering](https://docs.livekit.io/reference/components/react/concepts/rendering-audio/)

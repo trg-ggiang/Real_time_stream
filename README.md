@@ -46,14 +46,20 @@ npm --workspace frontend run preview
 
 Preview chạy cổng 4173 và dùng cùng API proxy khi `VITE_API_URL` để trống. Khi gọi API khác origin bằng URL tuyệt đối, đặt `FRONTEND_URL` đúng origin frontend. Preview chỉ phục vụ kiểm tra bản build. PoC token endpoint bị vô hiệu khi `POC_ENABLED` không bật và không cho bật trong `NODE_ENV=production`.
 
+## Thử nhiều thiết bị qua HTTPS
+
+Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel tới frontend preview; script khởi động backend nếu chưa chạy. Gửi URL HTTPS được in cho nhóm thử nghiệm. Dừng bằng Ctrl+C hoặc `npm run tunnel:stop`. Giữ `VITE_API_URL=` trống. Link chưa có đăng nhập; chỉ dùng cho PoC. Xem [hướng dẫn tunnel](docs/modules/https-tunnel.mdx) về luồng, log và giới hạn.
+
 ## Tổ chức source
+
+- [Tài liệu giải thích code cho nhóm](docs/modules/module-01-team-guide.mdx): từng file, hàm, biến, tham số, cấu hình và các luồng Join/Leave/lỗi.
 
 - `backend/src/config/`: kiểm tra môi trường; `configure-app.ts`: prefix/CORS/shutdown.
 - `backend/src/livekit/`: controller HTTP, service ký token và module độc lập.
 - `frontend/src/features/meeting/`: API service, session hook, UI và room components.
 - Media state/track lifecycle do LiveKit SDK quản lý; token chỉ giữ trong memory.
 
-Xem [hướng dẫn Module 1](docs/modules/module-01-media-poc.mdx) để biết hợp đồng API, vận hành và checklist kiểm thử hai thiết bị. Chưa xác minh audio/video với LiveKit Cloud thật hoặc nghiệm thu Module 1.
+Xem [hướng dẫn Module 1](docs/modules/module-01-media-poc.mdx) để biết hợp đồng API, vận hành và checklist kiểm thử hai thiết bị. Người dùng đã xác nhận audio/video giữa nhiều tab cùng máy; chưa nghiệm thu hai thiết bị và toàn bộ Module 1.
 
 ## Tài liệu và workflow
 

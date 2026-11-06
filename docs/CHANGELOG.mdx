@@ -3,6 +3,29 @@ title: Changelog
 description: Lịch sử thay đổi dự án.
 ---
 
+## 2026-11-06 — Kiểm tra và bàn giao Git
+
+- Tạo nhánh `feature/livekit-mockdata-cloudflare-tunnel` từ main để bàn giao tunnel và tài liệu, theo yêu cầu người dùng; message được chọn: `update code cloudfare tunnel`.
+- Chạy lại typecheck, backend 2 tests, frontend 10 tests và build: đạt; kiểm tra env không tracked và credentials hiện tại không có trong candidate files.
+- [Checkpoint trước commit/push](/work-logs/2026-11-06-05-phase-05-git-handoff). Phase 04/05 vẫn In Progress, chưa có nghiệm thu media mới.
+
+## 2026-11-06 — Giải thích implementation cho nhóm
+
+- Thêm tài liệu giải thích toàn bộ source Module 1 theo file/hàm, dictionary biến/props/config, units/defaults, flow và giới hạn; cuối mỗi hàm chốt trách nhiệm.
+- Đối chiếu source dependencies đã cài về config scope, throttler, token TTL và SDK cleanup. Không sửa application code, env hoặc runtime.
+- Thêm navigation/liên kết từ README và các trang overview. Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-06-04-phase-05-team-code-guide).
+
+## 2026-11-06 — Hướng dẫn đọc code
+
+- Thêm bản giải thích file/hàm theo luồng bootstrap, Join/token, media, Leave và HTTPS tunnel.
+- Không thay đổi source/runtime; Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-06-03-phase-05-code-walkthrough).
+
+## 2026-11-06 — HTTPS tunnel
+
+- Thêm `npm run tunnel` và `npm run tunnel:stop`: build, kiểm tra cloudflared SHA256, khởi động local services và Quick Tunnel, dừng theo PID/start time.
+- Dùng preview loopback và origin Host cố định; không mở wildcard Vite/CORS, không sửa env/secrets. Tài liệu hóa luồng và giới hạn public PoC/rate limit.
+- Build và HTTP smoke qua HTTPS đạt; start/stop được thử. Người dùng xác nhận media nhiều tab cùng máy; hai thiết bị còn chờ. [Work log](/work-logs/2026-11-06-02-phase-05-https-tunnel).
+
 ## 2026-10-19 — Tổng kết phase
 
 - Thêm PHASE_05_SUMMARY.md: phạm vi, mã nguồn đã triển khai, lỗi đã xử lý, kiểm tra và phần chờ nghiệm thu.
@@ -48,3 +71,8 @@ description: Lịch sử thay đổi dự án.
 - Thêm cấu hình Codex/Claude dựa trên Pet_Sevice, điều chỉnh đúng stack.
 - Thêm docs MDX, roadmap phase và quy tắc đóng từng phiên bằng work log.
 - Giữ source folders trống; chưa triển khai sản phẩm hoặc dịch vụ cloud.
+
+## 2026-11-06 - Module 1 review
+
+- Reviewed join/media support and loopback limitations; typecheck and 12 tests passed.
+- No application/env changes. Phase 04/05 remain In Progress. [Work log](/work-logs/2026-11-06-01-phase-05-readiness-review).

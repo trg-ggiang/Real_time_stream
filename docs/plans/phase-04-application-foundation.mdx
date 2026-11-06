@@ -19,7 +19,7 @@ NestJS bootstrap/config/health, module token và React/Vite meeting feature. Ch�
 
 ## Kết quả và giới hạn
 
-Người dùng đã điền env LiveKit; token API trả 200 trực tiếp và qua proxy. Chưa xác minh credentials với Cloud, browser UI hoặc media thật; không đánh dấu Done. Hướng dẫn và quyết định tại [Module 1](/modules/module-01-media-poc).
+Người dùng đã điền env LiveKit và xác nhận nghe/thấy giữa nhiều tab trên cùng máy. Token API trả 200 trực tiếp và qua proxy; HTTPS tunnel đã được kiểm tra HTTP. Chưa nghiệm thu media hai thiết bị và đầy đủ browser lifecycle; không đánh dấu Done. Hướng dẫn và quyết định tại [Module 1](/modules/module-01-media-poc).
 
 ## Work log
 
@@ -34,3 +34,23 @@ Tải lại frontend, thử Join và thực hiện checklist nghiệm thu hai th
 Đã sửa API proxy tránh khác origin localhost/127.0.0.1; HTTP smoke hai địa chỉ thành công. Trạng thái vẫn In Progress.
 
 - [Work log sửa kết nối](/work-logs/2026-10-19-03-phase-05-local-api-proxy)
+
+## Review 2026-11-06
+
+Typecheck and 12 tests passed. Source supports join and media; two-device acceptance remains pending. Phase 04/05 remain In Progress. [Review log](/work-logs/2026-11-06-01-phase-05-readiness-review).
+
+## HTTPS tunnel 2026-11-06
+
+Thêm lệnh build/start/stop và [hướng dẫn HTTPS](/modules/https-tunnel). Frontend preview và API proxy hoạt động qua tunnel; giữ loopback và Vite host protections. Người dùng đã xác nhận media nhiều tab cùng máy. Chưa nghiệm thu hai thiết bị, giữ In Progress. [Work log](/work-logs/2026-11-06-02-phase-05-https-tunnel).
+
+## Hướng dẫn đọc code
+
+Thêm [giải thích file/hàm theo luồng](/modules/code-walkthrough), từ bootstrap/config tới hook/API và cleanup. Không đổi code, không có nghiệm thu mới; In Progress. [Work log](/work-logs/2026-11-06-03-phase-05-code-walkthrough).
+
+## Bản chi tiết để trình bày cho nhóm
+
+Giải thích từng biến/tham số/cấu hình, units và từng hàm tại [team guide](/modules/module-01-team-guide). Không thay code hoặc trạng thái nghiệm thu; In Progress. [Work log](/work-logs/2026-11-06-04-phase-05-team-code-guide).
+
+## Kiểm tra trước bàn giao Git
+
+Typecheck, tests và build đạt trước commit nhánh feature; không có acceptance media mới. Phase vẫn In Progress. [Checkpoint](/work-logs/2026-11-06-05-phase-05-git-handoff).

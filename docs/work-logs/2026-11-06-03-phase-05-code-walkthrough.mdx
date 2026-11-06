@@ -1,0 +1,54 @@
+---
+title: 2026-11-06-03 — Hướng dẫn đọc code
+description: Giải thích file và hàm Module 1 theo thứ tự hoạt động.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-06-03
+- Ngày: 2026-11-06, Asia/Saigon (+07:00); không ghi nhận chính xác bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04, 05
+- Kết quả phiên: Completed trong phạm vi giải thích code
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Giải thích code theo từng cụm/file, vai trò hàm và trình tự thực thi để người dùng hiểu cách vận hành. Không sửa application source, env hoặc tunnel runtime.
+
+## Công việc hoàn thành
+
+Đọc backend bootstrap/config/controller/service, frontend entry/page/hook/API/room, CSS, tests, scripts và tunnel. Đối chiếu LiveKitRoom, audio renderer, callbacks và tối ưu media với tài liệu chính thức. Viết docs/modules/code-walkthrough.mdx và giải thích trong chat. Làm rõ credentials/joined không phải Cloud Connected, refs chống request race, interface không xác thực JSON và hook leave không trực tiếp giữ/disconnect Room.
+
+File thay đổi: docs/modules/code-walkthrough.mdx, docs/modules/module-01-media-poc.mdx, docs/plans/phase-04-application-foundation.mdx, docs/plans/phase-05-livekit-poc.mdx, docs/plans/master-plan.mdx, docs/dev/session-log.mdx, docs/CHANGELOG.mdx, docs/docs.json, work log này. Bảo toàn thay đổi phiên trước.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| git status, rg và đọc source | Passed | Không đọc/in credentials |
+| Đối chiếu docs SDK chính thức | Passed | LiveKitRoom/context, audio và callbacks |
+| Docs JSON/navigation/internal links | Passed | Kiểm tra sau khi ghi |
+| git diff --check | Passed | Kiểm tra whitespace |
+| Build/typecheck/tests | Skipped | Chỉ thêm tài liệu, không đổi application source |
+| Browser/media/tunnel start/stop | Skipped | Không thay đổi runtime, không có nghiệm thu mới |
+| Mintlify render | Skipped | Không chạy docs CLI |
+
+## Quyết định và lý do
+
+Giải thích theo runtime thay vì thứ tự thư mục; gom cụm backend startup, frontend Join, token API, media, cleanup và vận hành. Giữ Phase 04/05 In Progress do chưa có bằng chứng nghiệm thu mới.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho tài liệu. Media hai thiết bị/hai mạng và checklist acceptance vẫn chưa được xác nhận trong phiên này.
+
+## Bước tiếp theo
+
+Người dùng mở hướng dẫn cạnh source và theo một lượt Join/Leave; kiểm thử hai thiết bị theo Module 1. Giải thích sâu thêm các đoạn khó theo nhu cầu, không tự mở scope auth/database/chat.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh
