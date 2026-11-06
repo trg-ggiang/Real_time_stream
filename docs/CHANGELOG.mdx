@@ -3,28 +3,40 @@ title: Changelog
 description: Lịch sử thay đổi dự án.
 ---
 
+## 2026-11-07 - Full-height auth photo
+
+Changed the desktop form:image ratio to 1:1.5. The existing photo now covers the full right-hand panel with no inset border or supporting copy. Build and 15 frontend tests passed.
+
+## 2026-11-07 - Desktop login/register design
+
+Added desktop-first auth layout, light/dark/system themes, self-hosted Vietnamese typography, generated supporting image, inline validation and password visibility. API contract and in-memory session remain unchanged. Frontend typecheck, 15 tests and build passed; local Lighthouse desktop scored 99 performance and 100 accessibility. [Work log](/work-logs/2026-11-07-02-phase-04-desktop-auth-ui).
+
+## 2026-11-07 - Auth integration
+
+Merged Hai auth/users/Supabase into the main NestJS workspace; added React login/register/logout, application JWT protection for LiveKit tokens, validation and auth tests. Legacy standalone app removed from tracked source. Real Supabase credentials/schema and two-device acceptance remain pending. [Guide](/modules/auth-integration).
+
 ## 2026-11-06 — Kiểm tra và bàn giao Git
 
 - Tạo nhánh `feature/livekit-mockdata-cloudflare-tunnel` từ main để bàn giao tunnel và tài liệu, theo yêu cầu người dùng; message được chọn: `update code cloudfare tunnel`.
 - Chạy lại typecheck, backend 2 tests, frontend 10 tests và build: đạt; kiểm tra env không tracked và credentials hiện tại không có trong candidate files.
-- [Checkpoint trước commit/push](/work-logs/2026-11-06-05-phase-05-git-handoff). Phase 04/05 vẫn In Progress, chưa có nghiệm thu media mới.
+- . Phase 04/05 vẫn In Progress, chưa có nghiệm thu media mới.
 
 ## 2026-11-06 — Giải thích implementation cho nhóm
 
 - Thêm tài liệu giải thích toàn bộ source Module 1 theo file/hàm, dictionary biến/props/config, units/defaults, flow và giới hạn; cuối mỗi hàm chốt trách nhiệm.
 - Đối chiếu source dependencies đã cài về config scope, throttler, token TTL và SDK cleanup. Không sửa application code, env hoặc runtime.
-- Thêm navigation/liên kết từ README và các trang overview. Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-06-04-phase-05-team-code-guide).
+- Thêm navigation/liên kết từ README và các trang overview. Phase 04/05 vẫn In Progress.
 
 ## 2026-11-06 — Hướng dẫn đọc code
 
 - Thêm bản giải thích file/hàm theo luồng bootstrap, Join/token, media, Leave và HTTPS tunnel.
-- Không thay đổi source/runtime; Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-06-03-phase-05-code-walkthrough).
+- Không thay đổi source/runtime; Phase 04/05 vẫn In Progress.
 
 ## 2026-11-06 — HTTPS tunnel
 
 - Thêm `npm run tunnel` và `npm run tunnel:stop`: build, kiểm tra cloudflared SHA256, khởi động local services và Quick Tunnel, dừng theo PID/start time.
 - Dùng preview loopback và origin Host cố định; không mở wildcard Vite/CORS, không sửa env/secrets. Tài liệu hóa luồng và giới hạn public PoC/rate limit.
-- Build và HTTP smoke qua HTTPS đạt; start/stop được thử. Người dùng xác nhận media nhiều tab cùng máy; hai thiết bị còn chờ. [Work log](/work-logs/2026-11-06-02-phase-05-https-tunnel).
+- Build và HTTP smoke qua HTTPS đạt; start/stop được thử. Người dùng xác nhận media nhiều tab cùng máy; hai thiết bị còn chờ.
 
 ## 2026-10-19 — Tổng kết phase
 
@@ -75,4 +87,4 @@ description: Lịch sử thay đổi dự án.
 ## 2026-11-06 - Module 1 review
 
 - Reviewed join/media support and loopback limitations; typecheck and 12 tests passed.
-- No application/env changes. Phase 04/05 remain In Progress. [Work log](/work-logs/2026-11-06-01-phase-05-readiness-review).
+- No application/env changes. Phase 04/05 remain In Progress.

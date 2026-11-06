@@ -3,6 +3,8 @@ title: Module 1 — Media Connection PoC
 description: Kiến trúc, token API, cấu hình và kiểm thử audio/video hai chiều.
 ---
 
+> Auth update: the current implementation requires login and a Bearer application JWT before issuing LiveKit tokens. Older PoC descriptions below are historical; see [current setup and API contract](/modules/auth-integration).
+
 ## Trạng thái và phạm vi
 
 Đã triển khai mã nguồn; chưa nghiệm thu media thật. Phạm vi: một room cố định, Join/Leave, local/remote video, remote audio, camera/microphone, trạng thái kết nối và xử lý lỗi. Chưa thêm Supabase, auth, room động, chat, waiting room, screen sharing hoặc recording.
@@ -87,4 +89,4 @@ Phiên 2026-10-19-03 đã xác nhận token 200 qua cả hai địa chỉ fronte
 
 ## Review 2026-11-06
 
-Typecheck and tests passed (backend 2, frontend 10). Credentials were previously configured and token HTTP 200 recorded; Cloud/media acceptance is still pending. Vite dev/preview bind 127.0.0.1, so other devices cannot directly open the page through the host LAN IP. Separate localhost setups must use the same LiveKit project and room to meet. Concurrent capacity has not been benchmarked. [Review log](/work-logs/2026-11-06-01-phase-05-readiness-review).
+Typecheck and tests passed (backend 2, frontend 10). Credentials were previously configured and token HTTP 200 recorded; Cloud/media acceptance is still pending. Vite dev/preview bind 127.0.0.1, so other devices cannot directly open the page through the host LAN IP. Separate localhost setups must use the same LiveKit project and room to meet. Concurrent capacity has not been benchmarked.

@@ -11,7 +11,7 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 | --- | --- | --- |
 | 01 | Khung công nghệ, agent config và docs | Done |
 | 02 | Chốt yêu cầu và kiến trúc PoC | Done |
-| 03 | Supabase schema, auth và phân quyền | Todo |
+| 03 | Supabase schema, auth và phân quyền | In Progress |
 | 04 | NestJS API và React nền tảng cho PoC | In Progress |
 | 05 | Tích hợp LiveKit Cloud | In Progress |
 | 06 | Chat WebSocket và lưu lịch sử | Todo |
@@ -30,7 +30,6 @@ Sau khi nghiệm thu PoC, module phòng động sẽ cần kế hoạch phase ri
 - [Phase 04](/plans/phase-04-application-foundation)
 - [Phase 05](/plans/phase-05-livekit-poc)
 - [Thiết kế và nghiệm thu Module 1](/modules/module-01-media-poc)
-- Phiên gần nhất: [Kiểm tra và bàn giao Git](/work-logs/2026-11-06-05-phase-05-git-handoff)
 
 ## Bước tiếp theo
 
@@ -42,20 +41,32 @@ Tổng kết đọc trên Git: `PHASE_05_SUMMARY.md` ở root. Phase 04/05 vẫn
 
 ## Review 2026-11-06
 
-Typecheck and 12 tests passed. Source supports join and media; two-device acceptance remains pending. Phase 04/05 remain In Progress. [Review log](/work-logs/2026-11-06-01-phase-05-readiness-review).
+Typecheck and 12 tests passed. Source supports join and media; two-device acceptance remains pending. Phase 04/05 remain In Progress.
 
 ## HTTPS tunnel 2026-11-06
 
-Đã có lệnh build/start/stop Quick Tunnel, kiểm tra HTTP qua HTTPS và hướng dẫn vận hành. Người dùng xác nhận media giữa các tab cùng máy. Phase 04/05 giữ In Progress, chờ checklist hai thiết bị/hai mạng và browser lifecycle. [Work log](/work-logs/2026-11-06-02-phase-05-https-tunnel).
+Đã có lệnh build/start/stop Quick Tunnel, kiểm tra HTTP qua HTTPS và hướng dẫn vận hành. Người dùng xác nhận media giữa các tab cùng máy. Phase 04/05 giữ In Progress, chờ checklist hai thiết bị/hai mạng và browser lifecycle.
 
 ## Hướng dẫn code 2026-11-06
 
-Thêm [luồng đọc từng file](/modules/code-walkthrough), không thay đổi code/runtime. Phase 04/05 vẫn In Progress; chưa có nghiệm thu media mới. [Work log](/work-logs/2026-11-06-03-phase-05-code-walkthrough).
+Thêm [luồng đọc từng file](/modules/code-walkthrough), không thay đổi code/runtime. Phase 04/05 vẫn In Progress; chưa có nghiệm thu media mới.
 
 ## Tài liệu code cho nhóm 2026-11-06
 
-Thêm [bản giải thích chi tiết từng biến và cấu hình](/modules/module-01-team-guide), gồm ý nghĩa isGlobal/ttl/limit, props SDK, state/ref, test và tunnel. Không thay source/runtime hoặc acceptance; Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-06-04-phase-05-team-code-guide).
+Thêm [bản giải thích chi tiết từng biến và cấu hình](/modules/module-01-team-guide), gồm ý nghĩa isGlobal/ttl/limit, props SDK, state/ref, test và tunnel. Không thay source/runtime hoặc acceptance; Phase 04/05 vẫn In Progress.
 
 ## Bàn giao Git 2026-11-06
 
-Theo yêu cầu người dùng, tạo nhánh `feature/livekit-mockdata-cloudflare-tunnel` từ main để commit/push các thay đổi tunnel và tài liệu. Typecheck, 12 tests và build đạt; giữ Phase 04/05 In Progress do chưa có media acceptance mới. [Checkpoint trước commit/push](/work-logs/2026-11-06-05-phase-05-git-handoff); kết quả remote được xác minh sau khi tạo commit.
+Theo yêu cầu người dùng, tạo nhánh `feature/livekit-mockdata-cloudflare-tunnel` từ main để commit/push các thay đổi tunnel và tài liệu. Typecheck, 12 tests và build đạt; giữ Phase 04/05 In Progress do chưa có media acceptance mới. kết quả remote được xác minh sau khi tạo commit.
+
+## Auth integration 2026-11-07
+
+Auth and Supabase modules from Hai are now integrated into the main backend and React login. LiveKit token issuance requires an application JWT. Phase 03/04/05 remain In Progress: real Supabase configuration/schema and two-device media acceptance are pending. See [integration guide](/modules/auth-integration) and [completed code work log](/work-logs/2026-11-07-01-phase-03-auth-integration).
+
+## Desktop auth UI 2026-11-07
+
+Completed the approved desktop-first login/register redesign: 480px form, secondary image, light/dark/system themes, inline validation and password visibility. Frontend typecheck, 15 tests and build passed; browser layout and Lighthouse checks completed. Phase 03/04/05 remain In Progress pending real DB/media acceptance. [Work log](/work-logs/2026-11-07-02-phase-04-desktop-auth-ui).
+
+## Auth image ratio 2026-11-07
+
+Updated the desktop form:image split to 1:1.5 as requested. The photo fills the entire right panel. Build and 15 frontend tests passed; browser measured 576px:864px at 1440px viewport. Phase remains In Progress. [Work log](/work-logs/2026-11-07-03-phase-04-auth-image-ratio).

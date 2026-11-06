@@ -1,7 +1,10 @@
 import type { JoinCredentials } from '../types';
 
+export class UnauthorizedError extends Error {}
+
 export async function requestJoinCredentials(
   signal: AbortSignal,
+  accessToken: string,
 ): Promise<JoinCredentials> {
   const baseUrl = (
     import.meta.env.VITE_API_URL?.trim() || ''
@@ -9,9 +12,11 @@ export async function requestJoinCredentials(
   const response = await fetch(`${baseUrl}/api/livekit/token`, {
     method: 'POST',
     cache: 'no-store',
+    headers: { Authorization: `Bearer ${accessToken}` },
     signal,
   });
   if (!response.ok) {
+    if (response.status === 401) throw new UnauthorizedError('Phiên đăng nhập hết hạn. Hãy đăng nhập lại.');
     if (response.status === 429)
       throw new Error(
         'Bạn tham gia quá nhiều lần. Vui lòng thử lại sau một phút.',

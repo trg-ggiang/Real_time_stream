@@ -30,7 +30,7 @@ export class UsersService {
       .select(COLS)
       .eq('email', email.toLowerCase())
       .maybeSingle();
-    if (error) throw new InternalServerErrorException(error.message);
+    if (error) throw new InternalServerErrorException('User data is temporarily unavailable.');
     return data ? this.toUser(data) : null;
   }
 
@@ -41,7 +41,7 @@ export class UsersService {
       .select(`${COLS},password_hash`)
       .eq('email', email.toLowerCase())
       .maybeSingle();
-    if (error) throw new InternalServerErrorException(error.message);
+    if (error) throw new InternalServerErrorException('User data is temporarily unavailable.');
     return data ? this.toUser(data) : null;
   }
 
@@ -51,7 +51,7 @@ export class UsersService {
       .select(COLS)
       .eq('user_id', userId)
       .maybeSingle();
-    if (error) throw new InternalServerErrorException(error.message);
+    if (error) throw new InternalServerErrorException('User data is temporarily unavailable.');
     return data ? this.toUser(data) : null;
   }
 
@@ -68,7 +68,7 @@ export class UsersService {
 
     if (error) {
       if (error.code === '23505') throw new ConflictException('Email đã được sử dụng');
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException('User data is temporarily unavailable.');
     }
     return this.toUser(data);
   }

@@ -9,16 +9,16 @@ export class RegisterDto {
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(8)
   @MaxLength(72) // bcrypt chỉ xử lý tối đa 72 byte
-  password: string;
+  password!: string;
 
   @Transform(trim)
   @IsString()
   @MinLength(2)
   @MaxLength(50)
-  displayName: string;
+  displayName!: string;
 }
