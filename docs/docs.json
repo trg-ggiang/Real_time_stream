@@ -17,7 +17,10 @@
               "quickstart",
               "CHANGELOG",
               "project-context",
-              "modules/module-01-media-poc"
+              "modules/module-01-media-poc",
+              "modules/https-tunnel",
+              "modules/code-walkthrough",
+              "modules/module-01-team-guide"
             ]
           }
         ]
@@ -56,7 +59,12 @@
               "work-logs/2026-10-19-02-phase-05-media-poc",
               "work-logs/2026-10-19-03-phase-05-local-api-proxy",
               "work-logs/2026-10-19-04-phase-05-gitignore-secrets",
-              "work-logs/2026-10-19-05-phase-05-summary"
+              "work-logs/2026-10-19-05-phase-05-summary",
+              "work-logs/2026-11-06-01-phase-05-readiness-review",
+              "work-logs/2026-11-06-02-phase-05-https-tunnel",
+              "work-logs/2026-11-06-03-phase-05-code-walkthrough",
+              "work-logs/2026-11-06-04-phase-05-team-code-guide",
+              "work-logs/2026-11-06-05-phase-05-git-handoff"
             ]
           }
         ]

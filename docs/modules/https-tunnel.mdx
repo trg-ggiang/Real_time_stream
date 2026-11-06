@@ -1,0 +1,56 @@
+---
+title: HTTPS tunnel cho Module 1
+description: Chạy thử React, NestJS và LiveKit Cloud từ nhiều thiết bị qua Cloudflare Quick Tunnel.
+---
+
+## Chạy và dừng
+
+Từ thư mục gốc, sau khi đã cài dependencies và điền LiveKit credentials ở backend:
+
+```powershell
+npm run tunnel
+```
+
+Lệnh build hai workspace, tải cloudflared bản Windows x64 2026.10.7 chính thức nếu chưa có và kiểm tra SHA256, khởi động backend trên loopback nếu cổng 3000 chưa có tiến trình, chạy frontend preview trên 127.0.0.1:4173 rồi tạo URL HTTPS ngẫu nhiên. Không cần tài khoản Cloudflare, domain hoặc mở port router. Giữ terminal và máy chủ hoạt động; gửi URL được in cho nhóm thử nghiệm. Không dùng URL localhost trên thiết bị thứ hai.
+
+```powershell
+npm run tunnel:stop
+```
+
+Hoặc Ctrl+C trong terminal chạy tunnel. Chỉ các tiến trình do script tạo được dừng; backend đã chạy sẵn được giữ nguyên. Trạng thái và log nằm trong `logs/tunnel/` (Git ignore). Script kiểm tra PID cùng thời điểm khởi động trước khi dừng tiến trình. URL đổi khi tạo tunnel mới. Bản build không tự cập nhật khi sửa source; dừng và chạy lại lệnh tunnel để build lại.
+
+Giữ `VITE_API_URL=` trống trong frontend env. Script đặt `API_PROXY_TARGET=http://127.0.0.1:3000` cho preview. Các biến Supabase, WS và LiveKit frontend chưa dùng. Backend cần `POC_ENABLED=true`, HOST/PORT mặc định và LiveKit credentials hợp lệ; không bật NODE_ENV=production cho endpoint PoC. Build frontend production và NODE_ENV của tiến trình backend là hai khái niệm khác nhau.
+
+## Luồng kết nối
+
+```text
+Browser -> HTTPS trycloudflare.com -> cloudflared -> preview 127.0.0.1:4173
+                                                     |
+                                                     +-- /api -> NestJS 127.0.0.1:3000
+Browser <-------------------- audio/video --------------------> LiveKit Cloud
+```
+
+TLS phía browser do Cloudflare phục vụ. cloudflared tạo kết nối ra ngoài tới Cloudflare; chặng HTTP cuối chỉ chạy trên loopback của cùng máy. Backend cấp token và serverUrl; browser kết nối trực tiếp LiveKit Cloud. Camera/mic không đi qua Vite, NestJS hoặc tunnel.
+
+cloudflared đặt origin Host thành `localhost:4173`, vì vậy không cần tắt Vite allowedHosts hoặc cho phép toàn bộ trycloudflare.com. Backend CORS giữ nguyên vì browser gọi API cùng origin HTTPS, request được Vite proxy chuyển tiếp. Không sửa backend/frontend env hoặc đưa API secret ra frontend.
+
+## Giới hạn
+
+- Link hiện không có đăng nhập hoặc Cloudflare Access. Người có link có thể xin token vào cùng phòng PoC. Chỉ chia sẻ trong nhóm thử nghiệm và dừng tunnel sau khi dùng; HTTPS không thay thế authorization.
+- Preview là công cụ thử bản build, không phải máy chủ production. Quick Tunnel không bảo đảm uptime, URL không cố định, giới hạn 200 request đang xử lý và không hỗ trợ SSE; đây không phải giới hạn 200 người họp.
+- Backend rate limit trong memory vẫn 10 token request/phút/IP. Qua proxy loopback, nhiều người có thể bị tính chung một IP. Không bật trust proxy vô điều kiện hoặc bỏ giới hạn; nếu cần mở rộng phải thiết kế trusted proxy/rate limit riêng.
+- Máy chạy phải bật, có Internet và chạy đủ các tiến trình. Firewall/VPN có thể chặn kết nối tunnel hoặc LiveKit. Không cần cùng Wi-Fi.
+- Script dành cho Windows x64, cổng 3000/4173 mặc định. Backend đang chạy sẵn phải là API của dự án này. Cổng 4173 có tiến trình khác thì script dừng và báo lỗi.
+- Người dùng đã xác nhận nghe/thấy giữa nhiều tab trên cùng máy. Chưa nghiệm thu hai thiết bị/hai mạng, permission, reconnect và capacity; Phase 04/05 vẫn In Progress.
+
+## Kiểm tra hai thiết bị
+
+Mở link HTTPS trên laptop và điện thoại (thử cả Wi-Fi và 4G/5G). Cho phép camera/mic, dùng tai nghe, kiểm tra thấy/nghe nhau hai chiều, mute/unmute, Leave/Join lại và mất mạng/reconnect theo [checklist Module 1](/modules/module-01-media-poc).
+
+Trang `/api/health` chỉ là liveness; token 200 chưa chứng minh media hai chiều. Không chia sẻ nội dung token response hoặc log chứa token.
+
+## Nguồn
+
+- [Cloudflare Quick Tunnels](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/)
+- [Vite preview](https://vite.dev/config/preview-options)
+- [cloudflared 2026.10.7](https://github.com/cloudflare/cloudflared/releases/tag/2026.10.7)

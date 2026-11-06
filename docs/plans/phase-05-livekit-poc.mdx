@@ -19,7 +19,7 @@ Token giới hạn room/quyền/TTL, grid camera, audio renderer, controls và l
 
 ## Kết quả và giới hạn
 
-Người dùng đã điền env LiveKit; token API trả 200 trực tiếp và qua proxy. Chưa xác minh credentials với Cloud, browser UI hoặc media thật; không đánh dấu Done. Hướng dẫn và quyết định tại [Module 1](/modules/module-01-media-poc).
+Người dùng đã điền env LiveKit và xác nhận nghe/thấy giữa nhiều tab trên cùng máy. Token API trả 200 trực tiếp và qua proxy; HTTPS tunnel đã được kiểm tra HTTP. Chưa nghiệm thu media hai thiết bị và đầy đủ browser lifecycle; không đánh dấu Done. Hướng dẫn và quyết định tại [Module 1](/modules/module-01-media-poc).
 
 ## Work log
 
@@ -46,3 +46,23 @@ Tải lại frontend, thử Join và thực hiện checklist nghiệm thu hai th
 Bản tổng kết Markdown để review trên Git nằm tại `PHASE_05_SUMMARY.md` ở root. Tổng hợp công việc, xử lý lỗi, kiểm tra, bảo vệ credentials và việc còn lại. Agent instructions Markdown vẫn được phép Git theo dõi. Phase giữ In Progress.
 
 - [Phiên viết tổng kết](/work-logs/2026-10-19-05-phase-05-summary)
+
+## Review 2026-11-06
+
+Typecheck and 12 tests passed. Source supports join and media; two-device acceptance remains pending. Phase 04/05 remain In Progress. [Review log](/work-logs/2026-11-06-01-phase-05-readiness-review).
+
+## HTTPS tunnel 2026-11-06
+
+Người dùng xác nhận nghe/thấy giữa nhiều tab cùng máy. Đã triển khai Quick Tunnel HTTPS tới frontend preview và API proxy để thử thiết bị khác; media tiếp tục đi qua LiveKit Cloud. HTTP smoke thành công, chưa trực tiếp nghiệm thu media hai thiết bị/hai mạng. Giữ In Progress. [Work log](/work-logs/2026-11-06-02-phase-05-https-tunnel).
+
+## Hướng dẫn đọc code
+
+Thêm [giải thích file/hàm theo luồng](/modules/code-walkthrough), đặc biệt token, trạng thái phiên, room context và Join/Leave. Không đổi SDK integration hoặc kiểm thử media mới; In Progress. [Work log](/work-logs/2026-11-06-03-phase-05-code-walkthrough).
+
+## Bản chi tiết để trình bày cho nhóm
+
+Thêm [team guide](/modules/module-01-team-guide): từng grant/token option, SDK prop, state/callback, tunnel và giới hạn. Giữ Phase 05 In Progress; không có media acceptance mới. [Work log](/work-logs/2026-11-06-04-phase-05-team-code-guide).
+
+## Kiểm tra trước bàn giao Git
+
+Chuẩn bị commit/push nhánh `feature/livekit-mockdata-cloudflare-tunnel` theo ủy quyền người dùng. Typecheck, 12 tests và build đạt; cảnh báo meeting chunk lớn vẫn còn. Giữ In Progress. [Checkpoint](/work-logs/2026-11-06-05-phase-05-git-handoff).

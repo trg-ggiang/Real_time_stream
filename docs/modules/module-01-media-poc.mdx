@@ -9,6 +9,10 @@ description: Kiến trúc, token API, cấu hình và kiểm thử audio/video h
 
 ## Kiến trúc và trách nhiệm
 
+Để đọc source theo thứ tự chạy, xem [hướng dẫn từng file và hàm](/modules/code-walkthrough).
+
+Để giải thích implementation cho thành viên trong nhóm, xem [bản chi tiết từng biến, tham số và cấu hình](/modules/module-01-team-guide).
+
 Browser → token API NestJS → browser nhận token → LiveKit Cloud → publish/subscribe camera/microphone. NestJS không chuyển tiếp media.
 
 Backend là modular monolith: `config/environment.ts` kiểm tra cấu hình, `configure-app.ts` thiết lập HTTP, `livekit.controller.ts` xử lý endpoint và throttling, `livekit.service.ts` ký token. Đây là điểm bổ sung kiểm tra user/quyền vào room khi triển khai auth sau này.
@@ -52,6 +56,8 @@ Build backend xong chạy `npm --workspace backend start`. Frontend preview: `np
 
 ## Hai thiết bị và hai mạng
 
+Đã có lệnh `npm run tunnel` để build và mở HTTPS Quick Tunnel; xem [hướng dẫn HTTPS tunnel](/modules/https-tunnel). Không cần đổi VITE_API_URL khi dùng proxy cùng origin này. Người dùng xác nhận audio/video giữa nhiều tab trên một máy; checklist hai thiết bị vẫn còn chờ.
+
 Hai tab localhost chỉ kiểm tra ban đầu. Muốn dùng điện thoại hoặc mạng khác, cần URL HTTPS hợp lệ cho frontend và API, cấu hình `VITE_API_URL` thành HTTPS API và `FRONTEND_URL` đúng origin HTTPS frontend. Reverse proxy/tunnel do người vận hành cấu hình có thể chuyển tiếp về loopback; không tự mở port public trong phiên này. Không giả định IP LAN qua HTTP dùng được camera/microphone; trình duyệt yêu cầu secure context. Dùng môi trường thử nghiệm giới hạn truy cập, không phát hành public PoC không kiểm soát.
 
 ## Checklist nghiệm thu thủ công còn chờ
@@ -78,3 +84,7 @@ Room policy/token service có thể bổ sung authorization; session API có th�
 Nếu token API trả 200 khi gọi trực tiếp nhưng frontend báo lỗi mạng, kiểm tra VITE_API_URL và origin. Cấu hình cũ gọi localhost:3000 từ trang 127.0.0.1:5173 bị CORS vì backend chỉ cho localhost:5173. Đã đổi mặc định sang `/api` qua Vite proxy; không mở rộng CORS wildcard. Nếu đổi env mà Vite chưa cập nhật, restart frontend và tải lại trang. Backend cần restart sau khi đổi .env.
 
 Phiên 2026-10-19-03 đã xác nhận token 200 qua cả hai địa chỉ frontend với env được người dùng điền. Việc ký token thành công chưa xác minh credentials được Cloud chấp nhận hoặc media hai chiều.
+
+## Review 2026-11-06
+
+Typecheck and tests passed (backend 2, frontend 10). Credentials were previously configured and token HTTP 200 recorded; Cloud/media acceptance is still pending. Vite dev/preview bind 127.0.0.1, so other devices cannot directly open the page through the host LAN IP. Separate localhost setups must use the same LiveKit project and room to meet. Concurrent capacity has not been benchmarked. [Review log](/work-logs/2026-11-06-01-phase-05-readiness-review).
