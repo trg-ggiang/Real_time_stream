@@ -1,6 +1,6 @@
 # Real-time Stream — Meeting Module
 
-Ứng dụng thử nghiệm audio/video: React/Vite gọi NestJS để nhận token rồi kết nối trực tiếp LiveKit Cloud. Module 1 dùng một room cố định, chưa có đăng nhập, database hoặc chat.
+Ứng dụng thử nghiệm audio/video: React/Vite đăng nhập qua NestJS/Supabase, dùng JWT ứng dụng xin token rồi kết nối trực tiếp LiveKit Cloud. Hiện dùng một room cố định, chưa có phân quyền phòng hoặc chat. Code Hải đã gộp vào `backend/src`; không chạy app `backend/my-api` riêng. Xem [hướng dẫn auth và DB](docs/modules/auth-integration.mdx).
 
 ## Cài đặt và cấu hình
 
@@ -12,15 +12,18 @@ npm install
 
 `backend/.env` và `frontend/.env` đã được tạo cục bộ từ mẫu và bị Git ignore. Nếu checkout trên máy mới, copy từng `.env.example` sang `.env` khi file chưa tồn tại; không ghi đè cấu hình đang dùng.
 
-Điền ba giá trị trong `backend/.env` từ project LiveKit Cloud:
+Điền các giá trị trong `backend/.env` từ project development của nhóm:
 
 ```dotenv
 LIVEKIT_URL=wss://your-project.livekit.cloud
 LIVEKIT_API_KEY=
 LIVEKIT_API_SECRET=
+SUPABASE_URL=
+SUPABASE_SECRET_KEY=
+JWT_SECRET=
 ```
 
-Giữ `POC_ENABLED=true`, `LIVEKIT_ROOM_NAME=media-test-room`. Secret chỉ ở backend. Các biến Supabase, Socket.IO và `VITE_LIVEKIT_URL` trong mẫu dành cho các module sau; Module 1 lấy LiveKit URL từ token endpoint. `VITE_API_URL` để trống để gọi `/api` cùng origin qua Vite proxy; `API_PROXY_TARGET=http://127.0.0.1:3000` là địa chỉ backend cục bộ.
+Giữ `POC_ENABLED=true`, `LIVEKIT_ROOM_NAME=media-test-room`. `JWT_SECRET` cần chuỗi ngẫu nhiên ít nhất 32 ký tự, giữ ổn định giữa các lần khởi động. Secret chỉ ở backend. Backend yêu cầu cấu hình Supabase/JWT ngay khi khởi động; không dùng Supabase Auth ở FE. `VITE_API_URL` để trống để gọi `/api` cùng origin qua Vite proxy; `API_PROXY_TARGET=http://127.0.0.1:3000` là địa chỉ backend cục bộ.
 
 ## Chạy cục bộ
 
@@ -34,7 +37,7 @@ npm run dev:backend
 npm run dev:frontend
 ```
 
-Mở **http://localhost:5173** hoặc **http://127.0.0.1:5173**. Vite proxy `/api` về backend, tránh khác origin khi chạy cục bộ. API ở `http://localhost:3000/api`; `GET /api/health` kiểm tra liveness. Khi thiếu cấu hình LiveKit, API vẫn khởi động và token endpoint trả 503.
+Mở **http://localhost:5173** hoặc **http://127.0.0.1:5173**. Đăng ký/đăng nhập trước rồi tham gia phòng. Vite proxy `/api` về backend. API ở `http://localhost:3000/api`; `GET /api/health` kiểm tra liveness. Khi thiếu cấu hình LiveKit, API vẫn khởi động nếu Supabase/JWT hợp lệ và token endpoint trả 503 sau xác thực.
 
 ```powershell
 npm run typecheck
@@ -48,7 +51,7 @@ Preview chạy cổng 4173 và dùng cùng API proxy khi `VITE_API_URL` để tr
 
 ## Thử nhiều thiết bị qua HTTPS
 
-Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel tới frontend preview; script khởi động backend nếu chưa chạy. Gửi URL HTTPS được in cho nhóm thử nghiệm. Dừng bằng Ctrl+C hoặc `npm run tunnel:stop`. Giữ `VITE_API_URL=` trống. Link chưa có đăng nhập; chỉ dùng cho PoC. Xem [hướng dẫn tunnel](docs/modules/https-tunnel.mdx) về luồng, log và giới hạn.
+Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel tới frontend preview; script khởi động backend nếu chưa chạy. Gửi URL HTTPS được in cho nhóm thử nghiệm. Dừng bằng Ctrl+C hoặc `npm run tunnel:stop`. Giữ `VITE_API_URL=` trống. Link yêu cầu đăng nhập nhưng vẫn dùng phòng chung; chỉ dùng cho PoC. Xem [hướng dẫn tunnel](docs/modules/https-tunnel.mdx) về luồng, log và giới hạn.
 
 ## Tổ chức source
 
@@ -66,7 +69,7 @@ Xem [hướng dẫn Module 1](docs/modules/module-01-media-poc.mdx) để biết
 - [Project context](project_context.md): nội dung nguồn và hiện trạng cập nhật.
 - [Master plan](docs/plans/master-plan.mdx): Phase 02 Done; Phase 04/05 In Progress. PoC triển khai trước Phase 03 database/auth.
 - Codex đọc `AGENTS.md` và `.codex/AGENTS.md`; Claude đọc `CLAUDE.md`.
-- Mỗi phiên đóng bằng work log, phase, session log và changelog theo `docs/ai-workflow.mdx`.
+- Only create a work log after completing code changes; follow docs/ai-workflow.mdx.
 - Docs MDX/Mintlify chưa có CLI validation; dự án đã có Git, không tự commit.
 
 ## Chia sẻ cấu hình trong nhóm

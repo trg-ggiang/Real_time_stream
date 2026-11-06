@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -18,6 +19,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    if (Buffer.byteLength(dto.password, 'utf8') > 72) throw new BadRequestException('Mật khẩu không được vượt quá 72 byte UTF-8.');
     const exists = await this.users.findByEmail(dto.email);
     if (exists) throw new ConflictException('Email đã được sử dụng');
 
@@ -39,6 +41,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
+    if (Buffer.byteLength(dto.password, 'utf8') > 72) throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     const user = await this.users.findByEmailWithPassword(dto.email);
 
     // password_hash có thể NULL (tài khoản không dùng mật khẩu)

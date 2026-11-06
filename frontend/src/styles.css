@@ -146,3 +146,7 @@ footer {
     flex-wrap: wrap;
   }
 }
+
+.auth-form { display: grid; gap: 16px; }
+.auth-form label { display: grid; gap: 8px; }
+.auth-form input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #52627a; border-radius: 8px; background: #192537; color: #e9eef7; font: inherit; }

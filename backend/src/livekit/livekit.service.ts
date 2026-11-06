@@ -1,3 +1,4 @@
+import { User } from '../users/entities/user.entity';
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'node:crypto';
@@ -14,7 +15,7 @@ export interface JoinCredentials {
 export class LivekitService {
   constructor(private readonly config: ConfigService) {}
 
-  async createJoinCredentials(): Promise<JoinCredentials> {
+  async createJoinCredentials(user: User): Promise<JoinCredentials> {
     const serverUrl = this.config.get<string>('LIVEKIT_URL');
     const apiKey = this.config.get<string>('LIVEKIT_API_KEY')?.trim();
     const apiSecret = this.config.get<string>('LIVEKIT_API_SECRET')?.trim();
@@ -28,10 +29,11 @@ export class LivekitService {
         'Phòng thử nghiệm chưa được cấu hình trên máy chủ.',
       );
     }
-    const participantIdentity = randomUUID();
+    const participantIdentity = `${user.userId}:${randomUUID()}`;
     const roomName = this.config.getOrThrow<string>('LIVEKIT_ROOM_NAME');
     const accessToken = new AccessToken(apiKey, apiSecret, {
       identity: participantIdentity,
+      name: user.displayName,
       ttl: this.config.getOrThrow<number>('LIVEKIT_TOKEN_TTL_SECONDS'),
     });
     accessToken.addGrant({

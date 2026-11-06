@@ -13,6 +13,6 @@ it.each([
     json: async () => ({ token: 'synthetic-token', serverUrl: 'wss://test.livekit.cloud', roomName: 'test-room', participantIdentity: 'test-participant' }),
   });
   vi.stubGlobal('fetch', fetchMock);
-  await requestJoinCredentials(new AbortController().signal);
-  expect(fetchMock).toHaveBeenCalledWith(expected, expect.objectContaining({ method: 'POST' }));
+  await requestJoinCredentials(new AbortController().signal, 'app-jwt');
+  expect(fetchMock).toHaveBeenCalledWith(expected, expect.objectContaining({ method: 'POST', headers: { Authorization: 'Bearer app-jwt' } }));
 });

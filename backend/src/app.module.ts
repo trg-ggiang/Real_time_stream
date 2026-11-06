@@ -1,3 +1,5 @@
+import { AuthModule } from './auth/auth.module';
+import { SupabaseModule } from './supabase/supabase.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -9,6 +11,8 @@ import { LivekitModule } from './livekit/livekit.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 10 }]),
+    SupabaseModule,
+    AuthModule,
     LivekitModule,
   ],
   controllers: [HealthController],

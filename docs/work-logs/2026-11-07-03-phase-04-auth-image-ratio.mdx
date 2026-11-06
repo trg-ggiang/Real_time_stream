@@ -1,0 +1,51 @@
+---
+title: Tỷ lệ form và ảnh 1:1.5
+description: Ảnh phủ kín phần bên phải của trang auth desktop.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-03
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Điều chỉnh theo yêu cầu mới: form và ảnh theo tỷ lệ 1:1.5, ảnh chiếm kín khung 1.5 trên desktop.
+
+## Công việc hoàn thành
+
+- AuthApp.tsx: đổi cột phải thành ảnh phủ kín; bỏ copy và chi tiết phụ cùng icon không còn dùng.
+- auth.css: grid hai cột 1fr và 1.5fr, ảnh object-fit cover, không padding/bo góc; giữ fallback một cột dưới 768px.
+- Không thay đổi API, auth logic, backend hoặc env.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Bằng chứng/giới hạn |
+| --- | --- | --- |
+| npm --workspace frontend run build | Passed | Bao gồm TypeScript; cảnh báo chunk LiveKit cũ vẫn còn |
+| npm --workspace frontend test | Passed | 15 tests |
+| Playwright desktop 1440x900 | Passed | Form panel 576px, image panel 864px, tỷ lệ 1.5, ảnh lấp đầy cả chiều rộng/cao, không tràn ngang |
+| Screenshot visual | Passed | output/playwright/auth-ratio-1-to-1-5.png |
+| Lighthouse | Skipped | Thay đổi bố cục nhỏ, không đo lại; điểm cũ không được coi là đo mới |
+| DB/media thật | Skipped | Ngoài thay đổi bố cục; Supabase secret còn thiếu |
+
+## Quyết định và lý do
+
+Yêu cầu mới thay thế tỷ lệ form lớn của thiết kế trước. Ảnh dùng cover để giữ tỷ lệ tự nhiên khi phủ kín khung; mép ảnh có thể bị crop theo màn hình.
+
+## Blocker và việc chưa hoàn thành
+
+Không còn việc trong phạm vi căn chỉnh. Phase vẫn In Progress vì DB/media acceptance chưa hoàn tất. Không commit/push.
+
+## Bước tiếp theo
+
+Reload trang frontend đang chạy để xem tỷ lệ mới; bổ sung đúng Supabase secret để thử auth thật.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan, session log, changelog và guide.
+- [x] Đăng ký navigation, kiểm tra JSON và targets.

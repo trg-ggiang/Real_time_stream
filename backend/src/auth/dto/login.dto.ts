@@ -6,9 +6,9 @@ export class LoginDto {
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MaxLength(72)
-  password: string;
+  password!: string;
 }

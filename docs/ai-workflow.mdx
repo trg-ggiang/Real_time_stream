@@ -1,6 +1,6 @@
 ---
 title: Quy trình AI
-description: Mở phiên, làm việc và đóng phiên theo phase.
+description: Chỉ ghi log sau khi hoàn thành thay đổi code.
 ---
 
 ## Mở phiên
@@ -8,9 +8,9 @@ description: Mở phiên, làm việc và đóng phiên theo phase.
 Đọc hướng dẫn agent, master plan, phase hiện tại và work log gần nhất.
 Xác định phạm vi được người dùng giao; ghi tiến trình đúng với hiện trạng thực tế.
 
-## Đóng phiên bắt buộc
+## Chỉ ghi log khi hoàn thành thay đổi code
 
-Mỗi phiên làm việc phải có work log riêng, kể cả chỉ sửa tài liệu/config.
+Chỉ tạo work log sau khi hoàn thành thay đổi code ứng dụng hoặc script vận hành. Không tạo log cho câu hỏi, giải thích, đọc/review, thao tác Git, sửa tài liệu/config hoặc công việc chưa hoàn thành.
 Tên file: `YYYY-MM-DD-NN-phase-XX-topic.mdx`, ngày giờ theo Asia/Saigon.
 NN là số thứ tự trong ngày, không ghi đè log cũ. Phiên chạm nhiều phase ghi tất cả phase liên quan.
 
@@ -28,7 +28,7 @@ Các phase tương lai là kế hoạch dự kiến, chưa được phép tự t
 
 Codex đọc root AGENTS.md; Claude đọc CLAUDE.md, trong đó tham chiếu AGENTS.md.
 Đây là quy tắc dành cho agent, không phải hook tự động chạy khi ứng dụng bị đóng đột ngột.
-Nếu phiên bị ngắt, phiên sau phải ghi checkpoint còn thiếu bằng thông tin có thể xác minh.
+Nếu phiên bị ngắt, tiếp tục công việc ở phiên sau; không tự tạo log chưa hoàn thành trừ khi người dùng yêu cầu rõ ràng. Không bịa kết quả kiểm tra.
 
 ## Nguồn tham khảo
 

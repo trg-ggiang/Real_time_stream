@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { UnauthorizedError } from '../services/token-api';
 import { requestJoinCredentials } from '../services/token-api';
 import type { JoinCredentials } from '../types';
 
-export function useMeetingSession() {
+export function useMeetingSession(accessToken: string, onUnauthorized?: () => void) {
   const [credentials, setCredentials] = useState<JoinCredentials | null>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,13 +49,14 @@ export function useMeetingSession() {
     setIsJoining(true);
     const timeout = window.setTimeout(() => controller.abort(), 15_000);
     try {
-      const result = await requestJoinCredentials(controller.signal);
+      const result = await requestJoinCredentials(controller.signal, accessToken);
       if (!controller.signal.aborted) {
         joined.current = true;
         setCredentials(result);
       }
     } catch (cause) {
       if (pending.current === controller) {
+        if (cause instanceof UnauthorizedError) onUnauthorized?.();
         setError(
           controller.signal.aborted
             ? 'Yêu cầu đã quá thời gian. Hãy kiểm tra backend rồi thử lại.'
@@ -72,7 +74,7 @@ export function useMeetingSession() {
         setIsJoining(false);
       }
     }
-  }, []);
+  }, [accessToken, onUnauthorized]);
 
   return { credentials, isJoining, error, join, leave, endSession };
 }

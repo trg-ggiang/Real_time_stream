@@ -24,12 +24,20 @@ afterEach(() => {
 });
 
 describe('meeting session', () => {
+  it('returns to login when the application JWT is rejected', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 401 }));
+    const onUnauthorized = vi.fn();
+    const { result } = renderHook(() => useMeetingSession('expired-jwt', onUnauthorized));
+    await act(async () => { await result.current.join(); });
+    expect(onUnauthorized).toHaveBeenCalledOnce();
+    expect(result.current.credentials).toBeNull();
+  });
   it('clears ended sessions, preserves the disconnect message and allows rejoin', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({ ok: true, json: async () => credentials }),
     );
-    const { result } = renderHook(useMeetingSession);
+    const { result } = renderHook(() => useMeetingSession('app-jwt'));
     await act(async () => {
       await result.current.join();
     });
@@ -47,7 +55,7 @@ describe('meeting session', () => {
       .fn()
       .mockResolvedValue({ ok: true, json: async () => credentials });
     vi.stubGlobal('fetch', fetchMock);
-    const { result } = renderHook(useMeetingSession, { wrapper: StrictMode });
+    const { result } = renderHook(() => useMeetingSession('app-jwt'), { wrapper: StrictMode });
     await act(async () => {
       await Promise.all([result.current.join(), result.current.join()]);
     });
@@ -74,7 +82,7 @@ describe('meeting session', () => {
         }),
     );
     vi.stubGlobal('fetch', fetchMock);
-    const { result, unmount } = renderHook(useMeetingSession);
+    const { result, unmount } = renderHook(() => useMeetingSession('app-jwt'));
     let joining!: Promise<void>;
     act(() => {
       joining = result.current.join();
@@ -104,7 +112,7 @@ describe('meeting session', () => {
         .mockResolvedValueOnce({ ok: false, status })
         .mockResolvedValueOnce({ ok: true, json: async () => credentials });
       vi.stubGlobal('fetch', fetchMock);
-      const { result } = renderHook(useMeetingSession);
+      const { result } = renderHook(() => useMeetingSession('app-jwt'));
       await act(async () => {
         await result.current.join();
       });
@@ -127,7 +135,7 @@ describe('meeting session', () => {
         json: async () => ({ token: 'invalid' }),
       }),
     );
-    const { result } = renderHook(useMeetingSession);
+    const { result } = renderHook(() => useMeetingSession('app-jwt'));
     await act(async () => {
       await result.current.join();
     });
@@ -139,7 +147,7 @@ describe('meeting session', () => {
     vi.stubGlobal('isSecureContext', false);
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
-    const { result } = renderHook(useMeetingSession);
+    const { result } = renderHook(() => useMeetingSession('app-jwt'));
     await act(async () => {
       await result.current.join();
     });

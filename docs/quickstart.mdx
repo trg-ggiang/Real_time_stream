@@ -3,6 +3,8 @@ title: Cài đặt
 description: Cài dependencies, cấu hình môi trường và chạy Module 1.
 ---
 
+> Auth update: the current implementation requires login and a Bearer application JWT before issuing LiveKit tokens. Older PoC descriptions below are historical; see [current setup and API contract](/modules/auth-integration).
+
 Node.js 22.12+ và npm 10+. Chạy `npm install` tại root. Phiên triển khai đã kiểm tra Node 22.23.2 và npm 10.9.8.
 
 `backend/.env` và `frontend/.env` đã được tạo cục bộ, không được Git theo dõi. Trên máy mới, chỉ copy `.env.example` khi chưa có `.env`. Điền `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` ở backend. Supabase và Socket.IO chưa dùng trong Module 1.

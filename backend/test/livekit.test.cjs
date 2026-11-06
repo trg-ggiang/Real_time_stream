@@ -5,6 +5,9 @@ require('reflect-metadata');
 // Synthetic signing credentials: tests never call LiveKit or read real secrets.
 Object.assign(process.env, {
   NODE_ENV: 'test',
+  SUPABASE_URL: 'https://unit-test.supabase.co',
+  SUPABASE_SECRET_KEY: 'synthetic-supabase-key',
+  JWT_SECRET: 'synthetic-jwt-secret-at-least-32-characters',
   POC_ENABLED: 'true',
   LIVEKIT_URL: 'wss://unit-test.livekit.cloud',
   LIVEKIT_API_KEY: 'unit-test-api-key',
@@ -32,13 +35,25 @@ test('configuration rejects invalid values and production PoC token issuance', (
     { LIVEKIT_TOKEN_TTL_SECONDS: '3600' },
     { NODE_ENV: 'production', POC_ENABLED: 'true' },
   ]) {
-    assert.throws(() => validateEnvironment(values));
+    assert.throws(() => validateEnvironment({ ...process.env, ...values }));
   }
-  assert.equal(validateEnvironment({}).POC_ENABLED, false);
+  assert.equal(validateEnvironment({ ...process.env, POC_ENABLED: undefined }).POC_ENABLED, false);
+  for (const key of ['JWT_SECRET', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY']) {
+    assert.throws(() => validateEnvironment({ ...process.env, [key]: '' }));
+  }
+  assert.throws(() => validateEnvironment({ ...process.env, JWT_SECRET: 'short' }));
 });
 
 test('token API enforces room, identity, permissions, expiry and rate limit', async (t) => {
-  const app = await NestFactory.create(AppModule, { logger: false });
+  const { Test } = require('@nestjs/testing');
+  const { UsersService } = require('../dist/users/users.service');
+  const { JwtService } = require('@nestjs/jwt');
+  const user = { userId: 'test-user', email: 'test@example.test', displayName: 'Tester', avatarUrl: null };
+  const module = await Test.createTestingModule({ imports: [AppModule] })
+    .overrideProvider(UsersService).useValue({ findById: async id => id === user.userId ? user : null }).compile();
+  const app = module.createNestApplication({ logger: false });
+  const jwt = new JwtService({ secret: process.env.JWT_SECRET });
+  const accessToken = jwt.sign({ sub: user.userId });
   configureApp(app);
   await app.listen(0, '127.0.0.1');
   t.after(async () => {
@@ -50,6 +65,7 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
         Origin: 'http://localhost:5173',
       },
       body: JSON.stringify({
@@ -63,6 +79,10 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
   assert.equal(health.status, 200);
   assert.deepEqual(await health.json(), { status: 'ok' });
 
+  assert.equal((await fetch(base + '/api/livekit/token', { method: 'POST' })).status, 401);
+  assert.equal((await fetch(base + '/api/livekit/token', { method: 'POST', headers: { Authorization: 'Bearer invalid' } })).status, 401);
+  const expired = jwt.sign({ sub: user.userId }, { expiresIn: -1 });
+  assert.equal((await fetch(base + '/api/livekit/token', { method: 'POST', headers: { Authorization: 'Bearer ' + expired } })).status, 401);
   const first = await requestToken();
   assert.equal(first.status, 200);
   assert.equal(first.headers.get('cache-control'), 'no-store');
@@ -81,6 +101,8 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
     process.env.LIVEKIT_API_SECRET,
   ).verify(a.token);
   assert.equal(verified.sub, a.participantIdentity);
+  assert.ok(a.participantIdentity.startsWith(user.userId + ':'));
+  assert.equal(verified.name, user.displayName);
   assert.equal(verified.video.room, 'media-test-room');
   assert.equal(verified.video.roomJoin, true);
   assert.equal(verified.video.canPublish, true);
@@ -104,13 +126,13 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
   const service = app.get(LivekitService);
   config.set('LIVEKIT_API_SECRET', '');
   await assert.rejects(
-    service.createJoinCredentials(),
+    service.createJoinCredentials(user),
     (error) => error.getStatus() === 503,
   );
   config.set('LIVEKIT_API_SECRET', process.env.LIVEKIT_API_SECRET);
   config.set('POC_ENABLED', false);
   await assert.rejects(
-    service.createJoinCredentials(),
+    service.createJoinCredentials(user),
     (error) => error.getStatus() === 503,
   );
 });

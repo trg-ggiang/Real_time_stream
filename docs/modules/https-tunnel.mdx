@@ -36,7 +36,7 @@ cloudflared đặt origin Host thành `localhost:4173`, vì vậy không cần t
 
 ## Giới hạn
 
-- Link hiện không có đăng nhập hoặc Cloudflare Access. Người có link có thể xin token vào cùng phòng PoC. Chỉ chia sẻ trong nhóm thử nghiệm và dừng tunnel sau khi dùng; HTTPS không thay thế authorization.
+- Login is required. Registered users can join the shared PoC room; room membership permissions and Cloudflare Access are not implemented. Share only within the test group. See [auth integration](/modules/auth-integration).
 - Preview là công cụ thử bản build, không phải máy chủ production. Quick Tunnel không bảo đảm uptime, URL không cố định, giới hạn 200 request đang xử lý và không hỗ trợ SSE; đây không phải giới hạn 200 người họp.
 - Backend rate limit trong memory vẫn 10 token request/phút/IP. Qua proxy loopback, nhiều người có thể bị tính chung một IP. Không bật trust proxy vô điều kiện hoặc bỏ giới hạn; nếu cần mở rộng phải thiết kế trusted proxy/rate limit riêng.
 - Máy chạy phải bật, có Internet và chạy đủ các tiến trình. Firewall/VPN có thể chặn kết nối tunnel hoặc LiveKit. Không cần cùng Wi-Fi.

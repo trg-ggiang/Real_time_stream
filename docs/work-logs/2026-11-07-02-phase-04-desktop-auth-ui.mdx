@@ -1,0 +1,62 @@
+---
+title: Giao diện đăng nhập và đăng ký desktop
+description: Form ưu tiên desktop, giao diện sáng/tối và kiểm tra browser.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-02
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 03 và 04
+- Kết quả phiên: Completed (phạm vi giao diện được giao).
+- Trạng thái phase sau phiên: In Progress.
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng duyệt thiết kế mới cho đăng nhập/đăng ký, yêu cầu ưu tiên form desktop và xác nhận bắt đầu code. Giữ hợp đồng API đã gộp, không sửa backend, schema hay env trong phiên thiết kế.
+
+## Công việc hoàn thành
+
+- Thiết kế lại AuthApp: vùng form chiếm phần lớn desktop, chiều rộng tối đa 480px, ảnh phụ bên phải, chuyển login/register trên cùng trang.
+- CSS scoped riêng cho auth, nền trung tính và một accent xanh ngọc; sáng/tối/theo hệ thống. Giữ phong cách meeting hiện tại bên ngoài auth.
+- Label trên input, lỗi bên dưới, focus ô lỗi đầu tiên, hiện/ẩn mật khẩu, khóa gửi trùng và trạng thái đang xử lý. Giữ email khi chuyển chế độ, xóa và ẩn lại mật khẩu.
+- Phông Be Vietnam Pro được self-host qua package Fontsource, icon Phosphor import riêng từng icon. Favicon lấy từ icon library.
+- Ảnh hỗ trợ do imagegen tạo cho trang này, tối ưu JPEG 1024x768 khoảng 117 KB; không dùng ảnh người dùng thật hay giả số liệu marketing.
+- Bổ sung tests form/validation/registration/double-submit/API error. Giữ tests login/logout và abort khi unmount.
+- File: frontend/src/features/auth/{AuthApp.tsx,auth.css,auth-api.ts,AuthApp.test.tsx}, frontend/public/{images/study-together.jpg,favicon.svg}, frontend/index.html, frontend/package.json, package-lock.json; ignore browser artifacts trong .gitignore; cập nhật docs.
+
+## Kiểm tra
+
+| Lệnh/kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm --workspace frontend run typecheck | Passed | TypeScript frontend |
+| npm --workspace frontend test | Passed | 15 tests, API giả |
+| npm --workspace frontend run build | Passed | Chunk LiveKit SDK vẫn có cảnh báo kích thước, được lazy-load |
+| Playwright browser | Passed | Desktop 1440x900, 1366x768, 1280x720; fallback 390x844 |
+| Layout desktop | Passed | Form 480px, CTA trong viewport 1280x720; không tràn ngang |
+| Sáng/tối và reduced motion | Passed | Đã xem ảnh hai mode; system dark và transition 0s khi reduced motion |
+| Validation và lỗi API trên browser | Passed | Focus đúng ô đầu tiên; HTTP 401 mock hiện thông báo, đã gỡ route mock sau kiểm tra |
+| Lighthouse local build, desktop | Passed | Performance 99, accessibility 100; LCP khoảng 0.8s, CLS 0, TBT 0ms. Đây là phép đo lab, không phải INP thực tế |
+| Supabase/LiveKit thật | Skipped | Supabase secret chưa được cấp; không tạo tài khoản hoặc ghi DB thật |
+
+## Quyết định và lý do
+
+Áp dụng phần visual/redesign phù hợp của design-taste-frontend cho auth, không biến auth thành landing page dài. Design variance 6, motion intensity 3, visual density 3. Giữ React/Vite và CSS native để không đưa framework styling mới vào trang đơn. Không tìm thấy skill UI UX Max trên máy, không coi như đã dùng skill đó.
+
+## Kiểm tra thiết kế trước bàn giao
+
+Đã rà label, tương phản, focus, một accent, hai theme đồng nhất, CTA không xuống dòng, font tiếng Việt, ảnh thật dưới dạng asset được tạo, không preview UI giả, không em dash, không số liệu giả hoặc nút tính năng chưa hỗ trợ. Các mục marketing nhiều section/bento/marquee/scroll story không áp dụng cho trang auth. Screenshot và Lighthouse report nằm ở output/playwright, bị Git ignore.
+
+## Blocker và việc chưa hoàn thành
+
+Thiếu Supabase secret và xác nhận schema development; chưa nghiệm thu đăng nhập thật và media hai thiết bị. Phase 03/04/05 giữ In Progress. Không commit/push.
+
+## Bước tiếp theo
+
+Mở frontend localhost:5173 để duyệt giao diện. Khi có đúng Supabase secret, kiểm tra đăng ký/đăng nhập thật rồi Join/Leave cùng nhóm.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan, session log, changelog và hướng dẫn auth.
+- [x] Đăng ký work log trong navigation; kiểm tra JSON và target trước bàn giao.
