@@ -42,6 +42,7 @@ export class LivekitService {
       canPublish: true,
       canSubscribe: true,
       canPublishData: false,
+      canUpdateOwnMetadata: true,
       canPublishSources: [TrackSource.CAMERA, TrackSource.MICROPHONE],
     });
     return {

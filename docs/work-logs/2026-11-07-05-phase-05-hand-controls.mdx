@@ -1,0 +1,40 @@
+---
+title: 2026-11-07-05 — Bố cục nút giơ tay
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-05
+- Ngày: 2026-11-07, Asia/Saigon.
+- Agent: Codex
+- Phase: 05 — In Progress
+- Kết quả phiên: Completed
+
+## Mục tiêu và phạm vi được giao
+
+Đưa nút giơ tay vào giữa Camera và Leave. Hiện bàn tay lớn hơn trên ô người tham gia.
+
+## Công việc hoàn thành
+
+MeetingRoom.tsx tách DisconnectButton khỏi ControlBar để đặt sau nút giơ tay. styles.css căn hàng nút và tăng biểu tượng trên ô lên 1.75rem. Biểu tượng giữ nhãn đọc màn hình.
+
+## Kiểm tra
+
+Frontend build đạt, còn cảnh báo kích thước chunk LiveKit. JSON và đích điều hướng hợp lệ. Chưa thử bố cục trên trình duyệt hay cuộc gọi thật.
+
+## Quyết định và lý do
+
+Dùng lại DisconnectButton và ControlBar của LiveKit để giữ thao tác rời phòng và menu thiết bị.
+
+## Blocker và việc chưa hoàn thành
+
+Phase 05 vẫn In Progress. Chưa nghiệm thu media hai thiết bị.
+
+## Bước tiếp theo
+
+Mở phòng họp và xác nhận thứ tự Camera, Giơ tay, Leave cùng biểu tượng trên ô người tham gia.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase, master plan, session log và changelog
+- [x] Đăng ký và kiểm tra navigation

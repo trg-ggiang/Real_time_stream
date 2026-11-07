@@ -108,6 +108,7 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
   assert.equal(verified.video.canPublish, true);
   assert.equal(verified.video.canSubscribe, true);
   assert.equal(verified.video.canPublishData, false);
+  assert.equal(verified.video.canUpdateOwnMetadata, true);
   assert.deepEqual(verified.video.canPublishSources, ['camera', 'microphone']);
   assert.notEqual(verified.video.roomAdmin, true);
   assert.notEqual(verified.video.roomCreate, true);
