@@ -72,3 +72,15 @@ Auth and Supabase modules from Hai are now integrated into the main backend and 
 ## Bố cục nút giơ tay
 
 Đã cập nhật vị trí nút và biểu tượng. Phase 05 vẫn In Progress. [Bố cục nút giơ tay](/work-logs/2026-11-07-05-phase-05-hand-controls).
+
+## Tunnel startup fix
+
+The HTTPS runner now computes its pinned binary hash with .NET instead of relying on Get-FileHash cmdlet loading. Public page/health are 200; unauthenticated token requests remain 401. No new media acceptance; In Progress. [Work log](/work-logs/2026-11-07-04-phase-04-tunnel-hash-fix).
+
+## Chia sẻ màn hình 2026-11-07
+
+Đã triển khai quyền screen_share/screen_share_audio, nút share và vùng chọn nhiều người trình chiếu. Backend 4 tests, frontend 20 tests, typecheck/build đạt. Browser dùng video giả lập qua LiveKit Cloud xác minh nhận hình, late join, nhiều người share và dừng. Phase 05 giữ In Progress, chờ native picker/audio và hai thiết bị. [Work log](/work-logs/2026-11-07-06-phase-05-screen-sharing) — [Hướng dẫn](/modules/screen-sharing).
+
+## Bố cục screen và camera 2026-11-07
+
+Tách camera local luôn hiện trong sidebar khi có screen share; remote cameras cuộn riêng. Desktop đặt screen/camera cạnh nhau, mobile dùng dải camera bên dưới. Typecheck, 20 frontend tests và build đạt. Browser với LiveKit Cloud/video giả lập xác minh screen và self camera ở 1440/1024/768/390px, dừng share trở về grid. Phase 05 vẫn In Progress; chờ thiết bị thật/tunnel. [Work log](/work-logs/2026-11-07-07-phase-05-meeting-layout).

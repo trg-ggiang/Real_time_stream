@@ -2,7 +2,8 @@ import { User } from '../users/entities/user.entity';
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'node:crypto';
-import { AccessToken, TrackSource } from 'livekit-server-sdk';
+import { AccessToken } from 'livekit-server-sdk';
+import { getMeetingPublishSources } from './meeting-permissions';
 
 export interface JoinCredentials {
   serverUrl: string;
@@ -43,7 +44,7 @@ export class LivekitService {
       canSubscribe: true,
       canPublishData: false,
       canUpdateOwnMetadata: true,
-      canPublishSources: [TrackSource.CAMERA, TrackSource.MICROPHONE],
+      canPublishSources: getMeetingPublishSources(true),
     });
     return {
       serverUrl,

@@ -43,6 +43,12 @@ cloudflared đặt origin Host thành `localhost:4173`, vì vậy không cần t
 - Script dành cho Windows x64, cổng 3000/4173 mặc định. Backend đang chạy sẵn phải là API của dự án này. Cổng 4173 có tiến trình khác thì script dừng và báo lỗi.
 - Người dùng đã xác nhận nghe/thấy giữa nhiều tab trên cùng máy. Chưa nghiệm thu hai thiết bị/hai mạng, permission, reconnect và capacity; Phase 04/05 vẫn In Progress.
 
+## Lỗi PowerShell khi kiểm tra binary
+
+Nếu script cũ dừng sau build với `Get-FileHash is not recognized`, cập nhật bản sửa 2026-11-07: script dùng hàm `Get-Sha256` dựa trên .NET để không phụ thuộc việc PowerShell tự nạp cmdlet trong shell npm. Vẫn so sánh SHA256 với release đã pin; không bỏ qua kiểm tra binary. Lỗi này xảy ra trước khi tunnel được mở, khác lỗi Supabase/JWT hoặc Cloudflare network.
+
+Chạy lại `npm run tunnel` sau cập nhật và dùng URL mới được in. URL cũ không được coi là còn hoạt động. [Work log sửa lỗi](/work-logs/2026-11-07-04-phase-04-tunnel-hash-fix).
+
 ## Kiểm tra hai thiết bị
 
 Mở link HTTPS trên laptop và điện thoại (thử cả Wi-Fi và 4G/5G). Cho phép camera/mic, dùng tai nghe, kiểm tra thấy/nghe nhau hai chiều, mute/unmute, Leave/Join lại và mất mạng/reconnect theo [checklist Module 1](/modules/module-01-media-poc).
