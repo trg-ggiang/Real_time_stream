@@ -21,6 +21,7 @@
               "modules/https-tunnel",
               "modules/code-walkthrough",
               "modules/module-01-team-guide"
+              ,"modules/meeting-controls"
             ]
           }
         ]
@@ -34,6 +35,7 @@
               "plans/master-plan",
               "plans/phase-01-project-setup",
               "plans/phase-02-requirements-architecture",
+              "plans/phase-03-database-auth",
               "plans/phase-04-application-foundation",
               "plans/phase-05-livekit-poc"
             ]
@@ -64,7 +66,8 @@
               "work-logs/2026-11-06-02-phase-05-https-tunnel",
               "work-logs/2026-11-06-03-phase-05-code-walkthrough",
               "work-logs/2026-11-06-04-phase-05-team-code-guide",
-              "work-logs/2026-11-06-05-phase-05-git-handoff"
+              "work-logs/2026-11-06-05-phase-05-git-handoff",
+              "work-logs/2026-11-07-01-phase-03-meeting-controls"
             ]
           }
         ]
