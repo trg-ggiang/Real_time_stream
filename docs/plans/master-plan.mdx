@@ -11,7 +11,7 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 | --- | --- | --- |
 | 01 | Khung công nghệ, agent config và docs | Done |
 | 02 | Chốt yêu cầu và kiến trúc PoC | Done |
-| 03 | Supabase schema, auth và phân quyền | Todo |
+| 03 | Supabase schema, auth và phân quyền | In Progress |
 | 04 | NestJS API và React nền tảng cho PoC | In Progress |
 | 05 | Tích hợp LiveKit Cloud | In Progress |
 | 06 | Chat WebSocket và lưu lịch sử | Todo |
@@ -59,3 +59,7 @@ Thêm [bản giải thích chi tiết từng biến và cấu hình](/modules/mo
 ## Bàn giao Git 2026-11-06
 
 Theo yêu cầu người dùng, tạo nhánh `feature/livekit-mockdata-cloudflare-tunnel` từ main để commit/push các thay đổi tunnel và tài liệu. Typecheck, 12 tests và build đạt; giữ Phase 04/05 In Progress do chưa có media acceptance mới. [Checkpoint trước commit/push](/work-logs/2026-11-06-05-phase-05-git-handoff); kết quả remote được xác minh sau khi tạo commit.
+
+## Module quản lý phòng 2026-11-07
+
+Phase 03 được mở lại theo yêu cầu backend điều khiển phòng: xác thực token Supabase, vai trò owner/moderator, waiting room, mute mic và giới hạn người. Migration và API đã được thêm; cần áp dụng migration vào Supabase và tích hợp UI/webhook trước khi phase hoàn tất. [Phase 03](/plans/phase-03-database-auth) · [Work log](/work-logs/2026-11-07-01-phase-03-meeting-controls).

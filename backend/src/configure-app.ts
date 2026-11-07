@@ -6,7 +6,7 @@ export function configureApp(app: INestApplication): void {
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: config.getOrThrow<string>('FRONTEND_URL'),
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PATCH'],
   });
   app.enableShutdownHooks();
 }

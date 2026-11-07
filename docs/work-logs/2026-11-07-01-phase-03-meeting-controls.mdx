@@ -1,0 +1,77 @@
+---
+title: 2026-11-07-01 — Backend meeting controls
+description: Implement meeting ownership, moderation, admission and capacity APIs.
+---
+
+## Session details
+
+- Session ID: 2026-11-07-01
+- Date/time: 2026-11-07, Asia/Saigon (+07:00); exact start/end time unavailable
+- Agent: Codex
+- Phase: 03 — Database, auth and meeting controls
+- Outcome: Partial
+- Phase status after session: In Progress
+
+## Objective and authorized scope
+
+Implement backend functionality for meeting owner controls, moderator role assignment/revocation, moderator/owner microphone mute, waiting-room approval, and configurable participant capacity against the supplied Supabase schema.
+
+## Completed work
+
+- Added NestJS meeting APIs in `backend/src/meetings/` for meeting creation, joining, pending request listing/approval, moderator assignment, settings, microphone mute, removal and leave.
+- Verified Supabase Auth bearer tokens and mapped the authenticated UUID to `public.users.user_id`; service role access remains backend-only.
+- Added a LiveKit token flow scoped to the selected database meeting. Disabled self-unmute omits microphone publishing permission while preserving camera publishing.
+- Added a Supabase migration for capacity/self-unmute policy and an advisory-lock based RPC that atomically reserves seats.
+- Documented API routes, behavior and limitations in `/modules/meeting-controls`; updated phase/master plan, changelog, session index and docs navigation.
+
+## Changed files
+
+- `backend/src/app.module.ts`
+- `backend/src/configure-app.ts`
+- `backend/src/meetings/meetings.module.ts`
+- `backend/src/meetings/meetings.controller.ts`
+- `backend/src/meetings/meetings.service.ts`
+- `supabase/migrations/202611070001_meeting_controls.sql`
+- `docs/modules/meeting-controls.mdx`
+- `docs/plans/phase-03-database-auth.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+- `docs/docs.json`
+- `docs/index.mdx`
+- `docs/work-logs/2026-11-07-01-phase-03-meeting-controls.mdx`
+- `backend/.env.example` had pre-existing user changes at session start and was left untouched.
+
+## Checks
+
+| Command/check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace backend run typecheck` | Passed | TypeScript compilation with no emit |
+| Backend tests | Skipped | Not requested; no tests were added or run |
+| Supabase migration application | Skipped | No Supabase project connection supplied in this task |
+| `docs/docs.json` parsing and navigation target check | Passed | JSON valid; all 30 navigation targets exist |
+
+## Decisions and limits
+
+The provided schema lacked a per-meeting capacity field and microphone self-unmute policy, so the migration adds `max_participants` (default 20 for existing rows) and `allow_self_unmute` (default true). The backend expects the Supabase Auth user UUID to match `users.user_id`. Capacity depends on attendance rows; a browser that disappears without calling leave can hold a seat until a future LiveKit webhook/cleanup process updates `left_at`.
+
+The legacy static-room PoC token endpoint remains separate and does not grant access to created meetings. Signup/login UX and frontend meeting controls are not implemented here.
+
+## Blockers and unfinished work
+
+- Apply the migration to the target Supabase project and verify its table relationships, role permissions and any existing RLS policies.
+- Confirm users are provisioned in Supabase Auth with matching rows in `public.users`.
+- Connect frontend auth and meeting controls; implement LiveKit webhook cleanup for abrupt disconnects.
+- No live Supabase or LiveKit operations were performed.
+
+## Next step
+
+Apply `supabase/migrations/202611070001_meeting_controls.sql` to the target Supabase project, confirm service-role configuration and user UUID mapping, then exercise owner/moderator/member flows against a development room before frontend integration.
+
+## Session close checklist
+
+- [x] Update phase page and master plan
+- [x] Update session log, changelog and API docs
+- [x] Register new pages in `docs/docs.json`
+- [x] Verify docs JSON and navigation targets
+- [x] Record actual checks and remaining work

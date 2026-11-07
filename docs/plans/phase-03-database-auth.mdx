@@ -1,0 +1,26 @@
+---
+title: Phase 03 — Database, auth and meeting controls
+description: Supabase-backed identities, memberships and meeting authorization.
+---
+
+Status: In Progress. Updated: 2026-11-07 (Asia/Saigon).
+
+## Objective
+
+Connect the supplied Supabase meeting schema to authenticated NestJS APIs. This phase now includes the requested owner, moderator, admission, microphone and capacity controls. The client application and signup/login UX remain outside this backend task.
+
+## Acceptance criteria
+
+- [x] Backend verifies Supabase Auth bearer tokens and maps identity to `public.users`.
+- [x] Meeting owner, moderator, join approval, settings, removal and mute APIs are implemented.
+- [x] Waiting-room decisions and meeting membership are stored in Supabase.
+- [x] Meeting capacity is reserved atomically using Postgres.
+- [ ] Apply migration to the target Supabase project and confirm schema/RLS/service role setup.
+- [ ] Connect the frontend authentication and meeting controls.
+- [ ] Add LiveKit webhook cleanup for participants who disconnect without calling leave.
+
+## Decisions and limits
+
+The provided schema had no capacity or self-unmute policy fields; the migration adds `max_participants` (default 20 for existing meetings) and `allow_self_unmute` (default true). The backend expects user UUIDs issued by Supabase Auth to match `users.user_id`. The moderator role only applies to application API actions; privileged LiveKit operations stay on the backend. When self-unmute is disabled, a moderator mute also removes microphone publishing permission until the participant reconnects with refreshed permission.
+
+See [backend API contract](/modules/meeting-controls) and [implementation work log](/work-logs/2026-11-07-01-phase-03-meeting-controls).
