@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 import {
   ControlBar,
   DisconnectButton,
-  GridLayout,
   LiveKitRoom,
   ParticipantTile,
   RoomAudioRenderer,
@@ -12,16 +11,16 @@ import {
   useParticipantAttribute,
   useParticipants,
   useTrackRefContext,
-  useTracks,
 } from '@livekit/components-react';
 import {
   ConnectionState,
   DisconnectReason,
-  Track,
   VideoPresets,
   type RoomOptions,
 } from 'livekit-client';
 import type { JoinCredentials } from '../types';
+import { ScreenShareButton } from './ScreenShareButton';
+import { MeetingMediaLayout } from './MeetingMediaLayout';
 
 const connectionLabels: Record<ConnectionState, string> = {
   [ConnectionState.Disconnected]: 'Đã ngắt kết nối',
@@ -91,20 +90,13 @@ function MeetingParticipantTile() {
 function RoomContent({ onDeviceError }: { onDeviceError: () => void }) {
   const state = useConnectionState();
   const participants = useParticipants();
-  const tracks = useTracks([
-    { source: Track.Source.Camera, withPlaceholder: true },
-  ]);
   return (
     <>
       <div className="room-status" role="status" aria-live="polite">
         <span>{connectionLabels[state]}</span>
         <span>{participants.length} người trong phòng</span>
       </div>
-      <div className="video-grid">
-        <GridLayout tracks={tracks}>
-          <MeetingParticipantTile />
-        </GridLayout>
-      </div>
+      <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
       <RoomAudioRenderer />
       <StartAudio label="Bật âm thanh từ phòng" />
       <div className="meeting-controls">
@@ -120,6 +112,7 @@ function RoomContent({ onDeviceError }: { onDeviceError: () => void }) {
             leave: false,
           }}
         />
+        <ScreenShareButton />
         <RaiseHandButton connected={state === ConnectionState.Connected} />
         <DisconnectButton>Leave</DisconnectButton>
       </div>

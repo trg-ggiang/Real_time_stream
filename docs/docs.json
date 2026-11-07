@@ -20,7 +20,8 @@
               "modules/module-01-media-poc",
               "modules/https-tunnel",
               "modules/code-walkthrough",
-              "modules/module-01-team-guide"
+              "modules/module-01-team-guide",
+              "modules/screen-sharing"
             ]
           },
           {
@@ -32,7 +33,11 @@
               "work-logs/2026-11-07-02-phase-04-desktop-auth-ui",
               "work-logs/2026-11-07-03-phase-04-auth-image-ratio",
               "work-logs/2026-11-07-04-phase-05-raise-hand",
-              "work-logs/2026-11-07-05-phase-05-hand-controls"
+              "work-logs/2026-11-07-05-phase-05-hand-controls",
+
+              "work-logs/2026-11-07-04-phase-04-tunnel-hash-fix",
+              "work-logs/2026-11-07-06-phase-05-screen-sharing",
+              "work-logs/2026-11-07-07-phase-05-meeting-layout"
             ]
           }
         ]

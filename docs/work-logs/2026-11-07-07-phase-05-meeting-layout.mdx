@@ -1,0 +1,54 @@
+---
+title: 2026-11-07-07 — Bố cục màn hình và camera
+description: Giữ camera người xem luôn hiện khi có người chia sẻ màn hình.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-07
+- Thời gian: 2026-11-07, Asia/Saigon; không lưu chính xác giờ bắt đầu.
+- Agent: Codex
+- Phase: 05 — In Progress
+- Kết quả phiên: Completed trong phạm vi sửa bố cục
+
+## Mục tiêu và phạm vi được giao
+
+Khi A share, B xem nội dung tốt và vẫn nhìn camera của mình rõ. Giữ thay đổi hiện có và không thay quyền/media pipeline.
+
+## Công việc hoàn thành
+
+Thêm MeetingMediaLayout.tsx: không share thì GridLayout camera như trước; có share thì vùng trình chiếu và sidebar camera riêng. Camera local tách khỏi danh sách remote, không bị pagination/scroll của người khác đẩy mất; TrackLoop giữ context cho tile và badge giơ tay. MeetingRoom dùng component mới. CSS mở rộng vùng meeting tới 1600px, stage bên trái/sidebar bên phải trên desktop; dưới 850px camera thành dải ngang, self luôn ở đầu và remote scroll riêng. Screen video dùng contain để không cắt nội dung.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm run typecheck | Passed | Hai workspaces |
+| npm --workspace frontend test | Passed | 20 tests hiện có |
+| npm --workspace frontend run build | Passed | Còn cảnh báo chunk LiveKit lớn |
+| Playwright + LiveKit Cloud | Passed | A share video giả lập, B nhận screen và có local camera video giả lập |
+| 1440/1024/768/390px | Passed | Không tràn ngang, camera self trong viewport; ảnh đã quan sát desktop/mobile |
+| Dừng share | Passed | Quay về video-grid |
+| Native capture, camera thiết bị thật, hai thiết bị, full login UI và HTTPS tunnel | Skipped | Bài thử dùng production layout trong harness local, không thay thế nghiệm thu thiết bị thực |
+| Backend tests | Skipped | Không đổi backend trong lần sửa bố cục này |
+
+Kích thước đo: screen/self camera ở 1440px là 1042px/300x169px; 1024px là 690px/236x132px; 768px là 686px/220x124px; 390px là 324px/140x79px. Harness và server tạm đã dừng, đưa khỏi frontend source, giữ artifacts trong output/playwright bị ignore.
+
+## Quyết định và lý do
+
+Dành ô self camera riêng thay vì nhét tất cả camera vào grid cao 180px. Remote list có scroll riêng, tránh làm screen nhỏ dần khi nhiều người vào. Giữ màu/type của app hiện có. Không thêm test mô phỏng CSS; dùng đo layout và screenshot browser cho thay đổi giao diện này.
+
+## Blocker và việc chưa hoàn thành
+
+Không blocker code. Phase 05 vẫn In Progress; chưa kiểm thử thiết bị thật hoặc tunnel. Yêu cầu kiểm tra lỗi tunnel trước đó chưa được chẩn đoán trong phiên sửa layout này. Mobile vẫn bị giới hạn diện tích vật lý, xem chi tiết chữ nhỏ cần màn hình lớn hơn.
+
+## Bước tiếp theo
+
+Tải lại frontend dev; nếu dùng preview/tunnel, chạy lại tunnel để dùng bản build mới. Thử A share màn hình thật và B bật camera trên thiết bị khác.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan
+- [x] Cập nhật session log/changelog/module docs
+- [x] Đăng ký docs.json
+- [x] Ghi kết quả và giới hạn

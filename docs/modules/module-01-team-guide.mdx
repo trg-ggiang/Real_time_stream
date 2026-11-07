@@ -1021,10 +1021,14 @@ Nhánh start: tạo runtimeDir nếu cần, đọc previous và kiểm tra từn
 | Invoke-WebRequest -Uri | GitHub release chính thức | Nguồn tải pinned version |
 | -UseBasicParsing | Chế độ tương thích Windows PowerShell | Không cần engine HTML Internet Explorer |
 | -OutFile | downloadPath | Ghi binary ra file, không in nội dung |
-| Get-FileHash -Algorithm SHA256 | Hash file tải/cached | Không khớp thì throw, không chạy executable |
+| Get-Sha256 | Hash file tải/cached bằng .NET | Không khớp expectedHash thì throw, không chạy executable; không cần Get-FileHash cmdlet |
 | Move-Item -LiteralPath ... -Destination ... -Force | Đổi file tải đã kiểm tra sang tên cuối | Không là thao tác recursive; target cụ thể trong toolDir |
 
 Build thất bại thì không start tunnel. Binary cached vẫn được kiểm tra hash trước khi dùng. Không cài Windows service hoặc tự đăng nhập Cloudflare.
+
+Hàm `Get-Sha256(LiteralPath)` nhận đường dẫn file, mở `stream` để đọc và tạo `algorithm` SHA256 của .NET. ComputeHash đọc bytes, BitConverter tạo chuỗi hex, bỏ dấu gạch và chuyển lowercase để so expectedHash. Finally dispose cả algorithm và stream để không khóa file sau khi đọc. Dùng API .NET tránh lỗi cmdlet Get-FileHash không được nhận diện trong một số shell npm.
+
+**Chốt hàm Get-Sha256():** trả SHA256 chuẩn hóa của executable/file tải để xác minh integrity trước thực thi; không liên quan token hoặc password hashing của auth.
 
 ### 20.5. Hàm Wait-Http(Url, Child)
 

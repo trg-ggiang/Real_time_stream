@@ -55,6 +55,8 @@ Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel t�
 
 ## Tổ chức source
 
+- [Chia sẻ màn hình](docs/modules/screen-sharing.mdx): mọi thành viên được share, hỗ trợ nhiều người trình chiếu và checklist thử hai thiết bị. Restart backend và tham gia lại để nhận quyền mới.
+
 - [Tài liệu giải thích code cho nhóm](docs/modules/module-01-team-guide.mdx): từng file, hàm, biến, tham số, cấu hình và các luồng Join/Leave/lỗi.
 
 - `backend/src/config/`: kiểm tra môi trường; `configure-app.ts`: prefix/CORS/shutdown.

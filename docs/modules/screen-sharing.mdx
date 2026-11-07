@@ -1,0 +1,45 @@
+---
+title: Chia sẻ màn hình
+description: Luồng publish màn hình, quyền và checklist kiểm thử.
+---
+
+## Phạm vi
+
+Mọi người đã đăng nhập và tham gia phòng đều được tự chia sẻ màn hình. Nhiều người có thể chia sẻ đồng thời; mỗi người xem chọn người trình chiếu bằng danh sách. Không có host duyệt, khóa một người trình chiếu, ghi hình hoặc lưu trạng thái vào Supabase.
+
+## Luồng thực hiện
+
+1. React xin credentials qua API đã bảo vệ bằng JWT ứng dụng.
+2. `LivekitService` dùng `getMeetingPublishSources(true)` cấp camera, microphone, screen_share và screen_share_audio trong token. Hàm policy là điểm nối quyền theo vai trò trong tương lai; hiện mọi người được cùng quyền.
+3. `ScreenShareButton` đọc connection, trạng thái share và permission từ SDK. Khi click, gọi trực tiếp `setScreenShareEnabled` để giữ user activation cho hộp chọn của trình duyệt. Ref chặn thao tác lặp; pending khóa nút. Không tự bắt đầu share lúc join.
+4. Trình duyệt cho người dùng chọn tab/cửa sổ/màn hình. SDK publish media trực tiếp tới LiveKit Cloud; NestJS và Cloudflare tunnel không chuyển tiếp nội dung màn hình.
+5. `ScreenShareStage` đọc các publication ScreenShare. Người vào sau nhận publication hiện tại qua LiveKit. VideoTrack hiển thị màn hình đã chọn; khi người đó dừng/rời phòng, chọn màn hình còn lại hoặc ẩn stage. Lưới camera và badge giơ tay giữ riêng.
+6. Dừng từ app gọi SDK; dừng từ trình duyệt phát sự kiện track ended để SDK dọn publication. `useLocalParticipant` cập nhật nhãn nút theo trạng thái thật. LiveKitRoom tiếp tục quản lý cleanup khi rời phòng.
+
+## Quyền và phân quyền sau này
+
+Quyền thực thi nằm ở token/LiveKit server. Nút đọc `useLocalParticipantPermissions`, gồm quyền publish và các source cho phép. `getMeetingPublishSources(false)` chỉ cấp camera/microphone. Khi có vai trò, thay quyết định `true` bằng policy backend, không lấy quyền tự khai báo từ participant attributes. Đổi quyền của người đang online cần backend gọi LiveKit cập nhật participant permission; module đó chưa triển khai.
+
+## Cách chạy và thử
+
+Chạy backend/frontend như README; restart backend và rời/vào lại phòng để lấy token mới. Qua mạng ngoài dùng `npm run tunnel` và link HTTPS. Không cần env hay schema Supabase mới.
+
+- A chia sẻ; B thấy nội dung và nghe mic như trước.
+- C vào sau thấy màn hình A. A tắt camera vẫn chia sẻ được.
+- B cùng chia sẻ; mỗi người xem chọn A/B. Người đang được xem dừng hoặc rời phòng thì giao diện chuyển về người còn lại.
+- Dừng bằng nút app và Stop sharing của trình duyệt; camera/mic không bị tắt theo.
+- Hủy/từ chối hộp chọn rồi thử lại; mất kết nối phải khóa nút, không kết nối lại cả phòng vì lỗi share.
+- Thử share âm thanh tab và xác nhận không có tiếng vọng; thử nguồn không hỗ trợ audio vẫn chia sẻ được hình.
+- Thử hai thiết bị/hai mạng qua HTTPS; kiểm tra chữ nhỏ, cửa sổ thay đổi kích thước và giơ tay khi có stage.
+
+## Giới hạn
+
+Khả năng capture và âm thanh phụ thuộc trình duyệt, hệ điều hành và nguồn người dùng chọn. Mobile web có thể không hỗ trợ getDisplayMedia; khi thiếu API hoặc secure context, nút bị khóa và có giải thích. Không thể tự bỏ qua hộp chọn hay tự chọn màn hình cho người dùng. Browser không phân biệt rõ mọi trường hợp hủy và từ chối quyền, nên thông báo hướng dẫn thử lại.
+
+Âm thanh chỉ yêu cầu khi token cho phép screen_share_audio; trình duyệt có thể trả video mà không có audio. RoomAudioRenderer hiện có phát audio nhận được. Nhiều màn hình đồng thời tăng tải mạng/CPU; hiện không giới hạn số người share hay tối ưu subscription chỉ nhận người được chọn. Token cũ cần được cấp lại sau khi backend đổi quyền.
+
+Tham khảo [LiveKit screen sharing](https://docs.livekit.io/transport/media/screenshare/).
+
+## Bố cục khi có người share
+
+MeetingMediaLayout giữ screen lớn bên trái và camera bên phải trên desktop. Camera của bạn nằm riêng ở đầu, remote cameras cuộn trong vùng riêng. Dưới 850px screen ở trên, camera thành dải ngang bên dưới, camera local luôn hiện. Khi hết screen share, quay về GridLayout ban đầu. Đã thử video giả lập qua Cloud và đo ở 1440/1024/768/390px; chưa nghiệm thu thiết bị thật/tunnel.
