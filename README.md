@@ -1,6 +1,6 @@
 # Real-time Stream — Meeting Module
 
-Ứng dụng thử nghiệm audio/video: React/Vite đăng nhập qua NestJS/Supabase, dùng JWT ứng dụng xin token rồi kết nối trực tiếp LiveKit Cloud. Hiện dùng một room cố định, chưa có phân quyền phòng hoặc chat. Code Hải đã gộp vào `backend/src`; không chạy app `backend/my-api` riêng. Xem [hướng dẫn auth và DB](docs/modules/auth-integration.mdx).
+Ứng dụng thử nghiệm audio/video: React/Vite đăng nhập qua NestJS/Supabase rồi tham gia phòng LiveKit. Tại Home, chọn **Tham gia phòng**, thiết lập quyền mic/camera/phòng chờ và vào phòng. Cài đặt phòng hiện được giữ trong bộ nhớ backend. Code Hải đã gộp vào `backend/src`; không chạy app `backend/my-api` riêng. Xem [hướng dẫn auth và DB](docs/modules/auth-integration.mdx) và [luồng phòng họp](docs/modules/meeting-creation.mdx).
 
 ## Cài đặt và cấu hình
 
@@ -39,15 +39,17 @@ npm run dev:frontend
 
 Mở **http://localhost:5173** hoặc **http://127.0.0.1:5173**. Đăng ký/đăng nhập trước rồi tham gia phòng. Vite proxy `/api` về backend. API ở `http://localhost:3000/api`; `GET /api/health` kiểm tra liveness. Khi thiếu cấu hình LiveKit, API vẫn khởi động nếu Supabase/JWT hợp lệ và token endpoint trả 503 sau xác thực.
 
+Tại Home, nhấn **Tham gia phòng**, chọn quyền mặc định trong form thiết lập rồi lưu để mở cuộc gọi. Dùng nút sao chép link mời để khách mở `/meeting/{id}`. NestJS lưu phiên bằng cookie HttpOnly; token không xuất hiện trong URL hay browser storage. Cho phép camera/microphone trong browser khi được hỏi.
+
 ```powershell
 npm run typecheck
 npm test
 npm run build
-npm --workspace backend start
-npm --workspace frontend run preview
 ```
 
-Preview chạy cổng 4173 và dùng cùng API proxy khi `VITE_API_URL` để trống. Khi gọi API khác origin bằng URL tuyệt đối, đặt `FRONTEND_URL` đúng origin frontend. Preview chỉ phục vụ kiểm tra bản build. PoC token endpoint bị vô hiệu khi `POC_ENABLED` không bật và không cho bật trong `NODE_ENV=production`.
+Trong production, đặt `NODE_ENV=production` và chạy `npm --workspace backend start` sau `npm run build`; NestJS phục vụ React build tại `/`, `/meeting/{uuid}`, static assets và API `/api/*` cùng origin. Nếu thiếu `frontend/dist/index.html`, backend dừng khởi động thay vì chạy mà không có trang. Production không bật PoC token endpoint.
+
+Để preview cục bộ, chạy `npm --workspace frontend run preview` sau build; Preview chạy cổng 4173 và dùng API proxy khi `VITE_API_URL` để trống. Preview không đi qua static server của NestJS.
 
 ## Thử nhiều thiết bị qua HTTPS
 

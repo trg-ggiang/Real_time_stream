@@ -1,0 +1,45 @@
+﻿---
+title: Bỏ form quyền phòng riêng
+description: Form tạo meeting lưu dữ liệu và mở phòng sau khi ghi thành công.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-08
+- Thời gian: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — Application Foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Theo yêu cầu, bỏ cấu trúc form quyền phòng riêng. Form meeting chỉ thu thập dữ liệu để lưu vào bảng `meetings`.
+
+## Công việc hoàn thành
+
+- Bỏ bước `RoomPermissionForm` sau khi tạo meeting và bỏ component/CSS không còn dùng.
+- Sau khi API tạo meeting lưu DB thành công, Home mở cuộc gọi với meeting vừa tạo.
+- Gỡ gọi API lưu cài đặt phòng khỏi luồng frontend.
+- Cập nhật hướng dẫn tạo meeting và các ghi chú phiên liên quan.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Rà soát tham chiếu RoomPermissionForm và saveMeetingSettings | Passed | Không còn tham chiếu trong frontend source. |
+| Typecheck, tests, build | Skipped | Không chạy theo chỉ dẫn phiên. |
+| Ghi DB Supabase thật | Not verified | Cần áp dụng migration và xác nhận trên Supabase development. |
+
+## Quyết định và lý do
+
+Luồng tạo meeting đã ghi dữ liệu vào `meetings` và membership của host trong cùng RPC. Vì vậy không cần bước giao diện thứ hai để lưu thiết lập trước khi mở cuộc gọi.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh ghi DB thật hoặc cuộc gọi với LiveKit Cloud. Backend settings endpoint còn được giữ để tránh mở rộng phạm vi xóa API ngoài form.
+
+## Bước tiếp theo
+
+Áp dụng migration trên Supabase development, tạo meeting từ Home và xác nhận hai bảng `meetings`/`meeting_members`.
+

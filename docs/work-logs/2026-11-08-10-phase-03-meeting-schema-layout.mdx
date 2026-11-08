@@ -1,0 +1,44 @@
+---
+title: Căn chỉnh lưu meeting theo schema mới
+description: Chuyển lịch và tên phòng LiveKit sang meeting_sessions.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-10
+- Thời gian: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — Application Foundation; 05 — LiveKit PoC
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Căn chỉnh tạo meeting với schema Supabase mới gồm `meetings`, `meeting_sessions`, `meeting_members` và các bảng liên quan.
+
+## Công việc hoàn thành
+
+- Sửa RPC tạo meeting để ghi metadata vào `meetings`, lịch và `livekit_room_name` vào `meeting_sessions`, host vào `meeting_members` trong cùng transaction.
+- Bật RLS và cấp quyền bảng cho `service_role` trong migrations hiện có.
+- Cập nhật hướng dẫn tạo phòng và quickstart theo schema mới.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Đối chiếu tên bảng/cột trong migration với DDL được cung cấp | Passed | Lịch và `livekit_room_name` chỉ được ghi vào `meeting_sessions`. |
+| Kiểm tra code settings | Passed | `waiting_room_enabled` tiếp tục được cập nhật trong `meetings`. |
+| Typecheck, tests, build | Skipped | Không chạy theo quy tắc phiên. |
+| Áp dụng migration/ghi DB thật | Not verified | Cần áp dụng trên Supabase development. |
+
+## Quyết định và lý do
+
+Giữ `meeting_id` làm tên `livekit_room_name`, phù hợp luồng hiện tại dùng UUID meeting để xin token LiveKit và không cần thêm cột.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác nhận migrations trên instance Supabase thật. Best-practices skill cho Supabase/Postgres không có trong các skill khả dụng của phiên này; migration được đối chiếu trực tiếp với DDL người dùng cung cấp.
+
+## Bước tiếp theo
+
+Áp dụng migrations theo thứ tự thời gian trên Supabase development, tạo phòng và xác nhận hàng tương ứng xuất hiện trong cả ba bảng.

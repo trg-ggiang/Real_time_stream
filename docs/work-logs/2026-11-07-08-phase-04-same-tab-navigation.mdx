@@ -1,0 +1,47 @@
+---
+title: Mở phòng họp trong tab hiện tại
+description: Điều hướng liên kết phòng họp trong cùng tab.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-08
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đổi hành vi mở phòng họp sang `_self`, cùng tab hiện tại.
+
+## Công việc hoàn thành
+
+- Đặt `target="_self"` cho liên kết mở phòng mới trên Home và trong sidebar.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra source | Passed | Cả hai liên kết phòng họp dùng `_self`. |
+| Typecheck/tests/build | Skipped | Thay đổi thuộc tính liên kết. |
+
+## Quyết định và lý do
+
+Áp dụng hành vi nhất quán cho cả hai lối vào phòng họp.
+
+## Blocker và việc chưa hoàn thành
+
+Không có.
+
+## Bước tiếp theo
+
+Không cần bước tiếp theo.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

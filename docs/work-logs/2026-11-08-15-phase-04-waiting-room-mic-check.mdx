@@ -1,0 +1,51 @@
+---
+title: Kiểm tra phòng chờ và điều khiển mic
+description: Kiểm tra luồng duyệt thành viên và khóa mic của chủ phòng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-15
+- Thời gian bắt đầu/kết thúc: 2026-11-08 14:57–14:58 +07:00
+- Agent: Codex
+- Phase: 04 — NestJS API và React nền tảng cho PoC
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Kiểm tra tính năng chủ phòng duyệt thành viên trước khi vào và điều khiển tắt mic.
+
+## Công việc hoàn thành
+
+- Xác nhận backend không cấp LiveKit token cho khách trong phòng chờ; chủ phòng đọc được hàng chờ và duyệt theo app user ID. Frontend tự kiểm tra lại quyền vào sau mỗi 8 giây.
+- Xác nhận chủ phòng có thể mute track mic đang phát và thu hồi quyền publish microphone; mở khóa khôi phục quyền publish để thành viên tự bật mic lại.
+- Sửa kỳ vọng test LiveKit dùng enum `TrackSource` dạng số theo SDK thực tế.
+- Trạng thái phòng chờ và khóa mic lưu trong `Map` của backend, nên mất khi restart và không đồng bộ giữa nhiều instance.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace backend test` | Passed | Build TypeScript và 5/5 backend tests; gồm waiting room và host microphone control. |
+| `npm.cmd --workspace frontend test -- src/features/meeting/MeetingPage.test.tsx src/features/meeting/hooks/use-meeting-session.test.tsx src/features/meeting/services/token-api.test.ts` | Passed | 3 test files, 14/14 tests. |
+| Kiểm tra LiveKit Cloud thực tế | Skipped | Không thay đổi phòng Cloud hay dùng credentials ngoài kiểm thử mock. |
+
+## Quyết định và lý do
+
+Giữ hành vi mở khóa mic là khôi phục quyền publish; thành viên chủ động bật mic lại. Remote unmute phụ thuộc cấu hình LiveKit Cloud và không cần thiết cho nút “Cho phép bật mic”.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh tương tác trên hai thiết bị với LiveKit Cloud. Phòng chờ/khóa mic hiện chỉ có hiệu lực trên một tiến trình backend đang chạy.
+
+## Bước tiếp theo
+
+Nếu cần sử dụng ổn định qua restart hoặc nhiều backend instance, lưu trạng thái phòng chờ và khóa mic vào shared storage; sau đó nghiệm thu mute/approval trên hai thiết bị.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

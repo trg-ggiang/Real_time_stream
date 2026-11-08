@@ -1,0 +1,57 @@
+---
+title: Mở phòng họp ở tab riêng
+description: Mở tab họp toàn màn hình với session HttpOnly và room ID.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-06
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Copilot
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Khi nhấn Phòng họp hoặc Home action, mở trang họp riêng trong tab mới theo mẫu URL `/meeting/{id}`, giữ session an toàn và dùng LiveKit room tương ứng.
+
+## Công việc hoàn thành
+
+- Mục Phòng họp và action Home mở tab mới ở `/meeting/new`; FE tạo UUID v4 rồi thay URL thành `/meeting/{uuid}`.
+- Tạo layout họp toàn màn hình, tự xin token/kết nối và bật camera/microphone; LiveKit controls gồm camera, mic, chia sẻ màn hình, rời phòng.
+- Đổi auth sang cookie HttpOnly/SameSite=Lax, thêm restore `/api/auth/me` và logout xóa cookie; JWT không trả vào FE hoặc URL.
+- Thêm endpoint LiveKit xác thực cho UUID room riêng; room ID là định danh, chưa phải ACL membership.
+- NestJS production phục vụ FE build và fallback SPA; `/api/*` được giữ riêng.
+- Cập nhật test FE/BE, tài liệu route/auth và hướng dẫn production.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Frontend/backend typecheck, tests, build | Pending | Cần chạy sau thay đổi FE/BE |
+| `git diff --check` | Pending | Cần chạy sau thay đổi |
+| Full workspace checks trước camera diagnostic patch | Passed | Backend/frontend typecheck; backend 3 tests, frontend 21 tests; build đạt |
+| Production HTTP `/meeting/{id}` smoke với built assets | Chưa xác minh | Lệnh smoke bị gián đoạn trước khi có kết quả |
+
+## Quyết định và lý do
+
+Tab mới theo ảnh mẫu cần duy trì auth mà không đặt JWT vào URL. Dùng cookie HttpOnly; FE chỉ đọc user từ `/api/auth/me`. Tạo ID UUID phía FE và BE cấp quyền token cho room ID đó. UUID không thay cho danh sách thành viên hoặc phân quyền phòng.
+
+## Blocker và việc chưa hoàn thành
+
+- Production HTTP smoke chưa có kết quả do lệnh bị ngắt.
+- Cần chạy lại workspace checks sau thay đổi chẩn đoán camera.
+- Browser tích hợp kiểm tra quyền camera/microphone đang là denied; chưa kiểm tra được media thực trong browser đó.
+- Dynamic room ID chưa có membership/authorization; bất kỳ user đã đăng nhập nào có thể xin token cho ID phòng.
+
+## Bước tiếp theo
+
+Chạy lại workspace checks và production HTTP smoke; sau đó xác nhận tab mới `/meeting/{uuid}`, cookie auth, quyền camera và kết nối media trên thiết bị thật. Thiết kế membership trước khi dùng phòng riêng tư.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

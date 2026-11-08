@@ -1,0 +1,67 @@
+---
+title: Form tạo phòng và lưu Supabase
+description: Thêm wizard tạo meeting, ghi dữ liệu và chuyển sang thiết lập quyền phòng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-03
+- Thời gian: 2026-11-08, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — API và React nền tảng
+- Kết quả phiên: Completed — code đã hoàn thành, DB thật chưa nghiệm thu.
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Tạo form theo ảnh: nhập tên, mô tả, thời gian và chế độ phòng; lưu meeting vào Supabase rồi chuyển sang form thiết lập quyền phòng đã có.
+
+## Công việc hoàn thành
+
+- Thêm form tạo phòng bước 1 và API FE có cookie credentials.
+- Thêm DTO/endpoint NestJS được bảo vệ bằng JWT và rate limit.
+- Thêm migration mở rộng bảng `meetings`, bật RLS cho `meetings`/`meeting_members`, và function tạo meeting cùng host membership nguyên tử.
+- Lưu quyền mic/video/waiting room vào DB qua form thiết lập sẵn; chỉ mở cuộc họp sau khi API lưu thành công.
+- Mã meeting đồng nhất với `meeting_id` và `livekit_room_name`; `meeting_code` được tạo ngẫu nhiên.
+- Hướng dẫn migration được thêm trong phiên và sau đó gỡ cùng luồng form theo yêu cầu người dùng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy theo yêu cầu hiện tại. |
+| Supabase thật | Skipped | Chưa áp dụng migration hoặc gọi DB thật từ môi trường này. |
+| JSON/navigation docs | Passed | Đã parse docs.json và xác nhận targets sau cập nhật. |
+
+## Quyết định và lý do
+
+Dùng function Postgres để tạo meeting và host membership trong một giao dịch, tránh bản ghi meeting mồ côi nếu bước tạo thành viên lỗi. Function dùng `SECURITY INVOKER`, chỉ cấp quyền execute cho `service_role`; truy cập DB đi qua backend.
+
+## Blocker và việc chưa hoàn thành
+
+- Cần áp dụng `supabase/migrations/20261108120000_meeting_creation_form.sql` trên Supabase development trước khi dùng form.
+- Chưa xác minh luồng tạo DB hoặc UI trên browser.
+- Visibility được ghi vào DB; danh sách công khai và phân quyền join theo visibility chưa được triển khai.
+
+## Bước tiếp theo
+
+Áp dụng migration lên Supabase development, chạy app, tạo phòng và kiểm tra hàng meeting/host membership/settings; sau đó kiểm tra giao diện trên desktop/mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log và hướng dẫn trong docs.json
+- [x] Ghi giới hạn kiểm tra và xác minh
+
+## Cập nhật sau phiên — 2026-11-08
+
+Theo yêu cầu tiếp theo, wizard, API ghi meeting và migration chưa áp dụng đã được gỡ; Home trở lại luồng trước đó. Xem [work log thu hồi](/work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form).
+
+## Cập nhật tiếp theo — 2026-11-08
+
+Luồng tạo meeting được khôi phục theo yêu cầu mới, với migration timestamp mới. Xem [work log hiện hành](/work-logs/2026-11-08-05-phase-03-meeting-creation-db).
+
+## Cập nhật hiện trạng — 2026-11-08
+
+Luồng tạo meeting có DB được khôi phục theo yêu cầu mới và có migration timestamp mới. Chi tiết trạng thái hiện tại: [work log 2026-11-08-05](/work-logs/2026-11-08-05-phase-03-meeting-creation-db).

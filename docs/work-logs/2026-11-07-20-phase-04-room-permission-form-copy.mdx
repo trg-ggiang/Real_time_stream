@@ -1,0 +1,49 @@
+---
+title: Sửa chữ và icon form quyền phòng
+description: Khôi phục tiếng Việt đúng mã và thay biểu tượng emoji bị hỏng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-20
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa form quyền phòng theo ảnh người dùng gửi; chữ tiếng Việt và biểu tượng hiển thị không đọc được.
+
+## Công việc hoàn thành
+
+- Viết lại nội dung form bằng tiếng Việt Unicode đúng: tiêu đề, mô tả, các quyền mic/video/chờ duyệt, ghi chú và nút.
+- Thay chuỗi emoji đã hỏng bằng icon microphone, camera và clock từ bộ icon UI.
+- Cải thiện wrap và giới hạn tràn của heading/label dài.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy trong phiên này. |
+| Browser review | Skipped | Chưa xem trực tiếp form sau chỉnh sửa. |
+
+## Quyết định và lý do
+
+Thay icon thay vì sửa emoji vì icon cùng phong cách, kích thước ổn định và không phụ thuộc font emoji trên máy.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra trực quan sau khi sửa.
+
+## Bước tiếp theo
+
+Mở Home và xem form ở desktop/mobile; xác nhận nhãn tiếng Việt và icon hiển thị đúng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

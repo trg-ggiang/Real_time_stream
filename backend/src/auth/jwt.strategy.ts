@@ -8,7 +8,16 @@ import { UsersService } from '../users/users.service';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(config: ConfigService, private readonly users: UsersService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        (request) => {
+          const cookie = request?.headers?.cookie
+            ?.split(';')
+            .map((value: string) => value.trim())
+            .find((value: string) => value.startsWith('rts_session='));
+          return cookie?.slice('rts_session='.length);
+        },
+      ]),
       ignoreExpiration: false,
       algorithms: ['HS256'],
       secretOrKey: config.getOrThrow<string>('JWT_SECRET'),

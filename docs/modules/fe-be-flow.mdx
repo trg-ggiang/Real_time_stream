@@ -1,0 +1,110 @@
+---
+title: Luồng FE và BE
+description: Tóm tắt luồng đăng nhập, cấp token và kết nối phòng thử nghiệm.
+---
+
+## Tổng quan
+
+Ứng dụng có một frontend React/Vite và một backend NestJS. Frontend không truy cập Supabase bằng secret và không tự ký token LiveKit:
+
+1. Người dùng đăng ký hoặc đăng nhập từ frontend.
+2. Backend kiểm tra thông tin, đọc/ghi người dùng trong Supabase và trả JWT ứng dụng.
+3. Frontend gửi JWT để xin quyền tham gia phòng cố định.
+4. Backend xác thực JWT, kiểm tra người dùng còn tồn tại, rồi ký token LiveKit.
+5. Trình duyệt dùng LiveKit SDK kết nối media trực tiếp tới LiveKit Cloud.
+
+```text
+React → NestJS Auth → Supabase
+React ← JWT ứng dụng ← NestJS
+React → NestJS LiveKit (JWT ứng dụng)
+React ← LiveKit token ← NestJS
+React ↔ LiveKit Cloud (audio/video)
+```
+
+## Luồng frontend
+
+### 1. Mở Home hoặc Meeting
+
+Home ở `/`; nhấn Phòng họp hoặc Mở phòng họp mới mở tab mới tại `/meeting/{uuid}`. Đây là trang họp toàn màn hình, không render Home/navbar/sidebar. Vite dev/preview cung cấp SPA fallback; NestJS production phục vụ React build cho route frontend như `/meeting/{uuid}`, còn `/api/*` tiếp tục là API.
+
+### 2. Khởi tạo ứng dụng
+
+`frontend/src/main.tsx` nạp styles và render `AuthApp`. `AuthApp` kiểm tra `GET /api/auth/me` để khôi phục user từ cookie HttpOnly của BE. JWT không được FE đọc, không lưu browser storage và không truyền trong URL.
+
+### 3. Đăng ký hoặc đăng nhập
+
+Trong `frontend/src/features/auth/AuthApp.tsx`, người dùng chọn chế độ đăng nhập/đăng ký và gửi biểu mẫu:
+
+- FE kiểm tra định dạng email, độ dài tên và giới hạn mật khẩu trước khi gọi API.
+- `frontend/src/features/auth/auth-api.ts` gửi `POST /api/auth/register` hoặc `POST /api/auth/login`.
+- Mặc định URL API là `/api` cùng origin, được Vite proxy tới backend; có thể đặt `VITE_API_URL` khi cần API khác origin.
+- Request có thể hủy khi component đóng và timeout sau 15 giây. FE chuyển lỗi HTTP hoặc lỗi kết nối thành thông báo trên biểu mẫu.
+- Khi thành công, FE lưu thông tin user trong React state; cookie session HttpOnly do backend đặt. Trang `/` là Home, `/meeting/{uuid}` là trang họp; tải lại/tab mới khôi phục session qua `/api/auth/me`.
+
+### 4. Xin quyền vào phòng
+
+`frontend/src/features/meeting/MeetingPage.tsx` hiển thị nút tham gia. `useMeetingSession` trong `frontend/src/features/meeting/hooks/use-meeting-session.ts`:
+
+- Chặn thao tác Join lặp và yêu cầu trang ở secure context (HTTPS hoặc localhost).
+- Gọi `frontend/src/features/meeting/services/token-api.ts` để gửi `POST /api/livekit/rooms/{uuid}/token` kèm cookie session; JWT không xuất hiện trong request URL hay JS header.
+- Có timeout 15 giây, hỗ trợ hủy request khi rời trang hoặc hủy Join.
+- Nếu nhận 401, xóa phiên đăng nhập để người dùng đăng nhập lại; các lỗi 429/503 và lỗi mạng được hiển thị riêng.
+- Khi nhận dữ liệu hợp lệ, lưu thông tin phòng trong state; token LiveKit cũng chỉ được giữ trong bộ nhớ.
+
+### 5. Kết nối và rời phòng
+
+`frontend/src/features/meeting/components/MeetingRoom.tsx` dùng LiveKit React SDK để kết nối với `serverUrl` và token vừa nhận. SDK quản lý camera, microphone, audio/video tracks và trạng thái kết nối; giao diện có video grid, audio renderer, điều khiển mic/camera và nút rời phòng. Screen share và chat hiện bị tắt.
+
+Rời phòng sẽ bỏ credentials khỏi state và unmount `LiveKitRoom`, khiến SDK ngắt kết nối. Đăng xuất cũng rời phòng rồi xóa session FE. Mỗi phòng mới dùng UUID riêng; hiện tại mọi user đã đăng nhập có thể xin token cho room ID bất kỳ, nên UUID chưa phải quyền truy cập/phân quyền.
+
+## Luồng backend
+
+### 1. Khởi động và cấu hình
+
+`backend/src/main.ts` tạo NestJS app. `backend/src/app.module.ts` đăng ký Config, rate limiting, Supabase, Auth và LiveKit modules. `backend/src/config/environment.ts` kiểm tra cấu hình bắt buộc và định dạng trước khi app khởi động.
+
+`backend/src/configure-app.ts` đặt prefix `/api`, bật validation toàn cục, giới hạn CORS theo `FRONTEND_URL` với credentials và bật shutdown hooks. `backend/src/configure-frontend.ts` trong production phục vụ `frontend/dist`, fallback cho GET route như `/meeting/{uuid}` và bỏ qua `/api/*`. `AuthController` đặt/xóa cookie `rts_session` HttpOnly. `JwtStrategy` nhận bearer token cho compatibility hoặc cookie session. `LivekitController` xác thực user rồi cấp token cho UUID room; UUID là ID phòng, chưa có membership/authorization. Backend production cần build frontend trước.
+
+### 2. Auth và dữ liệu người dùng
+
+Các endpoint do `backend/src/auth/auth.controller.ts` cung cấp:
+
+| Endpoint | Xử lý |
+|---|---|
+| `POST /api/auth/register` | Validate input, chuẩn hóa email, tạo user, đặt cookie phiên HttpOnly và trả thông tin user công khai |
+| `POST /api/auth/login` | Tìm user theo email, so sánh bcrypt hash, đặt cookie phiên HttpOnly và trả thông tin user công khai |
+| `GET /api/auth/me` | Xác thực cookie phiên rồi trả user hiện tại |
+
+`AuthService` gọi `UsersService`; dịch vụ này truy vấn bảng `users` qua Supabase client từ `SupabaseService`. Khi đăng ký, mật khẩu được bcrypt hash trước khi ghi vào `password_hash`. Hash không được trả trong response.
+
+JWT ứng dụng được ký bằng `JWT_SECRET` và hết hạn sau một ngày. `JwtStrategy` chỉ nhận bearer token, kiểm tra chữ ký/hạn dùng rồi tải user hiện tại từ Supabase theo `sub`; user không còn tồn tại thì request không được xác thực.
+
+### 3. Cấp token LiveKit
+
+`POST /api/livekit/rooms/{roomId}/token` được xử lý bởi `LivekitController` và yêu cầu `JwtAuthGuard`. Controller lấy user đã xác thực từ request, nhưng hiện chưa kiểm tra room membership; người dùng đăng nhập có thể xin token cho room ID.
+
+`LivekitService` kiểm tra PoC và LiveKit credentials, sau đó ký token với:
+
+- Room cố định từ `LIVEKIT_ROOM_NAME`.
+- Identity riêng cho từng phiên tham gia.
+- Quyền join, publish/subscribe; chỉ cho publish camera và microphone, không publish data.
+- Thời hạn từ `LIVEKIT_TOKEN_TTL_SECONDS`.
+
+Nếu PoC bị tắt hoặc LiveKit chưa cấu hình, endpoint trả 503. Sau khi nhận token, browser kết nối trực tiếp với LiveKit Cloud; backend không chuyển tiếp luồng media.
+
+### 4. Health check
+
+`GET /api/health` trả trạng thái liveness `{ status: "ok" }`. Đây chỉ là kiểm tra backend đang phản hồi, không xác minh Supabase schema hay kết nối LiveKit thực tế.
+
+## Hợp đồng dữ liệu và giới hạn
+
+- Bảng Supabase `users` cần các cột tương thích với `UsersService`: `user_id`, `email`, `display_name`, `avatar_url`, `email_verified_at`, `created_at`, `password_hash`. Email nên unique và chuẩn hóa chữ thường; schema cần có default phù hợp cho ID/thời gian tạo.
+- Repo hiện chưa có migration để tạo bảng này; cần xác minh schema development trước khi thử auth thật.
+- Có một room cố định; chưa có phòng động, chat, refresh token, hoặc thu hồi JWT phía server.
+- CORS và các URL proxy cần khớp với địa chỉ frontend/backend khi chạy local hoặc preview.
+
+## Chạy và kiểm tra
+
+Từ root, cài dependencies bằng `npm install`, cấu hình env backend theo [hướng dẫn auth](./auth-integration.mdx), rồi chạy `npm run dev:backend` và `npm run dev:frontend` ở hai terminal. Mở `http://localhost:5173`.
+
+Kiểm tra mã nguồn bằng `npm run typecheck`, `npm test` và `npm run build`. Các kiểm tra này không thay thế việc xác minh Supabase development schema hoặc thử media giữa hai thiết bị.

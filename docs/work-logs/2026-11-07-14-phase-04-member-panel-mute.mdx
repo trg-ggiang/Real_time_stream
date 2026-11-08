@@ -1,0 +1,50 @@
+---
+title: Danh sách thành viên cạnh video
+description: Chuyển điều khiển mic host sang panel thành viên cạnh khung hình.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-14
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Hiển thị danh sách thành viên cạnh video và cho host mute bằng biểu tượng mic.
+
+## Công việc hoàn thành
+
+- Thay overlay mute nổi trên video bằng panel danh sách bên cạnh video.
+- Hiển thị tên, vai trò và trạng thái microphone cho tất cả participant hiện có.
+- Biểu tượng mic của thành viên khác gọi endpoint server-side mute; host không thể mute chính mình.
+- Trên màn hình hẹp, panel chuyển xuống dưới video.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend. |
+| Tests/build/browser | Skipped | Chưa chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Giữ backend làm nguồn thực thi quyền mute; frontend chỉ gửi identity của participant đang hiển thị trong LiveKit room.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra bố cục với browser thật hoặc mute giữa hai thiết bị.
+
+## Bước tiếp theo
+
+Thử panel trên desktop/mobile và xác nhận trạng thái mic cập nhật sau khi host bấm biểu tượng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

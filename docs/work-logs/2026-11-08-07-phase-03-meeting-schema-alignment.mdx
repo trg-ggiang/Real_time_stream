@@ -1,0 +1,52 @@
+---
+title: Căn chỉnh form tạo phòng theo schema Supabase
+description: Chỉ gửi và lưu các trường có trong schema meetings hiện tại.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-07
+- Thời gian bắt đầu/kết thúc: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 03 — Auth và Supabase
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Điều chỉnh form tạo phòng và đường ghi dữ liệu để khớp schema `users`, `meetings`, `meeting_members`, `attendances` người dùng cung cấp.
+
+## Công việc hoàn thành
+
+- Form chỉ gửi tên phòng, thời gian bắt đầu và thời gian kết thúc.
+- Backend tự tạo ID/mã phòng, gán người tạo từ phiên đăng nhập, kiểm tra thứ tự thời gian và gọi RPC tạo meeting cùng host membership.
+- Cập nhật migration để RPC ghi các cột có trong schema; thêm migration tương thích để thay function cũ nếu migration trước đã được áp dụng.
+- Chỉ lưu `waiting_room_enabled` từ cài đặt vào DB; mic/video vẫn được dùng cho quyền LiveKit trong phiên hiện tại vì schema không có cột tương ứng.
+- Cập nhật hướng dẫn form tạo meeting và đăng ký work log trong docs navigation.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Đọc tĩnh form, DTO, service và migration | Passed | Trường gửi/ghi khớp với schema đã cung cấp. |
+| Typecheck, tests, build | Skipped | Không được yêu cầu trong phiên này. |
+| Áp dụng migration/ghi DB thật | Not verified | Chưa có quyền truy cập PostgreSQL/Supabase CLI trong môi trường này. |
+
+## Quyết định và lý do
+
+Không thêm `description`, `visibility`, `allow_mic` hay `allow_video` vào dữ liệu tạo phòng vì các cột này không có trong schema người dùng đưa. `scheduled_end_at` được thêm vào form vì đã có sẵn trong bảng.
+
+## Blocker và việc chưa hoàn thành
+
+Migration vẫn cần được áp dụng trong Supabase. Sau đó cần đăng nhập, tạo phòng và xác nhận các hàng trong `meetings`/`meeting_members`.
+
+## Bước tiếp theo
+
+Áp dụng migration theo thứ tự timestamp trên Supabase development, rồi thử tạo phòng từ form.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

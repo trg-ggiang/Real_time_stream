@@ -1,0 +1,46 @@
+---
+title: Khôi phục luồng phòng trước form tạo meeting
+description: Gỡ wizard metadata và trở lại form quyền phòng cũ.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-14
+- Thời gian: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — Application Foundation; 05 — LiveKit PoC
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Quay lại luồng Home trước form nhập metadata meeting.
+
+## Công việc hoàn thành
+
+- Home mở form thiết lập quyền từ nút **Tham gia phòng**, tạo room UUID và vào LiveKit sau khi settings API thành công.
+- Bỏ form/API/DTO/backend service tạo meeting và endpoint POST tạo meeting.
+- Trả cấu hình phòng về process memory như luồng trước đó.
+- Gỡ ba migration tạo meeting chưa áp dụng; không thay đổi bảng hay hàng dữ liệu Supabase.
+- Cập nhật tài liệu hiện hành và giữ các work log cũ làm lịch sử.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Backend typecheck | Passed | `npm.cmd --workspace backend run typecheck`. |
+| Frontend typecheck | Failed | `Sidebar.test.tsx` còn import thiếu `components/Navbar` và `components/Sidebar`; không thuộc luồng Home/form. |
+| Tests | Skipped | Không chạy theo chỉ dẫn phiên. |
+| Supabase | Not modified | Không áp dụng migration hay gửi thao tác ghi; các migration local chưa từng được áp dụng theo work log trước. |
+
+## Quyết định và lý do
+
+Khôi phục đúng luồng đã ghi ở lần rollback trước: RoomPermissionForm vẫn dùng để chọn quyền media, còn wizard tạo metadata/ghi meeting DB được gỡ. Settings trở lại memory-only.
+
+## Blocker và việc chưa hoàn thành
+
+Frontend typecheck vẫn bị chặn bởi hai import test cũ không tồn tại. Cài đặt room sẽ mất khi backend restart như giới hạn của luồng trước.
+
+## Bước tiếp theo
+
+Nếu cần xác minh trực quan, mở Home và kiểm tra nút **Tham gia phòng** mở setup form rồi vào meeting sau khi lưu. Không cần migration Supabase cho luồng hiện tại.

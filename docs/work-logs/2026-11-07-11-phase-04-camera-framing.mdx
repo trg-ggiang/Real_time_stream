@@ -1,0 +1,47 @@
+---
+title: Hiển thị trọn khung camera
+description: Giữ nguyên tỷ lệ và tránh cắt cảnh camera trong ô video.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-11
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Hiển thị toàn bộ khung hình camera trong trang gọi.
+
+## Công việc hoàn thành
+
+- Đổi video camera sang `object-fit: contain` và căn giữa, tránh crop để lấp đầy tile.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra CSS | Passed | Selector áp dụng riêng cho video nguồn camera. |
+| Browser/typecheck/tests/build | Skipped | Chưa chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Giữ nguyên tỷ lệ toàn cảnh; có thể xuất hiện khoảng trống hai bên hoặc phía trên/dưới.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh trực quan với camera thật.
+
+## Bước tiếp theo
+
+Mở phòng và kiểm tra khung camera trên thiết bị thực.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

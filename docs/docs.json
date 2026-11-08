@@ -20,7 +20,10 @@
               "modules/module-01-media-poc",
               "modules/https-tunnel",
               "modules/code-walkthrough",
-              "modules/module-01-team-guide"
+              "modules/module-01-team-guide",
+              "modules/fe-be-flow",
+              "modules/room-approval-guide",
+              "modules/meeting-creation"
             ]
           },
           {
@@ -30,7 +33,40 @@
               "plans/phase-03-auth",
               "work-logs/2026-11-07-01-phase-03-auth-integration",
               "work-logs/2026-11-07-02-phase-04-desktop-auth-ui",
-              "work-logs/2026-11-07-03-phase-04-auth-image-ratio"
+              "work-logs/2026-11-07-03-phase-04-auth-image-ratio",
+              "work-logs/2026-11-07-04-phase-04-sidebar-navigation",
+              "work-logs/2026-11-07-05-phase-04-room-permission-form",
+              "work-logs/2026-11-07-06-phase-04-meeting-page-routing",
+              "work-logs/2026-11-07-07-phase-05-camera-diagnostics",
+              "work-logs/2026-11-07-08-phase-04-same-tab-navigation",
+              "work-logs/2026-11-07-09-phase-04-leave-to-home",
+              "work-logs/2026-11-07-10-phase-04-meeting-call-design",
+              "work-logs/2026-11-07-11-phase-04-camera-framing",
+              "work-logs/2026-11-07-12-phase-04-room-settings-and-approval",
+              "work-logs/2026-11-07-13-phase-04-host-mute-participant",
+              "work-logs/2026-11-07-14-phase-04-member-panel-mute",
+              "work-logs/2026-11-07-15-phase-04-mic-state-and-device-error",
+              "work-logs/2026-11-07-16-phase-04-host-mic-lock",
+              "work-logs/2026-11-07-17-phase-04-camera-layout",
+              "work-logs/2026-11-07-18-phase-04-meeting-on-home",
+              "work-logs/2026-11-07-19-phase-04-remove-screen-share",
+              "work-logs/2026-11-07-20-phase-04-room-permission-form-copy",
+              "work-logs/2026-11-08-01-phase-04-home-interface-restore",
+              "work-logs/2026-11-08-02-phase-04-remove-home-navigation",
+              "work-logs/2026-11-08-03-phase-03-meeting-creation-db",
+              "work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form",
+              "work-logs/2026-11-08-05-phase-03-meeting-creation-db",
+              "work-logs/2026-11-08-08-phase-03-remove-room-permission-form",
+              "work-logs/2026-11-08-09-phase-03-meeting-setup-flow",
+              "work-logs/2026-11-08-10-phase-03-meeting-schema-layout",
+              "work-logs/2026-11-08-11-phase-03-meeting-rpc-diagnosis",
+              "work-logs/2026-11-08-12-phase-03-meeting-rpc-contract",
+              "work-logs/2026-11-08-13-phase-03-meeting-rpc-fix",
+              "work-logs/2026-11-08-14-phase-04-restore-pre-form-room-flow",
+              "work-logs/2026-11-08-15-phase-04-waiting-room-mic-check",
+              "work-logs/2026-11-08-16-phase-04-required-host-approval",
+              "work-logs/2026-11-08-06-phase-03-supabase-secret-key-auth",
+              "work-logs/2026-11-08-07-phase-03-meeting-schema-alignment"
             ]
           }
         ]

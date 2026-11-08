@@ -1,0 +1,44 @@
+---
+title: Bắt buộc chủ phòng duyệt thành viên
+description: Thành viên phải được host chấp nhận trước khi nhận LiveKit token.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-16
+- Thời gian: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — Application Foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Yêu cầu thành viên phải được chủ phòng chấp nhận trước khi vào phòng.
+
+## Công việc hoàn thành
+
+- Bỏ tùy chọn tắt phòng chờ khỏi form; giao diện thông báo thành viên cần được chủ phòng chấp nhận.
+- Frontend luôn gửi `waitingRoom: true`; backend cũng ép cấu hình này thành `true`, bất kể request gửi giá trị nào. Cập nhật kỳ vọng trong backend test cho phòng không đăng ký; không chạy test.
+- Backend không cấp token cho ID phòng chưa được tạo/đăng ký. Cả endpoint token phòng mặc định không có chủ phòng cũng không cấp token, tránh đường vòng bỏ qua bước duyệt.
+- Cập nhật hướng dẫn duyệt phòng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Rà soát luồng tạo phòng, xin token, hàng chờ và duyệt | Passed | Phòng phải được đăng ký; khách ở trạng thái chờ cho đến khi host chấp nhận. |
+| Typecheck, tests, build | Skipped | Không chạy theo chỉ dẫn phiên. |
+| Kiểm tra với LiveKit Cloud | Not verified | Chưa thử hai tài khoản/thiết bị thật. |
+
+## Quyết định và lý do
+
+Cấu hình duyệt được áp dụng ở cả frontend và backend. Backend là ranh giới bảo mật: việc bỏ qua giao diện hoặc gửi `waitingRoom: false` không thể cấp token cho khách trước khi host chấp nhận.
+
+## Blocker và việc chưa hoàn thành
+
+Trạng thái phòng và danh sách duyệt vẫn lưu trong bộ nhớ một tiến trình. Sau khi backend khởi động lại, phòng cũ cần được chủ phòng khởi tạo lại; ID phòng chưa khởi tạo sẽ bị từ chối để tránh cấp token không qua duyệt.
+
+## Bước tiếp theo
+
+Xác minh luồng với hai tài khoản: host tạo phòng, guest mở link và ở màn hình chờ, host bấm **Cho vào**, guest tự kết nối sau lần kiểm tra trạng thái kế tiếp.

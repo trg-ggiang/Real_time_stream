@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
+import { act, cleanup, render, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { useMeetingSession } from './use-meeting-session';
 
 const credentials = {
@@ -9,6 +9,8 @@ const credentials = {
   roomName: 'media-test-room',
   participantIdentity: 'test-participant',
   token: 'synthetic-token',
+  isHost: false,
+  settings: { allowMic: true, allowVideo: true, waitingRoom: false },
 };
 
 beforeEach(() => {
@@ -70,6 +72,41 @@ describe('meeting session', () => {
     await act(async () => {
       await result.current.join();
     });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries an automatic join after StrictMode aborts the first effect request', async () => {
+    let requestCount = 0;
+    const fetchMock = vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+      requestCount += 1;
+      if (requestCount === 1) {
+        return new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener(
+            'abort',
+            () => reject(new DOMException('Aborted', 'AbortError')),
+            { once: true },
+          );
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => credentials });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    function AutoJoiningRoom() {
+      const session = useMeetingSession('strict-mode-room');
+      useEffect(() => {
+        void session.join();
+      }, [session.join]);
+      return <output>{session.credentials?.roomName ?? 'joining'}</output>;
+    }
+
+    const { getByText } = render(
+      <StrictMode>
+        <AutoJoiningRoom />
+      </StrictMode>,
+    );
+
+    await waitFor(() => expect(getByText('media-test-room')).toBeTruthy());
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 

@@ -3,4 +3,14 @@ export interface JoinCredentials {
   participantIdentity: string;
   roomName: string;
   token: string;
+  isHost: boolean;
+  settings: {
+    allowMic: boolean;
+    allowVideo: boolean;
+    waitingRoom: boolean;
+  };
+}
+
+export interface WaitingRoomStatus {
+  waiting: true;
 }

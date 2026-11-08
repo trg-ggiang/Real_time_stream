@@ -1,0 +1,50 @@
+---
+title: Thiết kế lại giao diện cuộc gọi
+description: Sân khấu video lớn và thanh điều khiển trên nền tối.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-10
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thiết kế trang gọi theo ảnh tham khảo, giữ các điều khiển media đang có.
+
+## Công việc hoàn thành
+
+- Tạo sân khấu video lớn, bo góc, căn giữa trên nền tối.
+- Đưa trạng thái kết nối và số người thành nhãn phủ trong video; giữ nhãn participant của LiveKit.
+- Đặt thanh điều khiển hiện có bên dưới video và tinh chỉnh kiểu nút.
+- Ẩn header/footer cũ khỏi bố cục trang họp.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra source | Passed | Component LiveKit hiện có được giữ; cấu trúc sân khấu và CSS đã cập nhật. |
+| Typecheck/tests/build | Skipped | Không chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Giữ các nút mic, camera, chia sẻ màn hình và rời phòng; không thêm giao diện giả cho chức năng ghi hình/chat chưa có.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xem giao diện trong browser và chưa xác minh responsive thực tế.
+
+## Bước tiếp theo
+
+Mở phòng trên desktop/mobile để kiểm tra kích thước video và thanh điều khiển.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

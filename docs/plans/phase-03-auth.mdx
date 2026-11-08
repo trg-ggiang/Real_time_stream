@@ -12,10 +12,54 @@ Người dùng đã yêu cầu gộp code auth/DB của Hải vào backend chín
 - [x] Validation, password hashing, public user responses, HTTP auth/rate-limit tests.
 - [ ] Cấu hình và kiểm chứng schema Supabase development của Hải.
 - [ ] Nghiệm thu đăng ký/đăng nhập với DB thật và tham gia phòng trên hai thiết bị.
-- [ ] Versioned migrations và phân quyền phòng: chưa thực hiện trong lần gộp này.
+- [ ] Áp dụng migration meeting lên Supabase development và nghiệm thu DB thật; phân quyền join theo visibility chưa triển khai.
 
 Hướng dẫn: [Auth integration](/modules/auth-integration). Kết quả code và kiểm thử: [work log](/work-logs/2026-11-07-01-phase-03-auth-integration).
 
 ## Desktop auth UI 2026-11-07
 
 Completed the approved desktop-first login/register redesign: 480px form, secondary image, light/dark/system themes, inline validation and password visibility. Frontend typecheck, 15 tests and build passed; browser layout and Lighthouse checks completed. Phase 03/04/05 remain In Progress pending real DB/media acceptance. [Work log](/work-logs/2026-11-07-02-phase-04-desktop-auth-ui).
+
+## Tạo phòng và ghi DB 2026-11-08
+
+Đã thử thêm luồng tạo meeting có migration và ghi DB, sau đó gỡ theo yêu cầu người dùng. Không có migration meeting còn áp dụng trong source hiện tại. Phase 03 vẫn In Progress. [Work log triển khai ban đầu](/work-logs/2026-11-08-03-phase-03-meeting-creation-db), [work log gỡ luồng](/work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form).
+
+## Khôi phục yêu cầu tạo meeting có DB 2026-11-08
+
+Người dùng yêu cầu lại luồng tạo meeting: lưu thông tin và host membership trước, sau đó lưu cài đặt phòng. Migration được thêm lại với timestamp mới; cần áp dụng lên DB development và nghiệm thu. [Work log](/work-logs/2026-11-08-05-phase-03-meeting-creation-db).
+
+## Sửa xác thực Supabase secret key 2026-11-08
+
+Backend loại `Authorization: Bearer` chứa `sb_secret_...` và chỉ gửi key mới trong `apikey`, theo yêu cầu Supabase. API lỗi tạo meeting cũng trả thông báo riêng cho key, quyền DB hoặc migration/schema chưa có. Chưa xác minh ghi DB thật. [Work log](/work-logs/2026-11-08-06-phase-03-supabase-secret-key-auth).
+
+## Căn chỉnh meeting theo schema hiện có 2026-11-08
+
+Form tạo phòng hiện chỉ thu thập title và thời gian bắt đầu/kết thúc; backend lưu đúng các cột hiện có và tạo host membership trong cùng RPC. Mic/video vẫn là quyền phiên LiveKit, waiting_room_enabled được lưu trong meetings. Migration cần được áp dụng và nghiệm thu với DB thật. Phase 03 vẫn In Progress. [Work log](/work-logs/2026-11-08-07-phase-03-meeting-schema-alignment).
+
+## Bỏ form quyền phòng riêng 2026-11-08
+
+Theo yêu cầu, bỏ bước cấu hình quyền phòng sau khi lưu meeting. Form tạo meeting ghi dữ liệu vào DB; khi thành công mở cuộc gọi ngay. Chưa chạy typecheck/tests/build; Phase 03/04 vẫn In Progress. [Work log](/work-logs/2026-11-08-08-phase-03-remove-room-permission-form).
+
+## Tạo phòng rồi thiết lập 2026-11-08
+
+Home mở form tạo phòng từ nút “Tạo phòng”. Sau khi API tạo meeting và host membership trong Supabase thành công, form thiết lập mic, camera và phòng chờ được hiển thị. Backend lưu lựa chọn phòng chờ; mic/camera áp dụng cho quyền LiveKit. Chưa xác minh ghi DB thật hoặc chạy kiểm tra. Phase 03/04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-09-phase-03-meeting-setup-flow).
+
+## Căn chỉnh schema meeting_sessions 2026-11-08
+
+RPC hiện ghi meeting metadata vào `meetings`, lịch và tên LiveKit vào `meeting_sessions`, cùng host admitted vào `meeting_members`. Các migrations đã được căn chỉnh theo DDL mới. Chưa chạy typecheck/tests/build hoặc áp dụng lên Supabase thật. Phase 03/04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-10-phase-03-meeting-schema-layout).
+
+## Chẩn đoán lỗi tạo meeting 2026-11-08
+
+Supabase REST dùng bởi backend truy cập được các bảng/cột liên quan, nhưng API schema không công bố RPC `create_meeting_with_host_member`; đây là nguyên nhân lỗi `PGRST202`. Thêm migration chỉ tạo RPC và cấp EXECUTE cho `service_role`, không tạo bảng hay sửa dữ liệu. RLS catalog chưa được kiểm tra trực tiếp; migration dùng definer có giới hạn. Chưa áp dụng migration. [Work log](/work-logs/2026-11-08-11-phase-03-meeting-rpc-diagnosis).
+
+## Hoàn thiện hợp đồng RPC 2026-11-08
+
+RPC nhận ID người dùng từ `public.users.user_id` sau khi JWT ứng dụng được xác minh, tự sinh ID/mã meeting/session, và trả về meeting cùng session. NestJS đọc kết quả có cấu trúc và phân biệt lỗi RPC, permission, FK, unique, table và column. Unit tests chưa chạy; migration và ghi Supabase thật vẫn chờ. [Work log](/work-logs/2026-11-08-12-phase-03-meeting-rpc-contract).
+
+## Đồng bộ và chẩn đoán RPC tạo meeting 2026-11-08
+
+Lời gọi backend dùng đúng chữ ký 4 tham số; kiểm tra REST/OpenAPI trực tiếp trả 200 nhưng không công bố RPC, xác nhận function chưa được cài trên project. Migration hiện dọn mọi overload an toàn bằng `RESTRICT`, tạo chữ ký chuẩn, giữ quyền EXECUTE chỉ cho `service_role` và reload PostgREST. Backend tests passed. Chưa áp dụng migration do phiên này không có kênh SQL, nên tạo dữ liệu thực và trạng thái RLS/EXECUTE vẫn cần xác minh. Phase 03/04/05 In Progress. [Work log](/work-logs/2026-11-08-13-phase-03-meeting-rpc-fix).
+
+## Khôi phục luồng trước form tạo meeting 2026-11-08
+
+Gỡ form metadata, API/RPC tạo meeting và migrations chưa áp dụng. Home quay lại luồng thiết lập quyền rồi vào room UUID LiveKit; cài đặt ở bộ nhớ backend, không ghi meeting mới vào Supabase. Phase 03/04 vẫn In Progress. [Work log](/work-logs/2026-11-08-14-phase-04-restore-pre-form-room-flow).

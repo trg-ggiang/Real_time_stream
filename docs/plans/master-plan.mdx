@@ -21,7 +21,7 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 
 Giữ nguyên số phase để bảo toàn lịch sử. Theo yêu cầu triển khai Module 1 ngày 2026-10-19 và context, thực hiện nền tảng API/React + LiveKit (04/05) trước database/auth (03). Phase 07 vẫn là kiểm thử/deployment toàn hệ thống, không ngăn kiểm thử từng module ngay trong phiên triển khai.
 
-Sau khi nghiệm thu PoC, module phòng động sẽ cần kế hoạch phase riêng; chưa triển khai vì chưa được giao. Các mục auth, chat, interview và club management tiếp tục là định hướng; không tự mở rộng scope.
+Người dùng đã giao triển khai bước đầu của tạo meeting có DB: form thông tin, host membership và thiết lập phòng. Quyền join theo visibility, chat, interview và club management vẫn cần yêu cầu/phase riêng.
 
 ## Chi tiết và bằng chứng
 
@@ -34,6 +34,10 @@ Sau khi nghiệm thu PoC, module phòng động sẽ cần kế hoạch phase ri
 ## Bước tiếp theo
 
 Env đã được điền; token API qua Vite proxy trả 200 ở localhost và 127.0.0.1. Tải lại frontend và kiểm thử UI/media trên hai thiết bị theo checklist. Không đánh dấu Module 1 hoặc Phase 04/05 Done chỉ vì build/test cục bộ thành công.
+
+## Sửa xác thực Supabase secret key 2026-11-08
+
+Đã sửa cách backend gửi key `sb_secret_...`, đồng thời bổ sung thông báo phân biệt khi thiếu migration/schema hoặc quyền ghi. Chưa xác minh ghi DB thật; cần áp dụng migration trước khi thử lại. Phase 03/04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-06-phase-03-supabase-secret-key-auth).
 
 Đã chuẩn bị ignore và hướng dẫn chia sẻ credentials trước push; không tự commit/push. Phase 04/05 vẫn In Progress, chờ đủ nghiệm thu.
 
@@ -70,3 +74,103 @@ Completed the approved desktop-first login/register redesign: 480px form, second
 ## Auth image ratio 2026-11-07
 
 Updated the desktop form:image split to 1:1.5 as requested. The photo fills the entire right panel. Build and 15 frontend tests passed; browser measured 576px:864px at 1440px viewport. Phase remains In Progress. [Work log](/work-logs/2026-11-07-03-phase-04-auth-image-ratio).
+
+## Meeting sidebar 2026-11-07
+
+Kept the Home-first vertical sidebar and added a top horizontal navbar with a video-camera icon on the left and initial-based account dropdown on the right. Removed the three-bar sidebar mark. Earlier typecheck, 18 tests and build passed; latest icon/alignment refinement and browser visual acceptance remain unverified. Phase 04/05 remain In Progress. [Work log](/work-logs/2026-11-07-04-phase-04-sidebar-navigation).
+
+Added the Home study image hero and `New Join` section while retaining the existing join flow. The layout has not yet been validated; Phase 04/05 remain In Progress.
+
+## Room permission form 2026-11-07
+
+Join opens the supplied permission form; choices are retained only in frontend state, not applied to LiveKit. Validation was declined; Phase 04/05 remain In Progress. [Work log](/work-logs/2026-11-07-05-phase-04-room-permission-form).
+
+## Meeting page routing 2026-11-07
+
+Home now opens a new full-screen meeting tab at `/meeting/{uuid}`. Auth uses HttpOnly cookie sessions; NestJS issues LiveKit credentials for the UUID room and serves the production React SPA. Camera errors now distinguish permission, missing device, and device-in-use cases. Browser permission is denied in the integrated check; production smoke and physical camera acceptance are pending. UUID is not room membership authorization. Phase 04/05 remain In Progress. [Work log](/work-logs/2026-11-07-06-phase-04-meeting-page-routing) and [camera diagnostics](/work-logs/2026-11-07-07-phase-05-camera-diagnostics).
+
+## Same-tab meeting navigation 2026-11-07
+
+Home and sidebar meeting links now use `target="_self"` to open rooms in the current tab. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-08-phase-04-same-tab-navigation).
+
+The Rời phòng action returns to `/` in the current tab after clearing the meeting session. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-09-phase-04-leave-to-home).
+
+Redesigned the meeting stage with a large centered video, dark canvas, connection overlay, and a compact control bar below. Browser and responsive review remain pending. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-10-phase-04-meeting-call-design).
+
+Camera video now uses `object-fit: contain` to preserve the full frame. Real-device visual review remains pending. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-11-phase-04-camera-framing).
+
+Room creation now saves media permissions; later participants receive the same token grants. Optional waiting-room requests enter a host approval queue. Typecheck passed; settings and queue currently live in backend process memory. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-12-phase-04-room-settings-and-approval).
+
+Added a host-only microphone mute action for other participants. The backend verifies room ownership and participant microphone track before calling LiveKit `RoomServiceClient.mutePublishedTrack`; typecheck passed, live browser acceptance pending. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-13-phase-04-host-mute-participant).
+
+Moved host microphone controls into a member list panel beside video. Each row shows member, role and mic state; responsive layout stacks the panel beneath video on narrow screens. Typecheck passed; browser review remains pending. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-14-phase-04-member-panel-mute).
+
+Member rows now explicitly show whether the microphone is active, and the connection error handler translates device-in-use errors through the media diagnostic helper. Typecheck passed; browser reproduction remains pending. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-15-phase-04-mic-state-and-device-error).
+
+Host mic control now mutes the active track and removes microphone from participant publish permissions; a second click restores permission. Typecheck passed; LiveKit Cloud interaction remains unverified. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-07-16-phase-04-host-mic-lock).
+
+Meeting camera layout now gives the video tiles the full row, with the member list and host mic controls in a compact horizontal strip below. Camera startup still depends on room permissions and browser device permission. Checks and browser review were not run. Phase remains In Progress. [Work log](/work-logs/2026-11-07-17-phase-04-camera-layout).
+
+Room creators now stay on Home while the meeting UI appears inside the Home content. A copy-invite action shares the direct `/meeting/{roomId}` route for guests, and leaving returns to Home. Typecheck/build/browser review were not run. Phase remains In Progress. [Work log](/work-logs/2026-11-07-18-phase-04-meeting-on-home).
+
+Removed screen sharing from room settings, meeting controls and LiveKit publishing grants. Validation was not run. Phase remains In Progress. [Work log](/work-logs/2026-11-07-19-phase-04-remove-screen-share).
+
+Repaired Vietnamese text and broken emoji in the room permission form, replacing them with consistent icons and safer label wrapping. Typecheck and browser review were not run. Phase remains In Progress. [Work log](/work-logs/2026-11-07-20-phase-04-room-permission-form-copy).
+
+## Giao diện Home 2026-11-08
+
+Khôi phục Home về trang chờ kết nối theo ảnh tham chiếu; giữ nguyên form cấu hình, tạo phòng và logic LiveKit. Typecheck, tests, build và browser review chưa chạy. Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-01-phase-04-home-interface-restore).
+
+Gỡ Navbar và Sidebar khỏi cây render của Home theo yêu cầu; giữ đăng xuất và luồng phòng. Chưa chạy kiểm tra hoặc browser review. Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-02-phase-04-remove-home-navigation).
+
+## Form tạo phòng và Supabase 2026-11-08
+
+Đã thử thêm wizard lưu meeting và host membership vào Supabase, sau đó gỡ theo yêu cầu người dùng. Home hiện dùng lại thẻ kết nối và form quyền phòng trước đó; Phase 03/04/05 vẫn In Progress. [Work log triển khai ban đầu](/work-logs/2026-11-08-03-phase-03-meeting-creation-db), [work log gỡ luồng](/work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form).
+
+## Thu hồi form tạo phòng 2026-11-08
+
+Theo yêu cầu, gỡ wizard nhập metadata meeting và khôi phục luồng Home trước đó. Migration chưa áp dụng đã được gỡ; Phase 03/04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form).
+
+## Tạo meeting có DB 2026-11-08
+
+Khôi phục theo yêu cầu mới luồng hai form: ghi meeting/host membership trước, lưu cài đặt sau đó mới mở cuộc gọi. Cần áp dụng migration trên Supabase development; phase 03/04/05 vẫn In Progress. [Hướng dẫn](/modules/meeting-creation), [work log](/work-logs/2026-11-08-05-phase-03-meeting-creation-db).
+
+## Căn chỉnh tạo meeting theo schema Supabase 2026-11-08
+
+Đã chỉnh form/API/RPC để ghi title, created_by, meeting_code, livekit_room_name, status mặc định và lịch bắt đầu/kết thúc theo schema được cung cấp. Thêm migration tương thích cho function cũ. Phase 03/04/05 vẫn In Progress; cần áp dụng migration và xác nhận ghi DB thật. [Hướng dẫn](/modules/meeting-creation), [work log](/work-logs/2026-11-08-07-phase-03-meeting-schema-alignment).
+
+## Bỏ form quyền phòng riêng 2026-11-08
+
+Form tạo meeting là bước nhập dữ liệu và lưu vào DB. Đã gỡ form quyền phòng khỏi luồng; lưu meeting thành công sẽ mở cuộc gọi. Chưa xác minh DB thật; Phase 03/04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-08-phase-03-remove-room-permission-form).
+
+## Tạo phòng rồi thiết lập 2026-11-08
+
+Khôi phục bước thiết lập sau khi tạo meeting: meeting và host được lưu trước, thiết lập mic/camera/phòng chờ được lưu tiếp theo, rồi mới vào cuộc gọi. Phase 03/04/05 vẫn In Progress; ghi DB thật và kiểm tra giao diện còn chờ. [Work log](/work-logs/2026-11-08-09-phase-03-meeting-setup-flow).
+
+## Căn chỉnh schema Supabase mới 2026-11-08
+
+RPC và migration ghi lịch cùng tên LiveKit vào `meeting_sessions`, meeting vào `meetings`, host vào `meeting_members`. Phase 03/04/05 vẫn In Progress; cần áp dụng migration và xác nhận ghi DB thật. [Hướng dẫn](/modules/meeting-creation), [work log](/work-logs/2026-11-08-10-phase-03-meeting-schema-layout).
+
+## Chẩn đoán tạo phòng 2026-11-08
+
+Truy vấn chỉ đọc xác nhận kết nối/table access; Supabase OpenAPI không liệt kê RPC tạo phòng, phù hợp với `PGRST202`. Bổ sung function-only migration, không tạo bảng hay sửa hàng hiện có. Cần áp dụng migration và thử tạo phòng để xác nhận. [Hướng dẫn](/modules/meeting-creation), [work log](/work-logs/2026-11-08-11-phase-03-meeting-rpc-diagnosis).
+
+## Hoàn thiện contract tạo phòng 2026-11-08
+
+RPC nay tự sinh định danh/mã meeting và session, trả về cả hai bản ghi, dùng `public.users.user_id` từ JWT ứng dụng đã xác minh và xử lý lỗi Supabase chi tiết hơn. Chưa chạy kiểm tra hoặc ghi DB thật; migration cần được áp dụng. [Work log](/work-logs/2026-11-08-12-phase-03-meeting-rpc-contract).
+
+## Sửa lỗi RPC tạo meeting 2026-11-08
+
+REST/OpenAPI của project trả 200 nhưng không liệt kê RPC, xác nhận nguyên nhân là function chưa được cài/công bố; code gửi đúng 4 tham số. Migration loại overload cũ an toàn và tạo đúng một function, thêm `NOTIFY`; log lỗi PostgREST đầy đủ. Backend tests passed, nhưng migration và ghi DB thật chưa thể chạy do không có SQL Editor/CLI/DB connection trong phiên. Phase 03/04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-13-phase-03-meeting-rpc-fix).
+
+## Khôi phục luồng trước form tạo meeting 2026-11-08
+
+Gỡ wizard tạo meeting cùng endpoint/RPC và migrations chưa áp dụng. Home trở lại form quyền phòng cũ và vào room UUID LiveKit sau khi lưu; không ghi meeting metadata vào Supabase. Phase 03/04 vẫn In Progress. [Work log](/work-logs/2026-11-08-14-phase-04-restore-pre-form-room-flow).
+
+## Kiểm tra duyệt thành viên và tắt mic 2026-11-08
+
+Backend tests xác nhận phòng chờ chặn cấp token cho khách đến khi host duyệt; host mute được mic và thu hồi/khôi phục quyền publish. Frontend meeting tests đạt 14/14. Trạng thái phòng chỉ lưu trong tiến trình backend; chưa xác minh trên LiveKit Cloud hai thiết bị. Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-15-phase-04-waiting-room-mic-check).
+
+## Thành viên cần được chủ phòng duyệt 2026-11-08
+
+Phòng chờ luôn bật: khách không nhận LiveKit token cho đến khi host chấp nhận. Chưa xác minh trên LiveKit Cloud; Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-16-phase-04-required-host-approval).

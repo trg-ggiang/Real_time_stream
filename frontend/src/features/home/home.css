@@ -1,0 +1,164 @@
+.workspace:has(.home-landing) {
+  min-height: 100vh;
+  display: block;
+  margin-left: 0;
+  padding: 0;
+  background: #101827;
+  color: #e9eef7;
+}
+
+.workspace:has(.home-landing) > .workspace-main {
+  width: min(1314px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: clamp(48px, 9vh, 88px) 0 32px;
+}
+
+.home-dashboard {
+  position: relative;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.home-logout {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px 12px;
+  border: 1px solid #344256;
+  border-radius: 9px;
+  background: transparent;
+  color: #a9b8cc;
+  font-size: 13px;
+}
+
+.home-intro {
+  width: 100%;
+  margin-bottom: 38px;
+}
+
+.home-hero-kicker {
+  color: #86e7dc;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.workspace .home-hero h1 {
+  margin: 24px 0 16px;
+  color: #e9eef7;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 750;
+  letter-spacing: -0.055em;
+  line-height: 1.12;
+}
+
+.home-hero-copy p {
+  margin: 0;
+  color: #b5c6df;
+  font-size: 19px;
+}
+
+.home-new-join {
+  width: min(925px, 100%);
+}
+
+.home-new-join:has(.room-permission-step) {
+  width: min(560px, 100%);
+}
+
+.workspace .home-new-join > .join-card {
+  width: 100%;
+  max-width: none;
+  min-height: 500px;
+  padding: clamp(32px, 5vw, 60px);
+  border: 1px solid #344256;
+  border-radius: 24px;
+  background: #192537;
+}
+
+.join-card .badge {
+  display: inline-flex;
+  padding: 7px 15px;
+  background: #223f43;
+  color: #abecdb;
+  font-size: 14px;
+}
+
+.workspace .join-card h2 {
+  margin: 24px 0 28px;
+  color: #f0f3fa;
+  font-size: 36px;
+  letter-spacing: -0.04em;
+}
+
+.workspace .join-card p {
+  max-width: 56ch;
+  margin: 0 0 22px;
+  color: #edf1f8;
+  font-size: 19px;
+  line-height: 1.7;
+}
+
+.workspace .join-card .join-hint {
+  color: #a9b8cc;
+}
+
+.join-page-link {
+  display: inline-flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 26px;
+  border-radius: 11px;
+  background: #9ce6ce;
+  color: #102a27;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.join-page-link:hover { filter: brightness(0.93); }
+.join-page-link:focus-visible,
+.home-logout:focus-visible { outline: 3px solid #9dd0ff; outline-offset: 4px; }
+
+.workspace .home-page-footer {
+  margin-top: auto;
+  padding-top: 28px;
+  color: #a9b8cc;
+  font-size: 14px;
+}
+
+.meeting-back {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 16px;
+  border: 1px solid #52627a;
+  border-radius: 10px;
+  background: #26374c;
+  color: #e9eef7;
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .workspace:has(.home-landing) > .workspace-main { padding: 38px 18px 24px; }
+  .home-dashboard { min-height: calc(100vh - 62px); }
+  .home-logout { top: -26px; font-size: 12px; }
+  .home-intro { margin: 22px 0 28px; }
+  .home-hero-kicker { font-size: 11px; }
+  .workspace .home-hero h1 { margin: 16px 0 12px; font-size: clamp(34px, 10vw, 48px); }
+  .home-hero-copy p { font-size: 16px; }
+  .workspace .home-new-join > .join-card { min-height: 0; padding: 28px 24px; border-radius: 20px; }
+  .workspace .join-card h2 { margin: 22px 0; font-size: 29px; }
+  .workspace .join-card p { font-size: 16px; }
+  .join-page-link { min-height: 56px; font-size: 16px; }
+}
+
+@media (min-width: 641px) and (max-width: 1362px) {
+  .workspace:has(.home-landing) > .workspace-main { width: 100%; padding-right: 24px; padding-left: 24px; }
+}

@@ -1,0 +1,48 @@
+---
+title: Phân biệt trạng thái mic và lỗi thiết bị
+description: Hiển thị trạng thái mic rõ trong danh sách và phân loại lỗi thiết bị.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-15
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Điều tra cảnh báo xuất hiện sau thao tác mic và phân biệt lỗi thiết bị với trạng thái mute participant.
+
+## Công việc hoàn thành
+
+- Danh sách thành viên hiển thị thêm “Mic đang bật/tắt”; nút host chỉ hoạt động khi mic participant đang publish.
+- Connection error dùng media error classifier để giải thích trường hợp thiết bị đang được app/tab khác sử dụng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend. |
+| Tests/build/browser | Skipped | Chưa chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Lỗi `Device in Use` là capture lỗi của browser/OS; mute người khác đi qua API backend. Hiển thị riêng trạng thái mic để biết khi nào có track đang hoạt động để host mute.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra browser thật; nếu mic của thành viên đang tắt thì host không có track để mute.
+
+## Bước tiếp theo
+
+Giải phóng mic/camera khỏi app hoặc tab khác, bật mic ở participant rồi host thử biểu tượng mic lại.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

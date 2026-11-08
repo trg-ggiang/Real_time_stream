@@ -1,0 +1,50 @@
+---
+title: Hiện form quyền khi tham gia phòng
+description: Mở form thiết lập quyền từ nút tham gia trước khi vào phòng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-05
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Copilot
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Khi bấm “Tham gia phòng”, hiển thị form quyền phòng được người dùng cung cấp; hỗ trợ hủy hoặc lưu lựa chọn trước khi tiếp tục.
+
+## Công việc hoàn thành
+
+- Tách component React `RoomPermissionForm` khỏi file `.css` đang chứa JSX; thay file đó bằng stylesheet hợp lệ.
+- Kết nối nút tham gia trong `MeetingPage`: mở form, Hủy quay lại; Lưu giữ lựa chọn trong state frontend và đổi nút thành “Vào phòng”.
+- Thêm ghi chú rõ các lựa chọn chỉ lưu trong phiên giao diện, chưa thay đổi quyền LiveKit phía máy chủ.
+- Thêm kiểm thử luồng mở form, hủy, lưu và tiếp tục tham gia.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Frontend typecheck, tests, build | Skipped | Lệnh kiểm tra bị người dùng từ chối; không có kết quả mới |
+| `git diff --check` | Skipped | Chưa chạy sau các thay đổi của phiên này |
+
+## Quyết định và lý do
+
+Giữ đây là thiết lập giao diện frontend. Backend hiện cấp quyền LiveKit cố định và chưa nhận cấu hình chia sẻ màn hình hoặc chờ duyệt; form không tuyên bố các lựa chọn đã được áp dụng phía server.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh typecheck, tests hoặc build sau khi thay đổi. Chưa có API/backend để áp dụng các quyền đã chọn lên LiveKit.
+
+## Bước tiếp theo
+
+Chạy typecheck, test và build frontend khi được phép; nếu cần quyền phòng có hiệu lực thật, thiết kế và triển khai hợp đồng API/backend riêng sau khi được duyệt.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

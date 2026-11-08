@@ -3,9 +3,43 @@ title: Changelog
 description: Lịch sử thay đổi dự án.
 ---
 
+## 2026-11-07 - Tách trang Meeting
+
+Home (`/`) mở tab mới cho phòng họp toàn màn hình `/meeting/{uuid}`. Auth dùng cookie HttpOnly, BE cấp LiveKit token theo room ID, production NestJS phục vụ React build. [Work log](/work-logs/2026-11-07-06-phase-04-meeting-page-routing).
+
+## 2026-11-07 - Bố cục camera phòng họp
+
+Mở rộng khu vực video thành hàng ngang lớn theo mẫu, chuyển danh sách thành viên và nút khóa mic của host xuống dải cuộn bên dưới. Camera tự bật sau khi kết nối nếu quyền phòng và quyền trình duyệt cho phép. Chưa chạy kiểm tra hoặc xác nhận trên browser. [Work log](/work-logs/2026-11-07-17-phase-04-camera-layout).
+
+## 2026-11-07 - Giữ cuộc gọi ngay trên Home
+
+Khi tạo phòng, chủ phòng ở lại Home và giao diện cuộc gọi hiển thị trong trang đó. Thêm nút sao chép link mời để khách mở phòng qua URL riêng; rời phòng đưa chủ phòng về Home. Chưa chạy typecheck, tests, build hoặc browser review. [Work log](/work-logs/2026-11-07-18-phase-04-meeting-on-home).
+
+## 2026-11-07 - Bỏ chia sẻ màn hình
+
+Gỡ lựa chọn và nút chia sẻ màn hình khỏi frontend; backend không còn cấp quyền publish screen share trong LiveKit token hoặc cập nhật participant. Chưa chạy typecheck, tests hoặc build. [Work log](/work-logs/2026-11-07-19-phase-04-remove-screen-share).
+
+## 2026-11-07 - Sửa form quyền phòng
+
+Sửa chữ tiếng Việt bị lỗi mã hóa, thay emoji hỏng bằng icon giao diện và cải thiện cách nhãn dài xuống dòng. Chưa chạy typecheck hoặc browser review. [Work log](/work-logs/2026-11-07-20-phase-04-room-permission-form-copy).
+
+## 2026-11-07 - Chẩn đoán camera
+
+Trang họp hiển thị hướng dẫn riêng khi quyền bị từ chối, không tìm thấy camera hoặc camera đang dùng ở app/tab khác. Browser kiểm tra hiện báo quyền camera/microphone denied; chưa nghiệm thu camera thực. [Work log](/work-logs/2026-11-07-07-phase-05-camera-diagnostics).
+
 ## 2026-11-07 - Full-height auth photo
 
 Changed the desktop form:image ratio to 1:1.5. The existing photo now covers the full right-hand panel with no inset border or supporting copy. Build and 15 frontend tests passed.
+
+## 2026-11-07 - Meeting sidebar
+
+Kept the Home-first vertical sidebar and added a separate top navbar with a video-camera icon on the left and signed-in initial on the right. Removed the three-bar mark from the sidebar and aligned navbar content toward the outer edges. Added video-camera and navigation SVG assets under `frontend/public/icon`. Earlier frontend checks passed; the latest icon/alignment refinement has not been revalidated. [Work log](/work-logs/2026-11-07-04-phase-04-sidebar-navigation).
+
+Added a home hero with the study-together image at roughly one-third of the viewport height and a `New Join` section below it, preserving the existing room-join flow. The Home layout has not yet been revalidated by build/tests or browser review.
+
+## 2026-11-07 - Room permission form
+
+The Join action now opens the provided permission form; Cancel returns to the join card, and Save keeps selections in frontend session state before showing the room-entry action. The UI notes that settings are not applied by the backend. Typecheck, tests and build were not run because the validation command was declined. [Work log](/work-logs/2026-11-07-05-phase-04-room-permission-form).
 
 ## 2026-11-07 - Desktop login/register design
 
@@ -88,3 +122,93 @@ Merged Hai auth/users/Supabase into the main NestJS workspace; added React login
 
 - Reviewed join/media support and loopback limitations; typecheck and 12 tests passed.
 - No application/env changes. Phase 04/05 remain In Progress.
+
+## 2026-11-07 - Meeting call layout
+
+Redesigned the meeting view with a large centered video stage, connection overlay, and dark control bar. Browser and responsive review remain pending. [Work log](/work-logs/2026-11-07-10-phase-04-meeting-call-design).
+
+## 2026-11-07 - Camera framing
+
+Camera video now preserves the full frame with contain sizing; visual review on a real device is pending. [Work log](/work-logs/2026-11-07-11-phase-04-camera-framing).
+
+## 2026-11-07 - Room settings and host approval
+
+The Home flow saves room media permissions before entry. Later participants inherit those grants; enabling the waiting room adds a host approval queue. Settings and queue are in backend memory for the single-process PoC. [Work log](/work-logs/2026-11-07-12-phase-04-room-settings-and-approval).
+
+## 2026-11-07 - Host microphone mute
+
+Room hosts can mute another participant's active microphone track. The backend verifies room ownership and track membership before calling LiveKit RoomServiceClient; a participant may still re-enable their mic. [Work log](/work-logs/2026-11-07-13-phase-04-host-mute-participant).
+
+## 2026-11-07 - Member list microphone control
+
+Moved the participant microphone actions into a member panel beside the video. The panel shows names, roles, and mic state; host mute remains server-side. [Work log](/work-logs/2026-11-07-14-phase-04-member-panel-mute).
+
+## 2026-11-07 - Microphone state diagnostics
+
+The member panel distinguishes active and muted microphones; connection errors now use the media-device diagnostic helper to explain device-in-use failures. [Work log](/work-logs/2026-11-07-15-phase-04-mic-state-and-device-error).
+
+## 2026-11-07 - Host microphone lock
+
+Host mute now mutes the active microphone track and removes microphone from that participant's publish permission until the host restores it. Typecheck passed; LiveKit Cloud interaction remains pending. [Work log](/work-logs/2026-11-07-16-phase-04-host-mic-lock).
+
+## 2026-11-08 - Home connection interface
+
+Restored the Home page to the dark, centered connection layout from the supplied reference. Room setup and LiveKit behavior remain connected to the existing flow. Validation and browser review are pending. [Work log](/work-logs/2026-11-08-01-phase-04-home-interface-restore).
+
+## 2026-11-08 - Removed Home navigation chrome
+
+Removed the navbar and sidebar from the authenticated Home interface. The dedicated Home logout action and meeting flow remain available. Validation and browser review are pending. [Work log](/work-logs/2026-11-08-02-phase-04-remove-home-navigation).
+
+## 2026-11-08 - Meeting creation wizard
+
+Added a meeting details form that saved the meeting and host membership to Supabase before opening the existing room settings form. This experimental flow was later removed at the user's request; see the [rollback work log](/work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form).
+
+## 2026-11-08 - Restored the previous room entry flow
+
+Removed the new meeting details wizard and its un-applied Supabase migration. Home is back to the connection card and existing room settings form. [Work log](/work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form).
+
+## 2026-11-08 - Meeting creation with DB persistence
+
+Restored the meeting details form on Join. Saving creates the meeting and host membership in Supabase, then opens existing room settings; the call opens after those settings are stored. Apply the migration before use. [Guide](/modules/meeting-creation), [work log](/work-logs/2026-11-08-05-phase-03-meeting-creation-db).
+
+Fixed backend handling for Supabase `sb_secret_...` keys: the key remains in `apikey` and is no longer also sent as a bearer token. Meeting creation errors now identify common missing-migration, invalid-key, and DB-permission cases. The migration must still be applied; a real DB write is not verified. [Work log](/work-logs/2026-11-08-06-phase-03-supabase-secret-key-auth).
+
+## 2026-11-08 - Meeting form follows existing schema
+
+The creation form now collects title and start/end times only. The backend creates meeting IDs/codes, assigns the authenticated host, and stores the host membership atomically. Waiting-room choice is persisted; mic/video stay runtime LiveKit permissions because the supplied schema has no columns for them. Migration and real DB write remain unverified. [Guide](/modules/meeting-creation), [work log](/work-logs/2026-11-08-07-phase-03-meeting-schema-alignment).
+
+## 2026-11-08 - Bỏ form quyền phòng riêng
+
+Home bỏ bước cấu hình quyền riêng và mở cuộc gọi ngay sau khi meeting được lưu thành công. Typecheck, tests và build chưa chạy. [Work log](/work-logs/2026-11-08-08-phase-03-remove-room-permission-form).
+
+## 2026-11-08 - Phục hồi bước thiết lập sau khi tạo phòng
+
+Nút Home “Tạo phòng” mở form thông tin; meeting và host được lưu trước khi hiện form thiết lập. Thiết lập được gửi tới backend và lưu trước khi vào cuộc gọi. Ghi DB thực tế chưa xác minh. [Work log](/work-logs/2026-11-08-09-phase-03-meeting-setup-flow).
+
+## 2026-11-08 - Meeting schema uses separate sessions
+
+Aligned the creation RPC and migrations with the supplied schema: meeting metadata goes to `meetings`, schedule and LiveKit room name go to `meeting_sessions`, and host membership goes to `meeting_members`. Real Supabase migration and write remain unverified. [Guide](/modules/meeting-creation), [work log](/work-logs/2026-11-08-10-phase-03-meeting-schema-layout).
+
+## 2026-11-08 - Diagnosed missing meeting creation RPC
+
+Read-only checks against the configured Supabase project confirmed table/column access but found no exposed `create_meeting_with_host_member` RPC. Added a function-only migration and differentiated PostgREST schema, relation, column, ambiguity, and permission errors. Migration application remains pending. [Guide](/modules/meeting-creation), [work log](/work-logs/2026-11-08-11-phase-03-meeting-rpc-diagnosis).
+
+## 2026-11-08 - Complete meeting creation RPC contract
+
+The creation RPC now generates the meeting ID, unique code and LiveKit session name, returns both records, and accepts the authenticated app user's `public.users.user_id`. Added mocked contract/error tests. Supabase migration and real row verification remain pending. [Guide](/modules/meeting-creation), [work log](/work-logs/2026-11-08-12-phase-03-meeting-rpc-contract).
+
+## 2026-11-08 - Repair missing meeting creation RPC
+
+Live REST/OpenAPI returned 200 without the RPC path, confirming the deployed function is missing from PostgREST. The migration now removes all overloads with `RESTRICT`, installs the canonical four-argument function, and reloads the schema. Backend logs full PostgREST diagnostics; backend tests pass. Migration application and real row verification remain pending because no SQL execution channel is available. [Guide](/modules/meeting-creation), [work log](/work-logs/2026-11-08-13-phase-03-meeting-rpc-fix).
+
+## 2026-11-08 - Restored the pre-creation-form room flow
+
+Removed the meeting metadata wizard, RPC creation endpoint and unapplied creation migrations. Home now opens the room permissions form from **Tham gia phòng**, then joins the generated LiveKit room after settings are saved. Room settings remain in backend memory. No Supabase data was changed. [Work log](/work-logs/2026-11-08-14-phase-04-restore-pre-form-room-flow).
+
+## 2026-11-08 - Checked waiting room approval and microphone control
+
+Backend tests cover blocking guests until host approval and host mute/unlock permission; frontend meeting tests pass. Room approval and mute state are process-local, so restarts or multiple backend instances are not covered. LiveKit Cloud two-device behavior remains unverified. [Work log](/work-logs/2026-11-08-15-phase-04-waiting-room-mic-check).
+
+## 2026-11-08 - Bắt buộc chủ phòng duyệt thành viên
+
+Khách cần được chủ phòng chấp nhận trước khi backend cấp LiveKit token; giao diện không còn tùy chọn bỏ qua. Typecheck, tests, build và LiveKit Cloud chưa được xác minh. [Work log](/work-logs/2026-11-08-16-phase-04-required-host-approval).

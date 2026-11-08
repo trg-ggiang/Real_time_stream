@@ -1,0 +1,51 @@
+---
+title: Áp dụng cài đặt phòng và chờ duyệt
+description: Lưu quyền media theo phòng và thêm hàng chờ do chủ phòng duyệt.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-12
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Áp dụng thiết lập trước khi vào phòng cho người tạo và người tham gia sau đó, gồm host duyệt khi bật phòng chờ.
+
+## Công việc hoàn thành
+
+- Home hiển thị form trước khi tạo phòng; cài đặt được POST lên NestJS cùng UUID phòng.
+- Backend áp dụng quyền mic/camera/chia sẻ màn hình trong LiveKit token grants và trả cài đặt cho frontend.
+- Khi bật phòng chờ, người mới được xếp hàng; host xem danh sách và duyệt. Client người chờ tự kiểm tra trạng thái định kỳ.
+- Frontend bật/tắt điều khiển media theo cài đặt phòng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend. |
+| Tests/build/browser | Skipped | Chưa chạy trong phiên này. |
+| JSON docs navigation | Pending | Cần xác minh sau cập nhật navigation. |
+
+## Quyết định và lý do
+
+Room settings và hàng chờ được lưu trong bộ nhớ backend theo giới hạn PoC một tiến trình. Host là tài khoản đã khởi tạo UUID phòng; chỉ host xem/duyệt hàng chờ.
+
+## Blocker và việc chưa hoàn thành
+
+Room settings và hàng chờ mất khi backend khởi động lại hoặc chạy nhiều instance. Chưa kiểm tra browser/LiveKit thật.
+
+## Bước tiếp theo
+
+Thử tạo phòng với từng quyền, mở URL bằng tài khoản khác và kiểm tra duyệt. Trước deployment nhiều instance, chuyển trạng thái phòng sang kho dùng chung bền vững.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

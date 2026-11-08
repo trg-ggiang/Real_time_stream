@@ -1,40 +1,40 @@
+﻿---
+title: Auth vĂ  káº¿t ná»‘i meeting
+description: Má»™t backend NestJS, Supabase users vĂ  JWT trÆ°á»›c khi vĂ o LiveKit.
 ---
-title: Auth và kết nối meeting
-description: Một backend NestJS, Supabase users và JWT trước khi vào LiveKit.
----
 
-## Cấu trúc sau gộp
+## Cáº¥u trĂºc sau gá»™p
 
-`backend/src` là app NestJS duy nhất. AuthModule, UsersModule, SupabaseModule được chuyển từ app Hải vào đây; LivekitModule giữ nguyên phòng cố định và được bảo vệ bằng JwtAuthGuard. Dependencies và lockfile nằm ở workspace gốc; không chạy/cài app `backend/my-api` nữa. Các file local bị ignore trong thư mục cũ được giữ lại.
+`backend/src` lĂ  app NestJS duy nháº¥t. AuthModule, UsersModule, SupabaseModule Ä‘Æ°á»£c chuyá»ƒn tá»« app Háº£i vĂ o Ä‘Ă¢y; LivekitModule giá»¯ nguyĂªn phĂ²ng cá»‘ Ä‘á»‹nh vĂ  Ä‘Æ°á»£c báº£o vá»‡ báº±ng JwtAuthGuard. Dependencies vĂ  lockfile náº±m á»Ÿ workspace gá»‘c; khĂ´ng cháº¡y/cĂ i app `backend/my-api` ná»¯a. CĂ¡c file local bá»‹ ignore trong thÆ° má»¥c cÅ© Ä‘Æ°á»£c giá»¯ láº¡i.
 
-Luồng: FE đăng ký/đăng nhập → NestJS đọc/ghi users qua Supabase → ký JWT ứng dụng → FE gửi Bearer JWT tới token API → backend tìm lại user → ký token LiveKit → browser truyền media trực tiếp LiveKit. Đây là auth NestJS tự quản lý, không phải Supabase Auth.
+Luá»“ng: FE Ä‘Äƒng kĂ½/Ä‘Äƒng nháº­p â†’ NestJS Ä‘á»c/ghi users qua Supabase â†’ kĂ½ JWT á»©ng dá»¥ng â†’ FE gá»­i Bearer JWT tá»›i token API â†’ backend tĂ¬m láº¡i user â†’ kĂ½ token LiveKit â†’ browser truyá»n media trá»±c tiáº¿p LiveKit. ÄĂ¢y lĂ  auth NestJS tá»± quáº£n lĂ½, khĂ´ng pháº£i Supabase Auth.
 
-## Cấu hình và chạy
+## Cáº¥u hĂ¬nh vĂ  cháº¡y
 
-Trong `backend/.env`, điền `SUPABASE_URL`, `SUPABASE_SECRET_KEY` của development project và `JWT_SECRET` ngẫu nhiên ít nhất 32 ký tự. Giữ secret backend-only. Điền LiveKit theo README, `POC_ENABLED=true`; production vẫn chặn PoC. Không ghi đè env hoặc chia sẻ secret qua Git.
+Trong `backend/.env`, Ä‘iá»n `SUPABASE_URL`, `SUPABASE_SECRET_KEY` cá»§a development project vĂ  `JWT_SECRET` ngáº«u nhiĂªn Ă­t nháº¥t 32 kĂ½ tá»±. Giá»¯ secret backend-only. Äiá»n LiveKit theo README, `POC_ENABLED=true`; production váº«n cháº·n PoC. KhĂ´ng ghi Ä‘Ă¨ env hoáº·c chia sáº» secret qua Git.
 
-Từ root: `npm install`, sau đó chạy `npm run dev:backend` và `npm run dev:frontend` trong hai terminal. Mở localhost:5173, đăng ký hoặc đăng nhập rồi tham gia phòng. Tunnel dùng cùng auth API qua proxy, không cần chạy backend khác. Khởi động lại backend đang chạy cũ sau khi cập nhật env/code.
+Tá»« root: `npm install`, sau Ä‘Ă³ cháº¡y `npm run dev:backend` vĂ  `npm run dev:frontend` trong hai terminal. Má»Ÿ localhost:5173; nháº¥n PhĂ²ng há»p Ä‘á»ƒ má»Ÿ tab `/meeting/{uuid}`. Login/register Ä‘áº·t cookie `rts_session` HttpOnly, SameSite=Lax; tunnel dĂ¹ng cĂ¹ng auth API qua proxy. Khi cháº¡y production, `npm run build` táº¡o frontend dist; vá»›i `NODE_ENV=production`, backend phá»¥c vá»¥ `/`, `/meeting/{uuid}` vĂ  static assets cĂ¹ng vá»›i `/api/*`. KhĂ´ng báº­t POC token issuance á»Ÿ production.
 
-DB cần bảng users đúng với code Hải: `user_id`, `email`, `display_name`, `avatar_url`, `email_verified_at`, `created_at`, `password_hash`. ID và thời gian tạo phải có default, email phải unique và dữ liệu email phải được chuẩn hóa lowercase; password_hash lưu bcrypt. Đây là yêu cầu tương thích của code đã gộp, không phải migration hay bằng chứng schema đã được xác minh. Repo chưa có migration để dựng lại schema. Nhận schema/migration từ Hải trước khi dùng DB mới; không tự tạo bảng khác theo phỏng đoán.
+DB cáº§n báº£ng users Ä‘Ăºng vá»›i code Háº£i: `user_id`, `email`, `display_name`, `avatar_url`, `email_verified_at`, `created_at`, `password_hash`. ID vĂ  thá»i gian táº¡o pháº£i cĂ³ default, email pháº£i unique vĂ  dá»¯ liá»‡u email pháº£i Ä‘Æ°á»£c chuáº©n hĂ³a lowercase; password_hash lÆ°u bcrypt. ÄĂ¢y lĂ  yĂªu cáº§u tÆ°Æ¡ng thĂ­ch cá»§a code Ä‘Ă£ gá»™p, khĂ´ng pháº£i migration hay báº±ng chá»©ng schema Ä‘Ă£ Ä‘Æ°á»£c xĂ¡c minh. Repo chÆ°a cĂ³ migration Ä‘á»ƒ dá»±ng láº¡i schema. Nháº­n schema/migration tá»« Háº£i trÆ°á»›c khi dĂ¹ng DB má»›i; khĂ´ng tá»± táº¡o báº£ng khĂ¡c theo phá»ng Ä‘oĂ¡n.
 
-## Hợp đồng API
+## Há»£p Ä‘á»“ng API
 
-| Endpoint | Request | Thành công |
+| Endpoint | Request | ThĂ nh cĂ´ng |
 | --- | --- | --- |
-| POST /api/auth/register | email, password, displayName | 201, access_token và user |
-| POST /api/auth/login | email, password | 200, access_token và user |
-| GET /api/auth/me | Bearer JWT ứng dụng | 200, user công khai |
-| POST /api/livekit/token | Bearer JWT ứng dụng | 200, serverUrl, roomName, participantIdentity, token |
+| POST /api/auth/register | email, password, displayName | 201, user cĂ´ng khai; Ä‘áº·t cookie phiĂªn HttpOnly |
+| POST /api/auth/login | email, password | 200, user cĂ´ng khai; Ä‘áº·t cookie phiĂªn HttpOnly |
+| GET /api/auth/me | Cookie phiên | 200, user công khai |
+| POST /api/livekit/rooms/{roomId}/token | Cookie phiên, UUID roomId | 200, serverUrl, roomName, participantIdentity, token LiveKit |
 
-User trong response đăng nhập: userId, email, displayName, avatarUrl. Không trả passwordHash. DTO kiểm tra/chuẩn hóa input và từ chối field thừa. Mật khẩu đăng ký ít nhất 8 ký tự, tối đa 72 byte UTF-8 để tránh bcrypt cắt ngầm. JWT ứng dụng hết hạn sau một ngày; token LiveKit có TTL riêng. Identity LiveKit gồm userId và UUID phiên để nhiều tab không trùng identity, tên hiển thị lấy từ DB.
+User trong response Ä‘Äƒng nháº­p: userId, email, displayName, avatarUrl. KhĂ´ng tráº£ passwordHash. DTO kiá»ƒm tra/chuáº©n hĂ³a input vĂ  tá»« chá»‘i field thá»«a. Máº­t kháº©u Ä‘Äƒng kĂ½ Ă­t nháº¥t 8 kĂ½ tá»±, tá»‘i Ä‘a 72 byte UTF-8 Ä‘á»ƒ trĂ¡nh bcrypt cáº¯t ngáº§m. JWT á»©ng dá»¥ng háº¿t háº¡n sau má»™t ngĂ y; token LiveKit cĂ³ TTL riĂªng. Identity LiveKit gá»“m userId vĂ  UUID phiĂªn Ä‘á»ƒ nhiá»u tab khĂ´ng trĂ¹ng identity, tĂªn hiá»ƒn thá»‹ láº¥y tá»« DB.
 
-400: input sai; 401: sai đăng nhập hoặc JWT không hợp lệ/hết hạn; 409: email trùng; 429: quá 10 request/phút/IP/route; 503: LiveKit chưa sẵn sàng. Lỗi DB trả 500 chung, không trả chi tiết truy vấn. Qua tunnel nhiều người có thể chung bucket IP; chưa thiết kế rate limit đa node.
+400: input sai; 401: sai Ä‘Äƒng nháº­p hoáº·c JWT khĂ´ng há»£p lá»‡/háº¿t háº¡n; 409: email trĂ¹ng; 429: quĂ¡ 10 request/phĂºt/IP/route; 503: LiveKit chÆ°a sáºµn sĂ ng. Lá»—i DB tráº£ 500 chung, khĂ´ng tráº£ chi tiáº¿t truy váº¥n. Qua tunnel nhiá»u ngÆ°á»i cĂ³ thá»ƒ chung bucket IP; chÆ°a thiáº¿t káº¿ rate limit Ä‘a node.
 
-## Phiên và giới hạn
+## PhiĂªn vĂ  giá»›i háº¡n
 
-JWT chỉ giữ trong bộ nhớ, tải lại trang cần đăng nhập lại. Đăng xuất xóa phiên ở FE, unmount phòng và hủy request đang chờ. JWT đã cấp chưa bị thu hồi server-side; chưa có refresh token, khôi phục mật khẩu, xác minh email hoặc quyền theo phòng. Người tự đăng ký được vào phòng thử nghiệm chung. Không dùng mô hình này làm phòng riêng tư/production khi chưa bổ sung phân quyền.
+JWT á»©ng dá»¥ng chá»‰ náº±m trong cookie HttpOnly; khĂ´ng tráº£ vá» cho FE, khĂ´ng lÆ°u trong localStorage/sessionStorage vĂ  khĂ´ng Ä‘Æ°a lĂªn URL. Tab má»›i kiá»ƒm tra phiĂªn báº±ng `GET /api/auth/me`; Ä‘Äƒng xuáº¥t xĂ³a cookie. Cookie giáº£m kháº£ nÄƒng Ä‘á»c token tá»« JavaScript nhÆ°ng khĂ´ng thay cho CSRF protections trong mĂ´ hĂ¬nh cross-origin. JWT Ä‘Ă£ cáº¥p chÆ°a bá»‹ thu há»“i server-side; chÆ°a cĂ³ refresh token, khĂ´i phá»¥c máº­t kháº©u, xĂ¡c minh email hoáº·c danh sĂ¡ch thĂ nh viĂªn phĂ²ng. UUID phĂ²ng lĂ  Ä‘á»‹nh danh, khĂ´ng pháº£i cÆ¡ cháº¿ má»i/á»§y quyá»n: ngÆ°á»i Ä‘Äƒng nháº­p cĂ³ thá»ƒ xin token cho room ID. KhĂ´ng dĂ¹ng mĂ´ hĂ¬nh nĂ y cho phĂ²ng riĂªng tÆ°/production trÆ°á»›c khi thiáº¿t káº¿ membership/authorization.
 
-Tests HTTP dùng mock UsersService và credentials tổng hợp, không ghi dữ liệu Supabase hoặc kết nối media thật. Cần nghiệm thu đăng ký/đăng nhập với DB development và hai thiết bị LiveKit sau khi có cấu hình. Phase 03/04/05 vẫn In Progress.
+Tests HTTP dĂ¹ng mock UsersService vĂ  credentials tá»•ng há»£p, khĂ´ng ghi dá»¯ liá»‡u Supabase hoáº·c káº¿t ná»‘i media tháº­t. Cáº§n nghiá»‡m thu Ä‘Äƒng kĂ½/Ä‘Äƒng nháº­p vá»›i DB development vĂ  hai thiáº¿t bá»‹ LiveKit sau khi cĂ³ cáº¥u hĂ¬nh. Phase 03/04/05 váº«n In Progress.
 
 ## Desktop interface
 

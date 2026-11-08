@@ -10,3 +10,75 @@ Previous work logs were removed at the user's request. Create a new entry only a
 - 2026-11-07: [Completed desktop auth UI](/work-logs/2026-11-07-02-phase-04-desktop-auth-ui); Phase 03/04 In Progress, real DB acceptance pending.
 
 - 2026-11-07: [Completed auth form:image ratio 1:1.5](/work-logs/2026-11-07-03-phase-04-auth-image-ratio), Phase 04 In Progress.
+
+- 2026-11-07: [Meeting sidebar and top navbar](/work-logs/2026-11-07-04-phase-04-sidebar-navigation), Phase 04 In Progress; final revalidation and browser visual verification pending.
+
+- 2026-11-07: [Room permission form on Join](/work-logs/2026-11-07-05-phase-04-room-permission-form), Partial; validation was declined, backend does not apply the permission choices.
+
+- 2026-11-07: [New-tab Meeting page](/work-logs/2026-11-07-06-phase-04-meeting-page-routing), Partial; HttpOnly auth, UUID room IDs and full-screen meeting page added; production smoke and camera acceptance pending.
+
+- 2026-11-07: [Camera diagnostics](/work-logs/2026-11-07-07-phase-05-camera-diagnostics), Partial; browser permission was denied, UI now explains causes; final checks were declined and real camera use remains unverified.
+
+- 2026-11-07: [Same-tab meeting navigation](/work-logs/2026-11-07-08-phase-04-same-tab-navigation); Home and sidebar meeting links open in the current tab.
+
+- 2026-11-07: [Leave room to Home](/work-logs/2026-11-07-09-phase-04-leave-to-home); leaving a meeting clears the session and returns to `/` in the same tab.
+
+- 2026-11-07: [Meeting call design](/work-logs/2026-11-07-10-phase-04-meeting-call-design); large centered video stage and dark control layout added; browser review pending.
+
+- 2026-11-07: [Camera framing](/work-logs/2026-11-07-11-phase-04-camera-framing); camera video now preserves its full frame; real-device review pending.
+
+- 2026-11-07: [Room settings and host approval](/work-logs/2026-11-07-12-phase-04-room-settings-and-approval); settings apply to subsequent participants; typecheck passed; backend in-memory limitation recorded.
+
+- 2026-11-07: [Host mute participant](/work-logs/2026-11-07-13-phase-04-host-mute-participant); server-side mute endpoint and host UI added; typecheck passed, live acceptance pending.
+
+- 2026-11-07: [Member panel mute control](/work-logs/2026-11-07-14-phase-04-member-panel-mute); member list moved beside video with mic state and host mute action; typecheck passed.
+
+- 2026-11-07: [Mic state and device error](/work-logs/2026-11-07-15-phase-04-mic-state-and-device-error); active mic state is explicit, device-in-use errors use the diagnostic helper; typecheck passed.
+
+- 2026-11-07: [Host mic lock](/work-logs/2026-11-07-16-phase-04-host-mic-lock); host mute now also revokes mic publish permission until host restores it; typecheck passed.
+
+- 2026-11-07: [Camera layout matching the reference](/work-logs/2026-11-07-17-phase-04-camera-layout); expanded camera tiles across the meeting view and moved member/mute controls into a horizontal strip; checks and browser review not run.
+
+- 2026-11-07: [Meeting stays on Home](/work-logs/2026-11-07-18-phase-04-meeting-on-home); creators see the call inside Home, can copy a guest invite URL, and return to Home when leaving; checks not run.
+
+- 2026-11-07: [Removed screen sharing](/work-logs/2026-11-07-19-phase-04-remove-screen-share); removed the form option, meeting control, track rendering, and server-side publish grants; checks not run.
+
+- 2026-11-07: [Fixed room permission form copy](/work-logs/2026-11-07-20-phase-04-room-permission-form-copy); repaired Vietnamese labels, replaced corrupted emoji, and improved wrapping; checks not run.
+
+- 2026-11-08: [Restored the Home connection interface](/work-logs/2026-11-08-01-phase-04-home-interface-restore); replaced the image hero with the dark connection landing layout while retaining room setup and LiveKit behavior; checks and browser review not run.
+
+- 2026-11-08: [Removed Home navbar and sidebar](/work-logs/2026-11-08-02-phase-04-remove-home-navigation); removed both components from AuthApp rendering while keeping logout and room flow; checks and browser review not run.
+
+- 2026-11-08: [Meeting creation form and Supabase persistence](/work-logs/2026-11-08-03-phase-03-meeting-creation-db); added the two-step form, transactional meeting/host creation and persisted room settings. Migration and real DB/browser acceptance remain pending.
+
+- 2026-11-08: [Removed the new meeting creation form](/work-logs/2026-11-08-04-phase-03-remove-meeting-creation-form); restored the previous Home connection card and room settings flow. The un-applied migration and DB creation endpoint were removed.
+
+- 2026-11-08: [Restored meeting creation with Supabase persistence](/work-logs/2026-11-08-05-phase-03-meeting-creation-db); clicking Join opens the details form, DB save opens existing settings, and only a successful settings save enters the call. Migration and real DB/browser acceptance remain pending.
+
+- 2026-11-08: [Fixed Supabase secret-key authentication for meeting writes](/work-logs/2026-11-08-06-phase-03-supabase-secret-key-auth); backend avoids using `sb_secret_...` as a bearer JWT and reports likely migration, key, or permission errors. Real DB write remains unverified.
+
+- 2026-11-08: [Aligned meeting creation with the supplied database schema](/work-logs/2026-11-08-07-phase-03-meeting-schema-alignment); form/API now persist title and both schedule timestamps using existing meeting columns, with host membership in the same RPC. Remote migration and DB write remain unverified.
+
+- 2026-11-08: [Bỏ form quyền phòng riêng](/work-logs/2026-11-08-08-phase-03-remove-room-permission-form); form tạo meeting ghi DB và mở cuộc gọi khi thành công. Kiểm tra DB thật còn chờ.
+
+- 2026-11-08: [Tạo phòng rồi thiết lập quyền](/work-logs/2026-11-08-09-phase-03-meeting-setup-flow); nút “Tạo phòng” mở form, dữ liệu meeting được lưu trước, rồi người dùng thiết lập mic/camera/phòng chờ trước khi vào cuộc gọi. DB thật chưa xác minh.
+
+- 2026-11-08: [Căn chỉnh theo schema meeting_sessions](/work-logs/2026-11-08-10-phase-03-meeting-schema-layout); RPC tạo meeting, session lịch/LiveKit và host membership bằng đúng các bảng/cột DDL mới. Chưa áp dụng migration lên Supabase thật.
+
+- 2026-11-08: [Chẩn đoán RPC tạo phòng](/work-logs/2026-11-08-11-phase-03-meeting-rpc-diagnosis); kết nối và schema table được xác nhận bằng truy vấn chỉ đọc; RPC không có trong OpenAPI. Thêm migration function-only, chưa áp dụng từ phiên này.
+
+- 2026-11-08: [Hoàn thiện hợp đồng RPC tạo meeting](/work-logs/2026-11-08-12-phase-03-meeting-rpc-contract); RPC sinh và trả meeting/session, backend gửi `public.users.user_id`, thêm test mock cho tham số và lỗi. Chưa áp dụng migration hay xác nhận ghi hàng thật.
+
+## Sửa triệt để lỗi RPC tạo meeting 2026-11-08
+
+REST/OpenAPI trực tiếp xác nhận không có RPC đang được công bố; backend gửi đúng chữ ký 4 tham số. Migration dọn mọi overload bằng `RESTRICT`, log lỗi có đủ code/message/details/hint, backend test 6/6 passed. Không có SQL Editor/CLI/DB connection để áp dụng migration hoặc ghi meeting thật; typecheck tổng thể còn lỗi import `Navbar`/`Sidebar` trong test có sẵn. [Work log](/work-logs/2026-11-08-13-phase-03-meeting-rpc-fix).
+
+## Khôi phục luồng trước form tạo meeting 2026-11-08
+
+Gỡ form metadata, API/RPC tạo meeting và migrations chưa áp dụng. Home trở lại nút tham gia và form quyền phòng; lưu quyền xong mới vào room UUID LiveKit. Không thay đổi dữ liệu Supabase. Phase 03/04 vẫn In Progress. [Work log](/work-logs/2026-11-08-14-phase-04-restore-pre-form-room-flow).
+
+## Kiểm tra phòng chờ và mic 2026-11-08
+
+Xác nhận qua backend tests luồng khách chờ chủ phòng duyệt và host mute/khôi phục quyền publish microphone; frontend meeting tests đạt 14/14. Trạng thái approval/mute lưu trong memory một tiến trình, LiveKit Cloud hai thiết bị chưa được kiểm tra. [Work log](/work-logs/2026-11-08-15-phase-04-waiting-room-mic-check).
+
+- 2026-11-08: [Bắt buộc chủ phòng duyệt thành viên](/work-logs/2026-11-08-16-phase-04-required-host-approval); guests wait for host approval before receiving a LiveKit token. Live Cloud acceptance remains pending.

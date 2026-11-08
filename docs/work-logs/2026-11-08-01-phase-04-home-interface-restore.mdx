@@ -1,0 +1,50 @@
+---
+title: Khôi phục giao diện Home phòng họp
+description: Đưa trang Home về bố cục kết nối tối giản theo ảnh tham chiếu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-01
+- Thời gian: 2026-11-08, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Khôi phục giao diện Home theo ảnh người dùng gửi và giữ nguyên logic hiện có.
+
+## Công việc hoàn thành
+
+- Thay hero ảnh và khu New Join bằng trang chờ kết nối nền tối, phần giới thiệu, thẻ hướng dẫn tham gia và chân trang gần với bố cục tham chiếu.
+- Ẩn sidebar/navbar ở Home và giữ nút đăng xuất riêng.
+- Nút tham gia tiếp tục mở form quyền phòng và gọi luồng tạo phòng hiện tại; trang họp và logic LiveKit không đổi.
+- Cập nhật tiêu đề được kiểm tra trong test Home.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy theo phạm vi kiểm tra của phiên này. |
+| Browser review | Skipped | Chưa mở ứng dụng để đối chiếu trực quan. |
+
+## Quyết định và lý do
+
+Giữ form cấu hình và hành động tạo phòng hiện có phía sau nút trên thẻ để giữ hành vi hiện tại; nội dung hướng dẫn cũng nói rõ người dùng tạo phòng rồi chia sẻ liên kết.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh bố cục trực tiếp trên browser ở desktop/mobile. Phase 04 vẫn In Progress; nghiệm thu media hai thiết bị vẫn còn chờ.
+
+## Bước tiếp theo
+
+Mở Home trên browser ở desktop và mobile, so sánh với ảnh tham chiếu, sau đó kiểm tra tạo phòng, chia sẻ liên kết và Join/Leave.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

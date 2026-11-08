@@ -1,0 +1,48 @@
+---
+title: Hoàn thiện hợp đồng RPC tạo meeting
+description: Đồng bộ tham số, kết quả và lỗi RPC với database hiện tại.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-12
+- Thời gian: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — Application Foundation; 05 — LiveKit PoC
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Rà soát toàn bộ luồng tạo phòng, sửa RPC/migration theo schema sáu bảng hiện tại, xác thực đúng user ID và kiểm tra frontend/backend.
+
+## Công việc hoàn thành
+
+- Xác nhận ứng dụng dùng custom JWT; `sub` được nạp từ `public.users.user_id`, không dùng `auth.users.id`.
+- Cập nhật migration để thay chữ ký RPC cũ; function sinh ID meeting, mã unique và tên LiveKit, ghi meeting/session/host trong transaction, trả JSON gồm meeting/session.
+- Đồng bộ tên tham số trong `MeetingsService`; validate cấu trúc response và xử lý RPC, permission, FK, unique, table/column, network errors.
+- Bổ sung test mock hợp đồng RPC và cập nhật kỳ vọng LiveKit test bị lỗi thời về screen share.
+- Không tạo bảng hay sửa hàng dữ liệu.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Supabase REST/OpenAPI read-only | Passed | Kết nối secret key và cột cần thiết được nhận diện; RPC chưa được công bố. |
+| Backend build/tests | Passed | `npm.cmd --workspace backend test`: 5/5 tests passed. |
+| Frontend Home test | Passed | `npm.cmd --workspace frontend test -- src/features/home/page.test.tsx`: 1/1 passed. |
+| Root typecheck | Partial | Backend qua; frontend dừng do Sidebar.test.tsx import thiếu `components/Navbar` và `components/Sidebar`. |
+| RLS catalog inspection | Not verified | REST API không cho đọc catalog `pg_class/pg_policies`. |
+| Apply RPC migration/verify real rows | Not run | Không có Supabase CLI/psql hoặc kết nối SQL trong môi trường này; không tạo dữ liệu thử. |
+
+## Quyết định và lý do
+
+Chỉ tạo/thay RPC trong migration; không tạo hoặc sửa bảng. `created_by` lấy từ tài khoản app đã xác thực trong `public.users`. RPC chỉ cấp EXECUTE cho `service_role` và dùng `SECURITY DEFINER` với `search_path` rỗng để không mở table access cho browser roles.
+
+## Blocker và việc chưa hoàn thành
+
+Migration cần chạy trên đúng Supabase project bằng SQL Editor hoặc pipeline migration. Chưa xác nhận RLS flags trực tiếp hoặc ghi dữ liệu thật.
+
+## Bước tiếp theo
+
+Chạy `supabase/migrations/20261108190000_create_meeting_creation_rpc.sql` trên SQL Editor với quyền database owner; sau đó kiểm tra OpenAPI có RPC mới và tạo meeting thử để xác nhận hàng trong `meetings`, `meeting_sessions`, `meeting_members`.

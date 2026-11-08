@@ -11,7 +11,9 @@ Node.js 22.12+ và npm 10+. Chạy `npm install` tại root. Phiên triển khai
 
 Chạy hai terminal từ root: `npm run dev:backend` và `npm run dev:frontend`. Mở `http://localhost:5173` hoặc `http://127.0.0.1:5173`. Để trống VITE_API_URL để dùng API proxy; API_PROXY_TARGET mặc định http://127.0.0.1:3000. API liveness: `http://localhost:3000/api/health`. Backend vẫn chạy khi thiếu credentials nhưng token endpoint trả 503.
 
-Kiểm tra: `npm run typecheck`, `npm test`, `npm run build`. Sau build: `npm --workspace backend start`. Preview frontend: `npm --workspace frontend run preview` (cổng 4173, hỗ trợ API proxy cùng origin).
+Kiểm tra: `npm run typecheck`, `npm test`, `npm run build`. Build root tạo backend và `frontend/dist`. Trong production, đặt `NODE_ENV=production` rồi chạy `npm --workspace backend start`; NestJS phục vụ React tại `/`, `/meeting/{uuid}` và static assets, giữ API ở `/api/*`. Nếu thiếu frontend build, backend production dừng với lỗi. Preview frontend riêng: `npm --workspace frontend run preview` (cổng 4173, hỗ trợ API proxy cùng origin).
+
+Sau đăng nhập, nhấn **Tham gia phòng**, thiết lập quyền mic/camera/phòng chờ rồi lưu để hiện cuộc gọi ngay trong nội dung Home. Dùng **Sao chép link mời** để gửi khách tới `/meeting/{id}`. Phiên dùng cookie HttpOnly; token không lưu trong browser storage. Cho phép camera/microphone trong browser; trên Windows hãy đóng ứng dụng/tab khác đang dùng camera.
 
 [Hướng dẫn Module 1](/modules/module-01-media-poc) có hợp đồng API, cấu hình HTTPS khi thử hai thiết bị và checklist nghiệm thu còn chờ.
 

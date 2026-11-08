@@ -1,0 +1,46 @@
+---
+title: Chẩn đoán RPC tạo phòng bị thiếu
+description: Xác nhận lỗi PostgREST và thêm riêng RPC còn thiếu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-11
+- Thời gian: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 03 — Auth và Supabase
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Kiểm tra lỗi tạo phòng qua API, schema/RLS/kết nối Supabase và sửa đúng thành phần còn thiếu mà không tạo bảng meetings hay đụng dữ liệu hiện có.
+
+## Công việc hoàn thành
+
+- Kiểm tra read-only qua cấu hình backend: kết nối Supabase thành công; các cột đang được form/RPC sử dụng được API schema nhận diện.
+- OpenAPI của Supabase không công bố `public.create_meeting_with_host_member`; đây là nguyên nhân phù hợp với `PGRST202` mà API ánh xạ thành thông báo lỗi cấu trúc.
+- Thêm migration chỉ định nghĩa RPC và giới hạn EXECUTE cho `service_role`; RPC ghi meeting, session và host trong transaction. Không tạo/đổi/xóa bảng hoặc hàng dữ liệu.
+- Cải thiện thông báo riêng cho RPC/overload/table/column/permission errors.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Supabase REST select metadata (`limit=0`) | Passed | Kết nối secret key được chấp nhận; các quan hệ/cột kiểm tra được API nhận diện. |
+| Supabase OpenAPI schema | Passed | RPC tạo meeting không được công bố; `PGRST202` xác nhận function chưa khả dụng qua PostgREST. |
+| Trạng thái RLS trong catalog PostgreSQL | Not verified | REST API không cung cấp quyền đọc catalog; RPC dùng definer giới hạn service_role để xử lý an toàn khi RLS bật. |
+| Typecheck, tests, build | Skipped | Không chạy trong phiên. |
+| Áp dụng migration/ghi DB | Not run | Migration chỉ được tạo trong repo; không thay đổi project Supabase từ phiên này. |
+
+## Quyết định và lý do
+
+Không tạo lại bảng `meetings` hay migration dữ liệu. Bổ sung duy nhất RPC còn thiếu; RPC chạy với `search_path` rỗng, tên bảng đầy đủ và chỉ được gọi bởi `service_role`.
+
+## Blocker và việc chưa hoàn thành
+
+Migration cần được áp dụng trên đúng Supabase project. RLS enablement cần xác nhận qua SQL Editor nếu cần audit trực tiếp.
+
+## Bước tiếp theo
+
+Áp dụng `20261108190000_create_meeting_creation_rpc.sql`, sau đó thử tạo meeting qua ứng dụng và xác nhận ba hàng trong `meetings`, `meeting_sessions`, `meeting_members`.

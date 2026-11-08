@@ -1,0 +1,51 @@
+---
+title: Hiển thị cuộc gọi ngay trên Home
+description: Giữ chủ phòng ở Home và nhúng giao diện meeting vào nội dung trang.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-18
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sau khi tạo phòng, hiển thị màn hình gọi video ngay trên Home thay vì thay trang Home bằng trang meeting toàn màn hình.
+
+## Công việc hoàn thành
+
+- `AuthApp` lưu room ID đang hoạt động trong state và giữ route Home sau khi backend tạo phòng thành công.
+- `HomePage` hiển thị `MeetingPage` nhúng trong phần nội dung Home khi có phòng đang hoạt động.
+- Rời phòng trong chế độ nhúng đưa người tạo về nội dung Home.
+- Thêm nút sao chép URL `/meeting/{roomId}` để khách mời có thể mở phòng bằng route hiện có.
+- Cập nhật hướng dẫn duyệt phòng để mô tả đúng luồng Home và URL mời.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy trong phiên này. |
+| Browser review | Skipped | Chưa xác nhận Home nhúng cùng camera trên browser thật. |
+
+## Quyết định và lý do
+
+Giữ direct route `/meeting/{roomId}` cho khách, nhưng người tạo không rời Home. ID phòng hoạt động được giữ trong React state trong suốt phiên hiện tại.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh giao diện và camera trên browser. Tải lại Home sẽ làm mất room ID đang hoạt động trong state; persistence qua reload không nằm trong yêu cầu hiện tại.
+
+## Bước tiếp theo
+
+Tạo phòng từ Home, xác nhận camera hiện trong vùng nội dung, sao chép link mời sang cửa sổ khác và xác nhận nút rời phòng trở lại Home.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

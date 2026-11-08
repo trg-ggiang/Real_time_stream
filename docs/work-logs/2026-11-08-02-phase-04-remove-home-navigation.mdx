@@ -1,0 +1,46 @@
+---
+title: Gỡ navbar và sidebar khỏi giao diện Home
+description: Loại bỏ hai thành phần điều hướng khỏi cây render của Home.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-02
+- Thời gian: 2026-11-08, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Gỡ navbar và sidebar khỏi giao diện ứng dụng theo yêu cầu; giữ nguyên logic đăng nhập, đăng xuất và phòng họp.
+
+## Công việc hoàn thành
+
+- Bỏ import và render `Navbar`/`Sidebar` trong `AuthApp`.
+- Bỏ footer workspace trùng lặp; Home vẫn có chân trang riêng.
+- Xóa CSS ẩn các thành phần điều hướng đã gỡ.
+- Nút đăng xuất riêng trên Home vẫn gọi cùng luồng đăng xuất.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy trong phiên này. |
+| Browser review | Skipped | Chưa mở ứng dụng để xem giao diện. |
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh trực quan sau khi gỡ hai thành phần. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Mở Home trên browser và xác nhận không còn navbar/sidebar, đồng thời kiểm tra nút đăng xuất và thao tác tạo phòng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

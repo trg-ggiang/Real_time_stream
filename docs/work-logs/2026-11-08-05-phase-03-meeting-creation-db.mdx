@@ -1,0 +1,57 @@
+---
+title: Khôi phục wizard tạo meeting lưu Supabase
+description: Tạo meeting, chuyển qua thiết lập phòng và chỉ vào call sau khi lưu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-05
+- Thời gian: 2026-11-08, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — API và React nền tảng
+- Kết quả phiên: Completed — code hoàn thành; DB thật chưa nghiệm thu.
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Khi nhấn Tham gia phòng, mở form tạo meeting; lưu thông tin vào DB khi nhấn Tạo phòng; chuyển qua form thiết lập hiện có; chỉ vào cuộc gọi sau khi Lưu cài đặt thành công.
+
+## Công việc hoàn thành
+
+- Thêm form thông tin meeting gồm tên, mô tả, thời gian và visibility, với nút quay lại Home.
+- Thêm API tạo meeting được bảo vệ bằng cookie JWT/rate limit và DTO validation.
+- Thêm migration versioned cho các cột còn thiếu và function transaction tạo meeting cùng host membership.
+- Form quyền hiện có lưu mic/video/waiting room vào Supabase trước khi Home mở meeting.
+- Giữ LiveKit room name bằng meeting UUID để token route hiện tại dùng tiếp được.
+- Visibility được lưu; enforcement cho public/private chưa thuộc phần này.
+- Cập nhật hướng dẫn, changelog và phase documentation.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy trong phiên này. |
+| Supabase thật | Skipped | Migration chưa được áp dụng và DB chưa được xác minh. |
+| docs.json/navigation | Pending | Kiểm tra ở bước cuối phiên. |
+
+## Quyết định và lý do
+
+Dùng function Postgres `SECURITY INVOKER` để meeting và host membership được tạo trong cùng giao dịch. Function giới hạn execute cho `service_role`; backend giữ secret key. RLS bật trên hai bảng meeting và client roles bị thu hồi grant.
+
+## Blocker và việc chưa hoàn thành
+
+- Cần chạy `supabase/migrations/20261108130000_meeting_creation_form.sql` trên Supabase development.
+- Chưa xác minh UI hoặc luồng DB thật.
+- `visibility` được lưu nhưng chưa quyết định quyền join.
+
+## Bước tiếp theo
+
+Áp dụng migration rồi thử tạo meeting: xác nhận meeting/host membership, các quyền được lưu và cuộc gọi chỉ mở sau phản hồi lưu thành công.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log và hướng dẫn trong docs.json
+- [x] Xác minh JSON/navigation targets
+- [x] Ghi giới hạn xác minh

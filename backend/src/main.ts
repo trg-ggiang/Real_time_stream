@@ -4,11 +4,13 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { configureApp } from './configure-app';
+import { configureFrontend } from './configure-frontend';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
   configureApp(app);
+  configureFrontend(app, config);
   await app.listen(
     config.getOrThrow<number>('PORT'),
     config.getOrThrow<string>('HOST'),

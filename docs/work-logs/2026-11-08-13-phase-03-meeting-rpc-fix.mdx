@@ -1,0 +1,59 @@
+---
+title: Sửa lỗi RPC tạo meeting chưa được triển khai
+description: Đồng bộ chữ ký PostgREST, dọn overload an toàn và bổ sung chẩn đoán RPC.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-13
+- Thời gian: 2026-11-08, Asia/Saigon
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — Application Foundation
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu
+
+Sửa lỗi `PGRST202` khi tạo meeting, đối chiếu chữ ký đang gọi với các migration, đảm bảo RPC ghi meeting/session/host atomically và xác minh project Supabase nếu có kết nối.
+
+## Kết quả
+
+- Tìm thấy một lời gọi RPC trong `backend/src/livekit/meetings.service.ts`; frontend gọi API NestJS, không gọi Supabase trực tiếp.
+- Chữ ký caller đang gửi: `p_created_by uuid` (ID từ `public.users` sau khi xác minh JWT), `p_title text`, `p_scheduled_start_at timestamptz` (ISO string), `p_scheduled_end_at timestamptz` (ISO string). Backend DTO xác thực các trường trước khi RPC chạy.
+- Migration lịch sử từng tạo overload 6 tham số (`uuid, uuid, text, text, timestamptz, timestamptz`); migration mới nhất nhắm tới chữ ký 4 tham số nêu trên.
+- Truy vấn REST/OpenAPI chỉ đọc tới project cấu hình trả HTTP 200 nhưng không có `/rpc/create_meeting_with_host_member`, xác nhận function hiện không được PostgREST công bố. Vì vậy chưa có chữ ký function runtime để báo cáo; không thể khẳng định DB từng có chữ ký cụ thể nào.
+- Migration hiện dọn mọi overload trong `public` với `DROP FUNCTION ... RESTRICT`, không cascade dependency; sau đó tạo duy nhất chữ ký chuẩn. Nó không tạo bảng hoặc sửa dữ liệu. Function thực hiện ba INSERT trong cùng một lời gọi PostgreSQL: `meetings`, `meeting_sessions`, `meeting_members`; lỗi bất kỳ sẽ rollback statement và các hàng đã chèn.
+- Giữ `SECURITY DEFINER`, `search_path = ''`, thu hồi EXECUTE khỏi `PUBLIC`, `anon`, `authenticated`, chỉ cấp cho `service_role`, và phát `NOTIFY pgrst, 'reload schema'`. Backend chỉ gọi sau auth ứng dụng, gán user ID từ JWT đã xác minh; secret key không ở frontend.
+- Backend log cấu trúc gồm đủ `code`, `message`, `details`, `hint` cho lỗi RPC, bao gồm PGRST202.
+
+## File thay đổi
+
+- `supabase/migrations/20261108190000_create_meeting_creation_rpc.sql`
+- `backend/src/livekit/meetings.service.ts`
+- `backend/test/livekit.test.cjs`
+- `docs/modules/meeting-creation.mdx`
+- `docs/plans/phase-03-auth.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Supabase REST/OpenAPI GET | Passed | HTTP 200; không liệt kê endpoint RPC này. Không ghi dữ liệu. |
+| `npm.cmd --workspace backend test` | Passed | Build thành công, 6/6 tests passed; có test xác nhận args/response và metadata log PGRST202. |
+| `npm.cmd run typecheck` | Failed | Backend pass; frontend thất bại vì `Sidebar.test.tsx` import không tìm thấy `components/Navbar` và `components/Sidebar` (lỗi hiện có, ngoài thay đổi RPC). |
+| Áp dụng migration | Chưa thực hiện | Có cấu hình REST nhưng không có SQL Editor, Supabase CLI, psql hoặc DB connection trong phiên. |
+| Tạo meeting thật và đọc lại ba bảng | Chưa thực hiện | Không chạy được khi migration chưa áp dụng; không tạo dữ liệu giả. |
+| Kiểm tra catalog RLS/EXECUTE | Chưa thực hiện | REST key không cung cấp quyền đọc catalog; cần SQL Editor sau khi áp dụng. |
+
+## Chữ ký trước và sau
+
+- Runtime trước sửa: RPC không xuất hiện trong PostgREST OpenAPI nên không có chữ ký khả dụng; lỗi runtime tương thích `PGRST202`.
+- Historical migration: overload 6 tham số `uuid, uuid, text, text, timestamptz, timestamptz` (và migration gần nhất trước đó có function 4 tham số trả UUID).
+- Chữ ký đích: `public.create_meeting_with_host_member(p_created_by uuid, p_title text, p_scheduled_start_at timestamptz, p_scheduled_end_at timestamptz) RETURNS jsonb`.
+
+## Bước tiếp theo
+
+Áp dụng `supabase/migrations/20261108190000_create_meeting_creation_rpc.sql` bằng SQL Editor hoặc pipeline migration trên đúng project. Sau đó kiểm tra chỉ còn một function với chữ ký 4 tham số, quyền EXECUTE chỉ thuộc `service_role`, rồi đăng nhập và tạo một meeting để xác nhận có đúng hàng liên kết trong cả ba bảng. Chỉ khi có bằng chứng đó mới đánh dấu xác minh DB thực tế.

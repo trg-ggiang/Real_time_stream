@@ -1,0 +1,50 @@
+---
+title: Host tắt mic thành viên
+description: Cho chủ phòng mute track microphone của participant khác.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-13
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Cho host chủ động tắt microphone participant khác trong phòng.
+
+## Công việc hoàn thành
+
+- Thêm nút tắt mic cho participant khác trong giao diện LiveKit; host không thể mute chính mình.
+- Thêm API backend host-only, xác nhận participant đang trong phòng và chỉ chọn track audio có source microphone.
+- Backend dùng `RoomServiceClient.mutePublishedTrack()`; LiveKit API credentials không rời backend.
+- Ghi giới hạn: participant vẫn có thể bật mic lại vì quyền publish hiện tại không bị thu hồi.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend. |
+| Tests/build/browser | Skipped | Chưa chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Dùng server-side mute thay vì tin vào client; kiểm tra owner, participant membership và microphone source trước khi gọi LiveKit.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra hành vi với LiveKit Cloud/browser thật. Participant có thể tự bật mic lại.
+
+## Bước tiếp theo
+
+Thử mute giữa hai thiết bị. Nếu cần khóa mic tới khi host cho phép, cần thêm trạng thái mute lock và luồng host unmute.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

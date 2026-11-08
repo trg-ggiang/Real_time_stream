@@ -1,0 +1,51 @@
+---
+title: Gỡ chức năng chia sẻ màn hình
+description: Xóa tùy chọn, điều khiển và quyền phát screen share.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-19
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Bỏ chức năng chia sẻ màn hình trong phòng họp.
+
+## Công việc hoàn thành
+
+- Gỡ `allowScreenShare` khỏi DTO cấu hình phòng, kiểu frontend và mặc định khi tạo phòng.
+- Bỏ checkbox chia sẻ màn hình khỏi form tạo phòng.
+- Bỏ đăng ký screen share track và ẩn điều khiển screen share trong LiveKit ControlBar.
+- Không cấp `SCREEN_SHARE` hoặc `SCREEN_SHARE_AUDIO` trong token grant và quyền participant khi host mute/unmute mic.
+- Cập nhật hướng dẫn duyệt phòng và trạng thái phase.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy trong phiên này. |
+| Tìm kiếm tham chiếu runtime | Passed | Không còn `allowScreenShare` hoặc grant screen share trong source runtime. |
+
+## Quyết định và lý do
+
+Bỏ quyền ở backend cùng nút giao diện để client không thể phát screen share bằng cách gọi SDK trực tiếp.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh bằng build hoặc LiveKit Cloud.
+
+## Bước tiếp theo
+
+Kiểm tra form tạo phòng và thanh điều khiển trong browser; xác nhận token không cho phép track screen share.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

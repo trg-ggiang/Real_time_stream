@@ -1,0 +1,49 @@
+---
+title: Bố cục camera phòng họp theo mẫu
+description: Mở rộng vùng video và sắp xếp dải thành viên bên dưới.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-17
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Điều chỉnh màn hình họp để camera hiển thị lớn ngay trong vùng họp, theo bố cục tham khảo do người dùng cung cấp.
+
+## Công việc hoàn thành
+
+- Mở rộng khung họp và cho lưới video dùng toàn bộ chiều ngang.
+- Ép lưới camera hiển thị tối đa hai cột trên desktop để các thành viên thấy nhau cạnh nhau.
+- Chuyển danh sách thành viên và thao tác khóa mic host thành dải ngang có thể cuộn bên dưới video; giữ bố cục cho màn hình hẹp.
+- Camera đã được tự bật trong `LiveKitRoom` khi phòng cho phép; thay đổi lần này tập trung vào kích thước/bố cục hiển thị.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không được yêu cầu chạy xác minh trong lượt này. |
+| Browser và camera thật | Skipped | Cần quyền camera của trình duyệt để xác nhận hình ảnh thực tế. |
+
+## Quyết định và lý do
+
+Giữ panel host mute nhưng chuyển nó xuống dưới video để video không còn bị thu hẹp bởi cột thành viên.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác nhận bố cục trên browser hoặc thiết bị thật. Camera cần quyền phòng và quyền camera của trình duyệt.
+
+## Bước tiếp theo
+
+Mở phòng trên browser, cho phép camera khi được hỏi và kiểm tra video tile trên desktop/mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

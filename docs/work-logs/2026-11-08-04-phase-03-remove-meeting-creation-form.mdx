@@ -1,0 +1,57 @@
+---
+title: Gỡ form tạo phòng và khôi phục luồng trước đó
+description: Thu hồi wizard tạo meeting/DB mới theo yêu cầu người dùng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-04
+- Thời gian: 2026-11-08, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Quay Home về giao diện ngay trước wizard tạo phòng và bỏ bước nhập chi tiết mới.
+
+## Công việc hoàn thành
+
+- Khôi phục thẻ Home “Sẵn sàng kết nối?” và luồng cũ mở `RoomPermissionForm`.
+- Khôi phục callback tạo room UUID và endpoint cài đặt hiện có.
+- Gỡ endpoint tạo meeting DB, service/DTO mới và migration chưa áp dụng.
+- Gỡ form tạo meeting, API frontend và hướng dẫn sử dụng wizard.
+- Giữ lại work log triển khai trước như lịch sử; ghi rollback này riêng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Typecheck/tests/build | Skipped | Không chạy trong phiên này. |
+| Supabase migration | Không áp dụng | Migration chưa từng được áp dụng và đã được gỡ khỏi source. |
+| docs.json/navigation | Pending | Sẽ kiểm tra JSON và target sau khi cập nhật. |
+
+## Blocker và việc chưa hoàn thành
+
+Không có form tạo meeting hoặc ghi metadata meeting mới vào DB trong luồng Home. Cài đặt room trước đó tiếp tục được giữ trong backend process memory.
+
+## Bước tiếp theo
+
+Không cần bước tiếp theo nếu giao diện Home cũ đáp ứng yêu cầu; có thể kiểm tra thủ công luồng tham gia và lưu quyền phòng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Xác minh JSON và navigation targets
+- [x] Ghi giới hạn kiểm tra
+
+## Cập nhật sau phiên — 2026-11-08
+
+Người dùng yêu cầu lại luồng tạo meeting và ghi DB; wizard cùng migration đã được triển khai lại trong [work log mới](/work-logs/2026-11-08-05-phase-03-meeting-creation-db). Migration mới có timestamp riêng và chưa được áp dụng.
+
+## Cập nhật tiếp — 2026-11-08
+
+Luồng tạo phòng hai bước và migration DB đã được khôi phục theo yêu cầu mới. Xem [work log hiện tại](/work-logs/2026-11-08-05-phase-03-meeting-creation-db).

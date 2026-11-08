@@ -1,0 +1,47 @@
+---
+title: Quay về trang chủ khi rời phòng
+description: Điều hướng về Home sau khi rời cuộc họp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-09
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Khi người dùng rời phòng, quay về trang chủ trong cùng tab.
+
+## Công việc hoàn thành
+
+- Nút Rời phòng dọn session phòng và điều hướng tab hiện tại về `/`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra source | Passed | Leave gọi `session.leave()` rồi điều hướng `/`. |
+| Typecheck/tests/build | Skipped | Chưa chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Dùng điều hướng cùng tab để trở về Home sau khi rời phòng.
+
+## Blocker và việc chưa hoàn thành
+
+Không có.
+
+## Bước tiếp theo
+
+Không cần bước tiếp theo.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

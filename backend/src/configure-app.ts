@@ -8,6 +8,7 @@ export function configureApp(app: INestApplication): void {
   app.enableCors({
     origin: config.getOrThrow<string>('FRONTEND_URL'),
     methods: ['GET', 'POST'],
+    credentials: true,
   });
   app.enableShutdownHooks();
 }

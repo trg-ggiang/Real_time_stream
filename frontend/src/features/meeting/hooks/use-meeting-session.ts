@@ -3,9 +3,10 @@ import { UnauthorizedError } from '../services/token-api';
 import { requestJoinCredentials } from '../services/token-api';
 import type { JoinCredentials } from '../types';
 
-export function useMeetingSession(accessToken: string, onUnauthorized?: () => void) {
+export function useMeetingSession(roomId: string, onUnauthorized?: () => void) {
   const [credentials, setCredentials] = useState<JoinCredentials | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const [waiting, setWaiting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pending = useRef<AbortController | null>(null);
   const joined = useRef(false);
@@ -16,6 +17,7 @@ export function useMeetingSession(accessToken: string, onUnauthorized?: () => vo
     joined.current = false;
     setCredentials(null);
     setIsJoining(false);
+    setWaiting(false);
     setError(null);
   }, []);
 
@@ -49,10 +51,15 @@ export function useMeetingSession(accessToken: string, onUnauthorized?: () => vo
     setIsJoining(true);
     const timeout = window.setTimeout(() => controller.abort(), 15_000);
     try {
-      const result = await requestJoinCredentials(controller.signal, accessToken);
+      const result = await requestJoinCredentials(controller.signal, roomId);
       if (!controller.signal.aborted) {
-        joined.current = true;
-        setCredentials(result);
+        if ('waiting' in result) {
+          setWaiting(true);
+        } else {
+          joined.current = true;
+          setWaiting(false);
+          setCredentials(result);
+        }
       }
     } catch (cause) {
       if (pending.current === controller) {
@@ -74,7 +81,7 @@ export function useMeetingSession(accessToken: string, onUnauthorized?: () => vo
         setIsJoining(false);
       }
     }
-  }, [accessToken, onUnauthorized]);
+  }, [roomId, onUnauthorized]);
 
-  return { credentials, isJoining, error, join, leave, endSession };
+  return { credentials, isJoining, waiting, error, join, leave, endSession };
 }

@@ -4,50 +4,84 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { AuthApp } from './AuthApp';
 
 vi.mock('../meeting/MeetingPage', () => ({
-  MeetingPage: ({ accessToken, displayName, onLogout }: { accessToken: string; displayName: string; onLogout: () => void }) =>
-    <div><span>{displayName}</span><span data-testid="token">{accessToken}</span><button onClick={onLogout}>Đăng xuất</button></div>,
+  MeetingPage: ({ roomId, onUnauthorized }: { roomId: string; onUnauthorized: () => void }) =>
+    <div><span data-testid="room-id">{roomId}</span><button onClick={onUnauthorized}>Unauthorized</button></div>,
 }));
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
-it('logs in with the API contract and clears the in-memory session on logout', async () => {
-  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
-    access_token: 'app-jwt', user: { userId: 'u1', email: 'a@test.dev', displayName: 'Tester', avatarUrl: null },
-  }) });
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+  window.history.replaceState(null, '', '/');
+});
+
+function unauthorizedResponse() {
+  return Promise.resolve({ ok: false, status: 401 });
+}
+
+it('logs in with a cookie-backed session and restores a direct meeting URL', async () => {
+  const fetchMock = vi.fn().mockImplementation((url: string) => {
+    if (url.endsWith('/api/auth/me')) return unauthorizedResponse();
+    if (url.endsWith('/api/auth/logout')) return Promise.resolve({ ok: true, status: 204 });
+    return Promise.resolve({
+      ok: true,
+      json: async () => ({
+        user: { userId: 'u1', email: 'a@test.dev', displayName: 'Tester', avatarUrl: null },
+      }),
+    });
+  });
   vi.stubGlobal('fetch', fetchMock);
   render(<AuthApp />);
+
+  await screen.findByLabelText('Email');
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@test.dev' } });
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
-  await waitFor(() => expect(screen.getByText('Tester')).toBeTruthy());
-  expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/login');
-  expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ email: 'a@test.dev', password: 'password123' });
-  expect(screen.getByTestId('token').textContent).toBe('app-jwt');
-  fireEvent.click(screen.getByText('Đăng xuất'));
-  expect(screen.queryByText('Tester')).toBeNull();
-  expect(screen.getByLabelText('Mật khẩu')).toBeTruthy();
+  await waitFor(() => expect(screen.getByRole('link', { name: 'Phòng họp' })).toBeTruthy());
+
+  const loginCall = fetchMock.mock.calls.find(([url]) => url.endsWith('/api/auth/login'));
+  expect(loginCall?.[1]).toEqual(expect.objectContaining({ credentials: 'include' }));
+  expect(JSON.parse(loginCall?.[1].body)).toEqual({ email: 'a@test.dev', password: 'password123' });
+
+  const roomId = '377f21cc-25b6-4396-b2e4-9b386c6f013b';
+  window.history.pushState(null, '', `/meeting/${roomId}`);
+  fireEvent.popState(window);
+  expect(screen.getByTestId('room-id').textContent).toBe(roomId);
+
+  fireEvent.click(screen.getByText('Unauthorized'));
+  await screen.findByLabelText('Mật khẩu');
+  expect(fetchMock.mock.calls.some(([url]) => url.endsWith('/api/auth/logout'))).toBe(true);
 });
 
 it('aborts authentication on unmount and ignores late success', async () => {
   let resolve!: (value: unknown) => void;
-  const fetchMock = vi.fn().mockImplementation(() => new Promise(r => { resolve = r; }));
+  const fetchMock = vi.fn().mockImplementation((url: string) => {
+    if (url.endsWith('/api/auth/me')) return unauthorizedResponse();
+    return new Promise((done) => { resolve = done; });
+  });
   vi.stubGlobal('fetch', fetchMock);
   const { unmount } = render(<AuthApp />);
+  await screen.findByLabelText('Email');
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@test.dev' } });
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
-  const signal = fetchMock.mock.calls[0][1].signal as AbortSignal;
-  unmount(); expect(signal.aborted).toBe(true);
-  await act(async () => resolve({ ok: true, json: async () => ({ access_token: 'jwt', user: { userId: 'u', email: 'e', displayName: 'Late' } }) }));
+  const loginCall = fetchMock.mock.calls.find(([url]) => url.endsWith('/api/auth/login'));
+  const signal = loginCall?.[1].signal as AbortSignal;
+  unmount();
+  expect(signal.aborted).toBe(true);
+  await act(async () => resolve({ ok: true, json: async () => ({ user: { userId: 'u', email: 'e', displayName: 'Late' } }) }));
   expect(screen.queryByText('Late')).toBeNull();
 });
 
-it('validates registration inline without sending invalid data and toggles password visibility', async () => {
-  const fetchMock = vi.fn();
+it('validates registration inline without sending invalid credentials and toggles password visibility', async () => {
+  const fetchMock = vi.fn().mockImplementation((url: string) =>
+    url.endsWith('/api/auth/me') ? unauthorizedResponse() : Promise.resolve({ ok: true }),
+  );
   vi.stubGlobal('fetch', fetchMock);
   render(<AuthApp />);
+  await screen.findByLabelText('Email');
   fireEvent.click(screen.getByRole('button', { name: 'Đăng ký' }));
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
-  expect(fetchMock).not.toHaveBeenCalled();
+  expect(fetchMock.mock.calls.some(([url]) => url.endsWith('/api/auth/register'))).toBe(false);
   expect(screen.getByLabelText('Tên hiển thị').getAttribute('aria-invalid')).toBe('true');
   expect(document.activeElement).toBe(screen.getByLabelText('Tên hiển thị'));
   expect(screen.getByText('Nhập địa chỉ email hợp lệ.')).toBeTruthy();
@@ -61,18 +95,28 @@ it('validates registration inline without sending invalid data and toggles passw
 
 it('sends registration fields, prevents double submit, and keeps a useful server error', async () => {
   let resolve!: (value: unknown) => void;
-  const fetchMock = vi.fn().mockImplementation(() => new Promise(r => { resolve = r; }));
+  const fetchMock = vi.fn().mockImplementation((url: string) => {
+    if (url.endsWith('/api/auth/me')) return unauthorizedResponse();
+    return new Promise((done) => { resolve = done; });
+  });
   vi.stubGlobal('fetch', fetchMock);
   render(<AuthApp />);
+  await screen.findByLabelText('Email');
   fireEvent.click(screen.getByRole('button', { name: 'Đăng ký' }));
   fireEvent.change(screen.getByLabelText('Tên hiển thị'), { target: { value: ' Tester ' } });
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@test.dev' } });
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   const form = screen.getByLabelText('Email').closest('form')!;
-  fireEvent.submit(form); fireEvent.submit(form);
-  expect(fetchMock).toHaveBeenCalledTimes(1);
-  expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/register');
-  expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ email: 'a@test.dev', password: 'password123', displayName: 'Tester' });
+  fireEvent.submit(form);
+  fireEvent.submit(form);
+  const registerCalls = fetchMock.mock.calls.filter(([url]) => url.endsWith('/api/auth/register'));
+  expect(registerCalls).toHaveLength(1);
+  expect(registerCalls[0][1]).toEqual(expect.objectContaining({ credentials: 'include' }));
+  expect(JSON.parse(registerCalls[0][1].body)).toEqual({
+    email: 'a@test.dev',
+    password: 'password123',
+    displayName: 'Tester',
+  });
   expect((screen.getByRole('button', { name: 'Đang xử lý…' }) as HTMLButtonElement).disabled).toBe(true);
   await act(async () => resolve({ ok: false, status: 409 }));
   expect(screen.getByRole('alert').textContent).toBe('Email đã được sử dụng.');

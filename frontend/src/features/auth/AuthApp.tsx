@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowRight } from '@phosphor-icons/react/dist/csr/ArrowRight';
 import { Eye } from '@phosphor-icons/react/dist/csr/Eye';
 import { EyeSlash } from '@phosphor-icons/react/dist/csr/EyeSlash';
@@ -6,8 +6,14 @@ import { Monitor } from '@phosphor-icons/react/dist/csr/Monitor';
 import { Moon } from '@phosphor-icons/react/dist/csr/Moon';
 import { Sun } from '@phosphor-icons/react/dist/csr/Sun';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
+import { HomePage } from '../home/page';
 import { MeetingPage } from '../meeting/MeetingPage';
-import { authenticate, type AuthSession } from './auth-api';
+import {
+  authenticate,
+  endSession,
+  restoreSession,
+  type AuthSession,
+} from './auth-api';
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/500.css';
 import '@fontsource/be-vietnam-pro/600.css';
@@ -17,8 +23,21 @@ type Mode = 'login' | 'register';
 type Field = 'email' | 'password' | 'displayName';
 type Theme = 'system' | 'light' | 'dark';
 
+function readRoutePath(): string {
+  const path = window.location.pathname;
+  if (path === '/meeting' || path === '/meeting/new') {
+    window.history.replaceState(window.history.state, '', '/');
+    return '/';
+  }
+  return path;
+}
+
 export function AuthApp() {
   const [session, setSession] = useState<AuthSession | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [sessionError, setSessionError] = useState('');
+  const [currentPath, setCurrentPath] = useState(readRoutePath);
+  const [activeHomeRoomId, setActiveHomeRoomId] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>('login');
   const [theme, setTheme] = useState<Theme>('system');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +48,50 @@ export function AuthApp() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const errorRef = useRef<HTMLParagraphElement | null>(null);
   const registering = mode === 'register';
+  const logout = useCallback(() => {
+    void endSession().then(() => {
+      setSession(null);
+      setActiveHomeRoomId(null);
+      window.history.replaceState(null, '', '/');
+      setCurrentPath('/');
+    }).catch((cause: unknown) => {
+      setSessionError(
+        cause instanceof Error ? cause.message : 'Không thể đăng xuất.',
+      );
+    });
+  }, []);
+
+  const openJoinedRoom = useCallback((meetingId: string) => {
+    setActiveHomeRoomId(meetingId);
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void restoreSession(controller.signal)
+      .then((restored) => {
+        if (!controller.signal.aborted) setSession(restored);
+      })
+      .catch((cause: unknown) => {
+        if (!controller.signal.aborted) {
+          setSessionError(
+            cause instanceof Error
+              ? cause.message
+              : 'Không thể kiểm tra phiên đăng nhập.',
+          );
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setSessionLoading(false);
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = () => setCurrentPath(readRoutePath());
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   useEffect(() => () => {
     pending.current?.abort();
@@ -84,7 +147,10 @@ export function AuthApp() {
       const result = await authenticate(mode, {
         email, password, ...(registering ? { displayName } : {}),
       }, controller.signal);
-      if (!controller.signal.aborted) setSession(result);
+      if (!controller.signal.aborted) {
+        setSession(result);
+        setSessionError('');
+      }
     } catch (cause) {
       if (pending.current === controller) {
         setError(controller.signal.aborted
@@ -102,8 +168,45 @@ export function AuthApp() {
     }
   }
 
-  if (session) return <MeetingPage accessToken={session.access_token}
-    displayName={session.user.displayName} onLogout={() => setSession(null)} />;
+  if (session) {
+    const meetingMatch = currentPath.match(
+      /^\/meeting\/([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i,
+    );
+    if (currentPath.startsWith('/meeting/')) {
+      if (!meetingMatch) {
+        return (
+          <main className="meeting-route-error">
+            <h1>Đường dẫn phòng họp không hợp lệ</h1>
+            <a href="/">Về trang chủ</a>
+          </main>
+        );
+      }
+      return (
+        <MeetingPage
+          roomId={meetingMatch[1]}
+          onUnauthorized={logout}
+        />
+      );
+    }
+
+    return (
+      <div className="workspace">
+        <main className="workspace-main">
+          <HomePage
+            onMeetingCreated={openJoinedRoom}
+            activeRoomId={activeHomeRoomId}
+            onLeaveRoom={() => setActiveHomeRoomId(null)}
+            onUnauthorized={logout}
+            onLogout={logout}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  if (sessionLoading) {
+    return <main className="auth-session-loading" role="status">Đang kiểm tra phiên đăng nhập…</main>;
+  }
 
   return (
     <div className="auth-page" data-theme={theme}>
@@ -131,6 +234,9 @@ export function AuthApp() {
 
           <main className="auth-main">
             <section className="auth-content" aria-labelledby="auth-title">
+              {sessionError && (
+                <p className="auth-server-error" role="alert">{sessionError}</p>
+              )}
               <div className="auth-mode-switch" role="group" aria-label="Chọn thao tác">
                 <button type="button" aria-pressed={!registering} disabled={busy} onClick={() => switchMode('login')}>Đăng nhập</button>
                 <button type="button" aria-pressed={registering} disabled={busy} onClick={() => switchMode('register')}>Đăng ký</button>
@@ -178,7 +284,7 @@ export function AuthApp() {
                   <span>{busy ? 'Đang xử lý…' : registering ? 'Tạo tài khoản' : 'Đăng nhập'}</span>
                   {!busy && <ArrowRight size={20} aria-hidden="true" />}
                 </button>
-                <p className="auth-session-note">Phiên đăng nhập chỉ được giữ trong tab này.<br />Tải lại trang sẽ cần đăng nhập lại.</p>
+                <p className="auth-session-note">Phiên được bảo vệ bằng cookie HttpOnly.<br />Tab họp mới dùng cùng phiên đăng nhập.</p>
               </form>
             </section>
           </main>

@@ -1,0 +1,54 @@
+---
+title: Sửa chẩn đoán camera phòng họp
+description: Phân biệt lỗi quyền camera, thiết bị không tồn tại và thiết bị đang được sử dụng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-07
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Copilot
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Điều tra và sửa tình trạng camera không tải trong trang họp mới.
+
+## Công việc hoàn thành
+
+- Đọc trạng thái quyền của browser tích hợp: camera và microphone đang `denied`; vì vậy browser không cho phép trang lấy media.
+- Thêm thông báo cụ thể cho permission denied, không tìm thấy thiết bị, và camera/microphone đang được app/tab khác dùng.
+- Truyền thông tin lỗi từ LiveKit media callback và camera toggle vào giao diện; giữ nút điều khiển để thử lại sau khi sửa quyền.
+- Thêm unit test cho các trường hợp permission, device in use và missing device.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Browser permission query | Camera và microphone `denied` | Browser tích hợp không có phiên auth nên chưa kiểm tra được vào room/media thực |
+| Workspace typecheck/tests/build trước thay đổi camera diagnostic | Passed | BE/FE typecheck, backend 3 tests, frontend 21 tests, build đạt |
+| Kiểm tra sau camera diagnostic | Skipped | Lệnh bị người dùng từ chối; unit test mới và build chưa xác minh |
+| Camera trên thiết bị thật | Chưa xác minh | Cần cấp quyền trong browser và kiểm tra không có app/tab khác giữ camera |
+
+## Quyết định và lý do
+
+Không cố vượt qua quyền browser bằng code. Thông báo cho người dùng bật quyền cạnh thanh địa chỉ hoặc đóng app/tab đang dùng camera; quyền media là quyết định của browser/OS.
+
+## Blocker và việc chưa hoàn thành
+
+- Browser kiểm tra đang chặn camera/microphone; code không thể tự cấp quyền thay người dùng.
+- Chưa xác minh camera thật sau khi người dùng cấp quyền.
+- Cần chạy lại typecheck/test/build khi có thể.
+
+## Bước tiếp theo
+
+Trong browser, mở quyền site cạnh thanh địa chỉ, đặt Camera/Microphone thành Allow; đóng Zoom/Teams/tab khác đang dùng camera rồi tải lại phòng họp. Sau đó kiểm tra thông báo lỗi mới nếu camera vẫn không mở.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

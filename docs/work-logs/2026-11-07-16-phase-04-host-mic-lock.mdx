@@ -1,0 +1,50 @@
+---
+title: Host khóa và cấp lại quyền microphone
+description: Kết hợp mute track với cập nhật quyền publish mic của participant.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-16
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa host mute để bấm mic thực sự tắt participant mic ngay và ngăn participant tự bật lại đến khi host cho phép.
+
+## Công việc hoàn thành
+
+- Host mic control chuyển thành toggle: mute hoặc cấp lại quyền publish mic.
+- Backend xác minh host và participant, mute track microphone đang phát, rồi cập nhật `canPublishSources` để khóa microphone.
+- Cấp lại quyền khôi phục publish sources theo room settings; participant tự bật mic lại trên thiết bị.
+- Lock được lưu theo user ID trong room state để áp dụng lại khi participant xin token lại trong cùng backend process.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend. |
+| Tests/build/LiveKit Cloud | Skipped | Chưa chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Chỉ mute track đang phát có thể để participant tự bật lại ngay. Cập nhật quyền publish mic ở LiveKit để backend thực thi trạng thái mute tới khi host cấp lại.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa thử tương tác giữa hai browser/thiết bị với LiveKit Cloud.
+
+## Bước tiếp theo
+
+Host bấm mic cạnh thành viên đang bật mic; xác nhận âm thanh của thành viên tắt. Bấm lại để cấp mic, sau đó thành viên tự bật mic.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

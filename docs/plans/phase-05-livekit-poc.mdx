@@ -64,3 +64,11 @@ Chuẩn bị commit/push nhánh `feature/livekit-mockdata-cloudflare-tunnel` the
 ## Auth integration 2026-11-07
 
 Auth and Supabase modules from Hai are now integrated into the main backend and React login. LiveKit token issuance requires an application JWT. Phase 03/04/05 remain In Progress: real Supabase configuration/schema and two-device media acceptance are pending. See [integration guide](/modules/auth-integration) and [completed code work log](/work-logs/2026-11-07-01-phase-03-auth-integration).
+
+## New meeting tab and camera diagnostics 2026-11-07
+
+Home now opens a full-screen new tab at `/meeting/{uuid}`; the FE joins the UUID room via a credentialed LiveKit endpoint, and the BE authenticates with an HttpOnly cookie. Camera errors report permission denied, missing device, or device in use. The integrated browser reported camera and microphone permission denied; real media after granting browser permission is not verified. Workspace typecheck/tests/build passed before the final camera diagnostics change; revalidation was declined. Phase remains In Progress. [Meeting work log](/work-logs/2026-11-07-06-phase-04-meeting-page-routing) and [camera work log](/work-logs/2026-11-07-07-phase-05-camera-diagnostics).
+
+## Kiểm tra phòng chờ và mic 2026-11-08
+
+Backend tests xác nhận phòng chờ chặn cấp token cho khách đến khi host duyệt; host mute được mic và thu hồi/khôi phục quyền publish. Frontend meeting tests đạt 14/14. Trạng thái phòng chỉ lưu trong tiến trình backend; chưa xác minh trên LiveKit Cloud hai thiết bị. Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-08-15-phase-04-waiting-room-mic-check).

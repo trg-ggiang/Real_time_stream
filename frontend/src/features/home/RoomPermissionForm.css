@@ -1,0 +1,45 @@
+.room-permission-step {
+  display: grid;
+  gap: 24px;
+  padding: 28px;
+  border: 1px solid #344256;
+  border-radius: 18px;
+  background: #192537;
+  color: #e9eef7;
+}
+
+.room-permission-heading { display: flex; align-items: center; gap: 14px; }
+.room-permission-heading h2 { margin: 0 0 5px; color: #f0f3fa; font-size: 23px; }
+.room-permission-heading p { margin: 0; color: #a9b8cc; }
+.room-permission-step-number {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #223f43;
+  color: #abecdb;
+  font-weight: 700;
+}
+
+.room-permission-form { display: grid; gap: 18px; }
+.room-permission-form > label { display: flex; align-items: flex-start; gap: 12px; color: #dce5f2; line-height: 1.5; }
+.room-permission-form input { accent-color: #86e7dc; margin-top: 4px; }
+.room-permission-note { margin: 0; color: #abecdb; line-height: 1.5; }
+.room-permission-error { margin: 0; color: #ff9b9b; }
+.room-permission-actions { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.room-permission-submit,
+.room-permission-cancel {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #9ce6ce;
+  color: #102a27;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.room-permission-cancel { border: 1px solid #52627a; background: transparent; color: #e9eef7; }
+.room-permission-form button:disabled { opacity: .65; cursor: wait; }

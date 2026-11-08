@@ -1,4 +1,6 @@
 import { useCallback, useState } from 'react';
+import { Microphone } from '@phosphor-icons/react/dist/csr/Microphone';
+import { MicrophoneSlash } from '@phosphor-icons/react/dist/csr/MicrophoneSlash';
 import {
   ControlBar,
   GridLayout,
@@ -13,11 +15,17 @@ import {
 import {
   ConnectionState,
   DisconnectReason,
+  MediaDeviceFailure,
   Track,
   VideoPresets,
   type RoomOptions,
 } from 'livekit-client';
 import type { JoinCredentials } from '../types';
+import {
+  getMediaDeviceErrorFromException,
+  getMediaDeviceErrorMessage,
+} from '../services/media-device-error';
+import { muteParticipantMicrophone } from '../services/room-api';
 
 const connectionLabels: Record<ConnectionState, string> = {
   [ConnectionState.Disconnected]: 'Đã ngắt kết nối',
@@ -35,41 +43,93 @@ const roomOptions: RoomOptions = {
   },
 };
 
-function RoomContent({ onDeviceError }: { onDeviceError: () => void }) {
+function RoomContent({
+  isHost,
+  allowMic,
+  onMuteMicrophone,
+}: {
+  isHost: boolean;
+  allowMic: boolean;
+  onMuteMicrophone: (participantIdentity: string, muted: boolean) => Promise<void>;
+}) {
   const state = useConnectionState();
   const participants = useParticipants();
+  const [mutingIdentities, setMutingIdentities] = useState<Set<string>>(() => new Set());
   const tracks = useTracks([
     { source: Track.Source.Camera, withPlaceholder: true },
   ]);
   return (
     <>
-      <div className="room-status" role="status" aria-live="polite">
-        <span>{connectionLabels[state]}</span>
-        <span>{participants.length} người trong phòng</span>
-      </div>
-      <div className="video-grid">
-        <GridLayout tracks={tracks}>
-          <ParticipantTile />
-        </GridLayout>
+      <div className="meeting-screen">
+        <div className="room-status" role="status" aria-live="polite">
+          <span className="meeting-connection-state">
+            <span className="meeting-live-indicator" aria-hidden="true" />
+            {connectionLabels[state]}
+          </span>
+          <span>{participants.length} thành viên</span>
+        </div>
+        <div className="video-grid">
+          <GridLayout tracks={tracks}>
+            <ParticipantTile />
+          </GridLayout>
+        </div>
+        <aside className="meeting-member-panel" aria-label="Danh sách thành viên">
+          <header className="meeting-member-header">
+            <strong>Thành viên</strong>
+            <span>{participants.length}</span>
+          </header>
+          <div className="meeting-member-list">
+            {participants.map((participant) => {
+              const displayName = participant.name || participant.identity;
+              const canControlMic = isHost && allowMic && !participant.isLocal;
+              const isMutating = mutingIdentities.has(participant.identity);
+              async function toggleMicrophone() {
+                setMutingIdentities((current) => new Set(current).add(participant.identity));
+                try {
+                  await onMuteMicrophone(participant.identity, participant.isMicrophoneEnabled);
+                } finally {
+                  setMutingIdentities((current) => {
+                    const next = new Set(current);
+                    next.delete(participant.identity);
+                    return next;
+                  });
+                }
+              }
+              return (
+                <div className="meeting-member-row" key={participant.identity}>
+                  <span className="meeting-member-avatar" aria-hidden="true">
+                    {displayName.trim().charAt(0).toUpperCase() || '?'}
+                  </span>
+                  <span className="meeting-member-info">
+                    <strong title={displayName}>{displayName}</strong>
+                    <small className="meeting-member-role">{participant.isLocal ? (isHost ? 'Chủ phòng' : 'Bạn') : 'Thành viên'}</small>
+                    <small className={`meeting-member-mic-state${participant.isMicrophoneEnabled ? ' is-on' : ''}`}>
+                      {participant.isMicrophoneEnabled ? 'Mic đang bật' : 'Mic đang tắt'}
+                    </small>
+                  </span>
+                  <button
+                    className="meeting-member-mic"
+                    type="button"
+                    aria-label={participant.isMicrophoneEnabled ? `Tắt mic ${displayName}` : `Cho phép ${displayName} bật mic`}
+                    title={!allowMic ? 'Mic bị tắt theo cài đặt phòng' : participant.isMicrophoneEnabled ? 'Tắt mic thành viên' : 'Cho phép thành viên bật mic'}
+                    disabled={!canControlMic || isMutating}
+                    onClick={() => void toggleMicrophone()}
+                  >
+                    {participant.isMicrophoneEnabled
+                      ? <Microphone size={18} weight="fill" aria-hidden="true" />
+                      : <MicrophoneSlash size={18} weight="fill" aria-hidden="true" />}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </aside>
       </div>
       <RoomAudioRenderer />
       <StartAudio label="Bật âm thanh từ phòng" />
-      <ControlBar
-        variation="verbose"
-        saveUserChoices={false}
-        onDeviceError={onDeviceError}
-        controls={{
-          microphone: true,
-          camera: true,
-          screenShare: false,
-          chat: false,
-          leave: true,
-        }}
-      />
     </>
   );
 }
-
 export function MeetingRoom({
   credentials,
   onLeave,
@@ -81,16 +141,38 @@ export function MeetingRoom({
 }) {
   const [error, setError] = useState<string | null>(null);
   // Stable callbacks prevent the SDK connection effect restarting on UI updates.
-  const handleConnectionError = useCallback(() => {
-    setError(
-      'Kết nối hoặc thiết bị gặp lỗi. Hãy kiểm tra mạng, quyền camera/microphone; thử bật lại thiết bị hoặc rời phòng và tham gia lại.',
-    );
+  const handleConnectionError = useCallback((error: Error) => {
+    setError(getMediaDeviceErrorFromException(error));
   }, []);
-  const handleDeviceError = useCallback(() => {
-    setError(
-      'Không mở được camera hoặc microphone. Kiểm tra quyền truy cập và thiết bị, rồi thử bật lại bằng thanh điều khiển.',
-    );
+  const handleDeviceFailure = useCallback(
+    (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => {
+      setError(getMediaDeviceErrorMessage(failure, kind));
+    },
+    [],
+  );
+  const handleToggleDeviceError = useCallback(
+    ({ source, error }: { source: Track.Source; error: Error }) => {
+      const kind: MediaDeviceKind | undefined =
+        source === Track.Source.Camera
+          ? 'videoinput'
+          : source === Track.Source.Microphone
+            ? 'audioinput'
+            : undefined;
+      setError(getMediaDeviceErrorFromException(error, kind));
+    },
+    [],
+  );
+  const handleConnected = useCallback(() => {
+    setError(null);
   }, []);
+  const handleMuteMicrophone = useCallback(async (participantIdentity: string, muted: boolean) => {
+    try {
+      await muteParticipantMicrophone(credentials.roomName, participantIdentity, muted);
+      setError(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Không thể tắt mic người tham gia.');
+    }
+  }, [credentials.roomName]);
   const handleDisconnected = useCallback(
     (reason?: DisconnectReason) => {
       onEnded(
@@ -107,26 +189,42 @@ export function MeetingRoom({
         token={credentials.token}
         serverUrl={credentials.serverUrl}
         connect
-        audio
-        video
+        audio={credentials.settings.allowMic}
+        video={credentials.settings.allowVideo}
         options={roomOptions}
+        onConnected={handleConnected}
         onDisconnected={handleDisconnected}
         onError={handleConnectionError}
-        onMediaDeviceFailure={handleDeviceError}
+        onMediaDeviceFailure={handleDeviceFailure}
         data-lk-theme="default"
       >
-        <div className="room-heading">
-          <span>Phòng: {credentials.roomName}</span>
-          <button className="secondary" onClick={onLeave}>
-            Rời phòng
-          </button>
-        </div>
         {error && (
-          <p className="notice error" role="alert">
+          <p className="meeting-device-error notice error" role="alert">
             {error}
           </p>
         )}
-        <RoomContent onDeviceError={handleDeviceError} />
+        <RoomContent
+          isHost={credentials.isHost}
+          allowMic={credentials.settings.allowMic}
+          onMuteMicrophone={handleMuteMicrophone}
+        />
+        <div className="meeting-controls">
+          <ControlBar
+            variation="verbose"
+            saveUserChoices={false}
+            onDeviceError={handleToggleDeviceError}
+            controls={{
+              microphone: credentials.settings.allowMic,
+              camera: credentials.settings.allowVideo,
+              screenShare: false,
+              chat: false,
+              leave: false,
+            }}
+          />
+          <button className="meeting-leave" onClick={onLeave}>
+            Rời phòng
+          </button>
+        </div>
       </LiveKitRoom>
     </section>
   );

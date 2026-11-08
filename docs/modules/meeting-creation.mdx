@@ -1,0 +1,14 @@
+---
+title: Luồng phòng họp hiện tại
+description: Tham gia phòng thử nghiệm và thiết lập quyền media.
+---
+
+## Luồng hiện tại
+
+Home không còn form nhập metadata meeting. Người dùng nhấn **Tham gia phòng**, chọn quyền mic/camera/phòng chờ rồi lưu. Backend tạo room UUID, giữ cài đặt trong process memory và cấp token LiveKit cho UUID đó.
+
+Luồng này không thêm bản ghi vào `meetings`, `meeting_sessions` hoặc `meeting_members`. Cài đặt sẽ mất khi backend khởi động lại.
+
+## Thay đổi trước đây
+
+Wizard tạo meeting và RPC lưu DB đã được gỡ theo yêu cầu. Các ghi chú lịch sử nằm trong work logs Phase 03; các migration tạo phòng chưa được áp dụng lên Supabase.

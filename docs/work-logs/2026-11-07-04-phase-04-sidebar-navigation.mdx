@@ -1,0 +1,60 @@
+---
+title: Sidebar và navbar cho meeting
+description: Giữ sidebar dọc và thêm navbar ngang phía trên.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-04
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Copilot
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Giữ sidebar dọc với Home đứng đầu như thiết kế ban đầu; thêm navbar ngang ở mép trên, camera lớn bên trái và menu tài khoản bên phải.
+
+## Công việc hoàn thành
+
+- Giữ sidebar dọc trên desktop, Home đứng đầu cột icon, Phòng họp ở dưới; giữ avatar và đăng xuất ở chân sidebar.
+- Thêm navbar ngang cố định trên cùng, camera lớn ở trái và chữ cái đầu tên người dùng trong nút tròn bên phải.
+- Bỏ biểu tượng ba sọc khỏi đầu sidebar, dùng icon máy quay video ở đầu navbar và căn cụm thương hiệu sát trái, avatar sát phải.
+- Thêm menu tài khoản thả xuống có tên, nút đăng xuất, đóng khi nhấn Escape hoặc click bên ngoài.
+- Trên mobile, navbar vẫn ở phía trên và sidebar chuyển thành thanh điều hướng dưới.
+- Tích hợp cả hai thanh vào MeetingPage; các anchor Home và Phòng họp trỏ tới khu vực tương ứng.
+- Thêm SVG camera, home, meeting và sign-out vào `frontend/public/icon`.
+- Thêm test cho thứ tự Home, asset Home, active navigation, menu tài khoản và đăng xuất.
+- Thêm màn hình Home với ảnh nhóm học chiếm khoảng 1/3 chiều cao khung nhìn, nội dung phủ trên ảnh và khu vực `New Join` bên dưới; giữ nguyên thao tác tham gia phòng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm --workspace frontend run typecheck` | Passed | TypeScript không báo lỗi |
+| `npm --workspace frontend test` | Passed | 18 tests, 4 files |
+| `npm --workspace frontend run build` | Passed | Vite báo chunk LiveKit lớn hơn 500 kB |
+| Xác minh sau lần khôi phục sidebar cuối | Skipped | Lệnh kiểm tra bị người dùng từ chối; không ghi nhận kết quả mới |
+| Kiểm tra sau tinh chỉnh icon và căn lề | Skipped | Chưa chạy lại sau thay đổi mới nhất |
+| Kiểm tra sau bổ sung Home hero và New Join | Skipped | Chưa chạy lệnh build/test cho thay đổi này |
+| Kiểm tra trực quan trên browser | Skipped | Chưa chạy browser preview trong phiên |
+
+## Quyết định và lý do
+
+Navbar riêng ở phía trên để đúng bố cục được làm rõ; sidebar vẫn giữ nguyên kiểu rail dọc ban đầu. Chưa thêm chat, phòng động hoặc chức năng ngoài phạm vi.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa nghiệm thu hiển thị trực tiếp trên browser ở desktop/mobile. Typecheck, test và build đạt ở lần chạy trước phần Home hero/New Join; các thay đổi sau đó chưa được xác minh lại. Phase vẫn In Progress.
+
+## Bước tiếp theo
+
+Đăng nhập, mở màn hình Home và kiểm tra tỷ lệ/crop ảnh, khối New Join, navbar/sidebar ở desktop/mobile; xác nhận menu tài khoản, logout và khoảng trống quanh thanh điều hướng di động.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh
