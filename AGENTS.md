@@ -1,7 +1,7 @@
 # Real-time Stream — Agent Instructions
 
 ## Scope and stack
-- Current authorized scope: Module 1 — Media Connection PoC (NestJS token API and React/LiveKit meeting page), environment setup, tests and documentation. Do not implement database/auth, dynamic rooms, chat or club workflows until requested.
+- Current authorized scope: integrate Hai's auth/users/Supabase backend into the main NestJS app and connect React login to the fixed-room LiveKit meeting. Do not implement dynamic rooms, chat or club workflows until requested.
 - Backend: Node.js / NestJS. Frontend: React / Vite. Stream: LiveKit Cloud. Database: Supabase. Chat: Socket.IO over WebSocket.
 - Source is organized as a NestJS livekit module and a frontend meeting feature. See `docs/modules/module-01-media-poc.mdx`.
 
@@ -19,10 +19,11 @@
 - Do not auto-commit, publish, or execute destructive Git/filesystem commands without user authorization.
 - Use the smallest relevant checks. Record skipped checks and their reasons honestly.
 
-## Mandatory session close
-Every working session, including configuration/docs-only sessions, must be closed in `docs/` before the final response:
+## Work logs for completed code changes only
+Create a work log only after requested application or operational script code changes are complete. Do not create logs for questions, explanations, read-only reviews, Git operations, configuration/docs-only changes, or incomplete work. The user's current instruction takes precedence over older logging requirements.
+For a completed code change:
 1. Create a unique work log `docs/work-logs/YYYY-MM-DD-NN-phase-XX-topic.mdx` using `docs/templates/session-close.mdx`. Use Asia/Saigon time; NN increases for each session that day.
-2. Record the phase, objective, completed work, changed files, commands/results, decisions, blockers, unfinished work, and concrete next step. If interrupted, checkpoint when possible; never invent completed checks.
+2. Record the phase, objective, completed code, changed files, commands/results and concrete next step. Never invent completed checks; do not create an unfinished-session checkpoint unless the user explicitly requests one.
 3. Update the phase page in `docs/plans/` and `docs/plans/master-plan.mdx` with actual status and link to the work log. Finishing a session does not automatically finish the phase.
 4. Append an entry/link to `docs/dev/session-log.mdx`; update `docs/CHANGELOG.mdx` for changes and relevant setup/architecture docs.
 5. Register new pages in `docs/docs.json`. Do not overwrite earlier logs.

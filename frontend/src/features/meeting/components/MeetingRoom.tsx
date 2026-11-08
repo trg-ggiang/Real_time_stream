@@ -1,23 +1,26 @@
 import { useCallback, useState } from 'react';
 import {
   ControlBar,
-  GridLayout,
+  DisconnectButton,
   LiveKitRoom,
   ParticipantTile,
   RoomAudioRenderer,
   StartAudio,
   useConnectionState,
+  useLocalParticipant,
+  useParticipantAttribute,
   useParticipants,
-  useTracks,
+  useTrackRefContext,
 } from '@livekit/components-react';
 import {
   ConnectionState,
   DisconnectReason,
-  Track,
   VideoPresets,
   type RoomOptions,
 } from 'livekit-client';
 import type { JoinCredentials } from '../types';
+import { ScreenShareButton } from './ScreenShareButton';
+import { MeetingMediaLayout } from './MeetingMediaLayout';
 
 const connectionLabels: Record<ConnectionState, string> = {
   [ConnectionState.Disconnected]: 'Đã ngắt kết nối',
@@ -35,37 +38,84 @@ const roomOptions: RoomOptions = {
   },
 };
 
+const handRaisedAttribute = 'handRaised';
+
+function RaiseHandButton({ connected }: { connected: boolean }) {
+  const { localParticipant } = useLocalParticipant();
+  const raised =
+    useParticipantAttribute(handRaisedAttribute, { participant: localParticipant }) === 'true';
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function toggleHand() {
+    if (!connected || pending) return;
+    setPending(true);
+    setError(null);
+    try {
+      await localParticipant.setAttributes({ [handRaisedAttribute]: raised ? '' : 'true' });
+    } catch {
+      setError('Không thể cập nhật trạng thái giơ tay. Vui lòng thử lại.');
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="lk-button"
+        disabled={!connected || pending}
+        onClick={() => void toggleHand()}
+      >
+        <span aria-hidden="true">✋</span> {raised ? 'Hạ tay' : 'Giơ tay'}
+      </button>
+      {error && <p className="notice error raise-hand-error" role="alert">{error}</p>}
+    </>
+  );
+}
+
+function MeetingParticipantTile() {
+  const { participant } = useTrackRefContext();
+  const raised = useParticipantAttribute(handRaisedAttribute, { participant }) === 'true';
+
+  return (
+    <div className="meeting-participant-tile">
+      <ParticipantTile />
+      {raised && <span className="raised-hand-badge" role="img" aria-label="Đang giơ tay">✋</span>}
+    </div>
+  );
+}
+
 function RoomContent({ onDeviceError }: { onDeviceError: () => void }) {
   const state = useConnectionState();
   const participants = useParticipants();
-  const tracks = useTracks([
-    { source: Track.Source.Camera, withPlaceholder: true },
-  ]);
   return (
     <>
       <div className="room-status" role="status" aria-live="polite">
         <span>{connectionLabels[state]}</span>
         <span>{participants.length} người trong phòng</span>
       </div>
-      <div className="video-grid">
-        <GridLayout tracks={tracks}>
-          <ParticipantTile />
-        </GridLayout>
-      </div>
+      <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
       <RoomAudioRenderer />
       <StartAudio label="Bật âm thanh từ phòng" />
-      <ControlBar
-        variation="verbose"
-        saveUserChoices={false}
-        onDeviceError={onDeviceError}
-        controls={{
-          microphone: true,
-          camera: true,
-          screenShare: false,
-          chat: false,
-          leave: true,
-        }}
-      />
+      <div className="meeting-controls">
+        <ControlBar
+          variation="verbose"
+          saveUserChoices={false}
+          onDeviceError={onDeviceError}
+          controls={{
+            microphone: true,
+            camera: true,
+            screenShare: false,
+            chat: false,
+            leave: false,
+          }}
+        />
+        <ScreenShareButton />
+        <RaiseHandButton connected={state === ConnectionState.Connected} />
+        <DisconnectButton>Leave</DisconnectButton>
+      </div>
     </>
   );
 }

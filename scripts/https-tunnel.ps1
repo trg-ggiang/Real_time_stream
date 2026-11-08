@@ -6,6 +6,18 @@ $projectRoot = Split-Path $PSScriptRoot -Parent
 $runtimeDir = Join-Path $projectRoot 'logs/tunnel'
 $statePath = Join-Path $runtimeDir 'session.json'
 
+function Get-Sha256([string]$LiteralPath) {
+    # Avoid depending on Get-FileHash/module auto-loading in nested npm shells.
+    $stream = [System.IO.File]::OpenRead($LiteralPath)
+    $algorithm = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return [System.BitConverter]::ToString($algorithm.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $algorithm.Dispose()
+        $stream.Dispose()
+    }
+}
+
 function Stop-OwnedProcess($record) {
     $process = Get-Process -Id $record.id -ErrorAction SilentlyContinue
     if ($process -and $process.StartTime.ToUniversalTime().ToString('o') -eq $record.started) {
@@ -48,12 +60,12 @@ if (-not (Test-Path -LiteralPath $cloudflared)) {
     Write-Host 'Downloading official cloudflared 2026.10.7 (Windows x64)...'
     $downloadPath = "$cloudflared.download"
     Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/cloudflare/cloudflared/releases/download/2026.10.7/cloudflared-windows-amd64.exe' -OutFile $downloadPath
-    if ((Get-FileHash -LiteralPath $downloadPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedHash) {
+    if ((Get-Sha256 $downloadPath) -ne $expectedHash) {
         throw 'Downloaded cloudflared SHA256 verification failed.'
     }
     Move-Item -LiteralPath $downloadPath -Destination $cloudflared -Force
 }
-if ((Get-FileHash -LiteralPath $cloudflared -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedHash) {
+if ((Get-Sha256 $cloudflared) -ne $expectedHash) {
     throw 'cloudflared SHA256 verification failed. Do not run this executable.'
 }
 
@@ -107,7 +119,7 @@ try {
     if (-not $publicUrl) { throw "No public URL received. See $tunnelLog" }
     [pscustomobject]@{ url = $publicUrl; processes = $owned } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $statePath -Encoding UTF8
     Write-Host "HTTPS meeting URL: $publicUrl"
-    Write-Host 'Anyone with this URL can request a PoC room token. Share only with your test group.'
+    Write-Host 'Login is required; registered users share the PoC room. Share only with your test group.'
     Write-Host 'Keep this terminal running. Ctrl+C or npm run tunnel:stop stops this session.'
     while (-not $tunnel.HasExited) {
         if ($preview.HasExited -or ($backend -and $backend.HasExited)) { throw 'A local service stopped.' }

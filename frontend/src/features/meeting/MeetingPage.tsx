@@ -7,11 +7,12 @@ const MeetingRoom = lazy(() =>
   })),
 );
 
-export function MeetingPage() {
-  const session = useMeetingSession();
+export function MeetingPage({ accessToken, displayName, onLogout }: { accessToken: string; displayName: string; onLogout: () => void }) {
+  const session = useMeetingSession(accessToken, onLogout);
   return (
     <main>
       <header>
+        <div className="room-heading"><span>{displayName}</span><button className="secondary" onClick={() => { session.leave(); onLogout(); }}>Đăng xuất</button></div>
         <p className="eyebrow">MEETING / MODULE 01</p>
         <h1>Cùng gặp nhau, từ bất cứ đâu.</h1>
         <p className="subtitle">
@@ -59,7 +60,7 @@ export function MeetingPage() {
         </section>
       )}
       <footer>
-        Chỉ dùng cho thử nghiệm • Chưa có đăng nhập hoặc phòng riêng tư
+        Chỉ dùng cho thử nghiệm • Phòng chung sau đăng nhập
       </footer>
     </main>
   );

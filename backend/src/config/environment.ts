@@ -1,4 +1,9 @@
 export function validateEnvironment(env: Record<string, unknown>) {
+  for (const key of ['SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'JWT_SECRET']) {
+    if (!String(env[key] ?? '').trim()) throw new Error(`${key} is required.`);
+  }
+  if (String(env.JWT_SECRET).length < 32) throw new Error('JWT_SECRET must contain at least 32 characters.');
+  if (!['http:', 'https:'].includes(new URL(String(env.SUPABASE_URL)).protocol)) throw new Error('SUPABASE_URL must use HTTP(S).');
   const port = Number(env.PORT ?? 3000);
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error('PORT must be an integer from 1 to 65535.');
@@ -27,10 +32,10 @@ export function validateEnvironment(env: Record<string, unknown>) {
       'LIVEKIT_ROOM_NAME must contain 1–64 letters, digits, underscores or hyphens.',
     );
   }
-  // This endpoint has no application authentication. Fail closed in production.
+  // Keep this fixed-room development PoC disabled in production.
   if (env.NODE_ENV === 'production' && env.POC_ENABLED === 'true') {
     throw new Error(
-      'Unauthenticated PoC token issuance must not be enabled in production.',
+      'Development PoC token issuance must not be enabled in production.',
     );
   }
   return {

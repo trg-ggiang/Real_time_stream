@@ -1,0 +1,41 @@
+---
+title: Auth và kết nối meeting
+description: Một backend NestJS, Supabase users và JWT trước khi vào LiveKit.
+---
+
+## Cấu trúc sau gộp
+
+`backend/src` là app NestJS duy nhất. AuthModule, UsersModule, SupabaseModule được chuyển từ app Hải vào đây; LivekitModule giữ nguyên phòng cố định và được bảo vệ bằng JwtAuthGuard. Dependencies và lockfile nằm ở workspace gốc; không chạy/cài app `backend/my-api` nữa. Các file local bị ignore trong thư mục cũ được giữ lại.
+
+Luồng: FE đăng ký/đăng nhập → NestJS đọc/ghi users qua Supabase → ký JWT ứng dụng → FE gửi Bearer JWT tới token API → backend tìm lại user → ký token LiveKit → browser truyền media trực tiếp LiveKit. Đây là auth NestJS tự quản lý, không phải Supabase Auth.
+
+## Cấu hình và chạy
+
+Trong `backend/.env`, điền `SUPABASE_URL`, `SUPABASE_SECRET_KEY` của development project và `JWT_SECRET` ngẫu nhiên ít nhất 32 ký tự. Giữ secret backend-only. Điền LiveKit theo README, `POC_ENABLED=true`; production vẫn chặn PoC. Không ghi đè env hoặc chia sẻ secret qua Git.
+
+Từ root: `npm install`, sau đó chạy `npm run dev:backend` và `npm run dev:frontend` trong hai terminal. Mở localhost:5173, đăng ký hoặc đăng nhập rồi tham gia phòng. Tunnel dùng cùng auth API qua proxy, không cần chạy backend khác. Khởi động lại backend đang chạy cũ sau khi cập nhật env/code.
+
+DB cần bảng users đúng với code Hải: `user_id`, `email`, `display_name`, `avatar_url`, `email_verified_at`, `created_at`, `password_hash`. ID và thời gian tạo phải có default, email phải unique và dữ liệu email phải được chuẩn hóa lowercase; password_hash lưu bcrypt. Đây là yêu cầu tương thích của code đã gộp, không phải migration hay bằng chứng schema đã được xác minh. Repo chưa có migration để dựng lại schema. Nhận schema/migration từ Hải trước khi dùng DB mới; không tự tạo bảng khác theo phỏng đoán.
+
+## Hợp đồng API
+
+| Endpoint | Request | Thành công |
+| --- | --- | --- |
+| POST /api/auth/register | email, password, displayName | 201, access_token và user |
+| POST /api/auth/login | email, password | 200, access_token và user |
+| GET /api/auth/me | Bearer JWT ứng dụng | 200, user công khai |
+| POST /api/livekit/token | Bearer JWT ứng dụng | 200, serverUrl, roomName, participantIdentity, token |
+
+User trong response đăng nhập: userId, email, displayName, avatarUrl. Không trả passwordHash. DTO kiểm tra/chuẩn hóa input và từ chối field thừa. Mật khẩu đăng ký ít nhất 8 ký tự, tối đa 72 byte UTF-8 để tránh bcrypt cắt ngầm. JWT ứng dụng hết hạn sau một ngày; token LiveKit có TTL riêng. Identity LiveKit gồm userId và UUID phiên để nhiều tab không trùng identity, tên hiển thị lấy từ DB.
+
+400: input sai; 401: sai đăng nhập hoặc JWT không hợp lệ/hết hạn; 409: email trùng; 429: quá 10 request/phút/IP/route; 503: LiveKit chưa sẵn sàng. Lỗi DB trả 500 chung, không trả chi tiết truy vấn. Qua tunnel nhiều người có thể chung bucket IP; chưa thiết kế rate limit đa node.
+
+## Phiên và giới hạn
+
+JWT chỉ giữ trong bộ nhớ, tải lại trang cần đăng nhập lại. Đăng xuất xóa phiên ở FE, unmount phòng và hủy request đang chờ. JWT đã cấp chưa bị thu hồi server-side; chưa có refresh token, khôi phục mật khẩu, xác minh email hoặc quyền theo phòng. Người tự đăng ký được vào phòng thử nghiệm chung. Không dùng mô hình này làm phòng riêng tư/production khi chưa bổ sung phân quyền.
+
+Tests HTTP dùng mock UsersService và credentials tổng hợp, không ghi dữ liệu Supabase hoặc kết nối media thật. Cần nghiệm thu đăng ký/đăng nhập với DB development và hai thiết bị LiveKit sau khi có cấu hình. Phase 03/04/05 vẫn In Progress.
+
+## Desktop interface
+
+The desktop form panel and photo panel use a 1:1.5 split (40% and 60%). The form itself stays up to 480px wide; the photo covers the full height and width of the right panel and crops naturally with object-fit: cover. Switch login/register on the same page; email stays while password clears on mode changes. Light/dark/system controls apply to auth, and the layout collapses to one column below 768px. Inputs provide inline errors and password visibility, while pending requests prevent duplicate submissions. Session persistence, endpoints and DB requirements above are unchanged.

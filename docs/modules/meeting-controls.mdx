@@ -1,34 +1,63 @@
 ---
-title: Meeting controls backend
-description: Authenticated meeting creation, admission, capacity and moderation API.
+title: Backend điều khiển meeting
+description: API tạo meeting, session, duyệt người tham gia và mute micro.
 ---
 
-## Scope and setup
+## Quy tắc nghiệp vụ
 
-The NestJS API uses Supabase Auth access tokens (`Authorization: Bearer ...`) and verifies that the same UUID exists in `public.users.user_id`. The service role key stays in the backend. Apply `supabase/migrations/202611070001_meeting_controls.sql` before using meeting endpoints. Configure `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and LiveKit credentials in `backend/.env`.
+Backend dùng JWT ứng dụng do NestJS phát hành (`Authorization: Bearer ...`) và lấy định danh từ `users.user_id`. Supabase service-role key và LiveKit API secret chỉ được dùng ở backend. Code meeting tuân theo schema DB hiện có; không yêu cầu áp dụng migration cũ `202611070001_meeting_controls.sql` cho database mới.
 
-The migration adds `meetings.max_participants` and `meetings.allow_self_unmute`, plus an atomic seat reservation function. The provided schema did not contain these two settings. Capacity defaults to 20 for existing meetings; newly created meetings must specify their capacity.
+Hệ thống có hai luồng:
+
+- **Meeting nhanh:** tạo một meeting cùng một session `active` để bắt đầu ngay. Khi kết thúc, giữ meeting/session/attendance làm lịch sử; có thể lưu note theo `session_id`.
+- **Meeting theo lịch:** tạo meeting dùng lại với `recurrence_rule` tùy chọn. Lịch không lặp tạo tối đa một session; lịch lặp tạo các session theo RRULE khi một member lên lịch buổi đầu.
+
+Người ngoài meeting được duyệt vào đúng một session. Yêu cầu session-specific được nối với `meeting_sessions` qua bản ghi `attendances` chưa có `joined_at`; khi session kết thúc, quyền guest hết hạn. Muốn tham gia các session tiếp theo, owner/moderator mời user vào meeting; membership được mời có `invited_at` và tồn tại qua các session.
+
+## Quyền
+
+- Owner và moderator có thể xem, duyệt hoặc từ chối yêu cầu guest.
+- Owner có thể mời member lâu dài, đổi role moderator, và chỉnh `waiting_room_enabled`.
+- Member đã được duyệt có thể tạo hoặc kết thúc session trong meeting.
+- Owner/moderator có thể mute hoặc remove target cùng cấp hay thấp hơn; owner không thể bị remove và không cho phép tự mute bằng endpoint quản trị.
+- Mute tắt các audio track đang publish trên kết nối hiện tại. Khi kết nối lại, mute không được giữ.
+- Khi tắt phòng chờ, yêu cầu đang chờ vẫn chờ duyệt; cài đặt mới áp dụng cho lượt vào mới. Cách xử lý này giống hành vi lobby của Teams, nơi người đang chờ vẫn ở lobby khi cài đặt được đổi trong cuộc họp ([tài liệu Microsoft Teams](https://support.microsoft.com/en-gb/teams/meetings/using-the-lobby-in-microsoft-teams-meetings)).
 
 ## API
 
-All routes below require a valid Supabase Auth bearer token. IDs are UUIDs; join uses the meeting code.
+Tất cả route yêu cầu JWT ứng dụng hợp lệ. ID là UUID. Mã meeting nằm trong link cố định.
 
-| Method and route | Purpose | Permission |
+| Method và route | Body / kết quả | Quyền |
 | --- | --- | --- |
-| `POST /api/meetings` | Create a meeting. Body: `{ "title": "...", "maxParticipants": 20, "waitingRoomEnabled": true, "allowSelfUnmute": true }` | Authenticated user becomes owner |
-| `POST /api/meetings/:code/join` | Request entry or receive LiveKit credentials when admitted | Authenticated member |
-| `POST /api/meetings/:id/join-requests` | List waiting requests | Owner or moderator |
-| `POST /api/meetings/:id/join-requests/:memberId/approve` | Admit a pending member | Owner |
-| `PATCH /api/meetings/:id/members/:memberId/moderator` | Set `{ "enabled": true }` to grant or false to revoke moderator role | Owner |
-| `POST /api/meetings/:id/members/:memberId/mute` | Mute the member's published microphone track in LiveKit | Owner or moderator |
-| `POST /api/meetings/:id/members/:memberId/remove` | Remove a member and disconnect them from LiveKit | Owner |
-| `PATCH /api/meetings/:id/settings` | Change `waitingRoomEnabled`, `maxParticipants`, and/or `allowSelfUnmute` | Owner |
-| `POST /api/meetings/:id/leave` | Close the member's active attendance reservation | Authenticated member |
+| `POST /api/meetings` | Tạo meeting theo lịch/phòng dùng lại: `{ title, waitingRoomEnabled?, recurrenceRule? }` | User đăng nhập thành owner |
+| `POST /api/meetings/quick` | Tạo meeting nhanh và session `active`: `{ title, waitingRoomEnabled? }` | User đăng nhập thành owner |
+| `GET /api/meetings/:code/sessions` | Trả meeting và danh sách session để chọn | User đăng nhập |
+| `POST /api/meetings/:meetingId/sessions` | Lên lịch: `{ scheduledStartAt, scheduledEndAt }`; nếu meeting có RRULE thì tạo toàn bộ các lần lặp | Member đã được mời/owner/moderator |
+| `POST /api/meetings/:code/join` | `{ sessionId }`; trả pending hoặc LiveKit credentials và `attendanceId` | User đăng nhập |
+| `GET /api/meetings/:meetingId/sessions/:sessionId/join-status` | `not_requested`, `pending`, `admitted`, `denied` hoặc `session_ended` | User đăng nhập |
+| `GET /api/meetings/:meetingId/sessions/:sessionId/join-requests` | Danh sách guest đang chờ đúng session | Owner hoặc moderator |
+| `POST /api/meetings/:meetingId/sessions/:sessionId/join-requests/:memberId/approve` | Duyệt guest của session; sau đó client gọi join để lấy token | Owner hoặc moderator |
+| `POST /api/meetings/:meetingId/sessions/:sessionId/join-requests/:memberId/deny` | Từ chối guest của session | Owner hoặc moderator |
+| `POST /api/meetings/:meetingId/members` | Mời member lâu dài: `{ email }` | Owner hoặc moderator |
+| `PATCH /api/meetings/:meetingId/members/:memberId/moderator` | `{ enabled }` | Owner |
+| `PATCH /api/meetings/:meetingId/settings` | `{ waitingRoomEnabled }` | Owner |
+| `POST /api/meetings/:meetingId/sessions/:sessionId/members/:memberId/mute` | Mute micro track hiện tại | Owner/moderator theo thứ bậc role |
+| `POST /api/meetings/:meetingId/members/:memberId/remove` | Xóa member và ngắt các kết nối hoạt động | Owner/moderator theo thứ bậc role |
+| `POST /api/meetings/:meetingId/sessions/:sessionId/leave` | `{ attendanceId }`; đóng đúng kết nối của thiết bị hiện tại | Member đã được duyệt |
+| `POST /api/meetings/:meetingId/sessions/:sessionId/end` | Kết thúc session, ngắt participant, hết hạn guest session-only | Member đã được mời/owner/moderator |
 
-When waiting room is on, join returns `{ "status": "pending" }` without a media token. After approval, the client calls join again. When the capacity is reached, join returns HTTP 403 with `Meeting is full.` Seat reservation is serialized in Postgres to avoid overbooking concurrent requests.
+Yêu cầu bị từ chối có thể gửi lại tối đa ba lần trong cửa sổ giới hạn; sau lần từ chối thứ ba phải chờ 30 phút. Member được mời lâu dài không chịu giới hạn này.
 
-When self-unmute is disabled, the moderator mute operation also removes that participant’s microphone publishing permission (camera remains allowed). When enabled, the microphone track is muted server-side and the participant may unmute themselves. Existing participants whose permission was revoked need a refreshed token/reconnect after the owner enables self-unmute again.
+## Định dạng lặp lịch
 
-## Integration limits
+`recurrenceRule` nhận cú pháp RRULE với `FREQ` bắt buộc và đúng một trong `COUNT` hoặc `UNTIL`. Backend hiện hỗ trợ `FREQ=DAILY|WEEKLY|MONTHLY|YEARLY`, `INTERVAL`, `COUNT`, `UNTIL`, `BYDAY` không có thứ tự và `BYMONTHDAY`/`BYMONTH` trong các tổ hợp được hỗ trợ. Tối đa 5.000 session được tạo. Quy tắc RRULE khác/field chưa hỗ trợ sẽ bị từ chối thay vì âm thầm tạo lịch sai. Mốc thời gian session là ISO 8601; recurrence được mở rộng theo UTC.
 
-The caller must leave through the API for the capacity reservation to be released. Abrupt disconnects can keep an attendance active until a LiveKit webhook or operational cleanup updates `left_at`; webhook cleanup is not part of this implementation. The existing `/api/livekit/token` endpoint remains the separate static-room PoC and does not grant access to meetings created here. Frontend integration and full authentication signup/login are not included.
+Ví dụ: `FREQ=WEEKLY;BYDAY=MO,WE;COUNT=10`. Thời lượng mỗi lần lặp được lấy từ `scheduledEndAt - scheduledStartAt` của session đầu.
+
+## Giới hạn cần biết
+
+- Frontend hiện vẫn gọi `/api/livekit/token` cho room cố định, chưa gọi các meeting endpoints ở trên.
+- Chưa kết nối Supabase/LiveKit development trong lượt triển khai này; chưa xác minh trực tiếp nullable/default/foreign key/RLS trên DB.
+- Việc kết thúc session hiện là thao tác API của member. Chưa có worker tự kết thúc đúng giờ hoặc LiveKit webhook để dọn attendance khi mất mạng đột ngột.
+- Tạo meeting và thêm owner membership là hai request DB; nếu bước sau lỗi, cleanup meeting là best-effort, chưa có transaction RPC.
+- Code không tự áp dụng migration cũ. Migration ấy thêm capacity/self-unmute không thuộc ERD hiện được dùng.

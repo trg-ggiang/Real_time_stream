@@ -20,8 +20,24 @@
               "modules/module-01-media-poc",
               "modules/https-tunnel",
               "modules/code-walkthrough",
-              "modules/module-01-team-guide"
-              ,"modules/meeting-controls"
+              "modules/module-01-team-guide",
+              "modules/screen-sharing"
+            ]
+          },
+          {
+            "group": "Auth integration",
+            "pages": [
+              "modules/auth-integration",
+              "plans/phase-03-auth",
+              "work-logs/2026-11-07-01-phase-03-auth-integration",
+              "work-logs/2026-11-07-02-phase-04-desktop-auth-ui",
+              "work-logs/2026-11-07-03-phase-04-auth-image-ratio",
+              "work-logs/2026-11-07-04-phase-05-raise-hand",
+              "work-logs/2026-11-07-05-phase-05-hand-controls",
+
+              "work-logs/2026-11-07-04-phase-04-tunnel-hash-fix",
+              "work-logs/2026-11-07-06-phase-05-screen-sharing",
+              "work-logs/2026-11-07-07-phase-05-meeting-layout"
             ]
           }
         ]
@@ -52,6 +68,7 @@
               "dev/session-log",
               "templates/session-close"
             ]
+<<<<<<< HEAD
           },
           {
             "group": "Work Logs",
@@ -69,6 +86,8 @@
               "work-logs/2026-11-06-05-phase-05-git-handoff",
               "work-logs/2026-11-07-01-phase-03-meeting-controls"
             ]
+=======
+>>>>>>> c77b0f82efcb3532adb20d3e58e1dce1f39fa591
           }
         ]
       }

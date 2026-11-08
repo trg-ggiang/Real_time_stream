@@ -1,26 +1,39 @@
+﻿---
+title: Phase 03 — Database, auth và meeting controls
+description: Backend meeting tuân thủ schema Supabase, xác thực và phân quyền thành viên/session.
 ---
-title: Phase 03 — Database, auth and meeting controls
-description: Supabase-backed identities, memberships and meeting authorization.
----
 
-Status: In Progress. Updated: 2026-11-07 (Asia/Saigon).
+Trạng thái: In Progress. Cập nhật: 2026-11-08 (Asia/Saigon).
 
-## Objective
+## Mục tiêu
 
-Connect the supplied Supabase meeting schema to authenticated NestJS APIs. This phase now includes the requested owner, moderator, admission, microphone and capacity controls. The client application and signup/login UX remain outside this backend task.
+Dùng database hiện có làm nguồn chuẩn và cập nhật NestJS cho meeting nhanh, meeting theo lịch, chọn session, guest approval, member lâu dài, quản lý owner/moderator và mute micro.
 
-## Acceptance criteria
+## Tiến độ
 
-- [x] Backend verifies Supabase Auth bearer tokens and maps identity to `public.users`.
-- [x] Meeting owner, moderator, join approval, settings, removal and mute APIs are implemented.
-- [x] Waiting-room decisions and meeting membership are stored in Supabase.
-- [x] Meeting capacity is reserved atomically using Postgres.
-- [ ] Apply migration to the target Supabase project and confirm schema/RLS/service role setup.
-- [ ] Connect the frontend authentication and meeting controls.
-- [ ] Add LiveKit webhook cleanup for participants who disconnect without calling leave.
+- [x] Meeting API xác thực bằng application JWT và ánh xạ `sub` về `users.user_id`.
+- [x] Phân biệt meeting nhanh một session với meeting dùng lại/session theo lịch.
+- [x] Dùng `meeting_sessions.livekit_room_name` và gắn `attendances` đúng `session_id`.
+- [x] Guest request, pending list, approve/deny và trạng thái request được giới hạn theo session.
+- [x] Guest được duyệt chỉ có quyền session đó; owner/moderator có thể mời user thành member lâu dài.
+- [x] Giới hạn ba lần bị từ chối trong 30 phút; trả `retryAt` cho client.
+- [x] Member đã được mời có thể lên lịch/kết thúc session; meeting lặp mở rộng RRULE trong tập hỗ trợ.
+- [x] Mute/remove kiểm tra thứ bậc owner/moderator; mute chỉ tác động kết nối hiện tại.
+- [x] DTO và UUID route validation.
+- [ ] Xác minh nullable/default/foreign key/leave_reason trên Supabase development và kiểm thử DB thật.
+- [ ] Tích hợp frontend dashboard, chọn session, waiting room và controls.
+- [ ] Tự kết thúc session theo lịch và cleanup attendance qua LiveKit webhook.
 
-## Decisions and limits
+## Quyết định và giới hạn
 
-The provided schema had no capacity or self-unmute policy fields; the migration adds `max_participants` (default 20 for existing meetings) and `allow_self_unmute` (default true). The backend expects user UUIDs issued by Supabase Auth to match `users.user_id`. The moderator role only applies to application API actions; privileged LiveKit operations stay on the backend. When self-unmute is disabled, a moderator mute also removes microphone publishing permission until the participant reconnects with refreshed permission.
+- Không sửa schema hoặc áp dụng migration cũ. Backend không còn phụ thuộc `meetings.livekit_room_name`, `meetings.status`, `max_participants` hay `allow_self_unmute`.
+- Mute không được duy trì qua reconnect theo quyết định mới nhất.
+- Khi tắt waiting room, request đang chờ vẫn giữ trạng thái pending; cài đặt mới áp dụng cho lượt join sau.
+- RRULE hiện hỗ trợ FREQ daily/weekly/monthly/yearly với các trường phổ biến; các field/tổ hợp khác bị từ chối. Cần so với format mà client/DB thực tế sử dụng.
+- Chưa chạy automated tests hoặc kết nối Supabase/LiveKit. Backend/frontend typecheck và frontend build đã qua.
 
-See [backend API contract](/modules/meeting-controls) and [implementation work log](/work-logs/2026-11-07-01-phase-03-meeting-controls).
+## Tài liệu
+
+- [Hợp đồng API meeting](/modules/meeting-controls)
+- [Kế hoạch tích hợp frontend và kết quả review](/backend-meeting-controls-db-review)
+- Work log: [Backend meeting/session controls 2026-11-08](/work-logs/2026-11-08-01-phase-03-meeting-controls-update)

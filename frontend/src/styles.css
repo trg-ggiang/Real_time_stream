@@ -127,10 +127,77 @@ button.secondary {
   padding: 14px 0;
   font-size: 0.9rem;
 }
+.meeting-participant-tile {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+}
+
+.raised-hand-badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1;
+  font-size: 1.75rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.meeting-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.meeting-controls .lk-control-bar {
+  padding: 0;
+  border: 0;
+}
+
+.raise-hand-error {
+  order: 1;
+  flex-basis: 100%;
+}
+
 .video-grid {
   height: min(60vh, 540px);
   min-height: 280px;
 }
+.screen-share-stage { margin-bottom: 16px; min-width: 0; }
+.screen-share-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; }
+.screen-share-heading label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.screen-share-heading select { max-width: 100%; padding: 8px; font: inherit; color: #e9eef7; background: #26374c; border: 1px solid #52627a; border-radius: 6px; }
+.screen-share-video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 60vh; object-fit: contain; background: #0d1520; }
+.meeting-media-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 23vw, 300px);
+  gap: 16px;
+  height: clamp(360px, calc(100dvh - 280px), 760px);
+}
+main:has(.meeting-room) { width: min(1600px, 100%); padding-top: 24px; }
+.meeting-media-layout .screen-share-stage { display: flex; flex-direction: column; min-height: 0; margin: 0; }
+.meeting-media-layout .screen-share-heading { flex: 0 0 auto; }
+.meeting-media-layout .screen-share-video { flex: 1; min-height: 0; height: 100%; max-height: none; aspect-ratio: auto; }
+.meeting-camera-sidebar { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
+.meeting-self-camera { flex: 0 0 auto; min-width: 0; }
+.meeting-camera-label { padding: 8px 0; font-size: 0.875rem; color: #b2ddcf; }
+.meeting-self-camera > .meeting-participant-tile,
+.meeting-other-cameras > .meeting-participant-tile { aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; }
+.meeting-other-cameras { display: grid; grid-auto-rows: max-content; gap: 12px; overflow-y: auto; min-height: 0; padding-right: 4px; }
+.meeting-camera-sidebar .lk-participant-tile { height: 100%; width: 100%; min-height: 0; }
+@media (max-width: 850px) {
+  .meeting-media-layout { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .meeting-media-layout .screen-share-video { flex: none; height: auto; aspect-ratio: 16 / 9; max-height: 50dvh; }
+  .meeting-camera-sidebar { flex-direction: row; align-items: flex-end; gap: 12px; }
+  .meeting-self-camera { width: clamp(140px, 34vw, 220px); }
+  .meeting-other-cameras { display: flex; flex: 1; overflow-x: auto; overflow-y: hidden; padding: 0 0 4px; }
+  .meeting-other-cameras > .meeting-participant-tile { flex: 0 0 clamp(140px, 34vw, 220px); }
+}
+.screen-share-message { flex-basis: 100%; margin: 4px 0; }
 footer {
   margin-top: 24px;
   font-size: 0.8rem;
@@ -146,3 +213,7 @@ footer {
     flex-wrap: wrap;
   }
 }
+
+.auth-form { display: grid; gap: 16px; }
+.auth-form label { display: grid; gap: 8px; }
+.auth-form input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #52627a; border-radius: 8px; background: #192537; color: #e9eef7; font: inherit; }

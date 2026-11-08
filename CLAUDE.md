@@ -5,7 +5,7 @@ Read `docs/plans/master-plan.mdx`, the active phase page, and the latest entry i
 
 This project currently contains dependencies and empty source folders only. Add implementation only when the user requests it.
 
-Every working session must end with a work log using `docs/templates/session-close.mdx`, updates to the relevant phase and master plan, a session-log entry, changelog changes, and navigation updates. Follow the exact naming and status rules in root `AGENTS.md`.
+Only completed application or operational script code changes require a work log using `docs/templates/session-close.mdx` and relevant phase/index/navigation updates. Do not create logs for questions, explanations, reviews, Git operations, config/docs-only changes or unfinished work. Follow the current user preference and root `AGENTS.md`.
 
 Use PowerShell-compatible commands, preserve user changes, keep secrets out of output and frontend, and do not auto-commit.
 The copied `.claude/skills/` are optional tools; their availability does not authorize product implementation.

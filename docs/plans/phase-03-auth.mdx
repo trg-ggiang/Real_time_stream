@@ -1,0 +1,21 @@
+---
+title: Phase 03 — Auth và Supabase
+description: Gộp backend Hải và nối phiên đăng nhập vào meeting.
+---
+
+Trạng thái: In Progress.
+
+Người dùng đã yêu cầu gộp code auth/DB của Hải vào backend chính và nối với frontend main.
+
+- [x] Gộp auth/users/Supabase vào backend/src và workspace dependencies.
+- [x] Đăng ký/đăng nhập trên FE, JWT ứng dụng trước token LiveKit.
+- [x] Validation, password hashing, public user responses, HTTP auth/rate-limit tests.
+- [ ] Cấu hình và kiểm chứng schema Supabase development của Hải.
+- [ ] Nghiệm thu đăng ký/đăng nhập với DB thật và tham gia phòng trên hai thiết bị.
+- [ ] Versioned migrations và phân quyền phòng: chưa thực hiện trong lần gộp này.
+
+Hướng dẫn: [Auth integration](/modules/auth-integration). Kết quả code và kiểm thử: [work log](/work-logs/2026-11-07-01-phase-03-auth-integration).
+
+## Desktop auth UI 2026-11-07
+
+Completed the approved desktop-first login/register redesign: 480px form, secondary image, light/dark/system themes, inline validation and password visibility. Frontend typecheck, 15 tests and build passed; browser layout and Lighthouse checks completed. Phase 03/04/05 remain In Progress pending real DB/media acceptance. [Work log](/work-logs/2026-11-07-02-phase-04-desktop-auth-ui).
