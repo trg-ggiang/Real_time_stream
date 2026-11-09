@@ -10,11 +10,20 @@ import { JoinSessionDto } from './dto/join-session.dto';
 import { MeetingSettingsDto } from './dto/meeting-settings.dto';
 import { SetModeratorDto } from './dto/set-moderator.dto';
 import { MeetingsService } from './meetings.service';
+import { ScreenShareDecisionDto } from './dto/screen-share.dto';
 
 @Controller('meetings')
 @UseGuards(JwtAuthGuard)
 export class MeetingsController {
   constructor(private readonly meetings: MeetingsService) {}
+
+  @Post(':meetingId/sessions/:sessionId/screen-share/decision')
+  screenShareDecision(@CurrentUser() user: User,
+    @Param('meetingId', new ParseUUIDPipe()) meetingId: string,
+    @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
+    @Body() body: ScreenShareDecisionDto) {
+    return this.meetings.decideScreenShare(user, meetingId, sessionId, body.identity, body.approved);
+  }
 
   @Post()
   create(@CurrentUser() user: User, @Body() body: CreateMeetingDto) {

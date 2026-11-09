@@ -61,3 +61,62 @@ Ví dụ: `FREQ=WEEKLY;BYDAY=MO,WE;COUNT=10`. Thời lượng mỗi lần lặp 
 - Việc kết thúc session hiện là thao tác API của member. Chưa có worker tự kết thúc đúng giờ hoặc LiveKit webhook để dọn attendance khi mất mạng đột ngột.
 - Tạo meeting và thêm owner membership là hai request DB; nếu bước sau lỗi, cleanup meeting là best-effort, chưa có transaction RPC.
 - Code không tự áp dụng migration cũ. Migration ấy thêm capacity/self-unmute không thuộc ERD hiện được dùng.
+
+## Frontend sử dụng API hiện có — 2026-11-08
+
+Frontend chính đã nối tạo nhanh, lịch lặp, mở mã, chọn session, phòng chờ, approve/deny, invite/moderator, settings, end và leave với attendanceId. Đăng ký/đăng nhập giữ nguyên. Không còn dựa vào endpoint room PoC để vào họp.
+
+Hợp đồng BE được giữ nguyên. Overview chỉ trả meetingId/title/meetingCode và sessions; không trả role/cài đặt. FE chỉ nhớ vai trò owner sau khi tạo meeting và thành viên từ response mời/duyệt trong tab, không gọi GET members hoặc tự giả định có danh sách đầy đủ. Các mutation vẫn được BE xác thực. Đóng màn hình chờ không hủy request phía server.
+
+Screen share/giơ tay trong meeting session chỉ dùng được nếu token thực tế có quyền; FE hiển thị icon trạng thái disabled khi không được cấp quyền. Không sửa BE/schema trong lần tích hợp này. Xem [kết quả và giới hạn](/work-logs/2026-11-08-03-phase-04-meeting-frontend).
+
+### Chọn giao diện
+
+Sau đăng nhập, mở icon bánh răng trên header rồi chọn mặt trời/mặt trăng để đổi sáng/tối hoặc chọn Đăng xuất. Lựa chọn được lưu trên trình duyệt và áp dụng cho dashboard, biểu mẫu, quản lý lẫn phòng họp; đổi theme không tham gia lại phòng. Theme sáng cùng palette với auth; bộ chọn và giao diện đăng nhập/đăng ký không đổi. [Kiểm tra theme](/work-logs/2026-11-08-04-phase-04-meeting-themes).
+
+### Giá trị role theo schema
+
+Từ 2026-11-08, BE và FE dùng host (Chủ phòng), moderator (Điều hành), participant (Thành viên). Chuỗi owner trong mô tả nghiệp vụ cũ chỉ nghĩa người sở hữu; không dùng owner làm giá trị cột role. Fix này sửa lỗi 23514 meeting_members_role_check dẫn đến 503 lúc thêm chủ phòng; không thay schema/dữ liệu. [Work log](/work-logs/2026-11-08-06-phase-03-schema-host-role).
+
+### Trạng thái session theo schema
+
+Trạng thái hiện hành là scheduled (đã lên lịch), ongoing (đang diễn ra), ended (đã kết thúc). Giá trị active trong tài liệu cũ là lịch sử và không được gửi vào meeting_sessions.status. BE/FE đã đồng bộ ongoing; API quick/read/end đã được kiểm tra thật. [Work log](/work-logs/2026-11-08-07-phase-03-session-status).
+
+### Waiting room uses existing admission status
+
+No migration is required. meeting_members.admission_status stores pending/admitted/denied at meeting level. Host/moderator approval changes pending to admitted. Attendance is recorded only when issuing a join token. join-requests returns requestId (= meeting_member_id). Requests are not bound to individual sessions. Ending a session expires guests with attendance in that session. The unexecuted 202611080001 migration has been deleted at the user's request.
+
+
+### LiveKit room đã bị xóa khi cleanup
+
+Leave/remove/end coi SDK ServerError 404/not_found từ removeParticipant là room/participant đã vắng mặt, rồi đóng attendance. Không gọi listParticipants trước remove nên tránh race khi room trống tự biến mất. Lỗi mạng/quyền và lỗi ghi DB vẫn được trả về để client không hiểu nhầm departure đã được xác nhận.
+
+
+## Waiting room checkbox (2026-11-08)
+
+Replaced select/save with an immediate native checkbox using existing settings API. Build and 27 frontend tests passed. No BE/DB change. Phase 04 In Progress. [Work log](/work-logs/2026-11-08-12-phase-04-waiting-checkbox).
+
+
+## Join lobby redesign (2026-11-09)
+
+Join-first layout with wider code/link input, secondary create/schedule panel, full-width session list and collapsible management. Both theme tokens retained. Build and 27 tests passed; browser/Lighthouse unavailable. Phase 04 In Progress. [Work log](/work-logs/2026-11-09-01-phase-04-join-lobby-redesign).
+
+
+## Role based screen sharing (2026-11-09)
+
+All roles may raise hands. Host shares immediately; moderator/participant requests are approved by the actual host via LiveKit permissions. No schema changes. Existing grid/focused screen stage retained. BE 24 tests, FE 27 tests, typecheck/build passed; real media acceptance pending. Phase 05 In Progress. [Work log](/work-logs/2026-11-09-02-phase-05-role-screen-sharing).
+
+
+## Neutral dark / white turquoise themes (2026-11-09)
+
+Charcoal dark palette matches supplied reference; light uses white surfaces and turquoise accents. Saved theme synchronizes across tabs. Build and 29 FE tests passed; browser visual review pending. Phase 04 In Progress. [Work log](/work-logs/2026-11-09-03-phase-04-neutral-themes).
+
+
+## Full frontend theme audit (2026-11-09)
+
+Unified semantic light/dark colors for auth, forms, settings, dialogs and LiveKit controls; fixed device selection styling, gear click handling and theme persistence across logout/reload. Build and 38 frontend tests passed; 40 browser states had zero measured text-contrast/overflow failures. UI simulation used; physical media acceptance remains pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-05-phase-04-theme-audit).
+
+
+## Specific scheduling conflicts (2026-11-09)
+
+Session overview now exposes recurrence/settings metadata, preventing an invalid extra-session scheduling affordance after reload. Distinct localized 409 reasons cover invalid times and existing single sessions. No schema changes. BE 18 tests, FE 40 tests and both builds passed; no live DB writes for testing. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-06-phase-04-schedule-conflicts).

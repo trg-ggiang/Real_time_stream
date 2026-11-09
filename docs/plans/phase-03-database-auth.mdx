@@ -37,3 +37,20 @@ Dùng database hiện có làm nguồn chuẩn và cập nhật NestJS cho meeti
 - [Hợp đồng API meeting](/modules/meeting-controls)
 - [Kế hoạch tích hợp frontend và kết quả review](/backend-meeting-controls-db-review)
 - Work log: [Backend meeting/session controls 2026-11-08](/work-logs/2026-11-08-01-phase-03-meeting-controls-update)
+
+## Đồng bộ role schema 2026-11-08
+
+Theo yêu cầu người dùng, code BE/FE đã đổi giá trị role owner thành host để khớp meeting_members_role_check. Đồng bộ tạo chủ phòng, rank/moderation và bảo vệ host khỏi remove/demote; nhãn UI vẫn là Chủ phòng. Typecheck/build, 4 tests quyền BE và 23 tests FE đạt. Không thay schema/dữ liệu, chưa thử tạo meeting thật sau sửa; các phase vẫn In Progress. [Work log](/work-logs/2026-11-08-06-phase-03-schema-host-role).
+
+## Session ongoing 2026-11-08
+
+Sửa lỗi 503 còn lại khi tạo meeting nhanh: code gửi active nhưng meeting_sessions_status_check dùng ongoing. Đồng bộ BE/FE và thêm regression; 6 tests BE liên quan, 23 tests FE, typecheck/build đạt. API thật cổng 3000 đã tạo session ongoing, đọc lại và kết thúc thành công. Giữ schema và các meeting đã có, các phase vẫn In Progress do chưa nghiệm thu media/phân quyền đầy đủ. [Work log](/work-logs/2026-11-08-07-phase-03-session-status).
+
+## Chuẩn bị session admission 2026-11-08
+
+Đã chuẩn bị logic pending/admitted trong meeting_members với requested_session_id, không tạo attendance trước khi được duyệt và join. Attendance giữ NOT NULL; FE dùng requestId. 17 tests BE liên quan, 23 tests FE, typecheck/build đạt. Theo lựa chọn người dùng, migration 202611080001 chưa áp dụng DB nên chưa nghiệm thu luồng thật; các phase vẫn In Progress. [Work log](/work-logs/2026-11-08-08-phase-03-session-admission).
+
+
+## Ph?ng ch? d?ng schema hi?n c? ? 2026-11-08
+
+B? migration ch?a ?p d?ng v? ph? thu?c requested_session_id theo y?u c?u. D?ng pending ? admitted ? c?p meeting; attendance ch? ghi khi join ???c c?p token. Build v? 19 tests BE ??t; ch?a E2E th?t. Phase 03/05 In Progress. [Work log](/work-logs/2026-11-08-10-phase-03-existing-admission-status).

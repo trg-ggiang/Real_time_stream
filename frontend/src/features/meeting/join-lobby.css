@@ -1,0 +1,40 @@
+/* Lobby hierarchy: join first, create second; existing theme tokens remain authoritative. */
+.meeting-app:not(.meeting-app--incall) .meeting-topbar { height: 76px; }
+.meeting-app .workspace-welcome { margin: 6px 0 36px; }
+.meeting-app .workspace-welcome h1 { font-size: clamp(28px, 3vw, 38px); letter-spacing: -.04em; margin-top: 12px; }
+.meeting-app .lobby-dashboard { grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 40px; align-items: stretch; }
+.meeting-app .lobby-join { display: flex; flex-direction: column; justify-content: center; border: 1px solid var(--meeting-line); border-radius: 20px; padding: clamp(28px, 4vw, 52px); background: var(--meeting-surface); min-width: 0; }
+.lobby-join-symbol { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 18px; color: var(--meeting-accent); background: var(--meeting-bg); margin-bottom: 32px; }
+.meeting-app .lobby-join .workspace-section-title { margin-bottom: 28px; }
+.meeting-app .lobby-join h2 { font-size: clamp(23px, 2.4vw, 30px); letter-spacing: -.04em; font-weight: 600; }
+.meeting-app .lobby-join .workspace-form { gap: 12px; }
+.meeting-app .lobby-join label { font-size: 13px; }
+.lobby-code-field { display: flex; align-items: center; gap: 12px; padding-left: 16px; color: var(--meeting-muted); background: var(--meeting-bg); border: 1px solid var(--meeting-muted); border-radius: 10px; }
+.lobby-code-field > svg { flex-shrink: 0; }
+.meeting-app .lobby-code-field input { background: transparent; border: 0; min-height: 56px; padding-left: 0; font-size: 14px; color: var(--meeting-text); }
+.lobby-code-field:focus-within { outline: 3px solid var(--meeting-accent); outline-offset: 3px; }
+.meeting-app .lobby-code-field input:focus-visible { outline: none; }
+.meeting-app .lobby-join .workspace-form > button { min-height: 52px; margin-top: 6px; font-size: 14px; white-space: nowrap; }
+.meeting-app .lobby-dashboard .workspace-create { padding: 16px 0; border: 0; border-radius: 0; background: transparent; }
+.meeting-app .lobby-dashboard .workspace-create .workspace-section-title h2 { font-size: 18px; }
+.meeting-app .lobby-dashboard .workspace-create .workspace-section-title > svg { width: 22px; }
+.meeting-app .workspace-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+.meeting-app .workspace-detail-heading { padding-bottom: 28px; border-bottom: 1px solid var(--meeting-line); margin-bottom: 28px; }
+.meeting-app .workspace-code-actions { padding: 6px 6px 6px 16px; background: var(--meeting-surface); border: 1px solid var(--meeting-line); border-radius: 12px; }
+.meeting-app .workspace-session { background: var(--meeting-surface); border-color: var(--meeting-line); border-radius: 14px; margin-top: 12px; padding: 24px; }
+.meeting-app .workspace-session[data-selected='true'] { border-color: var(--meeting-accent); }
+.meeting-app .workspace-session-actions > button:first-child { min-width: 144px; min-height: 48px; font-size: 13px; white-space: nowrap; }
+.lobby-management { border-top: 1px solid var(--meeting-line); padding-top: 20px; }
+.lobby-management > summary { cursor: pointer; padding: 12px 4px; color: var(--meeting-muted); font-size: 14px; }
+.lobby-management > summary:focus-visible { outline: 3px solid var(--meeting-accent); outline-offset: 3px; }
+.lobby-management[open] > summary { color: var(--meeting-text); margin-bottom: 16px; }
+.meeting-app .lobby-management .workspace-management { background: var(--meeting-surface); border-color: var(--meeting-line); }
+@media (max-width: 767px) {
+  .meeting-app .lobby-dashboard { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .meeting-app .lobby-join { padding: 28px 22px; }
+  .lobby-join-symbol { margin-bottom: 24px; width: 48px; height: 48px; border-radius: 14px; }
+  .meeting-app .lobby-dashboard .workspace-create { padding: 0 4px; }
+  .meeting-app .workspace-session { padding: 20px; }
+  .meeting-app .workspace-session-actions { width: 100%; }
+  .meeting-app .workspace-session { flex-direction: column; align-items: stretch; }
+}

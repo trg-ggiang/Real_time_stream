@@ -39,3 +39,13 @@ Tests HTTP dùng mock UsersService và credentials tổng hợp, không ghi dữ
 ## Desktop interface
 
 The desktop form panel and photo panel use a 1:1.5 split (40% and 60%). The form itself stays up to 480px wide; the photo covers the full height and width of the right panel and crops naturally with object-fit: cover. Switch login/register on the same page; email stays while password clears on mode changes. Light/dark/system controls apply to auth, and the layout collapses to one column below 768px. Inputs provide inline errors and password visibility, while pending requests prevent duplicate submissions. Session persistence, endpoints and DB requirements above are unchanged.
+
+
+## Login survives reload (2026-11-08)
+
+Valid auth sessions persist in tab-scoped sessionStorage; logout/expiry clears them. Frontend 27 tests and build passed. No BE/DB changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-08-11-phase-04-auth-reload).
+
+
+## Full frontend theme audit (2026-11-09)
+
+Unified semantic light/dark colors for auth, forms, settings, dialogs and LiveKit controls; fixed device selection styling, gear click handling and theme persistence across logout/reload. Build and 38 frontend tests passed; 40 browser states had zero measured text-contrast/overflow failures. UI simulation used; physical media acceptance remains pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-05-phase-04-theme-audit).

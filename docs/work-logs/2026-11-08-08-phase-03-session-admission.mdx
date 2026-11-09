@@ -1,0 +1,61 @@
+---
+title: 2026-11-08-08 — Tách phòng chờ khỏi attendance
+description: Chuẩn bị code và migration liên kết yêu cầu với session; chưa áp dụng DB theo lựa chọn người dùng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-08
+- Ngày: 2026-11-08, Asia/Saigon; không lưu giờ bắt đầu/kết thúc chính xác.
+- Agent: Codex
+- Phase: 03, 04, 05 — In Progress
+- Kết quả: Completed trong phạm vi chuẩn bị code/migration; chưa triển khai schema hoặc nghiệm thu DB thật.
+
+## Mục tiêu và phạm vi được giao
+
+Sửa logic phòng chờ ghi NULL vào livekit_identity/joined_at trái schema. Người dùng chọn rõ: chỉ chuẩn bị code/migration, chưa áp dụng DB. Câu hỏi tiếp theo về trạng thái được giải thích bằng luồng pending → admitted → attendance thực tế; không thêm trạng thái giả vào attendance.
+
+## Công việc hoàn thành
+
+- Migration `supabase/migrations/202611080001_session_join_requests.sql`: thêm requested_session_id nullable FK vào meeting_members; index yêu cầu theo session, unique active membership để chặn request trùng; transaction và reload PostgREST schema. Không nới NOT NULL attendance, không xóa hoặc backfill dữ liệu.
+- backend/src/meetings/meetings.service.ts: yêu cầu guest lưu pending/admitted cùng requested_session_id. Chờ và duyệt không tạo attendance. Join sau duyệt mới tạo attendance với identity/giờ vào không NULL.
+- Pending list, status, approve/deny dùng binding session; update approve/deny có điều kiện pending và removed_at null để tránh ghi đè request đã xử lý.
+- Denial cooldown tính từ removed_at lúc từ chối, thay vì created_at lúc xin vào.
+- Kết thúc session hết hạn cả guest đang chờ/đã duyệt/chưa từng vào; remove không còn xử lý attendance giả. End kiểm tra cột mới trước khi disconnect hoặc sửa attendance.
+- Guest cũ không có binding session bị từ chối cấp quyền tùy ý, không tự suy đoán phạm vi.
+- FE services/meetings-api.ts và components/MeetingManagement.tsx dùng requestId cho danh sách chờ, không dùng attendance_id giả.
+- backend/test/meeting-admission.test.cjs: regression chờ/duyệt/join, no-waiting, session isolation, xử lý đua approve/deny, expiry, thiếu migration và legacy binding.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm run typecheck | Passed | Backend/frontend sau đổi contract |
+| npm --workspace backend run build | Passed | Chạy lại sau guard migration |
+| node --test backend/test/meeting-admission.test.cjs backend/test/meetings-roles.test.cjs | Passed | 17 tests với mock Supabase/LiveKit; không ghi DB thật |
+| npm --workspace frontend test | Passed | 23 tests |
+| npm --workspace frontend run build | Passed | Còn cảnh báo chunk LiveKit lớn |
+| Tìm pending attendance NULL trong code | Passed | Không còn helper tạo placeholder hoặc payload NULL cũ |
+| Áp dụng migration / E2E DB thật | Not run | Người dùng chọn chưa áp dụng DB |
+| Browser | Skipped | Chỉ đổi key requestId, không đổi layout; browser host không khả dụng khi kiểm tra khả năng chạy SQL |
+| git diff --check | Passed | Warning LF/CRLF còn tồn tại |
+| Navigation | Limited | Log được đăng ký, target tồn tại; docs/docs.json còn conflict có sẵn |
+
+## Quyết định và giải thích
+
+Status trả lời “đang chờ hay đã được duyệt”; session ID trả lời “cho buổi nào”. meeting_members đã có pending/admitted nhưng chưa có liên kết session. attendances có NOT NULL nên không dùng làm queue. Cột mới giữ quyền guest đúng buổi và bền vững qua restart; không dùng Map trong RAM hoặc identity/giờ vào giả.
+
+## Việc chưa triển khai
+
+DB vẫn chưa thay đổi. Code cần migration trước khi dùng phòng chờ mới hoặc kết thúc session mới. Không báo lỗi join trên DB thật đã được giải quyết khi migration chưa chạy. Host/permanent membership vẫn đọc qua các trường cũ; không giả lập request thiếu binding.
+
+## Bước tiếp theo
+
+Sau khi người dùng đồng ý áp dụng schema, chạy riêng migration 202611080001 trong Supabase SQL Editor (không chạy migration legacy capacity). Kiểm tra host/guest ở hai browser: pending không có attendance, approve vẫn chưa có attendance, join mới tạo attendance, request/approval không dùng được cho buổi khác, end hết hạn request. Các phase vẫn In Progress.
+
+## Checklist đóng phiên
+
+- [x] Code và migration chuẩn bị xong; tests phù hợp đã chạy
+- [x] Cập nhật phase/master plan/session log/changelog/API docs
+- [x] Đăng ký log, ghi rõ conflict navigation và giới hạn
+- [x] Không áp dụng DB theo lựa chọn của người dùng
