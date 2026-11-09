@@ -7,6 +7,7 @@ import { validateEnvironment } from './config/environment';
 import { HealthController } from './health.controller';
 import { LivekitModule } from './livekit/livekit.module';
 import { ChatModule } from './chat/chat.module';
+import { MeetingsModule } from './meetings/meetings.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     LivekitModule,
     ChatModule,
+    MeetingsModule,
   ],
   controllers: [HealthController],
 })

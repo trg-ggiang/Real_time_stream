@@ -43,3 +43,13 @@ Tham khảo [LiveKit screen sharing](https://docs.livekit.io/transport/media/scr
 ## Bố cục khi có người share
 
 MeetingMediaLayout giữ screen lớn bên trái và camera bên phải trên desktop. Camera của bạn nằm riêng ở đầu, remote cameras cuộn trong vùng riêng. Dưới 850px screen ở trên, camera thành dải ngang bên dưới, camera local luôn hiện. Khi hết screen share, quay về GridLayout ban đầu. Đã thử video giả lập qua Cloud và đo ở 1440/1024/768/390px; chưa nghiệm thu thiết bị thật/tunnel.
+
+
+## Role based screen sharing (2026-11-09)
+
+All roles may raise hands. Host shares immediately; moderator/participant requests are approved by the actual host via LiveKit permissions. No schema changes. Existing grid/focused screen stage retained. BE 24 tests, FE 27 tests, typecheck/build passed; real media acceptance pending. Phase 05 In Progress. [Work log](/work-logs/2026-11-09-02-phase-05-role-screen-sharing).
+
+
+## Device error sources and meeting reload (2026-11-09)
+
+Capture errors are source-specific; screen picker cancellation is not a camera/mic error. Active session IDs resume with fresh credentials after reload; manual muted preferences survive. Isolated Chromium/LiveKit verification used synthetic media and HTTP fixtures, not physical hardware or DB writes. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-04-phase-05-device-errors-reload).

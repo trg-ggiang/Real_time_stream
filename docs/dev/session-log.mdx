@@ -3,7 +3,20 @@ title: Code change logs
 description: Reserved for completed code changes only.
 ---
 
-Previous work logs were removed at the user's request. Create a new entry only after completed application or operational script code changes; do not log reviews, questions, Git operations, documentation/config changes or unfinished work.
+| Session | Phase | Kết quả | Work log |
+| 2026-11-07-01 | 03 | Partial (backend controls) | [Meeting controls](/work-logs/2026-11-07-01-phase-03-meeting-controls) |
+| --- | --- | --- | --- |
+| 2026-10-11-01 | 01 | Completed | [Agent workflow](/work-logs/2026-10-11-01-phase-01-agent-workflow) |
+| 2026-10-19-01 | 02 | Completed | [Project context](/work-logs/2026-10-19-01-phase-02-project-context) |
+| 2026-10-19-02 | 02, 04, 05 | Partial | [Media PoC](/work-logs/2026-10-19-02-phase-05-media-poc) |
+| 2026-10-19-03 | 04, 05 | Completed | [Local API proxy](/work-logs/2026-10-19-03-phase-05-local-api-proxy) |
+| 2026-10-19-04 | 05 | Completed | [Gitignore và secrets](/work-logs/2026-10-19-04-phase-05-gitignore-secrets) |
+| 2026-10-19-05 | 05 | Completed | [Tổng kết Phase 05](/work-logs/2026-10-19-05-phase-05-summary) |
+| 2026-11-06-01 | 04, 05 | Completed (review) | [LiveKit readiness](/work-logs/2026-11-06-01-phase-05-readiness-review) |
+| 2026-11-06-02 | 04, 05 | Completed (tunnel setup) | [HTTPS tunnel](/work-logs/2026-11-06-02-phase-05-https-tunnel) |
+| 2026-11-06-03 | 04, 05 | Completed (explanation) | [Code walkthrough](/work-logs/2026-11-06-03-phase-05-code-walkthrough) |
+| 2026-11-06-04 | 04, 05 | Completed (team documentation) | [Team code guide](/work-logs/2026-11-06-04-phase-05-team-code-guide) |
+| 2026-11-06-05 | 04, 05 | Completed (pre-push checkpoint) | [Git handoff](/work-logs/2026-11-06-05-phase-05-git-handoff) |
 
 - 2026-11-07: [Completed auth integration code](/work-logs/2026-11-07-01-phase-03-auth-integration), Phase 03/04/05 In Progress; real DB/media acceptance pending.
 
@@ -24,3 +37,63 @@ Previous work logs were removed at the user's request. Create a new entry only a
 - 2026-11-08: [Thiết kế migration chat](/work-logs/2026-11-08-01-phase-06-chat-migration); chưa áp dụng DB, Phase 06 In Progress.
 
 - 2026-11-09: [Chat trong phiên họp](/work-logs/2026-11-09-01-phase-06-meeting-chat), code hoàn thành, Phase 06 In Progress; chờ persistence DB và hai thiết bị.
+- 2026-11-08-02: [Completed dark meeting UI](/work-logs/2026-11-08-02-phase-04-dark-meeting-ui), Phase 04/05 In Progress; giữ nguyên auth, chờ media hai thiết bị thật.
+
+- 2026-11-08-03: [Completed FE integration with existing meeting APIs](/work-logs/2026-11-08-03-phase-04-meeting-frontend); BE edits fully withdrawn, Phase 04/05 In Progress, API/DB/media limitations recorded.
+
+- 2026-11-08-04: [Completed meeting light/dark themes](/work-logs/2026-11-08-04-phase-04-meeting-themes); 23 tests/build passed, Phase 04 In Progress.
+
+- 2026-11-08-05: [Completed account settings menu](/work-logs/2026-11-08-05-phase-04-account-settings), Phase 04 In Progress.
+
+- 2026-11-08-06: [Completed schema host role alignment](/work-logs/2026-11-08-06-phase-03-schema-host-role), Phase 03/04 In Progress.
+
+- 2026-11-08-07: [Completed ongoing status alignment](/work-logs/2026-11-08-07-phase-03-session-status); quick/read/end APIs verified against real DB, phases In Progress.
+
+- 2026-11-08-08: [Completed preparation of session admission fix](/work-logs/2026-11-08-08-phase-03-session-admission); migration not applied at user's request, phases In Progress.
+
+- 2026-11-08-09: [Completed missing LiveKit room cleanup fix](/work-logs/2026-11-08-09-phase-05-missing-room-leave), Phase 05 In Progress.
+
+
+## Ph?ng ch? d?ng schema hi?n c? ? 2026-11-08
+
+B? migration ch?a ?p d?ng v? ph? thu?c requested_session_id theo y?u c?u. D?ng pending ? admitted ? c?p meeting; attendance ch? ghi khi join ???c c?p token. Build v? 19 tests BE ??t; ch?a E2E th?t. Phase 03/05 In Progress. [Work log](/work-logs/2026-11-08-10-phase-03-existing-admission-status).
+
+
+## Login survives reload (2026-11-08)
+
+Valid auth sessions persist in tab-scoped sessionStorage; logout/expiry clears them. Frontend 27 tests and build passed. No BE/DB changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-08-11-phase-04-auth-reload).
+
+
+## Waiting room checkbox (2026-11-08)
+
+Replaced select/save with an immediate native checkbox using existing settings API. Build and 27 frontend tests passed. No BE/DB change. Phase 04 In Progress. [Work log](/work-logs/2026-11-08-12-phase-04-waiting-checkbox).
+
+
+## Join lobby redesign (2026-11-09)
+
+Join-first layout with wider code/link input, secondary create/schedule panel, full-width session list and collapsible management. Both theme tokens retained. Build and 27 tests passed; browser/Lighthouse unavailable. Phase 04 In Progress. [Work log](/work-logs/2026-11-09-01-phase-04-join-lobby-redesign).
+
+
+## Role based screen sharing (2026-11-09)
+
+All roles may raise hands. Host shares immediately; moderator/participant requests are approved by the actual host via LiveKit permissions. No schema changes. Existing grid/focused screen stage retained. BE 24 tests, FE 27 tests, typecheck/build passed; real media acceptance pending. Phase 05 In Progress. [Work log](/work-logs/2026-11-09-02-phase-05-role-screen-sharing).
+
+
+## Neutral dark / white turquoise themes (2026-11-09)
+
+Charcoal dark palette matches supplied reference; light uses white surfaces and turquoise accents. Saved theme synchronizes across tabs. Build and 29 FE tests passed; browser visual review pending. Phase 04 In Progress. [Work log](/work-logs/2026-11-09-03-phase-04-neutral-themes).
+
+
+## Device error sources and meeting reload (2026-11-09)
+
+Capture errors are source-specific; screen picker cancellation is not a camera/mic error. Active session IDs resume with fresh credentials after reload; manual muted preferences survive. Isolated Chromium/LiveKit verification used synthetic media and HTTP fixtures, not physical hardware or DB writes. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-04-phase-05-device-errors-reload).
+
+
+## Full frontend theme audit (2026-11-09)
+
+Unified semantic light/dark colors for auth, forms, settings, dialogs and LiveKit controls; fixed device selection styling, gear click handling and theme persistence across logout/reload. Build and 38 frontend tests passed; 40 browser states had zero measured text-contrast/overflow failures. UI simulation used; physical media acceptance remains pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-05-phase-04-theme-audit).
+
+
+## Specific scheduling conflicts (2026-11-09)
+
+Session overview now exposes recurrence/settings metadata, preventing an invalid extra-session scheduling affordance after reload. Distinct localized 409 reasons cover invalid times and existing single sessions. No schema changes. BE 18 tests, FE 40 tests and both builds passed; no live DB writes for testing. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-06-phase-04-schedule-conflicts).

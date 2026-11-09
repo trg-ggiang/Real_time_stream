@@ -1,0 +1,56 @@
+﻿---
+title: Phase 03 — Database, auth và meeting controls
+description: Backend meeting tuân thủ schema Supabase, xác thực và phân quyền thành viên/session.
+---
+
+Trạng thái: In Progress. Cập nhật: 2026-11-08 (Asia/Saigon).
+
+## Mục tiêu
+
+Dùng database hiện có làm nguồn chuẩn và cập nhật NestJS cho meeting nhanh, meeting theo lịch, chọn session, guest approval, member lâu dài, quản lý owner/moderator và mute micro.
+
+## Tiến độ
+
+- [x] Meeting API xác thực bằng application JWT và ánh xạ `sub` về `users.user_id`.
+- [x] Phân biệt meeting nhanh một session với meeting dùng lại/session theo lịch.
+- [x] Dùng `meeting_sessions.livekit_room_name` và gắn `attendances` đúng `session_id`.
+- [x] Guest request, pending list, approve/deny và trạng thái request được giới hạn theo session.
+- [x] Guest được duyệt chỉ có quyền session đó; owner/moderator có thể mời user thành member lâu dài.
+- [x] Giới hạn ba lần bị từ chối trong 30 phút; trả `retryAt` cho client.
+- [x] Member đã được mời có thể lên lịch/kết thúc session; meeting lặp mở rộng RRULE trong tập hỗ trợ.
+- [x] Mute/remove kiểm tra thứ bậc owner/moderator; mute chỉ tác động kết nối hiện tại.
+- [x] DTO và UUID route validation.
+- [ ] Xác minh nullable/default/foreign key/leave_reason trên Supabase development và kiểm thử DB thật.
+- [ ] Tích hợp frontend dashboard, chọn session, waiting room và controls.
+- [ ] Tự kết thúc session theo lịch và cleanup attendance qua LiveKit webhook.
+
+## Quyết định và giới hạn
+
+- Không sửa schema hoặc áp dụng migration cũ. Backend không còn phụ thuộc `meetings.livekit_room_name`, `meetings.status`, `max_participants` hay `allow_self_unmute`.
+- Mute không được duy trì qua reconnect theo quyết định mới nhất.
+- Khi tắt waiting room, request đang chờ vẫn giữ trạng thái pending; cài đặt mới áp dụng cho lượt join sau.
+- RRULE hiện hỗ trợ FREQ daily/weekly/monthly/yearly với các trường phổ biến; các field/tổ hợp khác bị từ chối. Cần so với format mà client/DB thực tế sử dụng.
+- Chưa chạy automated tests hoặc kết nối Supabase/LiveKit. Backend/frontend typecheck và frontend build đã qua.
+
+## Tài liệu
+
+- [Hợp đồng API meeting](/modules/meeting-controls)
+- [Kế hoạch tích hợp frontend và kết quả review](/backend-meeting-controls-db-review)
+- Work log: [Backend meeting/session controls 2026-11-08](/work-logs/2026-11-08-01-phase-03-meeting-controls-update)
+
+## Đồng bộ role schema 2026-11-08
+
+Theo yêu cầu người dùng, code BE/FE đã đổi giá trị role owner thành host để khớp meeting_members_role_check. Đồng bộ tạo chủ phòng, rank/moderation và bảo vệ host khỏi remove/demote; nhãn UI vẫn là Chủ phòng. Typecheck/build, 4 tests quyền BE và 23 tests FE đạt. Không thay schema/dữ liệu, chưa thử tạo meeting thật sau sửa; các phase vẫn In Progress. [Work log](/work-logs/2026-11-08-06-phase-03-schema-host-role).
+
+## Session ongoing 2026-11-08
+
+Sửa lỗi 503 còn lại khi tạo meeting nhanh: code gửi active nhưng meeting_sessions_status_check dùng ongoing. Đồng bộ BE/FE và thêm regression; 6 tests BE liên quan, 23 tests FE, typecheck/build đạt. API thật cổng 3000 đã tạo session ongoing, đọc lại và kết thúc thành công. Giữ schema và các meeting đã có, các phase vẫn In Progress do chưa nghiệm thu media/phân quyền đầy đủ. [Work log](/work-logs/2026-11-08-07-phase-03-session-status).
+
+## Chuẩn bị session admission 2026-11-08
+
+Đã chuẩn bị logic pending/admitted trong meeting_members với requested_session_id, không tạo attendance trước khi được duyệt và join. Attendance giữ NOT NULL; FE dùng requestId. 17 tests BE liên quan, 23 tests FE, typecheck/build đạt. Theo lựa chọn người dùng, migration 202611080001 chưa áp dụng DB nên chưa nghiệm thu luồng thật; các phase vẫn In Progress. [Work log](/work-logs/2026-11-08-08-phase-03-session-admission).
+
+
+## Ph?ng ch? d?ng schema hi?n c? ? 2026-11-08
+
+B? migration ch?a ?p d?ng v? ph? thu?c requested_session_id theo y?u c?u. D?ng pending ? admitted ? c?p meeting; attendance ch? ghi khi join ???c c?p token. Build v? 19 tests BE ??t; ch?a E2E th?t. Phase 03/05 In Progress. [Work log](/work-logs/2026-11-08-10-phase-03-existing-admission-status).

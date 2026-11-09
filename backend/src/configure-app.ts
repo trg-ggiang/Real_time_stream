@@ -7,7 +7,7 @@ export function configureApp(app: INestApplication): void {
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }));
   app.enableCors({
     origin: config.getOrThrow<string>('FRONTEND_URL'),
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PATCH'],
   });
   app.enableShutdownHooks();
 }

@@ -8,6 +8,7 @@ import { Sun } from '@phosphor-icons/react/dist/csr/Sun';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { MeetingPage } from '../meeting/MeetingPage';
 import { authenticate, type AuthSession } from './auth-api';
+import { restoreSession, saveSession, sessionExpiresAt } from './session-storage';
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/500.css';
 import '@fontsource/be-vietnam-pro/600.css';
@@ -16,11 +17,18 @@ import './auth.css';
 type Mode = 'login' | 'register';
 type Field = 'email' | 'password' | 'displayName';
 type Theme = 'system' | 'light' | 'dark';
+const themePreferenceKey = 'rts.meeting-theme.v1';
+function savedTheme(): Theme {
+  try {
+    const value = localStorage.getItem(themePreferenceKey);
+    return value === 'light' || value === 'dark' ? value : 'system';
+  } catch { return 'system'; }
+}
 
 export function AuthApp() {
-  const [session, setSession] = useState<AuthSession | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(restoreSession);
   const [mode, setMode] = useState<Mode>('login');
-  const [theme, setTheme] = useState<Theme>('system');
+  const [theme, setTheme] = useState<Theme>(savedTheme);
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +37,44 @@ export function AuthApp() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const errorRef = useRef<HTMLParagraphElement | null>(null);
   const registering = mode === 'register';
+
+  function logout() {
+    saveSession(null);
+    setTheme(savedTheme());
+    setSession(null);
+  }
+
+  function changeTheme(next: Theme) {
+    setTheme(next);
+    try {
+      if (next === 'system') localStorage.removeItem(themePreferenceKey);
+      else localStorage.setItem(themePreferenceKey, next);
+    } catch { /* Continue without persistence. */ }
+  }
+
+  useEffect(() => {
+    const sync = (event: StorageEvent) => { if (event.key === themePreferenceKey) setTheme(savedTheme()); };
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
+
+  useEffect(() => {
+    if (session) return;
+    const query = window.matchMedia?.('(prefers-color-scheme: dark)');
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const previous = meta?.content;
+    const update = () => { if (meta) meta.content = (theme === 'dark' || (theme === 'system' && query?.matches)) ? '#1a1a1e' : '#ffffff'; };
+    update(); query?.addEventListener('change', update);
+    return () => { query?.removeEventListener('change', update); if (meta && previous !== undefined) meta.content = previous; };
+  }, [theme, session]);
+
+  useEffect(() => {
+    if (!session) return;
+    const remaining = sessionExpiresAt(session) - Date.now();
+    if (remaining <= 0) return;
+    const timer = window.setTimeout(logout, remaining);
+    return () => window.clearTimeout(timer);
+  }, [session]);
 
   useEffect(() => () => {
     pending.current?.abort();
@@ -84,7 +130,10 @@ export function AuthApp() {
       const result = await authenticate(mode, {
         email, password, ...(registering ? { displayName } : {}),
       }, controller.signal);
-      if (!controller.signal.aborted) setSession(result);
+      if (!controller.signal.aborted) {
+        saveSession(result);
+        setSession(result);
+      }
     } catch (cause) {
       if (pending.current === controller) {
         setError(controller.signal.aborted
@@ -103,7 +152,7 @@ export function AuthApp() {
   }
 
   if (session) return <MeetingPage accessToken={session.access_token}
-    displayName={session.user.displayName} onLogout={() => setSession(null)} />;
+    displayName={session.user.displayName} onLogout={logout} />;
 
   return (
     <div className="auth-page" data-theme={theme}>
@@ -122,7 +171,7 @@ export function AuthApp() {
                 ['dark', Moon, 'Giao diện tối'],
               ] as const).map(([value, Icon, label]) => (
                 <button type="button" key={value} aria-label={label} title={label}
-                  aria-pressed={theme === value} onClick={() => setTheme(value)}>
+                  aria-pressed={theme === value} onClick={() => changeTheme(value)}>
                   <Icon size={17} aria-hidden="true" />
                 </button>
               ))}
@@ -178,7 +227,6 @@ export function AuthApp() {
                   <span>{busy ? 'Đang xử lý…' : registering ? 'Tạo tài khoản' : 'Đăng nhập'}</span>
                   {!busy && <ArrowRight size={20} aria-hidden="true" />}
                 </button>
-                <p className="auth-session-note">Phiên đăng nhập chỉ được giữ trong tab này.<br />Tải lại trang sẽ cần đăng nhập lại.</p>
               </form>
             </section>
           </main>

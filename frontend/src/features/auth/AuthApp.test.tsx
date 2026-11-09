@@ -7,7 +7,48 @@ vi.mock('../meeting/MeetingPage', () => ({
   MeetingPage: ({ accessToken, displayName, onLogout }: { accessToken: string; displayName: string; onLogout: () => void }) =>
     <div><span>{displayName}</span><span data-testid="token">{accessToken}</span><button onClick={onLogout}>Đăng xuất</button></div>,
 }));
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); vi.unstubAllGlobals(); });
+
+it('restores and persists the shared theme preference on the login screen', () => {
+  localStorage.setItem('rts.meeting-theme.v1', 'dark');
+  const first = render(<AuthApp />);
+  expect(screen.getByRole('button', { name: 'Giao diện tối' }).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'Giao diện sáng' }));
+  expect(localStorage.getItem('rts.meeting-theme.v1')).toBe('light');
+  first.unmount(); render(<AuthApp />);
+  expect(screen.getByRole('button', { name: 'Giao diện sáng' }).getAttribute('aria-pressed')).toBe('true');
+});
+
+it('restores login after remount and removes the saved session on logout', async () => {
+  const token = `header.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))}.signature`;
+  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
+    access_token: token, user: { userId: 'u1', email: 'a@test.dev', displayName: 'Restored', avatarUrl: null },
+  }) });
+  vi.stubGlobal('fetch', fetchMock);
+  const first = render(<AuthApp />);
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@test.dev' } });
+  fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+  fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
+  await screen.findByText('Restored');
+  first.unmount();
+  const second = render(<AuthApp />);
+  expect(screen.getByText('Restored')).toBeTruthy();
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByText('Đăng xuất'));
+  second.unmount();
+  render(<AuthApp />);
+  expect(screen.queryByText('Restored')).toBeNull();
+});
+
+it.each(['{bad json', JSON.stringify({ access_token: 'broken', user: {} }), JSON.stringify({
+  access_token: `header.${btoa(JSON.stringify({ exp: 1 }))}.signature`,
+  user: { userId: 'u', email: 'e', displayName: 'Expired' },
+})])('discards malformed or expired saved sessions', value => {
+  sessionStorage.setItem('rts.auth-session.v1', value);
+  render(<AuthApp />);
+  expect(screen.getByLabelText('Email')).toBeTruthy();
+  expect(sessionStorage.getItem('rts.auth-session.v1')).toBeNull();
+});
 
 it('logs in with the API contract and clears the in-memory session on logout', async () => {
   const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
