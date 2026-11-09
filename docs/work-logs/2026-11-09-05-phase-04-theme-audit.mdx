@@ -1,0 +1,45 @@
+---
+title: Full frontend theme audit
+description: Consistent contrast and settings surfaces in dark and light modes.
+---
+
+## Session
+
+- Session ID: 2026-11-09-05. Agent: Codex. Timezone: Asia/Saigon; start/end timestamps not captured.
+- Phase 04. Outcome: Completed code and browser audit. Phase remains In Progress.
+
+## Objective
+
+Review the whole frontend for light/dark conversion defects, particularly settings menus.
+
+## Findings and completed changes
+
+- meeting-theme.css had stacked overrides and incomplete SDK foreground/control variables. Replaced them with one semantic palette shared by page, form, status, native dialog, account panel and media controls.
+- MediaDeviceMenu selection uses data-active, not the lk-active class previously targeted. Selected devices now get explicit foreground/background colors; headings retain full opacity; menu width and wrapping are bounded on mobile.
+- Clicking the gear SVG could trigger SDK outside-click handling because the target was a descendant rather than the button. Decorative control SVGs no longer receive pointer events, so the device menu stays open.
+- Button color transitions briefly mixed old-theme text with new-theme backgrounds. Removed color interpolation during theme changes, preserving transform-only interaction transitions.
+- Auth previously used a separate unsaved system/light/dark selection and green-tinted surfaces. Auth palette now matches white/turquoise and neutral charcoal themes. Selection is shared with meeting preferences, restored on logout/reload, and synced across tabs. System preference is followed when no explicit setting exists; HTML color-scheme and theme-color match.
+- Added automated palette contrast regressions and auth theme persistence coverage.
+
+Changed files: meeting-theme.css, meeting.css, auth.css, AuthApp.tsx/test, use-meeting-theme.ts and theme-contrast.test.ts. No BE/DB changes.
+
+## Checks and evidence
+
+- Final frontend build/typecheck passed. All 38 frontend tests passed. Existing media chunk-size warning remains.
+- Chromium audit covered 40 light/dark desktop/mobile states: login/register, validation errors, dashboard, schedule form, account settings, meeting/session management, confirmation dialog, in-call settings/device menu/selected controls, presentation layout and waiting room.
+- Custom computed-style scan found zero text-contrast failures or horizontal overflow in those 40 final states. Text threshold: 4.5:1 (3:1 for qualifying large text). Disabled controls were exempt. Palette tests also enforce 3:1 input-border contrast. This is targeted verification, not a claim of complete accessibility compliance.
+- Screenshots were reviewed, including mobile device menus in both themes, confirmation dialog and account settings. Local screenshots and safe simulation harness are under ignored output/playwright/theme-*.
+- Browser UI confirmed theme survives reload, logout and login-page reload.
+- UI audit used API fixtures and SDK simulation with synthetic media, no real users or DB mutations. One additional credential-bearing fixture was rejected by automatic approval review; safe UI simulation completed the audit without reading env or storing real tokens.
+- git diff --check passed apart from existing line-ending warnings. Navigation targets exist. Full docs.json parsing remains blocked by preexisting merge markers.
+
+## Decisions and remaining work
+
+Preserved app structure and functions. White surfaces with turquoise actions in light mode; charcoal with periwinkle actions in dark mode; red reserved for danger. Existing media reload verification is recorded separately in session 04. Physical-device/multi-device media acceptance remains pending; Phase 04/05 are not marked Done.
+
+## Next step and close checklist
+
+Try settings while switching themes on the user's browser and continue physical-media acceptance.
+
+- [x] Phase/master/session/changelog/module updates and navigation registration.
+- [x] Verification boundaries and review rejection recorded.

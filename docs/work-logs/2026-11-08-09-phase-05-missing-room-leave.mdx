@@ -1,0 +1,48 @@
+---
+title: 2026-11-08-09 — Rời phòng khi LiveKit room đã biến mất
+description: Cleanup chịu được room/participant không tồn tại, vẫn giữ lỗi mạng/quyền và xác nhận attendance qua DB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-09
+- Ngày: 2026-11-08, Asia/Saigon; không ghi chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 05 — In Progress
+- Kết quả: Completed trong phạm vi lỗi LiveKit cleanup.
+
+## Mục tiêu và công việc hoàn thành
+
+Người dùng báo listParticipants ném 404/not_found requested room does not exist trong leave. Room có thể chưa được tạo trên LiveKit hoặc đã bị xóa khi client cuối ngắt kết nối; đây là trường hợp cleanup đã đạt trạng thái đích.
+
+Thêm disconnectIfPresent trong backend/src/meetings/meetings.service.ts. Gọi removeParticipant trực tiếp thay cho list rồi remove, tránh race giữa hai RPC. Chỉ bỏ qua ServerError của SDK với status 404 và code not_found. Leave/removeMember/endSession dùng cùng helper rồi ghi left_at/leave_reason như trước. Lỗi mạng, permission, 404 không phải SDK và lỗi DB vẫn được báo.
+
+Thêm backend/test/meeting-leave.test.cjs: room không tồn tại, leave bình thường/lặp lại, lỗi không được nuốt, lỗi DB và helper dùng chung.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm --workspace backend run typecheck | Passed | Source SDK ServerError được đối chiếu trong package đang cài |
+| npm --workspace backend run build | Passed | dist cập nhật |
+| node --test backend/test/meeting-leave.test.cjs backend/test/meeting-admission.test.cjs backend/test/meetings-roles.test.cjs | Passed | 22 tests; 5 tests cleanup mới, mock SDK/DB |
+| git diff --check | Passed | Warning LF/CRLF còn tồn tại |
+| FE tests/build | Skipped | Không đổi FE |
+| LiveKit/DB thật | Skipped | Không ngắt kết nối người dùng hoặc sửa attendance thật để kiểm thử |
+| Navigation JSON | Limited | Log đăng ký và target tồn tại; conflict docs/docs.json có sẵn chưa xử lý |
+
+## Quyết định và giới hạn
+
+Không bắt mọi lỗi 404 theo chuỗi message; chỉ nhận diện lỗi SDK not_found để không che lỗi hệ thống. Lỗi DB sau cleanup không được báo thành công giả. Mute vẫn cần room/track tồn tại và không dùng cleanup helper.
+
+Không đổi schema, không áp dụng migration phòng chờ đang chờ theo lựa chọn người dùng. Fix leave độc lập với việc thêm cột requested_session_id; endSession vẫn có guard migration từ bản chuẩn bị trước. Phase 05 vẫn In Progress.
+
+## Bước tiếp theo
+
+Thử rời phòng khi chỉ còn một người hoặc khi kết nối chưa hoàn tất. Backend watch sẽ reload; nếu đang chạy start thì khởi động lại để dùng dist mới. Việc triển khai migration phòng chờ là bước riêng chưa thực hiện.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan/session log/changelog/module docs
+- [x] Đăng ký log, kiểm tra target, ghi rõ conflict JSON
+- [x] Ghi kiểm tra và giới hạn

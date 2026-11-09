@@ -1,0 +1,58 @@
+---
+title: 2026-11-08-06 — Đồng bộ role host theo schema
+description: Sửa role owner không được schema chấp nhận thành host trong BE và FE.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-06
+- Ngày: 2026-11-08, Asia/Saigon; không lưu giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 03, 04 — In Progress
+- Kết quả: Completed trong phạm vi đồng bộ role.
+
+## Mục tiêu và phạm vi được giao
+
+Theo yêu cầu mới của người dùng, sửa code để dùng role trong schema. Yêu cầu này cho phép sửa BE liên quan role, thay phạm vi FE-only của các lượt trước. Không sửa schema hoặc dữ liệu.
+
+## Công việc hoàn thành
+
+- `backend/src/meetings/meetings.service.ts`: tạo creator membership với role host; rank host cao nhất; host được moderation; không cho đổi role hoặc remove host.
+- `frontend/src/features/meeting/services/meetings-api.ts`: union Role và roleLabels dùng host, nhãn Chủ phòng.
+- `frontend/src/features/meeting/MeetingPage.tsx`: context sau tạo meeting dùng host.
+- `frontend/src/features/meeting/components/MeetingManagement.tsx`: nhận diện host và bảo vệ thao tác lên host.
+- `backend/test/meetings-roles.test.cjs`: kiểm tra role khi tạo membership, quyền host/moderator/participant, moderator không mute host, guest không quản lý session, host không bị remove/demote.
+
+## Nguyên nhân và bằng chứng
+
+Ở lượt chẩn đoán trước, Supabase trả 23514 meeting_members_role_check cho role owner. Các probe host/moderator/participant qua được CHECK và dừng ở FK kiểm tra có chủ đích; không có bản ghi được lưu. Lỗi 503 do code dùng role không khớp schema, không phải do dữ liệu cũ trong hai bảng.
+
+## Kiểm tra
+
+| Lệnh/kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm run typecheck | Passed | Backend và frontend |
+| npm --workspace backend run build | Passed | dist được cập nhật theo source |
+| node --test backend/test/meetings-roles.test.cjs | Passed | 4 tests, DB/LiveKit giả lập; xác nhận cả bảo vệ host |
+| npm --workspace frontend test | Passed | 23 tests hiện có |
+| npm --workspace frontend run build | Passed | Còn cảnh báo chunk LiveKit lớn |
+| Tìm literal owner trong meeting source | Passed | Không còn giá trị role 'owner'; biến owner/tiếng Anh owner vẫn mang nghĩa người sở hữu, không phải giá trị DB |
+| git diff --check | Passed | Warning LF/CRLF của Git còn tồn tại |
+| Tạo cuộc họp thật sau sửa | Skipped | Không tạo dữ liệu DB trong phiên sửa role; người dùng thử lại sau reload/restart BE |
+| Full backend suite | Skipped | Chạy tests role liên quan; test LiveKit cũ có expectation screen-share không khớp source từ trước, ngoài phạm vi sửa role |
+| Navigation | Limited | Log đã đăng ký, target tồn tại; docs/docs.json còn merge conflict có sẵn |
+
+## Quyết định và giới hạn
+
+Các giá trị role hiện dùng: host, moderator, participant. Giữ nguyên hợp đồng API khác, quyền token, schema và dữ liệu. Không đổi nhãn Chủ phòng thành thuật ngữ kỹ thuật trên UI. Phase 03/04/05 chưa được đóng vì chưa có nghiệm thu DB/media đầy đủ.
+
+## Bước tiếp theo
+
+Nếu backend đang chạy watch, chờ compile xong; nếu đang chạy bản build/start, khởi động lại để tải dist mới. Thử tạo một cuộc họp và kiểm tra các thao tác host/moderator theo luồng hiện có.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan
+- [x] Cập nhật session log/changelog/API docs
+- [x] Đăng ký log và kiểm tra target; ghi rõ JSON conflict
+- [x] Ghi kiểm tra và giới hạn

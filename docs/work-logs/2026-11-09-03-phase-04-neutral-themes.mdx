@@ -1,0 +1,25 @@
+---
+title: Neutral dark and white turquoise themes
+description: Match charcoal reference and preserve theme preferences.
+---
+
+## Session
+
+2026-11-09-03 Asia/Saigon. Agent Codex. Start/end not captured. Completed code; Phase 04 In Progress.
+
+## Objective and completed changes
+
+User supplied Discord screenshot for dark colors and requested white/turquoise light theme plus saved settings. Updated meeting.css/workspace.css blue tinted neutrals to charcoal; meeting-theme.css defines charcoal surfaces, periwinkle primary actions, white light surfaces and turquoise actions. Semantic danger remains red. Preserved layout and auth pages. useMeetingTheme retains versioned localStorage and adds cross-tab storage listener cleanup, updates browser theme-color. Added persistence/remount/storage-event regressions in use-meeting-theme.test.tsx. No BE/DB changes.
+
+## Checks
+
+Frontend build including typecheck passed (existing media chunk warning). All 29 frontend tests passed. Subsequent CSS-only refinement makes body/field text neutral and ensures white surfaces with visible borders. git diff --check run. Browser screenshots/Lighthouse unavailable in this environment; visual verification of both modes remains pending. New navigation target exists; existing docs.json conflict limits full JSON validation.
+
+## Decisions and next step
+
+Theme is saved per browser origin, persists reload/reopen and syncs tabs. Storage disabled remains graceful fallback without persistence. Only color reference borrowed, not Discord layout/branding. Review lobby and in-call themes on desktop/mobile. Phase remains In Progress.
+
+## Checklist
+
+- [x] Phase/master/session/changelog/module updated
+- [x] Navigation and verification limits recorded

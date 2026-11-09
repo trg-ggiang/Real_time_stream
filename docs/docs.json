@@ -37,7 +37,24 @@
 
               "work-logs/2026-11-07-04-phase-04-tunnel-hash-fix",
               "work-logs/2026-11-07-06-phase-05-screen-sharing",
-              "work-logs/2026-11-07-07-phase-05-meeting-layout"
+              "work-logs/2026-11-07-07-phase-05-meeting-layout",
+              "work-logs/2026-11-08-02-phase-04-dark-meeting-ui",
+              "work-logs/2026-11-08-03-phase-04-meeting-frontend",
+              "work-logs/2026-11-08-04-phase-04-meeting-themes",
+              "work-logs/2026-11-08-05-phase-04-account-settings",
+              "work-logs/2026-11-08-06-phase-03-schema-host-role",
+              "work-logs/2026-11-08-07-phase-03-session-status",
+              "work-logs/2026-11-08-08-phase-03-session-admission",
+              "work-logs/2026-11-08-09-phase-05-missing-room-leave",
+              "work-logs/2026-11-08-10-phase-03-existing-admission-status",
+              "work-logs/2026-11-08-11-phase-04-auth-reload",
+              "work-logs/2026-11-08-12-phase-04-waiting-checkbox",
+              "work-logs/2026-11-09-01-phase-04-join-lobby-redesign",
+              "work-logs/2026-11-09-02-phase-05-role-screen-sharing",
+              "work-logs/2026-11-09-03-phase-04-neutral-themes",
+              "work-logs/2026-11-09-04-phase-05-device-errors-reload",
+              "work-logs/2026-11-09-05-phase-04-theme-audit",
+              "work-logs/2026-11-09-06-phase-04-schedule-conflicts"
             ]
           }
         ]

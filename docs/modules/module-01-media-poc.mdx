@@ -90,3 +90,12 @@ Phiên 2026-10-19-03 đã xác nhận token 200 qua cả hai địa chỉ fronte
 ## Review 2026-11-06
 
 Typecheck and tests passed (backend 2, frontend 10). Credentials were previously configured and token HTTP 200 recorded; Cloud/media acceptance is still pending. Vite dev/preview bind 127.0.0.1, so other devices cannot directly open the page through the host LAN IP. Separate localhost setups must use the same LiveKit project and room to meet. Concurrent capacity has not been benchmarked.
+
+## Giao diện hiện hành 2026-11-08
+
+Sau đăng nhập, sảnh tối hiển thị danh tính người dùng và nút Tham gia phòng. Camera/microphone chỉ được yêu cầu khi tham gia. Trong phòng, thanh trạng thái và controls nằm quanh vùng media; khi có screen share, camera của bạn vẫn hiển thị riêng. Giao diện dùng stylesheet riêng `features/meeting/meeting.css`, không thay đổi đăng ký/đăng nhập. Xem [work log và giới hạn kiểm tra](/work-logs/2026-11-08-02-phase-04-dark-meeting-ui).
+
+
+## Device error sources and meeting reload (2026-11-09)
+
+Capture errors are source-specific; screen picker cancellation is not a camera/mic error. Active session IDs resume with fresh credentials after reload; manual muted preferences survive. Isolated Chromium/LiveKit verification used synthetic media and HTTP fixtures, not physical hardware or DB writes. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-04-phase-05-device-errors-reload).
