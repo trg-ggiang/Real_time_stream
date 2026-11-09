@@ -21,7 +21,8 @@
               "modules/https-tunnel",
               "modules/code-walkthrough",
               "modules/module-01-team-guide",
-              "modules/screen-sharing"
+              "modules/screen-sharing",
+              "modules/meeting-chat"
             ]
           },
           {
@@ -37,7 +38,9 @@
 
               "work-logs/2026-11-07-04-phase-04-tunnel-hash-fix",
               "work-logs/2026-11-07-06-phase-05-screen-sharing",
-              "work-logs/2026-11-07-07-phase-05-meeting-layout"
+              "work-logs/2026-11-07-07-phase-05-meeting-layout",
+              "work-logs/2026-11-08-01-phase-06-chat-migration",
+              "work-logs/2026-11-09-01-phase-06-meeting-chat"
             ]
           }
         ]
@@ -52,7 +55,8 @@
               "plans/phase-01-project-setup",
               "plans/phase-02-requirements-architecture",
               "plans/phase-04-application-foundation",
-              "plans/phase-05-livekit-poc"
+              "plans/phase-05-livekit-poc",
+              "plans/phase-06-chat"
             ]
           }
         ]

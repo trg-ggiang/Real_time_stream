@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useMeetingSession } from './hooks/use-meeting-session';
 
 const MeetingRoom = lazy(() =>
@@ -9,6 +9,24 @@ const MeetingRoom = lazy(() =>
 
 export function MeetingPage({ accessToken, displayName, onLogout }: { accessToken: string; displayName: string; onLogout: () => void }) {
   const session = useMeetingSession(accessToken, onLogout);
+  const [options, setOptions] = useState<{ sessionId: string; title: string; roomName: string }[]>([]);
+  const [selectedSession, setSelectedSession] = useState('');
+  const [loadingSessions, setLoadingSessions] = useState(true);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    const base = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/$/, '');
+    void fetch(`${base}/api/meeting-sessions`, { headers: { Authorization: `Bearer ${accessToken}` }, signal: controller.signal, cache: 'no-store' })
+      .then(async response => {
+        if (response.status === 401) { onLogout(); throw new Error('Phiên đăng nhập hết hạn.'); }
+        if (!response.ok) throw new Error('Không tải được danh sách phiên họp. Bạn vẫn có thể dùng phòng PoC không có chat.');
+        const data = await response.json();
+        if (!Array.isArray(data) || !data.every(row => typeof row?.sessionId === 'string' && typeof row?.title === 'string')) throw new Error('Danh sách phiên họp không hợp lệ.');
+        if (!controller.signal.aborted) { setOptions(data); setSelectedSession(data[0]?.sessionId ?? ''); }
+      }).catch(cause => { if (!controller.signal.aborted) setSessionsError(cause instanceof Error ? cause.message : 'Không tải được phiên họp.'); })
+      .finally(() => { if (!controller.signal.aborted) setLoadingSessions(false); });
+    return () => controller.abort();
+  }, [accessToken, onLogout]);
   return (
     <main>
       <header>
@@ -23,22 +41,31 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
         <Suspense fallback={<p role="status">Đang tải phòng họp…</p>}>
           <MeetingRoom
             credentials={session.credentials}
+            accessToken={accessToken}
             onLeave={session.leave}
             onEnded={session.endSession}
           />
         </Suspense>
       ) : (
         <section className="join-card" aria-label="Tham gia phòng thử nghiệm">
-          <span className="badge">Phòng thử nghiệm chung</span>
+          <span className="badge">{selectedSession ? 'Phiên họp có chat' : 'Phòng thử nghiệm chung'}</span>
           <h2>Sẵn sàng kết nối?</h2>
           <p>
             Cho phép truy cập camera và microphone khi trình duyệt hỏi. Mở cùng
             trang này trên thiết bị thứ hai để gặp nhau.
           </p>
           <p className="hint">
-            Dùng tai nghe để tránh tiếng vọng. Tất cả người tham gia sẽ vào cùng
-            một phòng thử nghiệm.
+            Dùng tai nghe để tránh tiếng vọng. Chọn cùng phiên họp với những
+            người bạn muốn gặp và trò chuyện.
           </p>
+          <div className="meeting-session-picker"><label htmlFor="meeting-session-select">Phiên họp</label>
+            <select id="meeting-session-select" value={selectedSession} onChange={event => setSelectedSession(event.target.value)} disabled={loadingSessions || session.isJoining}>
+              <option value="">Phòng PoC — media, không có lịch sử chat</option>
+              {options.map(option => <option key={option.sessionId} value={option.sessionId}>{option.title} · {option.roomName}</option>)}
+            </select>
+          </div>
+          <p className="hint">Chat dùng cho phiên đang diễn ra mà bạn đã được chấp nhận vào. Mọi người cần chọn cùng phiên.</p>
+          {sessionsError && <p role="status">{sessionsError}</p>}
           {session.error && (
             <p className="notice error" role="alert">
               {session.error}
@@ -46,8 +73,8 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
           )}
           <div className="join-actions">
             <button
-              disabled={session.isJoining}
-              onClick={() => void session.join()}
+              disabled={session.isJoining || loadingSessions}
+              onClick={() => void session.join(selectedSession || undefined)}
             >
               {session.isJoining ? 'Đang chuẩn bị…' : 'Tham gia phòng'}
             </button>

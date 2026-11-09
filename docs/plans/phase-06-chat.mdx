@@ -1,0 +1,33 @@
+---
+title: Phase 06 — Chat trong meeting
+description: Thiết kế lưu trữ và tiến trình triển khai chat.
+---
+
+Trạng thái: In Progress. Ngày 2026-11-08, Asia/Saigon.
+
+## Phạm vi đã hoàn thành
+
+Đã soạn `supabase/migrations/20261108000100_create_meeting_messages.sql` dựa trên schema người dùng cung cấp. Người dùng xác nhận đã áp dụng và kiểm tra constraint/index/RLS/grants. Ngày 2026-11-09 đã triển khai ChatModule, session access và UI; không tự thay đổi DB remote. [Thiết kế migration](/work-logs/2026-11-08-01-phase-06-chat-migration) — [Triển khai chat](/work-logs/2026-11-09-01-phase-06-meeting-chat).
+
+## Quyết định
+
+Tin nhắn thuộc session, người gửi thuộc public.users. Unique theo session/sender/client_message_id chống trùng khi retry; giới hạn 2000 ký tự và không chỉ có whitespace. Index phục vụ cursor history và FK sender. FK RESTRICT giữ lịch sử khi có yêu cầu xóa parent. RLS bật; anon/authenticated không được truy cập; service_role chỉ SELECT/INSERT trên bảng mới.
+
+Backend phải kiểm tra JWT, membership, admission, removed_at, session và attendance. Client không được tự chọn sender_id đáng tin. Khi insert, backend bỏ message_id/created_at để dùng default DB. Retry dùng cùng client_message_id, đọc lại bản ghi cũ khi conflict; không upsert ghi đè nội dung.
+
+## Tiêu chí nghiệm thu
+
+- [x] Có migration thiết kế theo schema hiện tại.
+- [x] Người dùng xác nhận đã áp dụng và kiểm chứng constraint, grants, RLS; backend query thật chỉ đọc thành công.
+- [x] Nối session/membership và xác minh participant qua LiveKit; không dựa vào attendance có thể cũ.
+- [x] Gateway, lịch sử, chống trùng và reconnect, kiểm thử fixtures.
+- [x] UI chat và nhiều tab qua Cloudflare HTTPS, Vite preview và LiveKit Cloud thật, dữ liệu fixtures.
+- [ ] Nghiệm thu persistence Supabase thật và hai thiết bị/hai mạng.
+
+## Cách áp dụng
+
+Mở Supabase SQL Editor đúng project, chạy toàn bộ file migration một lần bằng postgres/database owner. Transaction bảo đảm các bước cùng thành công hoặc rollback. Không dùng IF NOT EXISTS để tránh che giấu bảng có cấu trúc khác; nếu bảng đã tồn tại, dừng và đối chiếu schema. Không dùng CSV import/Table Editor để thực hiện DDL này. SQL Editor thực thi thủ công không tự đăng ký version vào lịch sử Supabase CLI migrations; phải đối chiếu trước khi dùng db push sau này.
+
+## Bước tiếp theo
+
+Nghiệm thu gửi/lưu/tải lại tin trên session thật bằng các tài khoản admitted, hai thiết bị qua HTTPS. [Hướng dẫn và giới hạn](/modules/meeting-chat). Phase 06 vẫn In Progress; không đánh dấu Done chỉ vì fixtures và build đạt.

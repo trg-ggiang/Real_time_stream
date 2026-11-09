@@ -21,6 +21,7 @@ import {
 import type { JoinCredentials } from '../types';
 import { ScreenShareButton } from './ScreenShareButton';
 import { MeetingMediaLayout } from './MeetingMediaLayout';
+import { MeetingChat } from '../chat/components/MeetingChat';
 
 const connectionLabels: Record<ConnectionState, string> = {
   [ConnectionState.Disconnected]: 'Đã ngắt kết nối',
@@ -87,7 +88,7 @@ function MeetingParticipantTile() {
   );
 }
 
-function RoomContent({ onDeviceError }: { onDeviceError: () => void }) {
+function RoomContent({ onDeviceError, credentials, accessToken }: { onDeviceError: () => void; credentials: JoinCredentials; accessToken: string }) {
   const state = useConnectionState();
   const participants = useParticipants();
   return (
@@ -96,7 +97,9 @@ function RoomContent({ onDeviceError }: { onDeviceError: () => void }) {
         <span>{connectionLabels[state]}</span>
         <span>{participants.length} người trong phòng</span>
       </div>
-      <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
+      <MeetingChat credentials={credentials} accessToken={accessToken}>
+        <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
+      </MeetingChat>
       <RoomAudioRenderer />
       <StartAudio label="Bật âm thanh từ phòng" />
       <div className="meeting-controls">
@@ -122,10 +125,12 @@ function RoomContent({ onDeviceError }: { onDeviceError: () => void }) {
 
 export function MeetingRoom({
   credentials,
+  accessToken,
   onLeave,
   onEnded,
 }: {
   credentials: JoinCredentials;
+  accessToken: string;
   onLeave: () => void;
   onEnded: (message?: string) => void;
 }) {
@@ -176,7 +181,7 @@ export function MeetingRoom({
             {error}
           </p>
         )}
-        <RoomContent onDeviceError={handleDeviceError} />
+        <RoomContent onDeviceError={handleDeviceError} credentials={credentials} accessToken={accessToken} />
       </LiveKitRoom>
     </section>
   );

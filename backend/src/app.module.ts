@@ -6,6 +6,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { validateEnvironment } from './config/environment';
 import { HealthController } from './health.controller';
 import { LivekitModule } from './livekit/livekit.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { LivekitModule } from './livekit/livekit.module';
     SupabaseModule,
     AuthModule,
     LivekitModule,
+    ChatModule,
   ],
   controllers: [HealthController],
 })
