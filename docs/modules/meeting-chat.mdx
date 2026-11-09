@@ -1,0 +1,87 @@
+---
+title: Chat trong phiên họp
+description: Cấu hình, luồng dữ liệu, quyền và giới hạn của chat Socket.IO.
+---
+
+## Phạm vi hiện tại
+
+Chat văn bản chung theo meeting session, lịch sử Supabase, gửi lại cùng client ID, tải tin cũ, reconnect tải bù, số tin chưa đọc và giới hạn gửi. Không nhắn riêng, file, reaction, sửa/xóa, xác nhận đã đọc hoặc giao diện host quản lý thành viên. Những người đã được admitted đều có cùng quyền chat.
+
+Không tự tạo meeting/session, không chuyển status, không tự admitted thành viên và không ghi attendance. Database của nhóm không bị thay đổi trong kiểm thử phiên triển khai; chỉ được đọc metadata/lịch sử. Người dùng trước đó xác nhận migration meeting_messages và các constraint/grants/RLS đã áp dụng.
+
+## Điều kiện chạy
+
+- Backend có Supabase/LiveKit/JWT như auth và screen sharing hiện tại.
+- Giữ POC_ENABLED=true cho token endpoint. Gate development PoC hiện tại vẫn chặn phát token khi production; module này chưa biến ứng dụng thành deployment production.
+- Bảng meeting_messages đã có theo migration 20261108000100; backend dùng secret key, frontend không truy cập bảng trực tiếp.
+- Session status ongoing, có livekit_room_name hợp lệ. Thành viên thuộc cùng meeting, admission_status admitted và removed_at NULL.
+- Người dùng chọn cùng session trước khi vào. Token của session dùng livekit_room_name trong DB thay vì LIVEKIT_ROOM_NAME.
+- Room PoC từ env vẫn giữ để thử media, không có chat. Chưa có màn hình tạo phiên/duyệt người dùng; quản trị dữ liệu đó ở workflow hiện có.
+
+Chạy npm run dev:backend và npm run dev:frontend ở root. Mở trang, đăng nhập, chọn Phiên họp, Tham gia phòng rồi mở Chat trong phòng. Backend xác minh participant đã thật sự ở LiveKit trước khi cho kết nối chat. Không suy ra online từ attendance.left_at NULL vì bản ghi có thể cũ.
+
+Qua mạng ngoài, restart backend cũ trước rồi chạy npm run tunnel. Script tunnel có thể tái sử dụng backend đang chạy; nếu backend đó chưa có ChatModule thì phải tự restart. Frontend cần build mới. Giữ VITE_API_URL trống để HTTP và Socket.IO dùng cùng origin; proxy /socket.io hỗ trợ ws ở dev và preview. Chat không dùng biến VITE_WS_URL localhost cũ. Nếu cấu hình API origin riêng, VITE_API_URL phải là origin HTTP(S) của backend, không gồm /api.
+
+## Cấu trúc code
+
+Backend:
+
+- meeting-sessions.service/controller/module: liệt kê session được admitted, kiểm tra session/member và cung cấp phòng đúng cho LivekitService.
+- chat-access.service: JWT HS256, user tồn tại, identity thuộc user, session/member và LiveKit getParticipant. Kiểm tra hạn JWT ở mỗi thao tác và timer đóng socket khi hết hạn.
+- chat.gateway: middleware handshake, namespace /chat, send/history ACK, phát tin theo session và kiểm tra lại từng recipient trước khi gửi. Sweep 30 giây thu hồi kết nối không còn hợp lệ.
+- chat.service: parse DTO, rate limit theo user và điều phối repository. Send tối đa 20 lần/10 giây; history 40 lần/10 giây, dùng bộ nhớ của một backend.
+- chat.repository: insert rồi select; unique conflict đọc lại tin cũ, không UPDATE/upsert. History tối đa 50 tin/trang với cursor created_at/message_id. Giữ microsecond PostgreSQL, không chuyển cursor qua JavaScript Date làm mất độ chính xác.
+- dto/chat.dto và chat.types: hợp đồng dữ liệu, UUID, chuỗi, ISO cursor và chặn field thừa.
+
+Frontend:
+
+- MeetingPage: GET danh sách session và chọn trước khi join.
+- token-api/useMeetingSession/types: thêm sessionId tùy chọn mà vẫn giữ đường PoC cũ.
+- chat/services/chat-socket: socket cùng origin, auth ở handshake, timeout ACK 10 giây; chỉ emit khi connected để tránh gửi ngầm ngoài ý muốn.
+- chat/hooks/use-meeting-chat: merge theo message ID, outbox gửi lỗi, retry cùng ID, cursor cũ/mới và checkpoint tải bù nếu một trang giữa chừng thất bại; cleanup listeners/socket khi rời phòng.
+- chat/components/MeetingChat: panel mở/đóng, unread, composer Enter gửi và Shift+Enter xuống dòng, không tự kéo xuống khi đang đọc tin cũ. React hiển thị plain text, không dựng HTML từ content.
+
+## Luồng xử lý
+
+1. JWT ứng dụng gọi GET /api/meeting-sessions, backend chỉ trả session ongoing mà user đã admitted và chưa removed.
+2. POST /api/livekit/token?sessionId=UUID kiểm tra lại quyền, ký token vào đúng room của session và trả sessionId. Không có query thì giữ room PoC, không được dùng chat với credentials đó.
+3. LiveKitRoom connected thì chat client mở WSS/WS namespace /chat, transport path /socket.io. Handshake gồm token, sessionId, participantIdentity.
+4. Backend xác minh JWT/user, mapping member/session và participant thực tế qua LiveKit. Client không thể tự khai senderId hoặc tự tham gia session không có quyền.
+5. Client đăng ký listener trước khi connect. Sau connect tải 50 tin gần nhất; reconnect tải bù từng trang sau checkpoint, merge với sự kiện live để tránh trùng/thiếu trong lúc tải.
+6. chat:send nhận clientMessageId/content. Backend xác thực payload/quyền, lưu DB trước, rồi phát chat:message và ACK. Recipient bị removed/phiên ended/đã rời LiveKit bị chặn trước delivery.
+7. Timeout không đồng nghĩa DB chưa lưu. Outbox giữ nội dung và nút thử lại; retry cùng ID đọc lại tin cũ, khác content với ID cũ trả 409. Không yêu cầu quyền UPDATE/DELETE.
+8. Rời media hoặc logout hủy socket/listeners, không ngắt media chỉ vì chat lỗi. Khi LiveKit reconnect, chat kết nối lại theo lifecycle và tải bù.
+
+## Hợp đồng sự kiện
+
+Handshake: token string, sessionId UUID, participantIdentity string. Không truyền khóa Supabase/LiveKit bí mật.
+
+- chat:send: { clientMessageId, content }, plain text tối đa 2000 Unicode code points, trim hai đầu; blank bị từ chối.
+- chat:history: {} cho trang gần nhất, { before: { createdAt, id } } cho tin cũ, hoặc { after: { createdAt, id } } cho tải bù. Không dùng cả before/after.
+- ACK thành công: { ok: true, data }; lỗi: { ok: false, code, message }. 400 payload, 401 JWT, 403 quyền/presence/session, 409 ID trùng khác content, 429 rate limit, 503 hạ tầng.
+- chat:message: id, sessionId, senderId, senderName, content, clientMessageId, createdAt. Time từ DB; sender từ JWT.
+- chat:revoked: thông báo rồi server ngắt socket; frontend cho kết nối lại hoặc đăng nhập lại khi phù hợp.
+
+## Kiểm thử đã thực hiện ngày 2026-11-09
+
+- Typecheck/build hai workspace đạt. Backend 14 tests, frontend 26 tests đạt.
+- Socket.IO qua TCP thật với Nest test app: JWT/identity/session, không có participant, sender spoof, nội dung/cursor sai, lỗi DB không broadcast, retry, session isolation, member removed, rate limit và socket JWT hết hạn.
+- Repository mock PostgREST query kiểm tra cursor microsecond, giới hạn trang, retry không upsert. Hook tests kiểm tra race history/live, ACK/echo, nhiều trang catch-up, checkpoint giữ khi có lỗi và cleanup.
+- Supabase thật chỉ đọc: bảng messages tồn tại, join sender/users, danh sách session/member và history query tương thích; không insert/seed hay đổi role/status/schema remote.
+- Trình duyệt chạy UI production với backend Nest thật, LiveKit Cloud thật và media giả lập. Users/sessions/messages được thay bằng fixtures bộ nhớ để không ghi DB nhóm.
+- Local Vite dev proxy và Cloudflare HTTPS → Vite preview → Socket.IO thật đều đạt login/join/send/receive/isolation/retry/reconnect/removal; HTML độc hại chỉ hiện văn bản; không có pageerror. Ảnh 1440/1024/768/390px không tràn ngang, screen/self camera giữ vùng riêng. Desktop rộng có composer trong viewport, tablet/mobile xếp chat dưới media.
+
+## Giới hạn cần hiểu
+
+- Chưa thử INSERT thật vào Supabase, hai thiết bị/hai mạng hoặc media thiết bị thật. Cần người dùng thử phiên development thực tế để nghiệm thu persistence.
+- Không xây lifecycle scheduled/ongoing/ended, waiting room, quản trị role hoặc đồng bộ attendance. Chỉ status ongoing được phép join/chat; started_at/scheduled_start_at không tự đổi status.
+- Backend xác minh LiveKit qua mạng cho mọi thao tác và từng recipient. Phù hợp nhóm nhỏ; phòng lớn tốn nhiều request/độ trễ. Mất dịch vụ xác minh thì fail closed và có thể phải kết nối lại chat.
+- Rate limits/socket routing ở một process; chưa Redis adapter hoặc nhiều backend. Không bảo đảm exactly-once delivery/broadcast bền vững; DB unique chống trùng bản ghi, history/retry bù lỗi kết nối. Chưa transactional outbox hay sequence commit nghiêm ngặt.
+- History cursor là thứ tự created_at/id, không cam kết thứ tự transaction commit giữa nhiều sender. Đọc lại trang gần nhất giúp bù overlap; các trường hợp cực đoan cần cơ chế ordering/outbox riêng nếu yêu cầu cao hơn.
+- Lịch sử/outbox đang trong memory của tab; reload mất draft chưa xác nhận, JWT và lựa chọn. Tin đã lưu vẫn có thể tải lại sau login/join. Message list chưa virtualize/giới hạn tổng bộ nhớ.
+- Gửi tin trước/sau cuộc họp, file/DM/edit/delete/read receipts chưa hỗ trợ. Table append-only đúng grants hiện tại.
+- Room PoC từ env vẫn là phòng thử chung, không được coi là private/session chat room. Quản trị phải giữ room PoC tách khỏi livekit_room_name của phiên riêng.
+
+## Nghiệm thu tiếp theo
+
+Hai tài khoản admitted cùng một ongoing session: join, chat, reload rồi xác minh lịch sử DB; thử B offline rồi A gửi nhiều tin, B trở lại tải bù; thử pending/removed/session ended bị chặn. Thử share/cam/giơ tay cùng chat qua HTTPS trên hai thiết bị. Không tự sửa dữ liệu thành viên/status nếu chưa có ủy quyền của nhóm.

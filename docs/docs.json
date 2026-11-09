@@ -21,7 +21,8 @@
               "modules/https-tunnel",
               "modules/code-walkthrough",
               "modules/module-01-team-guide",
-              "modules/screen-sharing"
+              "modules/screen-sharing",
+              "modules/meeting-chat"
             ]
           },
           {
@@ -38,6 +39,8 @@
               "work-logs/2026-11-07-04-phase-04-tunnel-hash-fix",
               "work-logs/2026-11-07-06-phase-05-screen-sharing",
               "work-logs/2026-11-07-07-phase-05-meeting-layout",
+              "work-logs/2026-11-08-01-phase-06-chat-migration",
+              "work-logs/2026-11-09-01-phase-06-meeting-chat"
               "work-logs/2026-11-08-02-phase-04-dark-meeting-ui",
               "work-logs/2026-11-08-03-phase-04-meeting-frontend",
               "work-logs/2026-11-08-04-phase-04-meeting-themes",
@@ -70,7 +73,8 @@
               "plans/phase-02-requirements-architecture",
               "plans/phase-03-database-auth",
               "plans/phase-04-application-foundation",
-              "plans/phase-05-livekit-poc"
+              "plans/phase-05-livekit-poc",
+              "plans/phase-06-chat"
             ]
           }
         ]
@@ -85,7 +89,6 @@
               "dev/session-log",
               "templates/session-close"
             ]
-<<<<<<< HEAD
           },
           {
             "group": "Work Logs",
@@ -103,8 +106,6 @@
               "work-logs/2026-11-06-05-phase-05-git-handoff",
               "work-logs/2026-11-07-01-phase-03-meeting-controls"
             ]
-=======
->>>>>>> c77b0f82efcb3532adb20d3e58e1dce1f39fa591
           }
         ]
       }

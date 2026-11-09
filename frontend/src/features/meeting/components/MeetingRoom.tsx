@@ -37,6 +37,7 @@ import { readMediaPreferences, saveMediaPreference } from '../services/media-pre
 import { ScreenShareButton } from './ScreenShareButton';
 import { ScreenShareRequests } from './ScreenShareRequests';
 import { MeetingMediaLayout } from './MeetingMediaLayout';
+import { MeetingChat } from '../chat/components/MeetingChat';
 import { MeetingManagement } from './MeetingManagement';
 import type { ComponentProps } from 'react';
 type ManagementProps = Omit<ComponentProps<typeof MeetingManagement>, 'onlineUsers'>;
@@ -111,6 +112,7 @@ function MeetingParticipantTile() {
   );
 }
 
+function RoomContent({ onDeviceError, credentials, accessToken }: { onDeviceError: () => void; credentials: JoinCredentials; accessToken: string }) {
 function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHost }: { onDeviceError: (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => void; onDeviceEnabled: (kind: MediaDeviceKind) => void; onLeave: () => void; management?: ManagementProps; isHost: boolean }) {
   const state = useConnectionState();
   const participants = useParticipants();
@@ -126,6 +128,9 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHo
         <span className="meeting-connection" data-connected={state === ConnectionState.Connected}>{connectionLabels[state]}</span>
         <span className="meeting-participant-count"><Users size={17} aria-hidden="true" />{participants.length} người trong phòng</span>
       </div>
+      <MeetingChat credentials={credentials} accessToken={accessToken}>
+        <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
+      </MeetingChat>
       <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
       {isHost && management?.sessionId ? <ScreenShareRequests accessToken={management.accessToken} meetingId={management.overview.meeting.meetingId} sessionId={management.sessionId} /> : null}
       <RoomAudioRenderer />
@@ -155,11 +160,13 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHo
 
 export function MeetingRoom({
   credentials,
+  accessToken,
   onLeave,
   onEnded,
   management,
 }: {
   credentials: JoinCredentials;
+  accessToken: string;
   onLeave: () => void;
   onEnded: (message?: string) => void;
   management?: ManagementProps;
@@ -215,6 +222,7 @@ export function MeetingRoom({
             {error}
           </p>
         )}
+        <RoomContent onDeviceError={handleDeviceError} credentials={credentials} accessToken={accessToken} />
         {Object.entries(deviceErrors).map(([kind, message]) => message ? <p className="notice error" role="alert" key={kind}>{message}</p> : null)}
         <RoomContent onDeviceError={handleDeviceError} onDeviceEnabled={handleDeviceEnabled} onLeave={onLeave} management={management} isHost={credentials.role === 'host'} />
       </LiveKitRoom>

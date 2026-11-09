@@ -35,7 +35,7 @@ export function useMeetingSession(accessToken: string, onUnauthorized?: () => vo
     [],
   );
 
-  const join = useCallback(async () => {
+  const join = useCallback(async (sessionId?: string) => {
     if (pending.current || joined.current) return;
     setError(null);
     if (!window.isSecureContext || !navigator.mediaDevices) {
@@ -49,7 +49,7 @@ export function useMeetingSession(accessToken: string, onUnauthorized?: () => vo
     setIsJoining(true);
     const timeout = window.setTimeout(() => controller.abort(), 15_000);
     try {
-      const result = await requestJoinCredentials(controller.signal, accessToken);
+      const result = await requestJoinCredentials(controller.signal, accessToken, sessionId);
       if (!controller.signal.aborted) {
         joined.current = true;
         setCredentials(result);
