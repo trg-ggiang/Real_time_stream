@@ -40,7 +40,7 @@
               "work-logs/2026-11-07-06-phase-05-screen-sharing",
               "work-logs/2026-11-07-07-phase-05-meeting-layout",
               "work-logs/2026-11-08-01-phase-06-chat-migration",
-              "work-logs/2026-11-09-01-phase-06-meeting-chat"
+              "work-logs/2026-11-09-01-phase-06-meeting-chat",
               "work-logs/2026-11-08-02-phase-04-dark-meeting-ui",
               "work-logs/2026-11-08-03-phase-04-meeting-frontend",
               "work-logs/2026-11-08-04-phase-04-meeting-themes",
@@ -57,7 +57,22 @@
               "work-logs/2026-11-09-03-phase-04-neutral-themes",
               "work-logs/2026-11-09-04-phase-05-device-errors-reload",
               "work-logs/2026-11-09-05-phase-04-theme-audit",
-              "work-logs/2026-11-09-06-phase-04-schedule-conflicts"
+              "work-logs/2026-11-09-06-phase-04-schedule-conflicts",
+              "work-logs/2026-11-10-01-phase-06-chat-merge-repair",
+              "work-logs/2026-11-10-02-phase-04-lobby-background",
+              "work-logs/2026-11-10-03-phase-06-remove-chat-reconnect-button",
+              "work-logs/2026-11-10-04-phase-06-chat-toolbar-icon",
+              "work-logs/2026-11-10-05-phase-04-hide-session-name",
+              "work-logs/2026-11-10-06-phase-04-input-placeholders",
+              "work-logs/2026-11-10-07-phase-04-remove-cancel-join",
+              "work-logs/2026-11-10-08-phase-04-toolbar-order",
+              "work-logs/2026-11-10-09-phase-04-restore-form-hints",
+              "work-logs/2026-11-10-10-phase-04-email-placeholder",
+              "work-logs/2026-11-10-11-phase-04-meeting-code-placeholder",
+              "work-logs/2026-11-10-12-phase-04-remove-meeting-title-example",
+              "work-logs/2026-11-10-13-phase-04-share-link-icon",
+              "work-logs/2026-11-10-14-phase-04-remove-self-camera-section",
+              "work-logs/2026-11-10-15-phase-04-audio-device-arrows"
             ]
           }
         ]

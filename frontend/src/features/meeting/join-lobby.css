@@ -28,6 +28,10 @@
 .lobby-management > summary { cursor: pointer; padding: 12px 4px; color: var(--meeting-muted); font-size: 14px; }
 .lobby-management > summary:focus-visible { outline: 3px solid var(--meeting-accent); outline-offset: 3px; }
 .lobby-management[open] > summary { color: var(--meeting-text); margin-bottom: 16px; }
+.meeting-app :is(.meeting-call-intro, .workspace-detail-heading) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 16px; }
+.meeting-app .meeting-call-intro h1 { min-width: 0; overflow-wrap: anywhere; }
+.meeting-share-button { justify-self: end; }
+.meeting-app .meeting-media-layout--presentation-only { grid-template-columns: minmax(0, 1fr); }
 .meeting-app .lobby-management .workspace-management { background: var(--meeting-surface); border-color: var(--meeting-line); }
 @media (max-width: 767px) {
   .meeting-app .lobby-dashboard { grid-template-columns: minmax(0, 1fr); gap: 32px; }

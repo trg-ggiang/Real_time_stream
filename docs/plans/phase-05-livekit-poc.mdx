@@ -120,3 +120,18 @@ Capture errors are source-specific; screen picker cancellation is not a camera/m
 ## Specific scheduling conflicts (2026-11-09)
 
 Session overview now exposes recurrence/settings metadata, preventing an invalid extra-session scheduling affordance after reload. Distinct localized 409 reasons cover invalid times and existing single sessions. No schema changes. BE 18 tests, FE 40 tests and both builds passed; no live DB writes for testing. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-06-phase-04-schedule-conflicts).
+
+
+## Chat merge repair (2026-11-10)
+
+Resolved accept-both JSX/function/render duplication; kept modern meeting lobby and connected chat to its session flow. Chat follows both themes. Legacy session tokens reuse admission/attendance/role policy. BE 31 tests, FE 42 tests, typecheck and both builds passed; browser UI fixtures reviewed. No DB changes. Phase 04/05/06 In Progress. [Work log](/work-logs/2026-11-10-01-phase-06-chat-merge-repair).
+
+
+## Remove self camera section (2026-11-10)
+
+Removed the dedicated self-camera sidebar section during screen sharing; no remote cameras means full-width presentation. Normal camera grid/publication unchanged. FE typecheck passed. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-14-phase-04-remove-self-camera-section).
+
+
+## Audio device dropdown arrows (2026-11-10)
+
+Replaced standalone gear with microphone/headphone caret menus, added receive-audio mute toggle and output-support fallback. FE build/typecheck and 43 tests passed; physical routing pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-15-phase-04-audio-device-arrows).

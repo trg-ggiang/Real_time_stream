@@ -1,0 +1,22 @@
+---
+title: Fix create meeting background
+description: Remove the rectangular surface behind the secondary lobby form.
+---
+
+## Session
+
+2026-11-10-02, Asia/Saigon. Codex. Exact start/end not captured. Completed. Phase 04 In Progress.
+
+## Objective and completed change
+
+User screenshot showed the secondary create-meeting form as a contrasting rectangle in dark mode. A semantic theme selector had greater specificity than join-lobby.css. Added a scoped transparent background override for lobby-dashboard .workspace-create in meeting-theme.css. Other form/panel surfaces unchanged.
+
+## Checks
+
+Chromium with synthetic login: computed background rgba(0,0,0,0) in dark mode, confirming the form inherits the page backdrop. No API writes or backend changes. git diff --check passed with line-ending warning. Build/unit tests skipped for this one-line visual CSS correction; actual browser style verified. Navigation JSON parsed and target exists.
+
+## Next step and checklist
+
+Reload the lobby. Phase 04 remains In Progress; previous media/chat acceptance limits still apply.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

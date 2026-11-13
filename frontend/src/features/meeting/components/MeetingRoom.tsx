@@ -1,12 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Hand } from '@phosphor-icons/react/dist/csr/Hand';
 import { Users } from '@phosphor-icons/react/dist/csr/Users';
+import { ChatCircleText } from '@phosphor-icons/react/dist/csr/ChatCircleText';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { SignOut } from '@phosphor-icons/react/dist/csr/SignOut';
 import { Microphone } from '@phosphor-icons/react/dist/csr/Microphone';
 import { MicrophoneSlash } from '@phosphor-icons/react/dist/csr/MicrophoneSlash';
 import { VideoCameraSlash } from '@phosphor-icons/react/dist/csr/VideoCameraSlash';
-import { GearSix } from '@phosphor-icons/react/dist/csr/GearSix';
+import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
+import { Headphones } from '@phosphor-icons/react/dist/csr/Headphones';
 import {
   MediaDeviceMenu,
   TrackToggle,
@@ -27,7 +29,6 @@ import {
   VideoPresets,
   Track,
   LocalAudioTrack,
-  LocalVideoTrack,
   MediaDeviceFailure,
   type RoomOptions,
 } from 'livekit-client';
@@ -112,12 +113,14 @@ function MeetingParticipantTile() {
   );
 }
 
-function RoomContent({ onDeviceError, credentials, accessToken }: { onDeviceError: () => void; credentials: JoinCredentials; accessToken: string }) {
-function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHost }: { onDeviceError: (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => void; onDeviceEnabled: (kind: MediaDeviceKind) => void; onLeave: () => void; management?: ManagementProps; isHost: boolean }) {
+function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHost, credentials, accessToken }: { credentials: JoinCredentials; accessToken: string; onDeviceError: (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => void; onDeviceEnabled: (kind: MediaDeviceKind) => void; onLeave: () => void; management?: ManagementProps; isHost: boolean }) {
   const state = useConnectionState();
   const participants = useParticipants();
-  const { isMicrophoneEnabled, isCameraEnabled, microphoneTrack, cameraTrack } = useLocalParticipant();
+  const { isMicrophoneEnabled, isCameraEnabled, microphoneTrack } = useLocalParticipant();
+  const [audioMuted, setAudioMuted] = useState(false);
+  const canSelectOutput = typeof HTMLMediaElement !== 'undefined' && 'setSinkId' in HTMLMediaElement.prototype;
   const [showManagement, setShowManagement] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false), [chatUnread, setChatUnread] = useState(0);
   const onlineUsers = useMemo(() => new Set(participants.map(participant => participant.identity.split(':')[0])), [participants]);
   const connected = state === ConnectionState.Connected;
   const microphoneLabel = isMicrophoneEnabled ? 'Tắt microphone' : 'Bật microphone';
@@ -128,28 +131,38 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHo
         <span className="meeting-connection" data-connected={state === ConnectionState.Connected}>{connectionLabels[state]}</span>
         <span className="meeting-participant-count"><Users size={17} aria-hidden="true" />{participants.length} người trong phòng</span>
       </div>
-      <MeetingChat credentials={credentials} accessToken={accessToken}>
+      <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen} onUnreadChange={setChatUnread}>
         <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
       </MeetingChat>
-      <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
       {isHost && management?.sessionId ? <ScreenShareRequests accessToken={management.accessToken} meetingId={management.overview.meeting.meetingId} sessionId={management.sessionId} /> : null}
-      <RoomAudioRenderer />
+      <RoomAudioRenderer volume={audioMuted ? 0 : 1} />
       <StartAudio label="Bật âm thanh từ phòng" />
       <div className="meeting-controls">
         <fieldset className="meeting-device-controls" disabled={!connected} aria-label="Thiết bị">
+        <div className="meeting-device-group">
         <TrackToggle source={Track.Source.Microphone} showIcon={false} onDeviceError={error => onDeviceError(MediaDeviceFailure.getFailure(error), 'audioinput')} onChange={(enabled, userInitiated) => { if (enabled) onDeviceEnabled('audioinput'); if (userInitiated) saveMediaPreference('audioinput', enabled); }} disabled={!connected}
           className="lk-button meeting-control-icon" aria-label={microphoneLabel} title={microphoneLabel}>
           {isMicrophoneEnabled ? <Microphone size={23} aria-hidden="true" /> : <MicrophoneSlash size={23} aria-hidden="true" />}
         </TrackToggle>
+        <MediaDeviceMenu kind="audioinput" disabled={!connected} className="lk-button meeting-control-icon meeting-device-arrow" aria-label="Chọn microphone" title="Chọn microphone"
+          tracks={{ audioinput: microphoneTrack?.track instanceof LocalAudioTrack ? microphoneTrack.track : undefined }}><CaretDown size={14} aria-hidden="true" /></MediaDeviceMenu>
+        </div>
+        <div className="meeting-device-group">
+          <button type="button" className="lk-button meeting-control-icon" disabled={!connected} data-lk-enabled={!audioMuted} aria-label={audioMuted ? 'Bật âm thanh phòng' : 'Tắt âm thanh phòng'} title={audioMuted ? 'Bật âm thanh phòng' : 'Tắt âm thanh phòng'} onClick={() => setAudioMuted(value => !value)}><Headphones size={23} aria-hidden="true" /></button>
+          <MediaDeviceMenu kind="audiooutput" disabled={!connected || !canSelectOutput} className="lk-button meeting-control-icon meeting-device-arrow" aria-label="Chọn loa hoặc tai nghe" title={canSelectOutput ? 'Chọn loa hoặc tai nghe' : 'Trình duyệt chưa hỗ trợ chọn đầu ra; hãy chọn trong cài đặt âm thanh hệ điều hành'}><CaretDown size={14} aria-hidden="true" /></MediaDeviceMenu>
+        </div>
         <TrackToggle source={Track.Source.Camera} showIcon={false} onDeviceError={error => onDeviceError(MediaDeviceFailure.getFailure(error), 'videoinput')} onChange={(enabled, userInitiated) => { if (enabled) onDeviceEnabled('videoinput'); if (userInitiated) saveMediaPreference('videoinput', enabled); }} disabled={!connected}
           className="lk-button meeting-control-icon" aria-label={cameraLabel} title={cameraLabel}>
           {isCameraEnabled ? <VideoCamera size={23} aria-hidden="true" /> : <VideoCameraSlash size={23} aria-hidden="true" />}
         </TrackToggle>
-        <MediaDeviceMenu disabled={!connected} className="lk-button meeting-control-icon" aria-label="Cài đặt thiết bị" title="Cài đặt thiết bị"
-          tracks={{ audioinput: microphoneTrack?.track instanceof LocalAudioTrack ? microphoneTrack.track : undefined, videoinput: cameraTrack?.track instanceof LocalVideoTrack ? cameraTrack.track : undefined }}><GearSix size={23} aria-hidden="true" /></MediaDeviceMenu>
+
         </fieldset>
-        <ScreenShareButton />
         <RaiseHandButton connected={state === ConnectionState.Connected} />
+        <ScreenShareButton />
+        {credentials.sessionId ? <button type="button" className="lk-button meeting-control-icon meeting-chat-toggle" aria-label={`${chatOpen ? 'Đóng chat' : 'Mở chat'}${!chatOpen && chatUnread ? `, ${chatUnread} tin chưa đọc` : ''}`} title={chatOpen ? 'Đóng chat' : 'Mở chat'} aria-controls="meeting-chat-panel" aria-expanded={chatOpen} aria-pressed={chatOpen} onClick={() => setChatOpen(value => !value)}>
+          <ChatCircleText size={23} weight={chatOpen ? 'fill' : 'regular'} aria-hidden="true" />
+          {!chatOpen && chatUnread > 0 ? <span className="meeting-chat-unread" aria-hidden="true">{chatUnread > 99 ? '99+' : chatUnread}</span> : null}
+        </button> : null}
         {management ? <button type="button" className="lk-button meeting-control-icon" aria-label="Quản lý cuộc họp" title="Quản lý cuộc họp" aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => setShowManagement(value => !value)}><Users size={23} aria-hidden="true" /></button> : null}
         <button type="button" className="lk-button meeting-control-icon meeting-control-leave" aria-label="Rời phòng" title="Rời phòng" onClick={onLeave}><SignOut size={23} aria-hidden="true" /></button>
       </div>
@@ -214,17 +227,13 @@ export function MeetingRoom({
         onMediaDeviceFailure={handleDeviceError}
         data-lk-theme="default"
       >
-        <div className="room-heading">
-          <div className="meeting-room-title"><VideoCamera size={20} aria-hidden="true" /><span>{credentials.roomName}</span></div>
-        </div>
         {error && (
           <p className="notice error" role="alert">
             {error}
           </p>
         )}
-        <RoomContent onDeviceError={handleDeviceError} credentials={credentials} accessToken={accessToken} />
         {Object.entries(deviceErrors).map(([kind, message]) => message ? <p className="notice error" role="alert" key={kind}>{message}</p> : null)}
-        <RoomContent onDeviceError={handleDeviceError} onDeviceEnabled={handleDeviceEnabled} onLeave={onLeave} management={management} isHost={credentials.role === 'host'} />
+        <RoomContent credentials={credentials} accessToken={accessToken} onDeviceError={handleDeviceError} onDeviceEnabled={handleDeviceEnabled} onLeave={onLeave} management={management} isHost={credentials.role === 'host'} />
       </LiveKitRoom>
     </section>
   );

@@ -199,7 +199,7 @@ export function AuthApp() {
                 </div>}
                 <div className="auth-field">
                   <label htmlFor="auth-email">Email</label>
-                  <input id="auth-email" name="email" type="email" autoComplete="email" placeholder="ban@example.com"
+                  <input id="auth-email" name="email" type="email" autoComplete="email" placeholder="email@gmail.com"
                     required disabled={busy} onChange={() => clearFieldError('email')}
                     aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? 'auth-email-error' : undefined} />
                   {fieldErrors.email && <p id="auth-email-error" className="auth-field-error">{fieldErrors.email}</p>}

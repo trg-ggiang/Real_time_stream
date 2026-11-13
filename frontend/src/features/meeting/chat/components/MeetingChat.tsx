@@ -4,11 +4,10 @@ import { useConnectionState } from '@livekit/components-react';
 import type { JoinCredentials } from '../../types';
 import { useMeetingChat } from '../hooks/use-meeting-chat';
 
-export function MeetingChat({ credentials, accessToken, children }: {
-  credentials: JoinCredentials; accessToken: string; children: ReactNode;
+export function MeetingChat({ credentials, accessToken, children, open, onUnreadChange }: {
+  credentials: JoinCredentials; accessToken: string; children: ReactNode; open: boolean; onUnreadChange: (count: number) => void;
 }) {
   const connected = useConnectionState() === ConnectionState.Connected;
-  const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [newBelow, setNewBelow] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -16,6 +15,7 @@ export function MeetingChat({ credentials, accessToken, children }: {
   const firstPosition = useRef(true);
   const previousCount = useRef(0);
   const chat = useMeetingChat(accessToken, credentials.sessionId, credentials.participantIdentity, connected, open);
+  useEffect(() => { onUnreadChange(chat.unread); }, [chat.unread, onUnreadChange]);
 
   function scrollToBottom() {
     const list = listRef.current;
@@ -52,16 +52,10 @@ export function MeetingChat({ credentials, accessToken, children }: {
   </>;
 
   return <>
-    <div className="meeting-chat-toolbar">
-      <button type="button" className="secondary" aria-expanded={open} aria-controls="meeting-chat-panel" onClick={() => setOpen(value => !value)}>
-        {open ? 'Đóng chat' : 'Chat trong phòng'}{!open && chat.unread > 0 ? ` (${chat.unread})` : ''}
-      </button>
-      <span role="status">{chat.status === 'connected' ? chat.syncing ? 'Đang đồng bộ tin nhắn…' : 'Chat đã kết nối' : chat.status === 'connecting' ? 'Đang kết nối chat…' : 'Chat chưa kết nối'}</span>
-    </div>
     <div className={`meeting-workspace${open ? ' has-chat' : ''}`}>
       <div className="meeting-workspace-media">{children}</div>
       {open && <section id="meeting-chat-panel" className="meeting-chat-panel" aria-label="Chat trong phiên họp">
-        <div className="chat-panel-heading"><strong>Chat trong phiên họp</strong><button type="button" className="secondary" onClick={chat.reconnect} disabled={!connected}>Kết nối lại</button></div>
+        <div className="chat-panel-heading"><strong>Chat trong phiên họp</strong><span className="chat-connection-status" role="status">{chat.status === 'connected' ? chat.syncing ? 'Đang đồng bộ tin nhắn…' : 'Chat đã kết nối' : chat.status === 'connecting' ? 'Đang kết nối chat…' : 'Chat chưa kết nối'}</span></div>
         {chat.error && <p className="notice error" role="alert">{chat.error}</p>}
         <div ref={listRef} className="chat-message-list" onScroll={() => {
           const list = listRef.current;

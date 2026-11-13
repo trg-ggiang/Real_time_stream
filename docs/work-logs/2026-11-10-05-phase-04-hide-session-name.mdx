@@ -1,0 +1,22 @@
+---
+title: Hide technical session room name
+description: Remove the internal room-name heading from the meeting interface.
+---
+
+## Session
+
+2026-11-10-05 Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 04 In Progress.
+
+## Objective and change
+
+Removed the room heading displaying credentials.roomName in MeetingRoom.tsx at user request. Meeting title and connection status remain available; session IDs continue to be used internally for media/chat.
+
+## Checks
+
+Source inspection confirmed only the displayed technical heading was removed. git diff --check run. Build/tests skipped for this markup-only removal. Navigation JSON parsed; log target exists. No BE/DB changes.
+
+## Next step and checklist
+
+Reload the room to see the simplified header. Phase 04 remains In Progress.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

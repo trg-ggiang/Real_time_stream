@@ -31,3 +31,18 @@ Mở Supabase SQL Editor đúng project, chạy toàn bộ file migration một 
 ## Bước tiếp theo
 
 Nghiệm thu gửi/lưu/tải lại tin trên session thật bằng các tài khoản admitted, hai thiết bị qua HTTPS. [Hướng dẫn và giới hạn](/modules/meeting-chat). Phase 06 vẫn In Progress; không đánh dấu Done chỉ vì fixtures và build đạt.
+
+
+## Chat merge repair (2026-11-10)
+
+Resolved accept-both JSX/function/render duplication; kept modern meeting lobby and connected chat to its session flow. Chat follows both themes. Legacy session tokens reuse admission/attendance/role policy. BE 31 tests, FE 42 tests, typecheck and both builds passed; browser UI fixtures reviewed. No DB changes. Phase 04/05/06 In Progress. [Work log](/work-logs/2026-11-10-01-phase-06-chat-merge-repair).
+
+
+## Remove manual chat reconnect button (2026-11-10)
+
+Removed the manual reconnect action from the chat header at user request; automatic Socket.IO reconnection remains unchanged. Phase 06 In Progress. [Work log](/work-logs/2026-11-10-03-phase-06-remove-chat-reconnect-button).
+
+
+## Chat toolbar icon (2026-11-10)
+
+Moved chat open/close into the bottom meeting toolbar as a labeled icon with unread badge; connection status now lives inside the chat panel. FE build and 42 tests passed. No BE/DB changes. Phase 04/06 In Progress. [Work log](/work-logs/2026-11-10-04-phase-06-chat-toolbar-icon).

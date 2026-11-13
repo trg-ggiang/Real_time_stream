@@ -12,11 +12,11 @@ Không tự tạo meeting/session, không chuyển status, không tự admitted 
 ## Điều kiện chạy
 
 - Backend có Supabase/LiveKit/JWT như auth và screen sharing hiện tại.
-- Giữ POC_ENABLED=true cho token endpoint. Gate development PoC hiện tại vẫn chặn phát token khi production; module này chưa biến ứng dụng thành deployment production.
+- `POC_ENABLED` chỉ cần cho phòng PoC cố định. Join theo session dùng chính sách admission/attendance/role của MeetingsService, kể cả khi gọi endpoint token tương thích.
 - Bảng meeting_messages đã có theo migration 20261108000100; backend dùng secret key, frontend không truy cập bảng trực tiếp.
 - Session status ongoing, có livekit_room_name hợp lệ. Thành viên thuộc cùng meeting, admission_status admitted và removed_at NULL.
 - Người dùng chọn cùng session trước khi vào. Token của session dùng livekit_room_name trong DB thay vì LIVEKIT_ROOM_NAME.
-- Room PoC từ env vẫn giữ để thử media, không có chat. Chưa có màn hình tạo phiên/duyệt người dùng; quản trị dữ liệu đó ở workflow hiện có.
+- Room PoC từ env vẫn giữ riêng để thử media, không có chat. Giao diện mới đã có tạo/lên lịch cuộc họp và phòng chờ.
 
 Chạy npm run dev:backend và npm run dev:frontend ở root. Mở trang, đăng nhập, chọn Phiên họp, Tham gia phòng rồi mở Chat trong phòng. Backend xác minh participant đã thật sự ở LiveKit trước khi cho kết nối chat. Không suy ra online từ attendance.left_at NULL vì bản ghi có thể cũ.
 
@@ -35,8 +35,8 @@ Backend:
 
 Frontend:
 
-- MeetingPage: GET danh sách session và chọn trước khi join.
-- token-api/useMeetingSession/types: thêm sessionId tùy chọn mà vẫn giữ đường PoC cũ.
+- MeetingPage: giữ sảnh giao diện mới, mở mã/link, chọn buổi và join bằng useSessionFlow; truyền sessionId và JWT ứng dụng cho chat trong MeetingRoom.
+- token-api/useMeetingSession: chỉ còn là đường tương thích, không dùng làm giao diện sảnh chính. Token session dùng lại logic join hiện tại để giữ quyền theo role.
 - chat/services/chat-socket: socket cùng origin, auth ở handshake, timeout ACK 10 giây; chỉ emit khi connected để tránh gửi ngầm ngoài ý muốn.
 - chat/hooks/use-meeting-chat: merge theo message ID, outbox gửi lỗi, retry cùng ID, cursor cũ/mới và checkpoint tải bù nếu một trang giữa chừng thất bại; cleanup listeners/socket khi rời phòng.
 - chat/components/MeetingChat: panel mở/đóng, unread, composer Enter gửi và Shift+Enter xuống dòng, không tự kéo xuống khi đang đọc tin cũ. React hiển thị plain text, không dựng HTML từ content.
@@ -85,3 +85,18 @@ Handshake: token string, sessionId UUID, participantIdentity string. Không truy
 ## Nghiệm thu tiếp theo
 
 Hai tài khoản admitted cùng một ongoing session: join, chat, reload rồi xác minh lịch sử DB; thử B offline rồi A gửi nhiều tin, B trở lại tải bù; thử pending/removed/session ended bị chặn. Thử share/cam/giơ tay cùng chat qua HTTPS trên hai thiết bị. Không tự sửa dữ liệu thành viên/status nếu chưa có ủy quyền của nhóm.
+
+
+## Chat merge repair (2026-11-10)
+
+Resolved accept-both JSX/function/render duplication; kept modern meeting lobby and connected chat to its session flow. Chat follows both themes. Legacy session tokens reuse admission/attendance/role policy. BE 31 tests, FE 42 tests, typecheck and both builds passed; browser UI fixtures reviewed. No DB changes. Phase 04/05/06 In Progress. [Work log](/work-logs/2026-11-10-01-phase-06-chat-merge-repair).
+
+
+## Remove manual chat reconnect button (2026-11-10)
+
+Removed the manual reconnect action from the chat header at user request; automatic Socket.IO reconnection remains unchanged. Phase 06 In Progress. [Work log](/work-logs/2026-11-10-03-phase-06-remove-chat-reconnect-button).
+
+
+## Chat toolbar icon (2026-11-10)
+
+Moved chat open/close into the bottom meeting toolbar as a labeled icon with unread badge; connection status now lives inside the chat panel. FE build and 42 tests passed. No BE/DB changes. Phase 04/06 In Progress. [Work log](/work-logs/2026-11-10-04-phase-06-chat-toolbar-icon).

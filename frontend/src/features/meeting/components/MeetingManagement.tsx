@@ -89,7 +89,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
       event.preventDefault(); if (locked.current) return;
       const email = String(new FormData(event.currentTarget).get('inviteEmail')).trim().toLowerCase();
       void act(`/${meetingId}/members`, { email }, 'POST', false, data => observe({ ...(data as unknown as Member), users: { display_name: email, email } }));
-    }}><label>Mời thành viên lâu dài<input type="email" name="inviteEmail" autoComplete="off" spellCheck={false} required maxLength={254} placeholder="Ví dụ: ban@example.com…" disabled={!!busy} /></label><button type="submit" disabled={!!busy}>{busy === `/${meetingId}/members` ? 'Đang mời…' : 'Mời thành viên'}</button></form></> : null}
+    }}><label>Mời thành viên lâu dài<input type="email" name="inviteEmail" autoComplete="off" spellCheck={false} required maxLength={254} placeholder="email@gmail.com" disabled={!!busy} /></label><button type="submit" disabled={!!busy}>{busy === `/${meetingId}/members` ? 'Đang mời…' : 'Mời thành viên'}</button></form></> : null}
     {loading ? <p role="status">Đang kiểm tra yêu cầu vào phòng…</p> : null}
     {canModerate && sessionId && session?.status !== 'ended' ? <section className="workspace-requests" aria-labelledby="requests-title"><h3 id="requests-title">Đang chờ duyệt ({requests.length})</h3>
       {!loading && requests.length === 0 ? <p className="workspace-empty">Chưa có yêu cầu tham gia buổi này.</p> : null}

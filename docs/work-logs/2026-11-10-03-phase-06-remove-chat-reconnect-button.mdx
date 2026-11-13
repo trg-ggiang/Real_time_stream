@@ -1,0 +1,22 @@
+---
+title: Remove manual chat reconnect button
+description: Simplify the chat header while keeping automatic reconnection.
+---
+
+## Session
+
+2026-11-10-03, Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 06 In Progress.
+
+## Objective and completed code
+
+Removed the manual reconnect button from MeetingChat.tsx as requested. Socket.IO automatic reconnection behavior is unchanged.
+
+## Checks
+
+Source inspection confirms the chat header no longer renders chat.reconnect. No new tests or full build for this small markup-only removal. git diff --check run. Navigation JSON parsed; new log target exists. No backend/DB changes.
+
+## Next step and checklist
+
+Reload chat to see the simplified header. Phase 06 remains In Progress pending live persistence/two-device acceptance.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

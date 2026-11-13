@@ -9,19 +9,14 @@ export function MeetingMediaLayout({ children }: { children: ReactElement }) {
   if (screens.length === 0) {
     return <div className="video-grid"><GridLayout tracks={cameras}>{children}</GridLayout></div>;
   }
-  const self = cameras.filter(track => track.participant.isLocal);
   const others = cameras.filter(track => !track.participant.isLocal);
 
-  return <div className="meeting-media-layout">
+  return <div className={`meeting-media-layout${others.length === 0 ? ' meeting-media-layout--presentation-only' : ''}`}>
     <ScreenShareStage />
-    <aside className="meeting-camera-sidebar" aria-label="Camera trong phòng">
-      <section className="meeting-self-camera" aria-label="Camera của bạn">
-        <div className="meeting-camera-label">Camera của bạn</div>
-        <TrackLoop tracks={self}>{children}</TrackLoop>
-      </section>
-      {others.length > 0 && <section className="meeting-other-cameras" aria-label="Camera thành viên">
+    {others.length > 0 && <aside className="meeting-camera-sidebar" aria-label="Camera trong phòng">
+      <section className="meeting-other-cameras" aria-label="Camera thành viên">
         <TrackLoop tracks={others}>{children}</TrackLoop>
-      </section>}
-    </aside>
+      </section>
+    </aside>}
   </div>;
 }

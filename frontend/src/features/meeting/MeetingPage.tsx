@@ -1,9 +1,7 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-import { useMeetingSession } from './hooks/use-meeting-session';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { ArrowLeft } from '@phosphor-icons/react/dist/csr/ArrowLeft';
-import { Copy } from '@phosphor-icons/react/dist/csr/Copy';
+import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { LinkSimple } from '@phosphor-icons/react/dist/csr/LinkSimple';
 import { CreateMeetingForm, ScheduleSessionForm, type CreateValues } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
@@ -23,81 +21,6 @@ function sessionFromUrl() { return new URLSearchParams(window.location.search).g
 const statusLabels = { scheduled: 'Đã lên lịch', ongoing: 'Đang diễn ra', ended: 'Đã kết thúc' };
 
 export function MeetingPage({ accessToken, displayName, onLogout }: { accessToken: string; displayName: string; onLogout: () => void }) {
-  const session = useMeetingSession(accessToken, onLogout);
-  const [options, setOptions] = useState<{ sessionId: string; title: string; roomName: string }[]>([]);
-  const [selectedSession, setSelectedSession] = useState('');
-  const [loadingSessions, setLoadingSessions] = useState(true);
-  const [sessionsError, setSessionsError] = useState<string | null>(null);
-  useEffect(() => {
-    const controller = new AbortController();
-    const base = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/$/, '');
-    void fetch(`${base}/api/meeting-sessions`, { headers: { Authorization: `Bearer ${accessToken}` }, signal: controller.signal, cache: 'no-store' })
-      .then(async response => {
-        if (response.status === 401) { onLogout(); throw new Error('Phiên đăng nhập hết hạn.'); }
-        if (!response.ok) throw new Error('Không tải được danh sách phiên họp. Bạn vẫn có thể dùng phòng PoC không có chat.');
-        const data = await response.json();
-        if (!Array.isArray(data) || !data.every(row => typeof row?.sessionId === 'string' && typeof row?.title === 'string')) throw new Error('Danh sách phiên họp không hợp lệ.');
-        if (!controller.signal.aborted) { setOptions(data); setSelectedSession(data[0]?.sessionId ?? ''); }
-      }).catch(cause => { if (!controller.signal.aborted) setSessionsError(cause instanceof Error ? cause.message : 'Không tải được phiên họp.'); })
-      .finally(() => { if (!controller.signal.aborted) setLoadingSessions(false); });
-    return () => controller.abort();
-  }, [accessToken, onLogout]);
-  return (
-    <main>
-      <header>
-        <div className="room-heading"><span>{displayName}</span><button className="secondary" onClick={() => { session.leave(); onLogout(); }}>Đăng xuất</button></div>
-        <p className="eyebrow">MEETING / MODULE 01</p>
-        <h1>Cùng gặp nhau, từ bất cứ đâu.</h1>
-        <p className="subtitle">
-          Phòng thử nghiệm âm thanh và hình ảnh trực tiếp.
-        </p>
-      </header>
-      {session.credentials ? (
-        <Suspense fallback={<p role="status">Đang tải phòng họp…</p>}>
-          <MeetingRoom
-            credentials={session.credentials}
-            accessToken={accessToken}
-            onLeave={session.leave}
-            onEnded={session.endSession}
-          />
-        </Suspense>
-      ) : (
-        <section className="join-card" aria-label="Tham gia phòng thử nghiệm">
-          <span className="badge">{selectedSession ? 'Phiên họp có chat' : 'Phòng thử nghiệm chung'}</span>
-          <h2>Sẵn sàng kết nối?</h2>
-          <p>
-            Cho phép truy cập camera và microphone khi trình duyệt hỏi. Mở cùng
-            trang này trên thiết bị thứ hai để gặp nhau.
-          </p>
-          <p className="hint">
-            Dùng tai nghe để tránh tiếng vọng. Chọn cùng phiên họp với những
-            người bạn muốn gặp và trò chuyện.
-          </p>
-          <div className="meeting-session-picker"><label htmlFor="meeting-session-select">Phiên họp</label>
-            <select id="meeting-session-select" value={selectedSession} onChange={event => setSelectedSession(event.target.value)} disabled={loadingSessions || session.isJoining}>
-              <option value="">Phòng PoC — media, không có lịch sử chat</option>
-              {options.map(option => <option key={option.sessionId} value={option.sessionId}>{option.title} · {option.roomName}</option>)}
-            </select>
-          </div>
-          <p className="hint">Chat dùng cho phiên đang diễn ra mà bạn đã được chấp nhận vào. Mọi người cần chọn cùng phiên.</p>
-          {sessionsError && <p role="status">{sessionsError}</p>}
-          {session.error && (
-            <p className="notice error" role="alert">
-              {session.error}
-            </p>
-          )}
-          <div className="join-actions">
-            <button
-              disabled={session.isJoining || loadingSessions}
-              onClick={() => void session.join(selectedSession || undefined)}
-            >
-              {session.isJoining ? 'Đang chuẩn bị…' : 'Tham gia phòng'}
-            </button>
-            {session.isJoining && (
-              <button className="secondary" onClick={session.leave}>
-                Hủy
-              </button>
-            )}
   const flow = useSessionFlow(accessToken, onLogout);
   const { theme, setTheme } = useMeetingTheme();
   const [code, setCode] = useState(codeFromUrl), [selectedId, setSelectedId] = useState(sessionFromUrl);
@@ -228,13 +151,13 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
       {pageError && (code || !error) ? <p role="alert" className="notice error workspace-error">{pageError}</p> : null}
       <p role="status" className="workspace-feedback">{notice}</p>
       {flow.active && overview ? <>
-        <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><span className="workspace-code" translate="no">{code}</span><button type="button" className="workspace-icon" onClick={() => void copyLink()} title="Sao chép đường dẫn" aria-label="Sao chép đường dẫn"><Copy size={20} aria-hidden="true" /></button></div>
-        <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} onLeave={() => void flow.leave()} onEnded={flow.ended}
+        <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><button type="button" className="workspace-icon meeting-share-button" onClick={() => void copyLink()} title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button></div>
+        <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} accessToken={accessToken} onLeave={() => void flow.leave()} onEnded={flow.ended}
           management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} /></Suspense>
       </> : code ? <>
         <button className="workspace-back" type="button" disabled={busy || flow.busy} onClick={async () => { await flow.leave(); openMeeting(''); }}><ArrowLeft size={18} aria-hidden="true" />Tổng quan</button>
         {loading ? <p role="status" className="meeting-loading">Đang tải cuộc họp…</p> : overview ? <>
-          <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><div className="workspace-code-actions"><code translate="no">{overview.meeting.meetingCode}</code><button className="workspace-icon" type="button" title="Sao chép đường dẫn" aria-label="Sao chép đường dẫn" onClick={() => void copyLink()}><Copy size={21} aria-hidden="true" /></button></div></div>
+          <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><button className="workspace-icon meeting-share-button" type="button" title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn" onClick={() => void copyLink()}><ShareNetwork size={22} aria-hidden="true" /></button></div>
           {waiting ? <section className="workspace-waiting" aria-labelledby="waiting-title">
             <span className="workspace-waiting-symbol" aria-hidden="true">{waiting.status === 'pending' ? '◷' : waiting.status === 'denied' ? '×' : '✓'}</span>
             <h2 id="waiting-title">{waiting.status === 'pending' ? 'Đang chờ duyệt' : waiting.status === 'denied' ? 'Yêu cầu đã bị từ chối' : waiting.status === 'session_ended' ? 'Buổi họp đã kết thúc' : 'Yêu cầu không còn hiệu lực'}</h2>
@@ -256,7 +179,6 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
               </article>;
             })}
             {overview.sessions.length > 10 ? <div className="workspace-pagination"><button type="button" disabled={sessionPage === 0} onClick={() => setSessionPage(page => page - 1)}>Trang trước</button><span>Trang {sessionPage + 1}</span><button type="button" disabled={(sessionPage + 1) * 10 >= overview.sessions.length} onClick={() => setSessionPage(page => page + 1)}>Trang sau</button></div> : null}
-            {flow.busy ? <button type="button" onClick={() => void flow.leave()}>Hủy tham gia</button> : null}
           </section>
           {canManageSessions(overview.membership) ? <details className="lobby-management"><summary>Quản lý cuộc họp</summary><MeetingManagement key={`${code}:${selected?.session_id || ''}`} accessToken={accessToken} overview={overview} sessionId={selected?.session_id} knownMembers={people[overview.meeting.meetingId] || []} onMembersChanged={onMembersChanged} onChanged={refresh} onError={reportAdmin} onSessionEnded={onSessionEnded} /></details> : null}
           </div>
@@ -269,7 +191,7 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
             <div className="workspace-section-title"><h2 id="join-title">Tham gia cuộc họp</h2></div>
             <form className="workspace-form" onSubmit={event => { event.preventDefault(); try { setError(''); openMeeting(parseMeetingCode(String(new FormData(event.currentTarget).get('code')))); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Mã không hợp lệ.'); } }}>
               <label htmlFor="meeting-code">Mã hoặc đường dẫn mời</label>
-              <div className="lobby-code-field"><LinkSimple size={21} aria-hidden="true" /><input id="meeting-code" name="code" required autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="Nhập mã hoặc dán đường dẫn" aria-invalid={!!error} aria-describedby={error ? 'join-code-error' : undefined} /></div>
+              <div className="lobby-code-field"><LinkSimple size={21} aria-hidden="true" /><input id="meeting-code" name="code" required autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="Mã ..." aria-invalid={!!error} aria-describedby={error ? 'join-code-error' : undefined} /></div>
               {error ? <p id="join-code-error" className="notice error" role="alert">{error}</p> : null}
               <button type="submit" disabled={busy}>Mở cuộc họp</button>
             </form>

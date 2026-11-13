@@ -109,7 +109,7 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
   assert.equal(verified.video.canSubscribe, true);
   assert.equal(verified.video.canPublishData, false);
   assert.equal(verified.video.canUpdateOwnMetadata, true);
-  assert.deepEqual(verified.video.canPublishSources, ['camera', 'microphone']);
+  assert.deepEqual(verified.video.canPublishSources, ['camera', 'microphone', 'screen_share', 'screen_share_audio']);
   assert.notEqual(verified.video.roomAdmin, true);
   assert.notEqual(verified.video.roomCreate, true);
   const remainingSeconds = verified.exp - Math.floor(Date.now() / 1000);
@@ -136,4 +136,15 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
     service.createJoinCredentials(user),
     (error) => error.getStatus() === 503,
   );
+});
+
+test('legacy session token requests reuse current admission and role policy', async () => {
+  const calls=[];
+  const session={meeting_id:'meeting',session_id:'session'};
+  const result={status:'admitted',role:'participant',token:'role-restricted',serverUrl:'wss://unit.invalid',participantIdentity:'user:connection',roomName:'room'};
+  const service=new LivekitService({}, {requireAccess:async()=>session},
+    {join:async(...args)=>{calls.push(args);return result;}},
+    {client:{from:()=>({select(){return this;},eq(){return this;},single:async()=>({data:{meeting_code:'ABCDEFGHIJ'},error:null})})}});
+  assert.deepEqual(await service.createJoinCredentials({userId:'user'},'session'),result);
+  assert.deepEqual(calls[0],[{userId:'user'},'ABCDEFGHIJ','session']);
 });
