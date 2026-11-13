@@ -1,0 +1,24 @@
+---
+title: Move chat into meeting toolbar
+description: Replace the separate chat action with a toolbar icon.
+---
+
+## Session
+
+2026-11-10-04 Asia/Saigon. Codex. Exact timestamps not captured. Completed code. Phase 04/06 In Progress.
+
+## Objective and completed code
+
+User requested an icon alongside bottom meeting controls. Lifted chat open/unread state to RoomContent, added a labeled Phosphor chat button to meeting-controls, and removed the separate chat toolbar. MeetingChat receives controlled open state and reports unread counts; connection status moved inside panel heading. Added a theme-aware unread badge. Draft, history and socket lifecycle remain within the mounted chat component when its panel closes.
+
+Files: MeetingRoom.tsx, MeetingChat.tsx, meeting-theme.css, MeetingRoom.test.tsx.
+
+## Checks
+
+Frontend build/typecheck passed with existing large chunk warning. 42 frontend tests passed, including toolbar placement and opening/closing controlled chat while rendering media once. git diff --check run. No new browser visual run; existing responsive toolbar styling reused. Backend tests skipped: no BE/DB changes. Navigation JSON parsed; log target exists.
+
+## Next step and checklist
+
+Reload room and use the chat icon near the hand/people controls. Phase 04/06 remain In Progress pending real chat/media acceptance.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

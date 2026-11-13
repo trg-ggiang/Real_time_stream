@@ -1,6 +1,6 @@
 # Real-time Stream — Meeting Module
 
-Ứng dụng thử nghiệm audio/video: React/Vite đăng nhập qua NestJS/Supabase, dùng JWT ứng dụng xin token rồi kết nối trực tiếp LiveKit Cloud. Hiện dùng một room cố định, chưa có phân quyền phòng hoặc chat. Code Hải đã gộp vào `backend/src`; không chạy app `backend/my-api` riêng. Xem [hướng dẫn auth và DB](docs/modules/auth-integration.mdx).
+Ứng dụng thử nghiệm audio/video và chat: React/Vite đăng nhập qua NestJS/Supabase, dùng JWT ứng dụng xin token rồi kết nối LiveKit Cloud. Người đã được admitted có thể chọn session ongoing và chat theo phiên bằng Socket.IO; phòng PoC cố định vẫn giữ để thử media, không có chat. Code Hải đã gộp vào `backend/src`; không chạy app `backend/my-api` riêng. Xem [hướng dẫn auth và DB](docs/modules/auth-integration.mdx) và [module chat](docs/modules/meeting-chat.mdx).
 
 ## Cài đặt và cấu hình
 
@@ -54,6 +54,8 @@ Preview chạy cổng 4173 và dùng cùng API proxy khi `VITE_API_URL` để tr
 Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel tới frontend preview; script khởi động backend nếu chưa chạy. Gửi URL HTTPS được in cho nhóm thử nghiệm. Dừng bằng Ctrl+C hoặc `npm run tunnel:stop`. Giữ `VITE_API_URL=` trống. Link yêu cầu đăng nhập nhưng vẫn dùng phòng chung; chỉ dùng cho PoC. Xem [hướng dẫn tunnel](docs/modules/https-tunnel.mdx) về luồng, log và giới hạn.
 
 ## Tổ chức source
+
+- [Chat trong phiên họp](docs/modules/meeting-chat.mdx): cần session ongoing và member admitted/chưa removed; chọn cùng phiên trước khi join. Chat dùng bảng meeting_messages đã được nhóm áp dụng. Backend kiểm tra participant thực tế qua LiveKit; không tự tạo session/duyệt thành viên/ghi attendance. Restart backend trước khi chạy tunnel nếu backend cũ đang chạy.
 
 - [Chia sẻ màn hình](docs/modules/screen-sharing.mdx): mọi thành viên được share, hỗ trợ nhiều người trình chiếu và checklist thử hai thiết bị. Restart backend và tham gia lại để nhận quyền mới.
 

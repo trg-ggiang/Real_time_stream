@@ -1,0 +1,22 @@
+---
+title: Share link icon in meeting header
+description: Replace the displayed code/copy group with a top-right share action.
+---
+
+## Session
+
+2026-11-10-13 Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 04 In Progress.
+
+## Objective and completed code
+
+MeetingPage.tsx now uses a labeled Phosphor ShareNetwork icon at the top-right of both the meeting detail header and active-call header. Removed the displayed code/copy group. Existing clipboard action and success/failure feedback retained. join-lobby.css uses a two-column header grid so the icon stays right on desktop/mobile and long titles wrap.
+
+## Checks
+
+Frontend typecheck passed. Source ordering and git diff --check. No tests added for this reversible icon/layout edit; no browser visual run. No BE/DB changes. Navigation JSON parsed; new target exists.
+
+## Next step and checklist
+
+Reload the meeting view and use the share icon to copy its invitation link. Phase 04 remains In Progress.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

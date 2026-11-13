@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { ArrowLeft } from '@phosphor-icons/react/dist/csr/ArrowLeft';
-import { Copy } from '@phosphor-icons/react/dist/csr/Copy';
+import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { LinkSimple } from '@phosphor-icons/react/dist/csr/LinkSimple';
 import { CreateMeetingForm, ScheduleSessionForm, type CreateValues } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
@@ -151,13 +151,13 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
       {pageError && (code || !error) ? <p role="alert" className="notice error workspace-error">{pageError}</p> : null}
       <p role="status" className="workspace-feedback">{notice}</p>
       {flow.active && overview ? <>
-        <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><span className="workspace-code" translate="no">{code}</span><button type="button" className="workspace-icon" onClick={() => void copyLink()} title="Sao chép đường dẫn" aria-label="Sao chép đường dẫn"><Copy size={20} aria-hidden="true" /></button></div>
-        <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} onLeave={() => void flow.leave()} onEnded={flow.ended}
+        <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><button type="button" className="workspace-icon meeting-share-button" onClick={() => void copyLink()} title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button></div>
+        <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} accessToken={accessToken} onLeave={() => void flow.leave()} onEnded={flow.ended}
           management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} /></Suspense>
       </> : code ? <>
         <button className="workspace-back" type="button" disabled={busy || flow.busy} onClick={async () => { await flow.leave(); openMeeting(''); }}><ArrowLeft size={18} aria-hidden="true" />Tổng quan</button>
         {loading ? <p role="status" className="meeting-loading">Đang tải cuộc họp…</p> : overview ? <>
-          <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><div className="workspace-code-actions"><code translate="no">{overview.meeting.meetingCode}</code><button className="workspace-icon" type="button" title="Sao chép đường dẫn" aria-label="Sao chép đường dẫn" onClick={() => void copyLink()}><Copy size={21} aria-hidden="true" /></button></div></div>
+          <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><button className="workspace-icon meeting-share-button" type="button" title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn" onClick={() => void copyLink()}><ShareNetwork size={22} aria-hidden="true" /></button></div>
           {waiting ? <section className="workspace-waiting" aria-labelledby="waiting-title">
             <span className="workspace-waiting-symbol" aria-hidden="true">{waiting.status === 'pending' ? '◷' : waiting.status === 'denied' ? '×' : '✓'}</span>
             <h2 id="waiting-title">{waiting.status === 'pending' ? 'Đang chờ duyệt' : waiting.status === 'denied' ? 'Yêu cầu đã bị từ chối' : waiting.status === 'session_ended' ? 'Buổi họp đã kết thúc' : 'Yêu cầu không còn hiệu lực'}</h2>
@@ -179,7 +179,6 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
               </article>;
             })}
             {overview.sessions.length > 10 ? <div className="workspace-pagination"><button type="button" disabled={sessionPage === 0} onClick={() => setSessionPage(page => page - 1)}>Trang trước</button><span>Trang {sessionPage + 1}</span><button type="button" disabled={(sessionPage + 1) * 10 >= overview.sessions.length} onClick={() => setSessionPage(page => page + 1)}>Trang sau</button></div> : null}
-            {flow.busy ? <button type="button" onClick={() => void flow.leave()}>Hủy tham gia</button> : null}
           </section>
           {canManageSessions(overview.membership) ? <details className="lobby-management"><summary>Quản lý cuộc họp</summary><MeetingManagement key={`${code}:${selected?.session_id || ''}`} accessToken={accessToken} overview={overview} sessionId={selected?.session_id} knownMembers={people[overview.meeting.meetingId] || []} onMembersChanged={onMembersChanged} onChanged={refresh} onError={reportAdmin} onSessionEnded={onSessionEnded} /></details> : null}
           </div>
@@ -192,7 +191,7 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
             <div className="workspace-section-title"><h2 id="join-title">Tham gia cuộc họp</h2></div>
             <form className="workspace-form" onSubmit={event => { event.preventDefault(); try { setError(''); openMeeting(parseMeetingCode(String(new FormData(event.currentTarget).get('code')))); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Mã không hợp lệ.'); } }}>
               <label htmlFor="meeting-code">Mã hoặc đường dẫn mời</label>
-              <div className="lobby-code-field"><LinkSimple size={21} aria-hidden="true" /><input id="meeting-code" name="code" required autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="Nhập mã hoặc dán đường dẫn" aria-invalid={!!error} aria-describedby={error ? 'join-code-error' : undefined} /></div>
+              <div className="lobby-code-field"><LinkSimple size={21} aria-hidden="true" /><input id="meeting-code" name="code" required autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="Mã ..." aria-invalid={!!error} aria-describedby={error ? 'join-code-error' : undefined} /></div>
               {error ? <p id="join-code-error" className="notice error" role="alert">{error}</p> : null}
               <button type="submit" disabled={busy}>Mở cuộc họp</button>
             </form>

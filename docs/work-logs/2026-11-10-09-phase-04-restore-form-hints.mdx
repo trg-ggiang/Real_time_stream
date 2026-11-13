@@ -1,0 +1,22 @@
+---
+title: Restore form-specific input hints
+description: Keep the short search placeholder only on meeting lookup.
+---
+
+## Session
+
+2026-11-10-09 Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 04 In Progress.
+
+## Objective and completed code
+
+Corrected an overbroad placeholder change after user clarification. Restored name/email/password hints in AuthApp.tsx, title example in MeetingForms.tsx, invite email example in MeetingManagement.tsx and message prompt in MeetingChat.tsx. Only the meeting code/link lookup keeps the requested short search placeholder. Labels and validation unchanged.
+
+## Checks
+
+Source placeholder audit and git diff --check. Build/tests skipped for string-only corrections. No BE/DB changes. Navigation JSON parsed; log target exists.
+
+## Next step and checklist
+
+Reload the frontend. Phase 04 remains In Progress.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

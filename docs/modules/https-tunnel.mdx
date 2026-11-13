@@ -3,6 +3,10 @@ title: HTTPS tunnel cho Module 1
 description: Chạy thử React, NestJS và LiveKit Cloud từ nhiều thiết bị qua Cloudflare Quick Tunnel.
 ---
 
+## Chat theo phiên họp
+
+Chat Socket.IO dùng /socket.io cùng origin HTTPS, proxy ws được bật cho dev và preview. Restart backend có ChatModule trước khi chạy tunnel nếu backend cũ đang chạy. Sau login, các thành viên admitted chọn cùng session ongoing trong danh sách rồi join; phòng PoC từ env vẫn thử media nhưng không có chat. Không dùng localhost trong VITE_WS_URL làm địa chỉ chat cho máy khác. [Hướng dẫn chat và giới hạn](/modules/meeting-chat).
+
 ## Chạy và dừng
 
 Từ thư mục gốc, sau khi đã cài dependencies và điền LiveKit credentials ở backend:

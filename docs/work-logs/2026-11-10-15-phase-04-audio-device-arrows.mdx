@@ -1,0 +1,24 @@
+---
+title: Audio device dropdown arrows
+description: Replace the separate device settings gear with compact audio selectors.
+---
+
+## Session
+
+2026-11-10-15 Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 04/05 In Progress.
+
+## Objective and completed code
+
+MeetingRoom now has a small caret next to microphone (audioinput selector) and headphones (audiooutput selector). Removed the standalone device gear. Headphone button toggles RoomAudioRenderer volume between zero and one without muting the outgoing microphone. Camera toggle remains separate. Output selection is disabled with an explanatory title when HTMLMediaElement.setSinkId is unsupported. Device selectors use existing SDK menus and theme tokens. Arrow width is approximately half the control width, with desktop/mobile sizing.
+
+Files: MeetingRoom.tsx, MeetingRoom.test.tsx, meeting-theme.css.
+
+## Checks
+
+Frontend typecheck/build passed; 43 frontend tests passed. New regression covers picker kinds, removal of gear and output mute/unmute. Existing media chunk warning remains. git diff --check run. Hardware speaker routing and browser visual verification not performed; native output-device support varies. No BE/DB changes. Navigation JSON parsed and target exists.
+
+## Next step and checklist
+
+Reload the room, select input/output using the carets and verify with connected hardware. Phase 04/05 remain In Progress.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

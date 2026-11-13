@@ -4,4 +4,5 @@ export interface JoinCredentials {
   participantIdentity: string;
   roomName: string;
   token: string;
+  sessionId?: string;
 }

@@ -46,7 +46,7 @@ export function CreateMeetingForm({ busy, onCreate }: { busy: boolean; onCreate:
     </div>
     <form onSubmit={event => void submit(event)} className="workspace-form" aria-busy={busy}>
       <fieldset disabled={busy}>
-        <label>Tên cuộc họp<input name="title" required maxLength={160} autoComplete="off" placeholder="Ví dụ: Trao đổi dự án…" /></label>
+        <label>Tên cuộc họp<input name="title" required maxLength={160} autoComplete="off" /></label>
         {kind === 'scheduled' ? <><ScheduleFields /><div className="workspace-form-row"><label>Lặp lại<select name="frequency" aria-label="Lặp lại"><option value="">Không lặp</option><option value="DAILY">Hàng ngày</option><option value="WEEKLY">Hàng tuần</option><option value="MONTHLY">Hàng tháng</option><option value="YEARLY">Hàng năm</option></select></label><label>Số buổi (nếu lặp)<input name="count" type="number" min={1} max={100} defaultValue={4} required inputMode="numeric" /></label></div><p className="workspace-help">Múi giờ: {Intl.DateTimeFormat().resolvedOptions().timeZone}</p></> : null}
         <label className="workspace-check"><input name="waiting" type="checkbox" defaultChecked /><span>Duyệt khách trước khi vào phòng</span></label>
         {error ? <p className="notice error" role="alert">{error}</p> : null}

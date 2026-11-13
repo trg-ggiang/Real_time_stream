@@ -215,5 +215,45 @@ footer {
 }
 
 .auth-form { display: grid; gap: 16px; }
+.meeting-session-picker { display: grid; gap: 8px; margin-top: 20px; }
+main:has(.meeting-room) > header { margin-bottom: 16px; }
+main:has(.meeting-room) > header .eyebrow,
+main:has(.meeting-room) > header h1,
+main:has(.meeting-room) > header .subtitle { display: none; }
+.meeting-session-picker select { max-width: 100%; font: inherit; padding: 10px; color: #e9eef7; background: #26374c; border: 1px solid #52627a; border-radius: 6px; }
+.meeting-chat-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 0 0 12px; font-size: .875rem; }
+.meeting-workspace { min-width: 0; }
+.meeting-workspace.has-chat { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.meeting-workspace-media { min-width: 0; }
+.meeting-workspace .meeting-media-layout { height: clamp(360px, calc(100dvh - 330px), 700px); }
+.has-chat .meeting-media-layout { grid-template-columns: minmax(0, 1fr) 220px; }
+.meeting-chat-panel { display: flex; flex-direction: column; height: clamp(400px, calc(100dvh - 330px), 700px); min-width: 0; border: 1px solid #52627a; border-radius: 8px; overflow: hidden; background: #142032; }
+.chat-panel-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; border-bottom: 1px solid #344256; }
+.chat-panel-heading button, .chat-message button { padding: 6px 10px; font-size: .8rem; }
+.meeting-chat-panel > .notice { margin: 8px; font-size: .85rem; }
+.chat-message-list { flex: 1; min-height: 100px; overflow-y: auto; padding: 12px; overflow-anchor: none; }
+.chat-message-list ol { list-style: none; padding: 0; margin: 0; }
+.chat-message { margin: 0 0 16px; padding-left: 8px; border-left: 2px solid #52627a; overflow-wrap: anywhere; }
+.chat-message.own { border-color: #9ce6ce; }
+.chat-message-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.chat-message-meta time, .chat-message > span { font-size: .75rem; color: #b6c5d8; }
+.chat-message p { margin: 4px 0; white-space: pre-wrap; font-size: .9rem; }
+.chat-load-older { width: 100%; margin-bottom: 16px; padding: 8px; }
+.chat-empty, .chat-session-hint { color: #b6c5d8; font-size: .875rem; }
+.chat-composer { padding: 12px; border-top: 1px solid #344256; }
+.chat-composer label { display: block; margin-bottom: 6px; font-size: .85rem; }
+.chat-composer textarea { display: block; width: 100%; resize: vertical; max-height: 160px; min-height: 72px; font: inherit; color: #e9eef7; background: #192537; border: 1px solid #52627a; border-radius: 6px; padding: 8px; }
+.chat-composer-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding-top: 8px; }
+.chat-composer-actions small { font-size: .7rem; color: #b6c5d8; }
+.chat-composer-actions button { padding: 8px 16px; }
+@media (max-width: 1200px) {
+  .meeting-workspace.has-chat { grid-template-columns: minmax(0, 1fr); }
+  .has-chat .meeting-media-layout { grid-template-columns: minmax(0, 1fr) clamp(220px, 23vw, 300px); }
+  .meeting-chat-panel { height: 480px; }
+}
+@media (max-width: 850px) {
+  .has-chat .meeting-media-layout { grid-template-columns: minmax(0, 1fr); }
+  .meeting-workspace .meeting-media-layout { height: auto; }
+}
 .auth-form label { display: grid; gap: 8px; }
 .auth-form input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #52627a; border-radius: 8px; background: #192537; color: #e9eef7; font: inherit; }

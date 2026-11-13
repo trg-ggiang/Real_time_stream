@@ -124,3 +124,73 @@ Unified semantic light/dark colors for auth, forms, settings, dialogs and LiveKi
 ## Specific scheduling conflicts (2026-11-09)
 
 Session overview now exposes recurrence/settings metadata, preventing an invalid extra-session scheduling affordance after reload. Distinct localized 409 reasons cover invalid times and existing single sessions. No schema changes. BE 18 tests, FE 40 tests and both builds passed; no live DB writes for testing. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-06-phase-04-schedule-conflicts).
+
+
+## Chat merge repair (2026-11-10)
+
+Resolved accept-both JSX/function/render duplication; kept modern meeting lobby and connected chat to its session flow. Chat follows both themes. Legacy session tokens reuse admission/attendance/role policy. BE 31 tests, FE 42 tests, typecheck and both builds passed; browser UI fixtures reviewed. No DB changes. Phase 04/05/06 In Progress. [Work log](/work-logs/2026-11-10-01-phase-06-chat-merge-repair).
+
+
+## Lobby create background (2026-11-10)
+
+Fixed a theme-selector specificity conflict that painted a rectangle behind the secondary create form. Chromium confirmed transparent background in dark mode. CSS-only; no BE/DB changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-02-phase-04-lobby-background).
+
+
+## Chat toolbar icon (2026-11-10)
+
+Moved chat open/close into the bottom meeting toolbar as a labeled icon with unread badge; connection status now lives inside the chat panel. FE build and 42 tests passed. No BE/DB changes. Phase 04/06 In Progress. [Work log](/work-logs/2026-11-10-04-phase-06-chat-toolbar-icon).
+
+
+## Hide technical session name (2026-11-10)
+
+Removed the internal LiveKit room-name heading from the meeting UI. No media/chat logic changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-05-phase-04-hide-session-name).
+
+
+## Simplify placeholders (2026-11-10)
+
+Replaced input example/hint placeholders with the short text requested by the user; labels and validation retained. Text-only FE edit. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-06-phase-04-input-placeholders).
+
+
+## Remove cancel join button (2026-11-10)
+
+Removed the requested cancel-join action from the meeting page. No join/media logic changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-07-phase-04-remove-cancel-join).
+
+
+## Meeting toolbar order (2026-11-10)
+
+Placed hand before sharing and device settings directly before leave, using DOM order. Frontend typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-08-phase-04-toolbar-order).
+
+
+## Restore form hints (2026-11-10)
+
+Restored field-specific hints/examples for auth, meeting creation, invitations and chat after user clarification; only meeting lookup retains the short search placeholder. Text-only FE correction. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-09-phase-04-restore-form-hints).
+
+
+## Email placeholder (2026-11-10)
+
+Email fields now use email@gmail.com as requested. Text-only FE edit. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-10-phase-04-email-placeholder).
+
+
+## Meeting code placeholder (2026-11-10)
+
+Updated meeting lookup placeholder to the requested short code hint. Text-only FE edit. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-11-phase-04-meeting-code-placeholder).
+
+
+## Remove meeting title example (2026-11-10)
+
+Removed the title input example placeholder at user request. Label and validation unchanged. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-12-phase-04-remove-meeting-title-example).
+
+
+## Share link icon (2026-11-10)
+
+Replaced the displayed meeting code/copy group with a top-right share icon in detail and active-call headers. Clipboard behavior retained. Frontend typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-13-phase-04-share-link-icon).
+
+
+## Remove self camera section (2026-11-10)
+
+Removed the dedicated self-camera sidebar section during screen sharing; no remote cameras means full-width presentation. Normal camera grid/publication unchanged. FE typecheck passed. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-14-phase-04-remove-self-camera-section).
+
+
+## Audio device dropdown arrows (2026-11-10)
+
+Replaced standalone gear with microphone/headphone caret menus, added receive-audio mute toggle and output-support fallback. FE build/typecheck and 43 tests passed; physical routing pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-15-phase-04-audio-device-arrows).
