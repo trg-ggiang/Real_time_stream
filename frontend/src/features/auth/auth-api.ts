@@ -1,6 +1,6 @@
 export interface AuthSession {
   access_token: string;
-  user: { userId: string; email: string; displayName: string; avatarUrl: string | null };
+  user: { userId: string; email: string; displayName: string; avatarUrl: string | null; role?: string | null };
 }
 
 export async function authenticate(

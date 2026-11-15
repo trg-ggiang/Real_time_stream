@@ -46,6 +46,10 @@ Theo yêu cầu người dùng, code BE/FE đã đổi giá trị role owner th�
 
 Sửa lỗi 503 còn lại khi tạo meeting nhanh: code gửi active nhưng meeting_sessions_status_check dùng ongoing. Đồng bộ BE/FE và thêm regression; 6 tests BE liên quan, 23 tests FE, typecheck/build đạt. API thật cổng 3000 đã tạo session ongoing, đọc lại và kết thúc thành công. Giữ schema và các meeting đã có, các phase vẫn In Progress do chưa nghiệm thu media/phân quyền đầy đủ. [Work log](/work-logs/2026-11-08-07-phase-03-session-status).
 
+## Quyết định xét duyệt CLB — 2026-11-15
+
+Thêm approve/reject flows trong backend để cập nhật clubs review metadata, publish CLB được duyệt và thêm creator vào `club_memberships`. Giả định membership role `president`; schema live chưa xác minh và chưa thử ghi DB. Phase 03 In Progress. [Work log](/work-logs/2026-11-15-32-phase-03-04-club-review-decisions).
+
 ## Chuẩn bị session admission 2026-11-08
 
 Đã chuẩn bị logic pending/admitted trong meeting_members với requested_session_id, không tạo attendance trước khi được duyệt và join. Attendance giữ NOT NULL; FE dùng requestId. 17 tests BE liên quan, 23 tests FE, typecheck/build đạt. Theo lựa chọn người dùng, migration 202611080001 chưa áp dụng DB nên chưa nghiệm thu luồng thật; các phase vẫn In Progress. [Work log](/work-logs/2026-11-08-08-phase-03-session-admission).

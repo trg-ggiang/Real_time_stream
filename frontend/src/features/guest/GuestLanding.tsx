@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import { GuestHero } from './GuestHero';
+import { ClubApplicationDialog } from './ClubApplicationDialog';
+import { ClubApplicationProgress, type ClubApplicationStatus } from './ClubApplicationProgress';
+import { ClubManagementPage } from './ClubManagementPage';
 import { publicDate, safePublicUrl, usePublicContent, type Collection, type PublicItem } from './public-content';
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/500.css';
@@ -47,10 +50,11 @@ function ContentDialog({ selection, close, requestLogin, signedIn }: { selection
   useEffect(() => { const element = ref.current; element?.showModal(); return () => element?.close(); }, []);
   return <dialog className="guest-dialog" ref={ref} onCancel={close} aria-labelledby="guest-detail-title">
     <button className="guest-dialog-close" aria-label="Đóng" onClick={close}><X size={24} /></button>
-    <p className="guest-overline">{kind === 'clubs' ? 'Câu lạc bộ' : kind === 'activities' ? 'Hoạt động công khai' : 'Bài viết công khai'}</p>
+    {kind !== 'clubs' && <p className="guest-overline">{kind === 'activities' ? 'Hoạt động công khai' : 'Bài viết công khai'}</p>}
     <h2 id="guest-detail-title">{item.name || item.title}</h2>
     {item.club_name && <p>{item.club_name}</p>}
-    {safePublicUrl(item.cover_url) && <PublicImage key={item.cover_url} src={item.cover_url} alt="" className="guest-dialog-image" />}
+    {kind === 'clubs' ? <PublicImage key={item.cover_url || item.logo_url || item.club_id} src={item.cover_url || item.logo_url} alt={item.name || 'Ảnh câu lạc bộ'} className="guest-dialog-image" />
+      : safePublicUrl(item.cover_url) && <PublicImage key={item.cover_url} src={item.cover_url} alt="" className="guest-dialog-image" />}
     {item.summary && <p>{item.summary}</p>}
     <p className="guest-long-text"><LinkedText text={item.content || item.description} /></p>
     {item.mission && <><h3>Sứ mệnh</h3><p className="guest-long-text"><LinkedText text={item.mission} /></p></>}
@@ -68,19 +72,47 @@ function ContentDialog({ selection, close, requestLogin, signedIn }: { selection
   </dialog>;
 }
 
-export function GuestLanding({ viewer, onMeeting, onLogout }: { viewer?: { displayName: string }; onMeeting?: () => void; onLogout?: () => void } = {}) {
+export function GuestLanding({ viewer, role, accessToken, onMeeting, onLogout }: { viewer?: { displayName: string }; role?: string | null; accessToken?: string; onMeeting?: () => void; onLogout?: () => void } = {}) {
   const clubs = usePublicContent('clubs');
   const activities = usePublicContent('activities');
   const posts = usePublicContent('posts');
   const [search, setSearch] = useState('');
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [adminPage, setAdminPage] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [gate, setGate] = useState<string | null>(null);
+  const [clubApplicationOpen, setClubApplicationOpen] = useState(false);
+  const [clubApplicationSent, setClubApplicationSent] = useState(false);
+  const [myClubRequest, setMyClubRequest] = useState<ClubApplicationStatus | null>(null);
+  const [clubRequestChecked, setClubRequestChecked] = useState(!accessToken);
+  const [clubRequestError, setClubRequestError] = useState('');
+  const [clubRequestRefresh, setClubRequestRefresh] = useState(0);
   const gateRef = useRef<HTMLDialogElement>(null);
   const query = search.trim().toLocaleLowerCase('vi');
   const visibleClubs = clubs.items.filter(item => `${item.name} ${item.summary} ${item.description}`.toLocaleLowerCase('vi').includes(query));
   function requestLogin(message: string) { setSelection(null); setGate(message); }
   useEffect(() => { if (!gate) return; const element = gateRef.current; element?.showModal(); return () => element?.close(); }, [gate]);
+  useEffect(() => {
+    if (!accessToken) { setMyClubRequest(null); setClubRequestChecked(true); return; }
+    const controller = new AbortController();
+    if (!myClubRequest) setClubRequestChecked(false);
+    setClubRequestError('');
+    const base = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/$/, '');
+    void fetch(`${base}/api/public/clubs/mine`, { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store', signal: controller.signal })
+      .then(async response => {
+        const result = await response.json().catch(() => null);
+        if (!response.ok || !Array.isArray(result?.items)) throw new Error(result?.message || 'Không kiểm tra được tiến độ đơn CLB.');
+        if (!controller.signal.aborted) setMyClubRequest(result.items[0] ?? null);
+      })
+      .catch(cause => { if (!controller.signal.aborted) setClubRequestError(cause instanceof Error ? cause.message : 'Không kiểm tra được tiến độ đơn CLB.'); })
+      .finally(() => { if (!controller.signal.aborted) setClubRequestChecked(true); });
+    return () => controller.abort();
+  }, [accessToken, clubRequestRefresh]);
+  useEffect(() => {
+    if (!accessToken) return;
+    const timer = window.setInterval(() => setClubRequestRefresh(value => value + 1), 30_000);
+    return () => window.clearInterval(timer);
+  }, [accessToken]);
   useEffect(() => {
     const sections = sectionNavigation.map(({ id }) => document.getElementById(id));
     let frame = 0;
@@ -112,13 +144,16 @@ export function GuestLanding({ viewer, onMeeting, onLogout }: { viewer?: { displ
   return <div className="guest-landing" data-signed-in={!!viewer}>
     <a href="#guest-content" className="guest-skip">Đến nội dung</a>
     <header className="guest-header"><a className="guest-brand" href="/">uni<b>circle</b></a>
-      <nav aria-label="Điều hướng công khai">{sectionNavigation.map(({ id, label }) => <a key={id} href={`#${id}`} aria-current={activeSection === id ? 'location' : undefined}>{label}</a>)}</nav>
+      <nav aria-label="Điều hướng công khai">{sectionNavigation.map(({ id, label }) => <a key={id} href={`#${id}`} aria-current={!adminPage && activeSection === id ? 'location' : undefined} onClick={() => setAdminPage(false)}>{label}</a>)}{role === 'admin' && <a href="#admin-clubs" onMouseDown={event => event.preventDefault()} onClick={event => { event.preventDefault(); setAdminPage(true); setActiveSection(null); history.pushState(null, '', '#admin-clubs'); }}>Quản lý CLB</a>}</nav>
       <div className="guest-auth">{viewer ? <><span className="guest-viewer">Sinh viên · {viewer.displayName}</span><button className="guest-primary" type="button" onClick={onMeeting}>Cuộc họp</button><button type="button" onClick={onLogout}>Đăng xuất</button></> : <><a href="/?mode=login">Đăng nhập</a><a className="guest-primary" href="/?mode=register">Đăng ký </a></>}</div>
     </header>
-    <GuestHero />
-    <main id="guest-content">
-<section id="guest-clubs" className="guest-section"><h2>Cùng tần số, <span>cùng đam mê.</span></h2><div className="guest-toolbar"><label>Tìm CLB<input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Tên hoặc sở thích…" /></label></div>
-<div className="guest-club-grid">{visibleClubs.map(item => <article className="guest-club-card" key={item.club_id}><div className="guest-club-media"><PublicImage src={item.cover_url} alt="" /></div><div className="guest-club-copy"><button className="guest-card-title" onClick={() => setSelection({ item, kind: 'clubs' })}><span>{item.name}</span></button><p>{item.summary}</p><div className="guest-card-actions"><button className="guest-text-action" onClick={() => setSelection({ item, kind: 'clubs' })}>Xem CLB</button><button className="guest-save" aria-label={`Quan tâm ${item.name}`} onClick={() => requestLogin(`Đăng nhập để quan tâm ${item.name}.`)}>Quan tâm</button></div></div></article>)}</div>
+    {!adminPage && <GuestHero />}
+    {!adminPage ? <main id="guest-content">
+<section id="guest-clubs" className="guest-section"><h2>Cùng tần số, <span>cùng đam mê.</span></h2>
+        {myClubRequest && accessToken && <ClubApplicationProgress request={myClubRequest} />}
+        {clubRequestError && accessToken && <p className="guest-club-request-error" role="alert">{clubRequestError} <button type="button" onClick={() => setClubRequestRefresh(value => value + 1)}>Thử lại</button></p>}
+        <div className="guest-toolbar"><label>Tìm CLB<input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Tên hoặc sở thích…" /></label>{clubRequestChecked && !myClubRequest && !clubRequestError && <button className="guest-primary guest-create-club" type="button" onClick={() => { if (viewer && accessToken) setClubApplicationOpen(true); else if (!viewer) window.location.assign('/?mode=login'); }}>+ Thành lập CLB</button>}{!clubRequestChecked && accessToken && <span className="guest-club-request-loading" role="status">Đang kiểm tra đơn…</span>}</div>
+<div className="guest-club-grid">{visibleClubs.map(item => <article className="guest-club-card" key={item.club_id}><div className="guest-club-media"><PublicImage src={item.cover_url || item.logo_url} alt="" /></div><div className="guest-club-copy"><button className="guest-card-title" onClick={() => setSelection({ item, kind: 'clubs' })}><span>{item.name}</span></button><p>{item.summary}</p><div className="guest-card-actions"><button className="guest-text-action" onClick={() => setSelection({ item, kind: 'clubs' })}>Xem CLB</button><button className="guest-save" aria-label={`Quan tâm ${item.name}`} onClick={() => requestLogin(`Đăng nhập để quan tâm ${item.name}.`)}>Quan tâm</button></div></div></article>)}</div>
         {!visibleClubs.length && clubs.items.length > 0 && <p className="guest-empty">Không có CLB phù hợp trong danh sách đã tải. Thử từ khóa khác hoặc tải thêm CLB.</p>}
         <CollectionStatus state={clubs} empty="Chưa có câu lạc bộ được công khai. Bạn có thể quay lại sau để khám phá." />
       </section>
@@ -152,7 +187,10 @@ export function GuestLanding({ viewer, onMeeting, onLogout }: { viewer?: { displ
         <CollectionStatus state={posts} empty="Chưa có bài viết công khai từ các CLB." />
       </section>
       <section className="guest-join"><h2>Câu chuyện sinh viên của bạn,<br /><span>còn nhiều trang để viết.</span></h2>{viewer ? <button className="guest-primary" type="button" onClick={onMeeting}>Mở cuộc họp</button> : <a className="guest-primary" href="/?mode=register">Đăng ký </a>}<p>{viewer ? 'Khám phá cộng đồng và kết nối với bạn bè.' : 'Tạo tài khoản để kết nối cùng cộng đồng.'}</p></section>
-    </main><footer className="guest-footer"><a className="guest-brand" href="/">unicircle</a><p>Kết nối đam mê. Mở rộng thế giới.</p></footer>
+    </main> : <ClubManagementPage token={accessToken || ''} />}
+    {!adminPage && <footer className="guest-footer"><a className="guest-brand" href="/">unicircle</a><p>Kết nối đam mê. Mở rộng thế giới.</p></footer>}
+    {clubApplicationSent && <p className="guest-club-application-status" role="status">Đã gửi đăng ký thành lập CLB để chờ xem xét.</p>}
+    {clubApplicationOpen && accessToken && <ClubApplicationDialog token={accessToken} onClose={() => setClubApplicationOpen(false)} onSubmitted={() => { setClubApplicationOpen(false); setClubApplicationSent(true); setClubRequestRefresh(value => value + 1); }} />}
     {selection && <ContentDialog selection={selection} close={() => setSelection(null)} requestLogin={requestLogin} signedIn={!!viewer} />}
     {gate && <dialog className="guest-dialog" ref={gateRef} onCancel={() => setGate(null)} aria-labelledby="guest-gate-title"><button className="guest-dialog-close" aria-label="Đóng" onClick={() => setGate(null)}><X size={24} /></button><h2 id="guest-gate-title">Một bước để kết nối</h2><p>{gate}</p><div className="guest-dialog-actions"><a className="guest-primary" href="/?mode=login">Đăng nhập </a><a className="guest-secondary" href="/?mode=register">Đăng ký</a></div><button className="guest-text-action" onClick={() => setGate(null)}>Tiếp tục khám phá</button></dialog>}
   </div>;

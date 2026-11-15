@@ -1,0 +1,38 @@
+---
+title: Club application layout
+description: Align the club application dialog with the supplied compact form reference.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-24
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed (UI adjustment)
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chỉnh popup đăng ký CLB theo ảnh tham chiếu, gồm các nhóm thông tin cơ bản, hình ảnh, liên hệ và đơn vị trực thuộc.
+
+## Công việc hoàn thành
+
+- Đổi popup thành form hẹp, gọn, chia nhóm và đặt nút gửi toàn chiều ngang.
+- Thêm các vùng chọn logo/ảnh bìa và selector đơn vị trực thuộc.
+- Bỏ trường sứ mệnh riêng khỏi giao diện; backend lấy tóm tắt làm giá trị dự phòng cho `mission` nếu người dùng không gửi.
+- Ghi rõ trong popup rằng ảnh chọn và đơn vị trực thuộc chưa được lưu vì chưa có tích hợp tương ứng trong backend/schema đã biết.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+
+## Quyết định và lý do
+
+Không giả định có API upload hoặc cột affiliation chưa được xác nhận trong bảng `clubs`; giao diện nêu rõ hai giới hạn này.
+
+## Bước tiếp theo
+
+Nếu cần lưu ảnh và đơn vị trực thuộc, xác nhận storage bucket và cột tương ứng trong schema trước khi nối chức năng.

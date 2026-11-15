@@ -380,3 +380,51 @@ Reproduced hidden section links below 768px and exposed them in a second header 
 ## 2026-11-15 — Meeting return to landing
 
 - Meeting navigation now supports a Trang chủ action and browser Back to the signed-in landing. Frontend typecheck, 57 tests and build passed. [Work log](/work-logs/2026-11-15-22-phase-04-meeting-return-landing).
+
+## Club application form — 2026-11-15
+
+Authenticated students can submit club name, summary, description, mission, contact and image URLs through a guest-feature dialog. NestJS inserts requests into `clubs` with the current user as `created_by` and `status: pending`. Supabase schema acceptance and real insertion are pending. [Work log](/work-logs/2026-11-15-23-phase-04-club-application).
+
+## Club application layout — 2026-11-15
+
+Aligned the registration dialog with the supplied compact, four-section form. Local image selection and affiliation are shown but not persisted; those integrations need confirmed storage/schema support. [Work log](/work-logs/2026-11-15-24-phase-04-club-application-layout).
+
+## Admin club navigation — 2026-11-15
+
+The users role is included in auth responses and refreshed for existing sessions. Accounts with `role: admin` see Quản lý CLB beside Bài viết; the destination is intentionally blank. [Work log](/work-logs/2026-11-15-25-phase-04-admin-club-navigation).
+
+## Admin club request list — 2026-11-15
+
+Replaced the blank admin page with database-backed club requests, counts, status filters, creator-name search and detail view. Admins can reject pending requests. Live schema confirmation and automated checks remain pending. [Work log](/work-logs/2026-11-15-26-phase-04-admin-club-requests).
+
+## Neutral admin navigation — 2026-11-15
+
+The Quản lý CLB link no longer receives selected-link emphasis or a persistent pointer-focus outline when opened, matching the surrounding navigation style. [Work log](/work-logs/2026-11-15-27-phase-04-nav-admin-neutral-style).
+
+## Neutral section navigation — 2026-11-15
+
+Active navigation links, including Bài viết, no longer change color, weight, underline or scale. The active location remains exposed through `aria-current`. [Work log](/work-logs/2026-11-15-28-phase-04-neutral-section-nav).
+
+## Admin club page styling — 2026-11-15
+
+Aligned the management dashboard, request cards, filters and detail dialog with the guest landing's Be Vietnam Pro typography, navy/blue palette, spacing and responsive behavior. No data or action logic changed. [Work log](/work-logs/2026-11-15-29-phase-04-admin-club-style).
+
+## Compact admin club summary — 2026-11-15
+
+Reduced the heading, summary cards, search field and status chips on the club management page to create a denser layout matching the supplied reference. [Work log](/work-logs/2026-11-15-30-phase-04-compact-admin-club-summary).
+
+## Student club application progress — 2026-11-15
+
+After a student submits a club request, the create button is replaced with a progress tracker under the club section heading. The latest application is loaded from the database by authenticated user ID and refreshed every 30 seconds. [Work log](/work-logs/2026-11-15-31-phase-04-student-club-application-progress).
+
+## Club review decisions — 2026-11-15
+
+Admins can approve pending applications, publish clubs, and add their creators to `club_memberships` as `president`; rejection writes review metadata and a note. Applicant progress reflects the resulting status. Membership schema/role assumptions and live DB behavior remain unverified. [Work log](/work-logs/2026-11-15-32-phase-03-04-club-review-decisions).
+
+## Club detail modal styling — 2026-11-15
+
+Updated the club detail dialog to match the supplied reference: natural image proportions, blue source links, white scrollable modal, revised spacing and mobile sizing. [Work log](/work-logs/2026-11-15-33-phase-04-club-detail-modal-style).
+
+## New club detail consistency — 2026-11-15
+
+Newly approved clubs reuse the standard detail modal. Cards/dialogs fall back from cover image to logo and keep a matching placeholder when neither exists. Local image files selected during application are still not persisted. [Work log](/work-logs/2026-11-15-34-phase-04-new-club-detail-consistency).

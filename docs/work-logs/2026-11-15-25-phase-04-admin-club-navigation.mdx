@@ -1,0 +1,38 @@
+---
+title: Admin club navigation
+description: Show an empty club management page link to users whose role is admin.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-25
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed (code)
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm mục Quản lý CLB bên cạnh Bài viết cho tài khoản có `users.role = admin`; trang đích để trống.
+
+## Công việc hoàn thành
+
+- Backend user lookup giờ chọn và ánh xạ `role`; auth response cũng trả role.
+- Authenticated landing nhận role và chỉ render Quản lý CLB khi giá trị bằng `admin`.
+- Mục điều hướng chuyển sang vùng nội dung trống. Session cũ không có role gọi `/api/auth/me` một lần để nạp role.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+| Role từ Supabase | Skipped | Không đọc hoặc ghi dữ liệu DB trong phiên. |
+
+## Quyết định và giới hạn
+
+Đọc cột `users.role` theo yêu cầu người dùng. Giao diện chỉ ẩn/hiện điều hướng; chưa có API quản trị CLB cần phân quyền.
+
+## Bước tiếp theo
+
+Khi triển khai chức năng quản lý, bảo vệ mọi API quản trị ở backend theo role; UI gating không thay thế phân quyền server.

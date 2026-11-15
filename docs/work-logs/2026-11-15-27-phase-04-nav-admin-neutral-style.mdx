@@ -1,0 +1,32 @@
+---
+title: Neutral admin navigation state
+description: Keep the Quản lý CLB link styled like its neighboring navigation items after selection.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-27
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Giữ nguyên kiểu chữ điều hướng khi người dùng mở trang Quản lý CLB, bỏ nhấn mạnh active và viền focus do click chuột.
+
+## Công việc hoàn thành
+
+- Bỏ `aria-current` khỏi liên kết Quản lý CLB để không kích hoạt kiểu active màu xanh/in đậm/gạch chân.
+- Ngăn pointer click lấy focus để không giữ viền focus quanh nhãn; keyboard focus behavior remains available.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+
+## Bước tiếp theo
+
+Không có.

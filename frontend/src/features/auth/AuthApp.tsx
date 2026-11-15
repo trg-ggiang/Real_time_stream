@@ -111,6 +111,22 @@ export function AuthApp() {
     return () => window.clearTimeout(timer);
   }, [session]);
 
+  useEffect(() => {
+    if (!session || session.user.role !== undefined) return;
+    const controller = new AbortController();
+    const base = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/$/, '');
+    void fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${session.access_token}` }, cache: 'no-store', signal: controller.signal })
+      .then(response => response.ok ? response.json() : null)
+      .then(user => {
+        if (!controller.signal.aborted && user && typeof user.userId === 'string') {
+          const updated = { ...session, user: { ...session.user, role: typeof user.role === 'string' ? user.role : null } };
+          saveSession(updated);
+          setSession(updated);
+        }
+      }).catch(() => undefined);
+    return () => controller.abort();
+  }, [session]);
+
   useEffect(() => () => {
     pending.current?.abort();
     pending.current = null;
@@ -196,7 +212,7 @@ export function AuthApp() {
     autoContinue={!justRegistered} onContinue={() => setProfileReady(true)} onLogout={logout} />;
   if (session && enterMeeting) return <MeetingPage accessToken={session.access_token}
     displayName={session.user.displayName} onBack={returnToLanding} onLogout={logout} />;
-  if (session) return <GuestLanding viewer={session.user} onMeeting={openMeeting} onLogout={logout} />;
+  if (session) return <GuestLanding viewer={session.user} role={session.user.role} accessToken={session.access_token} onMeeting={openMeeting} onLogout={logout} />;
 
   return (
     <div className="auth-page" data-theme={theme}>

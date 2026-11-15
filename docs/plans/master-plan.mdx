@@ -354,3 +354,51 @@ After authentication and profile completion, students open an authenticated land
 ## Meeting return to landing — 2026-11-15
 
 Fixed landing → meeting → back navigation through browser history and a Trang chủ button in the meeting header. Frontend typecheck, 57 tests and build passed. Phase 04 remains In Progress pending browser acceptance. [Work log](/work-logs/2026-11-15-22-phase-04-meeting-return-landing).
+
+## Club application form — 2026-11-15
+
+Added an authenticated club application dialog and protected NestJS insert endpoint. New requests use `status: pending` and record `created_by`. Live clubs schema/status constraints and database submission remain unverified; Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-23-phase-04-club-application).
+
+## Club application layout — 2026-11-15
+
+Matched the club application dialog to the supplied compact, four-section reference. File upload and affiliation persistence are not connected because their storage/schema support is unconfirmed. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-24-phase-04-club-application-layout).
+
+## Admin club navigation — 2026-11-15
+
+Users with `role: admin` now receive the role in the auth session and see Quản lý CLB after Bài viết; its content area is intentionally blank. No automated checks or live DB verification were run. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-25-phase-04-admin-club-navigation).
+
+## Admin club requests — 2026-11-15
+
+Replaced the empty destination with a Supabase-backed request list, counters, status filters, search, detail view and pending-request rejection. Live schema/status checks and automated checks remain pending. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-26-phase-04-admin-club-requests).
+
+## Neutral admin navigation — 2026-11-15
+
+Quản lý CLB remains visually consistent with neighboring links after pointer selection; removed selected-link emphasis and persistent click focus. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-27-phase-04-nav-admin-neutral-style).
+
+## Neutral section navigation — 2026-11-15
+
+Active section links, including Bài viết, retain the same visual style as neighboring links. `aria-current` remains for assistive technology. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-28-phase-04-neutral-section-nav).
+
+## Admin club page styling — 2026-11-15
+
+Restyled the management dashboard, request cards, filters and detail dialog to match the guest landing's typography, navy/blue palette and spacing, with responsive layouts. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-29-phase-04-admin-club-style).
+
+## Compact admin club summary — 2026-11-15
+
+Reduced the size and spacing of the page heading, statistic cards, search input and status filters to match the supplied reference. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-30-phase-04-compact-admin-club-summary).
+
+## Student club application progress — 2026-11-15
+
+Students with a submitted club request now see an application progress bar under the club section heading instead of the create button. Their latest request is read by authenticated user ID and status refreshes every 30 seconds. Live DB acceptance and automated checks remain pending. [Work log](/work-logs/2026-11-15-31-phase-04-student-club-application-progress).
+
+## Club review decisions — 2026-11-15
+
+Admin approval now publishes the club and creates a founder `president` membership; rejection updates status and review metadata. Applicant progress reads decision status/review note. Membership schema/role assumptions and DB acceptance remain pending. Phase 03/04 remain In Progress. [Work log](/work-logs/2026-11-15-32-phase-03-04-club-review-decisions).
+
+## Club detail modal style — 2026-11-15
+
+Matched the CLB detail dialog to the supplied reference with natural image proportions, blue source links, white scrollable modal and responsive spacing. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-15-33-phase-04-club-detail-modal-style).
+
+## New club detail consistency — 2026-11-15
+
+Newly approved clubs use the same detail dialog as existing clubs, with cover/logo fallback and a standard image placeholder. Local form image upload remains unsupported. [Work log](/work-logs/2026-11-15-34-phase-04-new-club-detail-consistency).

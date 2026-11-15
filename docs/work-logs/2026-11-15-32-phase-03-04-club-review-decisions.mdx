@@ -1,0 +1,39 @@
+---
+title: Club review decisions
+description: Publish approved clubs, create founder membership, and expose decisions to applicants.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-32
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 03 — Database/auth; 04 — React/API
+- Kết quả phiên: Completed (code); live schema acceptance pending
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Khi admin đồng ý, công khai CLB và thêm người gửi vào bảng membership; khi từ chối, cập nhật trạng thái CLB. Cả hai quyết định phải hiển thị cho người gửi.
+
+## Công việc hoàn thành
+
+- Thêm admin-only approve endpoint. Endpoint xác nhận yêu cầu còn pending, thêm người tạo vào `club_memberships` với role `president`, rồi cập nhật `clubs.status = published`, `published_at`, `reviewed_by`, `reviewed_at` và xóa review note cũ.
+- Nếu cập nhật clubs thất bại sau khi thêm membership, backend thử xóa lại membership vừa tạo để giảm dữ liệu mồ côi.
+- Từ chối cập nhật `status = rejected`, `reviewed_by`, `reviewed_at` và review note để applicant thấy lý do.
+- Thêm thao tác Đồng ý trong dialog admin. Trang công khai đã đọc status/review_note của đơn mới nhất; trạng thái được làm mới mỗi 30 giây.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+| Schema và thay đổi dữ liệu Supabase | Skipped | Không áp dụng approve/reject thật. Cột/role của `club_memberships` và status constraint chưa được xác minh từ DB. |
+
+## Quyết định và giới hạn
+
+Giả định bảng tên là `club_memberships` theo tài liệu dự án và vai trò người tạo là `president`. Công khai bằng `status = published`, phù hợp với các dòng CLB hiện có trong importer. Hai request DB không chạy trong một transaction; có best-effort cleanup nếu update clubs lỗi.
+
+## Bước tiếp theo
+
+Đối chiếu `club_memberships` key/role/defaults và clubs status constraint với Supabase thật trước khi nghiệm thu approve/reject.

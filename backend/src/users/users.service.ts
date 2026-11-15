@@ -6,7 +6,7 @@ import {
 import { SupabaseService } from '../supabase/supabase.service';
 import { User } from './entities/user.entity';
 
-const COLS = 'user_id,email,display_name,avatar_url,email_verified_at,created_at';
+const COLS = 'user_id,email,display_name,avatar_url,role,email_verified_at,created_at';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +18,7 @@ export class UsersService {
       email: r.email,
       displayName: r.display_name,
       avatarUrl: r.avatar_url ?? null,
+      role: r.role ?? null,
       emailVerifiedAt: r.email_verified_at ? new Date(r.email_verified_at) : null,
       createdAt: new Date(r.created_at),
       passwordHash: r.password_hash,

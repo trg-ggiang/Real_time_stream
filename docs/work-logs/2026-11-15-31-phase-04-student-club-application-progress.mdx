@@ -1,0 +1,39 @@
+---
+title: Student club application progress
+description: Replace the club creation button with the current student's application progress after submission.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-31
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed (code); DB acceptance pending
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sau khi sinh viên gửi đăng ký CLB, thay nút thành lập bằng thanh tiến độ ngay dưới tiêu đề section CLB.
+
+## Công việc hoàn thành
+
+- Thêm authenticated endpoint chỉ đọc các CLB do user hiện tại tạo.
+- Trang chủ tìm đơn mới nhất; nếu có đơn thì ẩn nút thành lập và hiển thị các bước đã gửi/chờ duyệt/kết quả.
+- Sau submit thành công, trạng thái được tải lại; khi trang đang mở, trạng thái được làm mới mỗi 30 giây.
+- Ánh xạ `pending`, `approved`/`published` và `rejected` sang trạng thái tiến độ tương ứng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+| DB status refresh | Skipped | Chưa truy vấn hoặc ghi dữ liệu Supabase trong phiên. |
+
+## Quyết định và giới hạn
+
+Theo dõi đơn gần nhất trong số các CLB có `created_by` khớp user đã xác thực. Tên và trạng thái lấy trực tiếp từ `clubs`; endpoint không cho phép xem đơn của user khác.
+
+## Bước tiếp theo
+
+Xác minh schema live và trạng thái sau khi admin duyệt/từ chối khi nghiệm thu tích hợp.

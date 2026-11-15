@@ -273,3 +273,51 @@ Reproduced hidden section links below 768px and exposed them in a second header 
 ## Meeting return to landing — 2026-11-15
 
 Added landing return navigation from the meeting header and browser history. Frontend typecheck, 57 tests and build passed. [Work log](/work-logs/2026-11-15-22-phase-04-meeting-return-landing).
+
+## Đăng ký thành lập CLB — 2026-11-15
+
+Đã thêm popup đăng ký CLB cho tài khoản đăng nhập và `POST /api/public/clubs` có JWT guard để ghi nội dung cùng `created_by`, trạng thái `pending`. Chưa xác nhận constraint/schema live hoặc insert thật; không chạy test/typecheck/build trong phiên. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-23-phase-04-club-application).
+
+## Bố cục form đăng ký CLB — 2026-11-15
+
+Popup được nén và chia thành bốn nhóm theo ảnh tham chiếu. Thêm vùng chọn file và đơn vị trực thuộc ở mức giao diện; chưa có lưu ảnh/đơn vị do chưa xác nhận storage và schema. Automated checks không chạy. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-24-phase-04-club-application-layout).
+
+## Điều hướng admin CLB — 2026-11-15
+
+Trả `users.role` trong auth response và nạp role qua `/api/auth/me` cho session cũ. Tài khoản có role `admin` thấy mục Quản lý CLB sau Bài viết; trang đích để trống. Chưa chạy automated checks hoặc xác minh DB. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-25-phase-04-admin-club-navigation).
+
+## Danh sách yêu cầu CLB admin — 2026-11-15
+
+Trang Quản lý CLB giờ đọc danh sách, người gửi và số liệu từ Supabase qua endpoint admin-only; có lọc, tìm kiếm, xem chi tiết và từ chối yêu cầu pending. Chưa xác minh schema live (`created_at`, trạng thái `rejected`) hoặc chạy automated checks. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-26-phase-04-admin-club-requests).
+
+## Kiểu điều hướng Quản lý CLB — 2026-11-15
+
+Bỏ trạng thái active nổi bật và viền sau pointer click để mục Quản lý CLB giữ cùng kiểu chữ với các liên kết cạnh nó. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-27-phase-04-nav-admin-neutral-style).
+
+## Kiểu điều hướng các mục — 2026-11-15
+
+Các liên kết mục, bao gồm Bài viết, giữ nguyên màu, độ đậm và kích thước khi active; trạng thái `aria-current` vẫn được duy trì. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-28-phase-04-neutral-section-nav).
+
+## Style trang quản lý CLB — 2026-11-15
+
+Đồng bộ dashboard, thẻ yêu cầu, bộ lọc và dialog chi tiết với typography/font, tông navy-xanh, khoảng cách và viền của landing; thêm responsive layout. Không đổi logic. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-29-phase-04-admin-club-style).
+
+## Thu gọn phần đầu trang quản lý — 2026-11-15
+
+Giảm cỡ tiêu đề, khoảng cách, chiều cao thẻ thống kê, ô tìm kiếm và chip lọc theo ảnh người dùng. Danh sách và dữ liệu không đổi. [Work log](/work-logs/2026-11-15-30-phase-04-compact-admin-club-summary).
+
+## Theo dõi tiến độ đơn CLB của sinh viên — 2026-11-15
+
+Sau khi có đơn trong DB, nút thành lập được thay bằng thanh tiến độ ngay dưới tiêu đề section. Backend chỉ trả đơn do user hiện tại tạo; FE làm mới ngay sau submit và mỗi 30 giây. Chưa xác minh DB live hoặc chạy automated checks. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-31-phase-04-student-club-application-progress).
+
+## Duyệt và từ chối đơn CLB — 2026-11-15
+
+Thêm thao tác admin duyệt/từ chối. Duyệt đặt CLB thành `published`, ghi review metadata và thêm creator vào `club_memberships` với role `president`; từ chối ghi `rejected` và review note. Applicant đọc status/review note qua endpoint của chính họ. Tên/cột/role của bảng membership và constraint live chưa xác minh; automated checks chưa chạy. Phase 03/04 In Progress. [Work log](/work-logs/2026-11-15-32-phase-03-04-club-review-decisions).
+
+## Kiểu dialog chi tiết CLB — 2026-11-15
+
+Đồng bộ dialog chi tiết với ảnh tham chiếu: bỏ overline cho CLB, giữ đúng tỷ lệ ảnh, liên kết nguồn màu xanh và nội dung cuộn trong modal nền trắng. [Work log](/work-logs/2026-11-15-33-phase-04-club-detail-modal-style).
+
+## Popup chi tiết CLB mới — 2026-11-15
+
+CLB mới tiếp tục dùng cùng dialog chi tiết; ảnh bìa ưu tiên, logo fallback và placeholder giữ nguyên khung khi chưa có ảnh. Ảnh local từ form chưa upload vào DB. [Work log](/work-logs/2026-11-15-34-phase-04-new-club-detail-consistency).

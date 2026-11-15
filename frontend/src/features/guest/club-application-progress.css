@@ -1,0 +1,22 @@
+.club-application-progress{margin:-8px 0 22px;padding:15px 18px;border:1px solid var(--guest-line);border-radius:12px;background:#f7f9fc;color:var(--guest-ink)}
+.club-application-progress-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.club-application-progress-heading>div{display:grid;gap:2px;min-width:0}
+.club-application-progress-label{color:var(--guest-muted);font-size:11px}
+.club-application-progress-heading strong{overflow:hidden;font-size:14px;text-overflow:ellipsis;white-space:nowrap}
+.club-application-progress-status{flex:none;padding:5px 10px;border-radius:999px;background:#fff1df;color:#a8581d;font-size:11px;font-weight:600}
+.club-application-progress.is-approved .club-application-progress-status{background:#e5f5eb;color:#16834c}
+.club-application-progress.is-rejected .club-application-progress-status{background:#ffe9e9;color:#c13d3d}
+.club-progress-steps{position:relative;display:flex;justify-content:space-between;margin:16px 6% 0}
+.club-progress-line{position:absolute;left:0;right:0;top:11px;height:3px;border-radius:3px;background:#dbe3ef}
+.club-progress-line>span{display:block;width:50%;height:100%;border-radius:inherit;background:var(--guest-accent);transition:width .2s}
+.club-progress-steps[data-current-step="3"] .club-progress-line>span{width:100%}
+.club-application-progress.is-rejected .club-progress-line>span{background:#c13d3d}
+.club-progress-step{position:relative;z-index:1;display:grid;justify-items:center;gap:5px;min-width:52px;color:#8390a2;font-size:10px;text-align:center}
+.club-progress-step i{display:grid;place-items:center;width:24px;height:24px;border:2px solid #dbe3ef;border-radius:50%;background:#fff;color:#8390a2;font-size:10px;font-style:normal;font-weight:700}
+.club-progress-step.is-complete,.club-progress-step.is-current{color:var(--guest-ink);font-weight:600}
+.club-progress-step.is-complete i{border-color:var(--guest-accent);background:var(--guest-accent);color:#fff}
+.club-application-progress.is-approved .club-progress-step.is-complete i{border-color:#16834c;background:#16834c}
+.club-application-progress.is-rejected .club-progress-step.is-complete i{border-color:#c13d3d;background:#c13d3d}
+.club-progress-step.is-current i{border-color:var(--guest-accent);color:var(--guest-accent)}
+.club-application-progress-footnote{margin:10px 0 0;color:var(--guest-muted);font-size:10px}
+@media(max-width:767px){.club-application-progress{margin:0 0 18px;padding:13px}.club-progress-steps{margin-inline:0}.club-progress-step{font-size:9px}}

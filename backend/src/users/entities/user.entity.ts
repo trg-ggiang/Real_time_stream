@@ -2,6 +2,7 @@ export class User {
   userId!: string;
   email!: string;
   displayName!: string;
+  role!: string | null;
   avatarUrl!: string | null;
   emailVerifiedAt!: Date | null;
   createdAt!: Date;
