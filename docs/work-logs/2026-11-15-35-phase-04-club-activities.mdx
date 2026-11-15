@@ -1,0 +1,43 @@
+---
+title: Hoạt động CLB
+description: Đề xuất, xét duyệt và công khai hoạt động theo vai trò trong CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-35
+- Ngày: 2026-11-15, Asia/Saigon. Không ghi nhận thời gian bắt đầu.
+- Agent: Codex
+- Phase: 03 và 04
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm **CLB của tôi** và màn hình hoạt động theo từng CLB. Thành viên gửi đề xuất, chủ nhiệm xét duyệt hoặc công khai ngay hoạt động do mình tạo.
+
+## Công việc hoàn thành
+
+- Backend: thêm `club-activities.controller.ts` và `club-activities.service.ts` vào `PublicContentModule`. JWT xác định tài khoản, membership `active` xác định quyền theo CLB. Quyết định duyệt chỉ cập nhật đề xuất `pending_review`.
+- Cập nhật `public-content.service.ts` để dùng `chairperson` và `active` nếu cần tạo membership cho người được duyệt thành lập.
+- Frontend: cập nhật `GuestLanding.tsx`, `public-content.ts` và thêm `ClubActivitiesPage.tsx` cùng stylesheet. Danh sách hoạt động công khai tải lại sau khi chủ nhiệm công khai hoạt động.
+- Thêm bài kiểm tra quyền theo CLB, các bước xuất bản, thử lại khi lỗi gửi và điều hướng của người dùng có hai vai trò ở hai CLB.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm run typecheck` | Passed | Backend và frontend. |
+| `npm --workspace frontend run build` | Passed | Vite vẫn cảnh báo bundle phòng họp vượt 500 kB. Backend build đạt trong `npm test`. |
+| `npm test` | Partial | Frontend 58/58. Backend 36/38, gồm 4 kiểm tra mới đạt. Hai bài HTTP auth và LiveKit gặp `EACCES` với loopback. |
+| `node --test backend/test/club-activities.test.cjs backend/test/public-content.test.cjs` | Passed | 7/7. |
+| Đọc metadata Supabase | Blocked | DNS trả `ENOTFOUND`. Chưa chạy tạo/duyệt/từ chối trên DB thật. |
+| JSON, điều hướng và `git diff --check` | Passed | Mục điều hướng mới và các link work log hợp lệ. Có 11 đích điều hướng thiếu từ trước. |
+
+## Quyết định và giới hạn
+
+Ứng dụng làm theo thứ tự `draft → pending_review → published` đã ghi trong log nhập dữ liệu công khai. Các bước ghi qua REST riêng, dùng lại UUID của biểu mẫu khi thử lại. Nếu bước công khai của chủ nhiệm thất bại sau khi gửi, hoạt động có thể còn ở mục chờ duyệt. Nếu bước gửi thất bại sau khi tạo nháp, có thể thử lại bằng cùng biểu mẫu còn mở.
+
+## Bước tiếp theo
+
+Kiểm tra trên Supabase dev bằng một thành viên và một chủ nhiệm cùng CLB. Xác nhận đề xuất chờ duyệt hiện riêng, lý do từ chối hiện cho người gửi, và cả hai đường công khai đều xuất hiện trong `public_club_activities`.

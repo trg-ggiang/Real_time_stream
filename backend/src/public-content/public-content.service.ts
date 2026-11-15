@@ -65,7 +65,7 @@ export class PublicContentService {
     let insertedMembership = false;
     if (!existingMembership) {
       const { error: membershipError } = await this.supabase.client.from('club_memberships').insert({
-        club_id: clubId, user_id: club.created_by, role: 'president',
+        club_id: clubId, user_id: club.created_by, role: 'chairperson', status: 'active',
       });
       if (membershipError) throw new ServiceUnavailableException('Could not add the club creator as a member.');
       insertedMembership = true;

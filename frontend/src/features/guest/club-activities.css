@@ -1,0 +1,32 @@
+.guest-landing .club-activity-page { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 46px 0 88px; }
+.guest-landing .club-activity-page h1 { margin: 14px 0 20px; font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.15; overflow-wrap: anywhere; }
+.club-activity-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.club-activity-heading p, .club-activity-muted { opacity: .78; }
+.club-activity-tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--guest-line); margin-bottom: 24px; }
+.club-activity-tabs button { padding: 10px 14px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.club-activity-tabs button[aria-pressed="true"] { border-bottom-color: currentColor; font-weight: 700; }
+.club-activity-list { display: grid; gap: 12px; }
+.club-activity-list article { display: flex; justify-content: space-between; align-items: start; gap: 16px; padding: 18px; border: 1px solid var(--guest-line); border-radius: 12px; }
+.guest-landing .club-activity-list h2 { font-size: 1.2rem; margin: 0 0 6px; letter-spacing: normal; overflow-wrap: anywhere; }
+.guest-landing .club-activity-list h2 a, .club-activity-list h2 button { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+.club-activity-list h2 button { font: inherit; text-align: left; border: 0; padding: 0; background: transparent; cursor: pointer; }
+.guest-landing .club-activity-list p { margin: 4px 0; overflow-wrap: anywhere; }
+.club-activity-status { font-size: .85rem; white-space: nowrap; padding: 5px 9px; border: 1px solid var(--guest-line); border-radius: 999px; }
+.club-activity-filter { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.club-activity-notice { margin: 12px 0; font-weight: 600; }
+.club-activity-dialog { max-height: 88vh; overflow: auto; }
+.club-activity-dialog p { margin: 12px 0; }
+.club-activity-form { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 12px; }
+.club-activity-form label { display: grid; gap: 5px; }
+.club-activity-form :is(input, textarea, select), .club-activity-filter select { width: 100%; padding: 8px 10px; border: 1px solid #8e9aac; border-radius: 6px; background: #fff; color: #17233b; font: inherit; }
+.club-activity-filter select { width: auto; }
+.club-activity-times { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.club-activity-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.guest-header .my-clubs-link[aria-current="page"] { text-decoration: underline; }
+@media (max-width: 767px) {
+  .guest-landing[data-signed-in='true'] .guest-header nav { flex-wrap: wrap; gap: 6px 16px; }
+}
+@media (max-width: 600px) {
+  .club-activity-heading, .club-activity-list article { flex-direction: column; align-items: flex-start; }
+  .club-activity-times { grid-template-columns: 1fr; }
+}

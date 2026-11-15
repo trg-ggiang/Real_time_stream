@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import { GuestHero } from './GuestHero';
 import { ClubApplicationDialog } from './ClubApplicationDialog';
 import { ClubApplicationProgress, type ClubApplicationStatus } from './ClubApplicationProgress';
 import { ClubManagementPage } from './ClubManagementPage';
+import { ClubActivitiesPage } from './ClubActivitiesPage';
 import { publicDate, safePublicUrl, usePublicContent, type Collection, type PublicItem } from './public-content';
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/500.css';
@@ -60,7 +61,7 @@ function ContentDialog({ selection, close, requestLogin, signedIn }: { selection
     {item.mission && <><h3>Sứ mệnh</h3><p className="guest-long-text"><LinkedText text={item.mission} /></p></>}
     {kind === 'activities' && <dl className="guest-metadata">
       <dt>Bắt đầu</dt><dd>{publicDate(item.starts_at)}</dd><dt>Kết thúc</dt><dd>{publicDate(item.ends_at)}</dd>
-      <dt>Hình thức</dt><dd>{item.format === 'online' ? 'Trực tuyến' : item.format === 'offline' ? 'Trực tiếp' : item.format === 'hybrid' ? 'Kết hợp' : item.format || 'Chưa cập nhật'}</dd>
+      <dt>Hình thức</dt><dd>{item.format === 'online' ? 'Trực tuyến' : ['offline', 'onsite'].includes(item.format || '') ? 'Trực tiếp' : item.format === 'hybrid' ? 'Kết hợp' : item.format || 'Chưa cập nhật'}</dd>
       <dt>Địa điểm</dt><dd>{[item.location_name, item.location_address].filter(Boolean).join(', ') || 'Chưa cập nhật'}</dd>
       <dt>Mở đăng ký</dt><dd>{publicDate(item.registration_opens_at)}</dd><dt>Hạn đăng ký</dt><dd>{publicDate(item.registration_closes_at)}</dd>
       {item.capacity != null && <><dt>Số lượng tối đa</dt><dd>{item.capacity}</dd></>}
@@ -79,6 +80,10 @@ export function GuestLanding({ viewer, role, accessToken, onMeeting, onLogout }:
   const [search, setSearch] = useState('');
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [adminPage, setAdminPage] = useState(false);
+  const [clubRoute, setClubRoute] = useState(() => window.location.hash);
+  const myClubsPage = !!viewer && !!accessToken && /^#my-clubs(?:\/[^/]+)?$/.test(clubRoute);
+  const selectedClubId = myClubsPage ? clubRoute.split('/')[1] : undefined;
+  const landingPage = !myClubsPage && !adminPage;
   const [selection, setSelection] = useState<Selection | null>(null);
   const [gate, setGate] = useState<string | null>(null);
   const [clubApplicationOpen, setClubApplicationOpen] = useState(false);
@@ -91,6 +96,17 @@ export function GuestLanding({ viewer, role, accessToken, onMeeting, onLogout }:
   const query = search.trim().toLocaleLowerCase('vi');
   const visibleClubs = clubs.items.filter(item => `${item.name} ${item.summary} ${item.description}`.toLocaleLowerCase('vi').includes(query));
   function requestLogin(message: string) { setSelection(null); setGate(message); }
+  useEffect(() => {
+    const syncClubRoute = () => {
+      setClubRoute(window.location.hash);
+      if (window.location.hash !== '#admin-clubs') setAdminPage(false);
+    };
+    window.addEventListener('hashchange', syncClubRoute);
+    return () => window.removeEventListener('hashchange', syncClubRoute);
+  }, []);
+  useEffect(() => {
+    if (myClubsPage) window.scrollTo(0, 0);
+  }, [myClubsPage, selectedClubId]);
   useEffect(() => { if (!gate) return; const element = gateRef.current; element?.showModal(); return () => element?.close(); }, [gate]);
   useEffect(() => {
     if (!accessToken) { setMyClubRequest(null); setClubRequestChecked(true); return; }
@@ -114,6 +130,7 @@ export function GuestLanding({ viewer, role, accessToken, onMeeting, onLogout }:
     return () => window.clearInterval(timer);
   }, [accessToken]);
   useEffect(() => {
+    if (!landingPage) return;
     const sections = sectionNavigation.map(({ id }) => document.getElementById(id));
     let frame = 0;
     const update = () => {
@@ -140,15 +157,22 @@ export function GuestLanding({ viewer, role, accessToken, onMeeting, onLogout }:
       observer?.disconnect();
       window.cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [landingPage]);
   return <div className="guest-landing" data-signed-in={!!viewer}>
     <a href="#guest-content" className="guest-skip">Đến nội dung</a>
     <header className="guest-header"><a className="guest-brand" href="/">uni<b>circle</b></a>
-      <nav aria-label="Điều hướng công khai">{sectionNavigation.map(({ id, label }) => <a key={id} href={`#${id}`} aria-current={!adminPage && activeSection === id ? 'location' : undefined} onClick={() => setAdminPage(false)}>{label}</a>)}{role === 'admin' && <a href="#admin-clubs" onMouseDown={event => event.preventDefault()} onClick={event => { event.preventDefault(); setAdminPage(true); setActiveSection(null); history.pushState(null, '', '#admin-clubs'); }}>Quản lý CLB</a>}</nav>
+      <nav aria-label="Điều hướng công khai">{sectionNavigation.map(({ id, label }, index) => <Fragment key={id}>
+        <a href={`#${id}`} aria-current={landingPage && activeSection === id ? 'location' : undefined}
+          onClick={() => {
+            if (!landingPage) requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
+            setAdminPage(false);
+          }}>{label}</a>
+        {index === 0 && viewer && accessToken && <a className="my-clubs-link" href="#my-clubs" aria-current={myClubsPage ? 'page' : undefined}>CLB của tôi</a>}
+      </Fragment>)}{role === 'admin' && <a href="#admin-clubs" onMouseDown={event => event.preventDefault()} onClick={event => { event.preventDefault(); setAdminPage(true); setActiveSection(null); history.pushState(null, '', '#admin-clubs'); setClubRoute('#admin-clubs'); }}>Quản lý CLB</a>}</nav>
       <div className="guest-auth">{viewer ? <><span className="guest-viewer">Sinh viên · {viewer.displayName}</span><button className="guest-primary" type="button" onClick={onMeeting}>Cuộc họp</button><button type="button" onClick={onLogout}>Đăng xuất</button></> : <><a href="/?mode=login">Đăng nhập</a><a className="guest-primary" href="/?mode=register">Đăng ký </a></>}</div>
     </header>
-    {!adminPage && <GuestHero />}
-    {!adminPage ? <main id="guest-content">
+    {landingPage && <GuestHero />}
+    {myClubsPage && accessToken ? <ClubActivitiesPage clubId={selectedClubId} token={accessToken} onPublished={activities.refresh} /> : landingPage ? <main id="guest-content">
 <section id="guest-clubs" className="guest-section"><h2>Cùng tần số, <span>cùng đam mê.</span></h2>
         {myClubRequest && accessToken && <ClubApplicationProgress request={myClubRequest} />}
         {clubRequestError && accessToken && <p className="guest-club-request-error" role="alert">{clubRequestError} <button type="button" onClick={() => setClubRequestRefresh(value => value + 1)}>Thử lại</button></p>}
@@ -188,7 +212,7 @@ export function GuestLanding({ viewer, role, accessToken, onMeeting, onLogout }:
       </section>
       <section className="guest-join"><h2>Câu chuyện sinh viên của bạn,<br /><span>còn nhiều trang để viết.</span></h2>{viewer ? <button className="guest-primary" type="button" onClick={onMeeting}>Mở cuộc họp</button> : <a className="guest-primary" href="/?mode=register">Đăng ký </a>}<p>{viewer ? 'Khám phá cộng đồng và kết nối với bạn bè.' : 'Tạo tài khoản để kết nối cùng cộng đồng.'}</p></section>
     </main> : <ClubManagementPage token={accessToken || ''} />}
-    {!adminPage && <footer className="guest-footer"><a className="guest-brand" href="/">unicircle</a><p>Kết nối đam mê. Mở rộng thế giới.</p></footer>}
+    {landingPage && <footer className="guest-footer"><a className="guest-brand" href="/">unicircle</a><p>Kết nối đam mê. Mở rộng thế giới.</p></footer>}
     {clubApplicationSent && <p className="guest-club-application-status" role="status">Đã gửi đăng ký thành lập CLB để chờ xem xét.</p>}
     {clubApplicationOpen && accessToken && <ClubApplicationDialog token={accessToken} onClose={() => setClubApplicationOpen(false)} onSubmitted={() => { setClubApplicationOpen(false); setClubApplicationSent(true); setClubRequestRefresh(value => value + 1); }} />}
     {selection && <ContentDialog selection={selection} close={() => setSelection(null)} requestLogin={requestLogin} signedIn={!!viewer} />}

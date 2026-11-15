@@ -42,10 +42,11 @@ export function usePublicContent(collection: Collection) {
     return () => controller.abort();
   }, [collection, page, attempt]);
   return { items, loading, error, hasMore, retry: () => setAttempt(value => value + 1),
+    refresh: () => { setPage(1); setAttempt(value => value + 1); },
     loadMore: () => { if (!loading && !error && hasMore) setPage(value => value + 1); } };
 }
 
-export function safePublicUrl(value?: string): string | undefined {
+export function safePublicUrl(value?: string | null): string | undefined {
   if (!value) return undefined;
   try { const url = new URL(value, window.location.origin); return ['http:', 'https:'].includes(url.protocol) ? url.href : undefined; }
   catch { return undefined; }

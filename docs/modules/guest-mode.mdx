@@ -95,3 +95,11 @@ Added bold blue active header labels with 2px underline and 1.15 scale; preserve
 ## Visible mobile section navigation (2026-11-15)
 
 Reproduced hidden section links below 768px and exposed them in a second header row. Desktop/mobile real scroll checks on port 5173 verified all active effects and sticky visibility. Build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-16-phase-04-visible-mobile-navigation).
+
+## Hoạt động của CLB đã tham gia
+
+Sau khi đăng nhập, chọn **CLB của tôi** cạnh **Câu lạc bộ** rồi mở một CLB. **Tạo hoạt động** mở biểu mẫu trên màn hình CLB. Thành viên gửi duyệt và theo dõi kết quả trong **Đề xuất của tôi**. Chủ nhiệm có thêm tab **Xét duyệt**, nơi có thể xem người gửi, duyệt hoặc từ chối kèm lý do. Hoạt động do chủ nhiệm tạo được công khai ngay sau khi đăng.
+
+API có JWT dưới `/api/my-clubs`, lấy vai trò từ membership `active` của từng CLB đã công khai. Backend dùng các trạng thái `draft`, `pending_review`, `published` và `rejected` trong `club_activities`. Mục công khai tiếp tục đọc `public_club_activities`. Đường dẫn họp trực tuyến chỉ có trong màn hình hoạt động dành cho thành viên được phép xem.
+
+[Work log](/work-logs/2026-11-15-35-phase-04-club-activities).
