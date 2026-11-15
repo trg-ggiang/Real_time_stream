@@ -1,0 +1,43 @@
+﻿---
+title: Student landing after authentication
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-21
+- Thời gian: 2026-11-15 (Asia/Saigon), giờ bắt đầu không có dữ liệu
+- Agent: Codex
+- Phase: 03 — Auth và Supabase; 04 — application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu
+
+Sau đăng nhập/hoàn thiện hồ sơ đưa tài khoản vào landing phù hợp, không mở meeting ngay.
+
+## Công việc hoàn thành
+
+- Sau khi kiểm tra/lưu hồ sơ, `AuthApp` hiển thị landing đã đăng nhập; meeting chỉ mở khi bấm nút Cuộc họp.
+- Landing dùng dữ liệu người dùng hiện có, hiển thị nhãn Sinh viên, tên tài khoản và nút đăng xuất.
+- Nút đăng ký ở cuối trang chuyển thành nút mở cuộc họp cho người đã đăng nhập. Ẩn thao tác quan tâm chưa được triển khai và hộp thoại yêu cầu đăng nhập trong chế độ này.
+- Bổ sung test xác nhận landing sinh viên và thao tác meeting riêng.
+
+## File thay đổi
+
+`frontend/src/features/auth/AuthApp.tsx`, `frontend/src/features/auth/PersonalProfile.tsx`, `frontend/src/features/guest/GuestLanding.tsx`, `frontend/src/features/guest/guest.css`, test tương ứng, tài liệu phase/master/session/changelog và log này.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm.cmd --workspace frontend run typecheck` | Passed |
+| `npm.cmd --workspace frontend test` | Passed: 57 tests |
+| `npm.cmd run build` | Passed |
+
+## Quyết định và giới hạn
+
+Bảng `users` và JWT hiện không chứa role toàn hệ thống. `club_memberships.role` là quyền theo từng CLB; role meeting là quyền theo từng cuộc họp. Vì vậy landing đã đăng nhập hiện là biến thể Sinh viên. Chưa có API/quy tắc để chia landing theo role CLB hoặc admin; Phase 03/04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Xác định role toàn hệ thống hoặc endpoint membership theo CLB nếu cần landing khác nhau cho các nhóm quyền. Nghiệm thu luồng đăng ký/đăng nhập trên Supabase development.

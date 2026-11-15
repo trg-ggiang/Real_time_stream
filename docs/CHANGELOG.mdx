@@ -351,3 +351,32 @@ Added bold blue active header labels with 2px underline and 1.15 scale; preserve
 ## Visible mobile section navigation (2026-11-15)
 
 Reproduced hidden section links below 768px and exposed them in a second header row. Desktop/mobile real scroll checks on port 5173 verified all active effects and sticky visibility. Build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-16-phase-04-visible-mobile-navigation).
+
+## 2026-11-15 — Auth UI alignment
+
+- Updated the login/register brand, palette, imagery and responsive layout to match the public landing page. Moved the guest-return link into the header flow to prevent overlap with the brand.
+- Frontend typecheck, 53 tests and production build passed. Browser visual QA was not available in this session; the computer-use browser host reported unavailable. [Work log](/work-logs/2026-11-15-02-phase-04-auth-ui-alignment).
+
+## 2026-11-15 — Student profile flow
+
+- Registration opens profile completion; returning users with incomplete profiles must save required student details. Completed profiles continue to the meeting. Backend profile controller registered. Typecheck, build and 53 frontend tests passed. [Work log](/work-logs/2026-11-15-17-phase-03-student-profile-flow).
+
+## 2026-11-15 — Registration profile visibility
+
+- Explicit login/register links bypass an older saved session and show the requested form. New registration-to-profile behavior is covered by tests. Frontend typecheck and 55 tests passed. [Work log](/work-logs/2026-11-15-18-phase-03-register-profile-visibility).
+
+## 2026-11-15 — Profile before call
+
+- Removed automatic transition to meeting after auth and redesigned the student profile form. Continuing now requires a click and an incomplete profile must be saved first. Frontend tests (55), typecheck and build passed. [Work log](/work-logs/2026-11-15-19-phase-03-profile-before-call).
+
+## 2026-11-15 — Auth/profile flow fix
+
+- Completed profile no longer reopens on returning login; registration stays on profile until save succeeds. Profile layout fills the viewport. Frontend typecheck, 56 tests and build passed. [Work log](/work-logs/2026-11-15-20-phase-03-auth-profile-flow-fix).
+
+## 2026-11-15 — Student landing
+
+- Authenticated students now see a signed-in landing after profile completion; meeting is opened by a separate button. Typecheck, 57 frontend tests and build passed. [Work log](/work-logs/2026-11-15-21-phase-03-student-landing).
+
+## 2026-11-15 — Meeting return to landing
+
+- Meeting navigation now supports a Trang chủ action and browser Back to the signed-in landing. Frontend typecheck, 57 tests and build passed. [Work log](/work-logs/2026-11-15-22-phase-04-meeting-return-landing).

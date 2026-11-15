@@ -5,8 +5,9 @@ import { EyeSlash } from '@phosphor-icons/react/dist/csr/EyeSlash';
 import { Monitor } from '@phosphor-icons/react/dist/csr/Monitor';
 import { Moon } from '@phosphor-icons/react/dist/csr/Moon';
 import { Sun } from '@phosphor-icons/react/dist/csr/Sun';
-import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { MeetingPage } from '../meeting/MeetingPage';
+import { PersonalProfile } from './PersonalProfile';
+import { GuestLanding } from '../guest/GuestLanding';
 import { authenticate, type AuthSession } from './auth-api';
 import { restoreSession, saveSession, sessionExpiresAt } from './session-storage';
 import '@fontsource/be-vietnam-pro/400.css';
@@ -26,7 +27,13 @@ function savedTheme(): Theme {
 }
 
 export function AuthApp() {
-  const [session, setSession] = useState<AuthSession | null>(restoreSession);
+  const [session, setSession] = useState<AuthSession | null>(() => {
+    const requestedMode = new URLSearchParams(window.location.search).get('mode');
+    return requestedMode === 'login' || requestedMode === 'register' ? null : restoreSession();
+  });
+  const [enterMeeting, setEnterMeeting] = useState(() => new URLSearchParams(window.location.search).get('view') === 'meeting');
+  const [profileReady, setProfileReady] = useState(false);
+  const [justRegistered, setJustRegistered] = useState(false);
   const [mode, setMode] = useState<Mode>(() =>
     new URLSearchParams(window.location.search).get('mode') === 'register' ? 'register' : 'login',
   );
@@ -40,10 +47,36 @@ export function AuthApp() {
   const errorRef = useRef<HTMLParagraphElement | null>(null);
   const registering = mode === 'register';
 
+  useEffect(() => {
+    const syncView = () => setEnterMeeting(new URLSearchParams(window.location.search).get('view') === 'meeting');
+    window.addEventListener('popstate', syncView);
+    return () => window.removeEventListener('popstate', syncView);
+  }, []);
+
+  function openMeeting() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', 'meeting');
+    window.history.pushState(null, '', url);
+    setEnterMeeting(true);
+  }
+
+  function returnToLanding() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('view');
+    url.searchParams.delete('meeting');
+    url.searchParams.delete('session');
+    window.history.replaceState(null, '', url);
+    setEnterMeeting(false);
+  }
+
   function logout() {
     saveSession(null);
+    returnToLanding();
     setTheme(savedTheme());
     setSession(null);
+    setEnterMeeting(false);
+    setProfileReady(false);
+    setJustRegistered(false);
   }
 
   function changeTheme(next: Theme) {
@@ -134,6 +167,12 @@ export function AuthApp() {
       }, controller.signal);
       if (!controller.signal.aborted) {
         saveSession(result);
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.delete('mode');
+        window.history.replaceState(window.history.state, '', `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+        setJustRegistered(mode === 'register');
+        setEnterMeeting(false);
+        setProfileReady(false);
         setSession(result);
       }
     } catch (cause) {
@@ -153,20 +192,23 @@ export function AuthApp() {
     }
   }
 
-  if (session) return <MeetingPage accessToken={session.access_token}
-    displayName={session.user.displayName} onLogout={logout} />;
+  if (session && !profileReady) return <PersonalProfile token={session.access_token}
+    autoContinue={!justRegistered} onContinue={() => setProfileReady(true)} onLogout={logout} />;
+  if (session && enterMeeting) return <MeetingPage accessToken={session.access_token}
+    displayName={session.user.displayName} onBack={returnToLanding} onLogout={logout} />;
+  if (session) return <GuestLanding viewer={session.user} onMeeting={openMeeting} onLogout={logout} />;
 
   return (
     <div className="auth-page" data-theme={theme}>
-      <a href="/" className="auth-guest-back">← Khám phá CLB</a>
       <a href="#auth-form" className="auth-skip-link">Đến biểu mẫu</a>
       <div className="auth-layout">
         <div className="auth-primary">
           <div className="auth-topbar">
             <div className="auth-brand">
-              <span className="auth-brand-icon"><VideoCamera size={23} weight="fill" aria-hidden="true" /></span>
-              <span>Real-time Stream</span>
+              <span className="auth-brand-icon" aria-hidden="true">u.</span>
+              <span>uni<b>circle</b></span>
             </div>
+            <a href="/" className="auth-guest-back">← Khám phá</a>
             <div className="auth-theme-switch" role="group" aria-label="Giao diện">
               {([
                 ['light', Sun, 'Giao diện sáng'],
@@ -233,12 +275,13 @@ export function AuthApp() {
               </form>
             </section>
           </main>
-          <footer className="auth-footer"><span>Real-time Stream</span><span>Kết nối để cùng học, cùng làm.</span></footer>
+          <footer className="auth-footer"><span>Cộng đồng sinh viên</span><span>Kết nối từ những điều chung.</span></footer>
         </div>
 
-        <aside className="auth-companion" aria-label="Học và làm việc cùng nhau">
-          <img src="/images/study-together.jpg" width="1024" height="768"
-            alt="Nhóm sinh viên cùng trao đổi bài học bên laptop trong thư viện" />
+        <aside className="auth-companion" aria-label="Cộng đồng sinh viên">
+          <img src="/images/guest/campus-bright-1000.jpg" width="1000" height="750"
+            alt="Sinh viên gặp gỡ và trao đổi trong khuôn viên trường" />
+          <div className="auth-companion-copy"><span>CỘNG ĐỒNG SINH VIÊN</span><p>Tìm cộng đồng.<br />Mở lối đam mê.</p></div>
         </aside>
       </div>
     </div>

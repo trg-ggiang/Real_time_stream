@@ -326,3 +326,31 @@ Added bold blue active header labels with 2px underline and 1.15 scale; preserve
 ## Visible mobile section navigation (2026-11-15)
 
 Reproduced hidden section links below 768px and exposed them in a second header row. Desktop/mobile real scroll checks on port 5173 verified all active effects and sticky visibility. Build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-16-phase-04-visible-mobile-navigation).
+
+## Auth page alignment 2026-11-15
+
+Updated the login/register layout to use the public landing page's navy and blue palette, UniCircle branding, campus photography and responsive editorial panel. Fixed the guest-return link placement so it no longer floats over the brand, and tightened form/input/focus styling. Frontend typecheck, 53 tests and production build passed. Browser visual QA was unavailable because the browser access host was down. [Work log](/work-logs/2026-11-15-02-phase-04-auth-ui-alignment).
+
+## Student profile flow — 2026-11-15
+
+Registration now opens profile completion. Login checks the stored profile and sends incomplete accounts to the form. Build, typecheck and 53 frontend tests passed. Phase 03 remains In Progress pending real Supabase verification. [Work log](/work-logs/2026-11-15-17-phase-03-student-profile-flow).
+
+## Registration profile visibility — 2026-11-15
+
+Fixed stored-session precedence on explicit login/register links. Added navigation and registration-to-profile tests; 55 frontend tests and typecheck passed. Phase 03 In Progress. [Work log](/work-logs/2026-11-15-18-phase-03-register-profile-visibility).
+
+## Profile before call — 2026-11-15
+
+Fixed automatic call navigation and redesigned profile form. Frontend tests (55), typecheck and build passed. Phase 03 In Progress pending database acceptance. [Work log](/work-logs/2026-11-15-19-phase-03-profile-before-call).
+
+## Auth/profile flow fix — 2026-11-15
+
+Fixed repeated profile form and dark side gutters. Frontend typecheck, 56 tests and build passed. Phase 03 In Progress. [Work log](/work-logs/2026-11-15-20-phase-03-auth-profile-flow-fix).
+
+## Student landing — 2026-11-15
+
+After authentication and profile completion, students open an authenticated landing instead of meeting. Role segmentation beyond the student account needs a role source. Frontend typecheck, 57 tests and build passed. Phase 03/04 In Progress. [Work log](/work-logs/2026-11-15-21-phase-03-student-landing).
+
+## Meeting return to landing — 2026-11-15
+
+Fixed landing → meeting → back navigation through browser history and a Trang chủ button in the meeting header. Frontend typecheck, 57 tests and build passed. Phase 04 remains In Progress pending browser acceptance. [Work log](/work-logs/2026-11-15-22-phase-04-meeting-return-landing).

@@ -72,4 +72,27 @@ export class UsersService {
     }
     return this.toUser(data);
   }
+
+  async getProfile(userId: string) {
+    const { data, error } = await this.supabase.client
+      .from('student_profiles')
+      .select('user_id,full_name,student_code,school_or_faculty,major,cohort,phone,bio,created_at,updated_at')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (error) throw new InternalServerErrorException('Profile data is temporarily unavailable.');
+    return data ?? {
+      user_id: userId, full_name: null, student_code: null, school_or_faculty: null,
+      major: null, cohort: null, phone: null, bio: null, created_at: null, updated_at: null,
+    };
+  }
+
+  async updateProfile(userId: string, input: object) {
+    const { data, error } = await this.supabase.client
+      .from('student_profiles')
+      .upsert({ user_id: userId, ...input, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+      .select('user_id,full_name,student_code,school_or_faculty,major,cohort,phone,bio,created_at,updated_at')
+      .single();
+    if (error) throw new InternalServerErrorException('Profile data is temporarily unavailable.');
+    return data;
+  }
 }

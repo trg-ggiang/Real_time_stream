@@ -1,0 +1,40 @@
+﻿---
+title: Return from meeting to landing
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-22
+- Thời gian: 2026-11-15 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu
+
+Sửa điều hướng từ landing vào meeting rồi quay lại khiến landing không hiện lại.
+
+## Công việc hoàn thành
+
+- Mở meeting tạo entry trong browser history với `view=meeting`.
+- Lắng nghe `popstate` để Back của trình duyệt đưa người dùng về landing đã đăng nhập.
+- Thêm nút Trang chủ trong header meeting; nhấn nút sẽ bắt đầu rời phiên, xóa tham số meeting/session/view khỏi URL và hiển thị lại landing ngay.
+- Đăng xuất cũng dọn tham số điều hướng meeting.
+- Bổ sung test điều hướng landing → meeting → Trang chủ và browser Back.
+
+## File thay đổi
+
+`frontend/src/features/auth/AuthApp.tsx`, `frontend/src/features/meeting/MeetingPage.tsx`, `frontend/src/features/meeting/meeting.css`, `frontend/src/features/auth/AuthApp.test.tsx`, docs phase/master/session/changelog và log này.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm.cmd --workspace frontend run typecheck` | Passed |
+| `npm.cmd --workspace frontend test` | Passed: 57 tests |
+| `npm.cmd --workspace frontend run build` | Passed; LiveKit chunk warning còn tồn tại |
+
+## Bước tiếp theo
+
+Kiểm tra trong browser thực: vào landing, mở cuộc họp, dùng Trang chủ và browser Back, xác nhận landing tải lại danh sách công khai từ API. Phase 04 vẫn In Progress.

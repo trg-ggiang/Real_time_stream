@@ -41,7 +41,7 @@ function CollectionStatus({ state, empty }: { state: ContentState; empty: string
   if (!state.items.length) return <p className="guest-empty">{empty}</p>;
   return state.hasMore ? <button className="guest-secondary guest-more" onClick={state.loadMore}>Xem thêm</button> : null;
 }
-function ContentDialog({ selection, close, requestLogin }: { selection: Selection; close: () => void; requestLogin: (message: string) => void }) {
+function ContentDialog({ selection, close, requestLogin, signedIn }: { selection: Selection; close: () => void; requestLogin: (message: string) => void; signedIn: boolean }) {
   const ref = useRef<HTMLDialogElement>(null);
   const { item, kind } = selection;
   useEffect(() => { const element = ref.current; element?.showModal(); return () => element?.close(); }, []);
@@ -64,11 +64,11 @@ function ContentDialog({ selection, close, requestLogin }: { selection: Selectio
     </dl>}
     {item.contact_email && <p>Email liên hệ: {item.contact_email}</p>}
     {item.contact_phone && <p>Điện thoại liên hệ: {item.contact_phone}</p>}
-    <div className="guest-dialog-actions"><button className="guest-primary" onClick={() => requestLogin('Đăng nhập để thực hiện các thao tác với CLB và hoạt động.')}>Đăng nhập </button><button className="guest-secondary" onClick={close}>Tiếp tục khám phá</button></div>
+    <div className="guest-dialog-actions">{!signedIn && <button className="guest-primary" onClick={() => requestLogin('Đăng nhập để thực hiện các thao tác với CLB và hoạt động.')}>Đăng nhập </button>}<button className="guest-secondary" onClick={close}>Tiếp tục khám phá</button></div>
   </dialog>;
 }
 
-export function GuestLanding() {
+export function GuestLanding({ viewer, onMeeting, onLogout }: { viewer?: { displayName: string }; onMeeting?: () => void; onLogout?: () => void } = {}) {
   const clubs = usePublicContent('clubs');
   const activities = usePublicContent('activities');
   const posts = usePublicContent('posts');
@@ -109,11 +109,11 @@ export function GuestLanding() {
       window.cancelAnimationFrame(frame);
     };
   }, []);
-  return <div className="guest-landing">
+  return <div className="guest-landing" data-signed-in={!!viewer}>
     <a href="#guest-content" className="guest-skip">Đến nội dung</a>
     <header className="guest-header"><a className="guest-brand" href="/">uni<b>circle</b></a>
       <nav aria-label="Điều hướng công khai">{sectionNavigation.map(({ id, label }) => <a key={id} href={`#${id}`} aria-current={activeSection === id ? 'location' : undefined}>{label}</a>)}</nav>
-      <div className="guest-auth"><a href="/?mode=login">Đăng nhập</a><a className="guest-primary" href="/?mode=register">Đăng ký </a></div>
+      <div className="guest-auth">{viewer ? <><span className="guest-viewer">Sinh viên · {viewer.displayName}</span><button className="guest-primary" type="button" onClick={onMeeting}>Cuộc họp</button><button type="button" onClick={onLogout}>Đăng xuất</button></> : <><a href="/?mode=login">Đăng nhập</a><a className="guest-primary" href="/?mode=register">Đăng ký </a></>}</div>
     </header>
     <GuestHero />
     <main id="guest-content">
@@ -151,9 +151,9 @@ export function GuestLanding() {
         </article>)}</div>
         <CollectionStatus state={posts} empty="Chưa có bài viết công khai từ các CLB." />
       </section>
-      <section className="guest-join"><h2>Câu chuyện sinh viên của bạn,<br /><span>còn nhiều trang để viết.</span></h2><a className="guest-primary" href="/?mode=register">Đăng ký </a><p>Tạo tài khoản để kết nối cùng cộng đồng.</p></section>
+      <section className="guest-join"><h2>Câu chuyện sinh viên của bạn,<br /><span>còn nhiều trang để viết.</span></h2>{viewer ? <button className="guest-primary" type="button" onClick={onMeeting}>Mở cuộc họp</button> : <a className="guest-primary" href="/?mode=register">Đăng ký </a>}<p>{viewer ? 'Khám phá cộng đồng và kết nối với bạn bè.' : 'Tạo tài khoản để kết nối cùng cộng đồng.'}</p></section>
     </main><footer className="guest-footer"><a className="guest-brand" href="/">unicircle</a><p>Kết nối đam mê. Mở rộng thế giới.</p></footer>
-    {selection && <ContentDialog selection={selection} close={() => setSelection(null)} requestLogin={requestLogin} />}
+    {selection && <ContentDialog selection={selection} close={() => setSelection(null)} requestLogin={requestLogin} signedIn={!!viewer} />}
     {gate && <dialog className="guest-dialog" ref={gateRef} onCancel={() => setGate(null)} aria-labelledby="guest-gate-title"><button className="guest-dialog-close" aria-label="Đóng" onClick={() => setGate(null)}><X size={24} /></button><h2 id="guest-gate-title">Một bước để kết nối</h2><p>{gate}</p><div className="guest-dialog-actions"><a className="guest-primary" href="/?mode=login">Đăng nhập </a><a className="guest-secondary" href="/?mode=register">Đăng ký</a></div><button className="guest-text-action" onClick={() => setGate(null)}>Tiếp tục khám phá</button></dialog>}
   </div>;
 }

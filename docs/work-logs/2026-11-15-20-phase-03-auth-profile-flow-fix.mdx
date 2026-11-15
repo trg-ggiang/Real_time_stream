@@ -1,0 +1,43 @@
+﻿---
+title: Auth and profile flow fix
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-20
+- Thời gian: 2026-11-15 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 03 — Auth và Supabase
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu
+
+Sửa form hồ sơ lặp lại sau khi điền, hai dải nền tối hai bên và rà luồng đăng nhập/đăng ký.
+
+## Công việc hoàn thành
+
+- Đăng ký mới luôn hiện form hồ sơ. Sau PATCH thành công chuyển vào meeting.
+- Đăng nhập/khôi phục phiên đọc hồ sơ: hồ sơ đầy đủ đi tiếp; hồ sơ thiếu ở lại form để cập nhật.
+- Không hiển thị nháy form khi đang kiểm tra hồ sơ đã hoàn thiện.
+- Xóa tham số `mode` khỏi URL sau khi xác thực thành công; tải lại trang không quay về form đăng ký/đăng nhập do URL cũ.
+- Đặt `.profile-page` rộng toàn viewport, bỏ giới hạn `main` chung, đồng bộ nền sáng ở root và bỏ margin của header chung gây lệch form.
+- Bổ sung test cho hồ sơ chưa đầy đủ, PATCH thành công và tự đi tiếp; cập nhật test tài khoản đã hoàn thiện.
+
+## File thay đổi
+
+`frontend/src/features/auth/AuthApp.tsx`, `frontend/src/features/auth/PersonalProfile.tsx`, `frontend/src/features/auth/auth.css`, `frontend/src/features/auth/AuthApp.test.tsx`, tài liệu phase/master/session/changelog và log này.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm.cmd --workspace frontend test` | Passed: 56 tests |
+| `npm.cmd --workspace frontend run typecheck` | Passed |
+| `npm.cmd run build` | Passed; cảnh báo LiveKit chunk lớn |
+| Supabase development end-to-end | Skipped; không thực hiện kết nối DB thật trong phiên này |
+| Browser visual QA | Skipped; browser access host không khả dụng trong phiên trước |
+
+## Bước tiếp theo
+
+Thử đăng ký → lưu hồ sơ → meeting → đăng xuất → đăng nhập lại trên Supabase development. Kiểm tra ràng buộc `student_profiles.user_id` và RLS trước nghiệm thu Phase 03.

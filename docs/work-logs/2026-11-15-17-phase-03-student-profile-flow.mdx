@@ -1,0 +1,45 @@
+﻿---
+title: Student profile flow
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-17
+- Thời gian: 2026-11-15 (Asia/Saigon), không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 03 — Auth và Supabase
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu
+
+Sau đăng ký yêu cầu hoàn thiện hồ sơ sinh viên. Sau đăng nhập kiểm tra hồ sơ; nếu còn thiếu thì yêu cầu cập nhật trước khi vào ứng dụng.
+
+## Công việc hoàn thành
+
+- Đăng ký dẫn đến màn hình hồ sơ; đăng nhập và khôi phục phiên kiểm tra hồ sơ trước khi vào meeting.
+- Hồ sơ đã đủ họ tên, mã sinh viên, trường/khoa, ngành và khóa được tiếp tục tự động; hồ sơ thiếu hiển thị form.
+- Chỉ cho tiếp tục sau khi lưu hồ sơ đầy đủ thành công. Sửa dữ liệu sau lưu yêu cầu lưu lại.
+- Đăng ký `UsersController` trong NestJS để GET/PATCH profile hoạt động.
+- Điều chỉnh test Auth UI theo luồng kiểm tra hồ sơ.
+
+## File thay đổi
+
+`backend/src/users/users.module.ts`, `frontend/src/features/auth/AuthApp.tsx`, `frontend/src/features/auth/PersonalProfile.tsx`, `frontend/src/features/auth/auth.css`, `frontend/src/features/auth/AuthApp.test.tsx`, tài liệu phase/master/session/changelog và file log này.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test` | Passed | 53 test |
+| `npm.cmd run build` | Passed | Cảnh báo chunk LiveKit lớn |
+| Supabase thực | Skipped | Chưa kiểm tra profile upsert và RLS trên DB development |
+
+## Còn lại
+
+Phase 03 In Progress: cần xác nhận `student_profiles.user_id` unique/PK và thử luồng trên Supabase development. `phone` và `bio` là tùy chọn. Các trường bắt buộc ở UI được chọn theo nghiệp vụ hiện tại; schema vẫn cho phép nullable.
+
+## Bước tiếp theo
+
+Thử đăng ký mới, điền hồ sơ, lưu, vào meeting; đăng xuất rồi đăng nhập lại để xác nhận tự đi tiếp khi hồ sơ đầy đủ.

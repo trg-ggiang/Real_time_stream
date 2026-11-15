@@ -20,7 +20,7 @@ function codeFromUrl() { return new URLSearchParams(window.location.search).get(
 function sessionFromUrl() { return new URLSearchParams(window.location.search).get('session') || ''; }
 const statusLabels = { scheduled: 'Đã lên lịch', ongoing: 'Đang diễn ra', ended: 'Đã kết thúc' };
 
-export function MeetingPage({ accessToken, displayName, onLogout }: { accessToken: string; displayName: string; onLogout: () => void }) {
+export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { accessToken: string; displayName: string; onLogout: () => void; onBack?: () => void }) {
   const flow = useSessionFlow(accessToken, onLogout);
   const { theme, setTheme } = useMeetingTheme();
   const [code, setCode] = useState(codeFromUrl), [selectedId, setSelectedId] = useState(sessionFromUrl);
@@ -145,6 +145,7 @@ export function MeetingPage({ accessToken, displayName, onLogout }: { accessToke
   return <div className={`meeting-app${flow.active ? ' meeting-app--incall' : ''}`} data-theme={theme}>
     <a className="meeting-skip" href="#meeting-main">Đến nội dung chính</a>
     <header className="meeting-topbar"><div className="meeting-brand"><span className="meeting-brand-symbol"><VideoCamera size={23} weight="fill" aria-hidden="true" /></span><span translate="no">Real-time Stream</span></div>
+      {onBack && <button className="meeting-home-link" type="button" onClick={() => { void flow.leave(); onBack(); }}><ArrowLeft size={17} aria-hidden="true" />Trang chủ</button>}
       <div className="meeting-account"><span className="meeting-account-name" title={name}>{name}</span><span className="meeting-avatar-small" aria-hidden="true">{initials}</span><AccountSettings theme={theme} onThemeChange={setTheme} onLogout={async () => { await flow.leave(); onLogout(); }} /></div>
     </header>
     <main id="meeting-main" className="meeting-main" tabIndex={-1}>

@@ -4,10 +4,15 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { AuthApp } from './AuthApp';
 
 vi.mock('../meeting/MeetingPage', () => ({
-  MeetingPage: ({ accessToken, displayName, onLogout }: { accessToken: string; displayName: string; onLogout: () => void }) =>
-    <div><span>{displayName}</span><span data-testid="token">{accessToken}</span><button onClick={onLogout}>Đăng xuất</button></div>,
+  MeetingPage: ({ accessToken, displayName, onLogout, onBack }: { accessToken: string; displayName: string; onLogout: () => void; onBack: () => void }) =>
+    <div><span>{displayName}</span><span data-testid="token">{accessToken}</span><button onClick={onBack}>Trang chủ</button><button onClick={onLogout}>Đăng xuất</button></div>,
 }));
-afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); vi.unstubAllGlobals(); });
+vi.mock('../guest/GuestLanding', () => ({
+  GuestLanding: ({ viewer, onMeeting, onLogout }: { viewer: { displayName: string }; onMeeting: () => void; onLogout: () => void }) =>
+    <div><span>Trang chủ {viewer.displayName}</span><button onClick={onMeeting}>Mở cuộc họp</button><button onClick={onLogout}>Đăng xuất</button></div>,
+}));
+afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); vi.unstubAllGlobals(); window.history.replaceState(null, '', '/'); });
+const completedProfile = { full_name: 'Test User', student_code: 'SV001', school_or_faculty: 'CNTT', major: 'IT', cohort: '2026' };
 
 it('restores and persists the shared theme preference on the login screen', () => {
   localStorage.setItem('rts.meeting-theme.v1', 'dark');
@@ -19,25 +24,72 @@ it('restores and persists the shared theme preference on the login screen', () =
   expect(screen.getByRole('button', { name: 'Giao diện sáng' }).getAttribute('aria-pressed')).toBe('true');
 });
 
+it('shows registration when the visitor explicitly opens the register link with an older session', () => {
+  const token = `header.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))}.signature`;
+  sessionStorage.setItem('rts.auth-session.v1', JSON.stringify({ access_token: token, user: { userId: 'old', email: 'old@test.dev', displayName: 'Old' } }));
+  window.history.replaceState(null, '', '/?mode=register');
+  try {
+    render(<AuthApp />);
+    expect(screen.getByLabelText('Tên hiển thị')).toBeTruthy();
+    expect(screen.queryByText('Old')).toBeNull();
+  } finally { window.history.replaceState(null, '', '/'); }
+});
+
+it('shows student profile after a successful new registration', async () => {
+  window.history.replaceState(null, '', '/?mode=register');
+  const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve({ ok: true, json: async () => url.includes('/profile')
+    ? { full_name: null, student_code: null, school_or_faculty: null, major: null, cohort: null }
+    : { access_token: 'new-jwt', user: { userId: 'new', email: 'new@test.dev', displayName: 'New User', avatarUrl: null } } }));
+  vi.stubGlobal('fetch', fetchMock);
+  render(<AuthApp />);
+  fireEvent.change(screen.getByLabelText('Tên hiển thị'), { target: { value: 'New User' } });
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'new@test.dev' } });
+  fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+  fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
+  await screen.findByRole('heading', { name: /Một chút về bạn/ });
+  expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/register');
+  expect(window.location.search).toBe('');
+  expect(screen.getByLabelText('Mã sinh viên')).toBeTruthy();
+  expect(screen.queryByTestId('token')).toBeNull();
+});
+
+it('keeps an incomplete account on the profile form until save succeeds', async () => {
+  const fetchMock = vi.fn().mockImplementation((url: string, options?: RequestInit) => Promise.resolve({ ok: true, json: async () =>
+    url.includes('/profile') ? options?.method === 'PATCH' ? { ...JSON.parse(String(options.body)) } : {} :
+      { access_token: 'student-jwt', user: { userId: 'student', email: 's@test.dev', displayName: 'Student', avatarUrl: null } } }));
+  vi.stubGlobal('fetch', fetchMock);
+  render(<AuthApp />);
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: 's@test.dev' } });
+  fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+  fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
+  await screen.findByRole('heading', { name: /Một chút về bạn/ });
+  expect(screen.queryByTestId('token')).toBeNull();
+  for (const [label, value] of [['Họ và tên', 'Sinh Vien'], ['Mã sinh viên', 'SV01'], ['Trường / khoa', 'CNTT'], ['Ngành học', 'IT'], ['Khóa', '2026']]) {
+    fireEvent.change(screen.getByLabelText(label), { target: { value } });
+  }
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu hồ sơ' }));
+  await screen.findByText('Trang chủ Student');
+  expect(fetchMock.mock.calls.some(([url, options]) => url === '/api/users/me/profile' && options.method === 'PATCH')).toBe(true);
+});
+
 it('restores login after remount and removes the saved session on logout', async () => {
   const token = `header.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))}.signature`;
-  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
-    access_token: token, user: { userId: 'u1', email: 'a@test.dev', displayName: 'Restored', avatarUrl: null },
-  }) });
+  const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve({ ok: true, json: async () => url.includes('/profile')
+    ? completedProfile : { access_token: token, user: { userId: 'u1', email: 'a@test.dev', displayName: 'Restored', avatarUrl: null } } }));
   vi.stubGlobal('fetch', fetchMock);
   const first = render(<AuthApp />);
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@test.dev' } });
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
-  await screen.findByText('Restored');
+  await screen.findByText('Trang chủ Restored');
   first.unmount();
   const second = render(<AuthApp />);
-  expect(screen.getByText('Restored')).toBeTruthy();
-  expect(fetchMock).toHaveBeenCalledTimes(1);
+  await screen.findByText('Trang chủ Restored');
+  expect(fetchMock.mock.calls.filter(([url]) => url === '/api/auth/login')).toHaveLength(1);
   fireEvent.click(screen.getByText('Đăng xuất'));
   second.unmount();
   render(<AuthApp />);
-  expect(screen.queryByText('Restored')).toBeNull();
+  expect(screen.queryByText('Trang chủ Restored')).toBeNull();
 });
 
 it.each(['{bad json', JSON.stringify({ access_token: 'broken', user: {} }), JSON.stringify({
@@ -51,18 +103,27 @@ it.each(['{bad json', JSON.stringify({ access_token: 'broken', user: {} }), JSON
 });
 
 it('logs in with the API contract and clears the in-memory session on logout', async () => {
-  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
-    access_token: 'app-jwt', user: { userId: 'u1', email: 'a@test.dev', displayName: 'Tester', avatarUrl: null },
-  }) });
+  const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve({ ok: true, json: async () => url.includes('/profile')
+    ? completedProfile : { access_token: 'app-jwt', user: { userId: 'u1', email: 'a@test.dev', displayName: 'Tester', avatarUrl: null } } }));
   vi.stubGlobal('fetch', fetchMock);
   render(<AuthApp />);
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@test.dev' } });
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
-  await waitFor(() => expect(screen.getByText('Tester')).toBeTruthy());
+  await waitFor(() => expect(screen.getByText('Trang chủ Tester')).toBeTruthy());
   expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/login');
   expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ email: 'a@test.dev', password: 'password123' });
+  expect(screen.queryByTestId('token')).toBeNull();
+  fireEvent.click(screen.getByText('Mở cuộc họp'));
   expect(screen.getByTestId('token').textContent).toBe('app-jwt');
+  expect(window.location.search).toContain('view=meeting');
+  fireEvent.click(screen.getByRole('button', { name: 'Trang chủ' }));
+  expect(screen.getByText('Trang chủ Tester')).toBeTruthy();
+  expect(window.location.search).not.toContain('view=meeting');
+  fireEvent.click(screen.getByText('Mở cuộc họp'));
+  window.history.back();
+  await waitFor(() => expect(window.location.search).not.toContain('view=meeting'));
+  expect(await screen.findByText('Trang chủ Tester')).toBeTruthy();
   fireEvent.click(screen.getByText('Đăng xuất'));
   expect(screen.queryByText('Tester')).toBeNull();
   expect(screen.getByLabelText('Mật khẩu')).toBeTruthy();

@@ -1,0 +1,37 @@
+﻿---
+title: Registration profile visibility
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-18
+- Thời gian: 2026-11-15 (Asia/Saigon), giờ bắt đầu không có dữ liệu
+- Agent: Codex
+- Phase: 03 — Auth và Supabase
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu
+
+Sửa trường hợp mở đăng ký nhưng không thấy form và không thấy bước hồ sơ sinh viên cho tài khoản mới.
+
+## Công việc hoàn thành
+
+- URL `?mode=login` hoặc `?mode=register` luôn mở biểu mẫu được yêu cầu, kể cả khi tab còn phiên cũ trong sessionStorage.
+- Thêm kiểm thử cho link đăng ký khi còn phiên cũ và cho tài khoản đăng ký mới vào bước hồ sơ sinh viên.
+
+## File thay đổi
+
+`frontend/src/features/auth/AuthApp.tsx`, `frontend/src/features/auth/AuthApp.test.tsx`, phase/master/session/changelog và work log.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm.cmd --workspace frontend test` | Passed, 55 tests |
+| `npm.cmd --workspace frontend run typecheck` | Passed |
+| Supabase thật | Skipped, không cần để xác minh điều hướng frontend |
+
+## Quyết định và bước tiếp theo
+
+Liên kết đăng ký/đăng nhập là thao tác rõ ràng của người dùng nên có ưu tiên hơn phiên được lưu. Phase 03 vẫn In Progress vì chưa nghiệm thu với Supabase development. Thử mở landing → Đăng ký trong tab đã từng đăng nhập; form đăng ký phải xuất hiện, rồi tài khoản mới phải thấy hồ sơ sinh viên.

@@ -61,3 +61,7 @@
 .guest-landing .guest-dialog-close{padding:8px;background:none;border:0}
 .guest-landing .guest-primary:active,.guest-landing .guest-secondary:active{transform:none}
 @media(max-width:767px){.guest-landing .guest-hero-actions .guest-primary{padding:10px 0;font-size:12px}.guest-landing .guest-header .guest-primary{font-size:11px}.guest-landing .guest-hero-actions{gap:26px}.guest-landing h1{font-size:35px}.guest-landing .guest-card-title{font-size:19px}.guest-landing .guest-brand{font-size:20px}}
+.guest-landing[data-signed-in='true'] .guest-save{display:none}
+.guest-landing .guest-viewer{color:var(--guest-ink);font-weight:600;white-space:nowrap}
+.guest-landing .guest-auth>button:not(.guest-primary){border:0;background:none;color:var(--guest-muted);font-size:13px}
+@media(max-width:767px){.guest-landing[data-signed-in='true'] .guest-auth{gap:10px;flex-wrap:wrap;justify-content:flex-end}.guest-landing .guest-viewer{font-size:11px}.guest-landing[data-signed-in='true'] .guest-header{grid-template-columns:1fr auto}}

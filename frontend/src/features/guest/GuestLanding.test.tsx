@@ -5,6 +5,16 @@ import { GuestLanding } from './GuestLanding';
 import { safePublicUrl } from './public-content';
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+it('shows the signed-in student landing and opens meetings only on request', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [], hasMore: false }) }));
+  const onMeeting = vi.fn();
+  render(<GuestLanding viewer={{ displayName: 'An' }} onMeeting={onMeeting} onLogout={vi.fn()} />);
+  expect(screen.getByText('Sinh viên · An')).toBeTruthy();
+  expect(screen.queryByRole('link', { name: 'Đăng nhập' })).toBeNull();
+  expect(onMeeting).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: 'Cuộc họp' }));
+  expect(onMeeting).toHaveBeenCalledTimes(1);
+});
 it('loads real public endpoints and shows honest empty states', async () => {
   const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [], hasMore: false }) });
   vi.stubGlobal('fetch', fetchMock);
