@@ -8,6 +8,7 @@ import { HealthController } from './health.controller';
 import { LivekitModule } from './livekit/livekit.module';
 import { ChatModule } from './chat/chat.module';
 import { MeetingsModule } from './meetings/meetings.module';
+import { PublicContentModule } from './public-content/public-content.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MeetingsModule } from './meetings/meetings.module';
     LivekitModule,
     ChatModule,
     MeetingsModule,
+    PublicContentModule,
   ],
   controllers: [HealthController],
 })

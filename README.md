@@ -1,5 +1,9 @@
 # Real-time Stream — Meeting Module
 
+## Guest mode
+
+Trang chủ hiện dùng Navy Mix cho khách, đọc CLB/hoạt động/bài viết từ ba public view Supabase qua NestJS. Mở `/?mode=login` hoặc `/?mode=register` để vào tài khoản; phiên hợp lệ tiếp tục mở meeting. The public views now contain 3 HUST clubs, 3 historical activities and 3 introduction posts; sources and image provenance are recorded in data/hust-public.json. Xem [API, phạm vi và hướng dẫn guest mode](docs/modules/guest-mode.mdx).
+
 Ứng dụng thử nghiệm audio/video và chat: React/Vite đăng nhập qua NestJS/Supabase, dùng JWT ứng dụng xin token rồi kết nối LiveKit Cloud. Người đã được admitted có thể chọn session ongoing và chat theo phiên bằng Socket.IO; phòng PoC cố định vẫn giữ để thử media, không có chat. Code Hải đã gộp vào `backend/src`; không chạy app `backend/my-api` riêng. Xem [hướng dẫn auth và DB](docs/modules/auth-integration.mdx) và [module chat](docs/modules/meeting-chat.mdx).
 
 ## Cài đặt và cấu hình

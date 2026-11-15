@@ -1,0 +1,26 @@
+---
+title: Distinct activity and story layouts
+description: Date-led event agenda and asymmetric editorial stories.
+---
+
+## Session information
+
+2026-11-15-13, Codex, Asia/Saigon; exact times not recorded. Outcome Completed. Phase 04 In Progress.
+
+## Request and completed work
+
+User superseded the preceding uniform-card request and asked each section to have its own style. Preserve-mode redesign using design-taste-frontend: white/navy palette, existing font and spacious section rhythm retained. Activities now use a pale blue agenda with prominent day/month/year, small event image, description/location/status and text actions in horizontal rows. Dates use Asia/Ho_Chi_Minh and handle invalid/missing values. Stories use an editorial layout: first item featured on the left with larger image/type, subsequent stories compact on the right. Additional paginated items auto-flow into subsequent rows. Club cards remain unchanged. GuestLanding.tsx and new guest-editorial.css contain the change. Mobile fallbacks stack agenda content and stories explicitly. Existing content, source links, pagination and auth gates preserved. No backend/database changes.
+
+## Validation
+
+Frontend build/typecheck and 10 targeted tests passed; existing media chunk warning remains. Subsequent one-line CSS grid auto-flow refinement checked in the browser. Real browser confirmed three events and three stories, working activity/story detail dialogs and interest login gate. No horizontal overflow at 1440, 900 or 390px. Desktop agenda/editorial and mobile screenshots captured; desktop screenshots visually reviewed. No new low-impact visual unit tests or repeat Lighthouse run; no new performance claim.
+
+## Next step and checklist
+
+Phase 04 In Progress; continue guest visual acceptance.
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered work log and checked JSON/new target.
+- [x] Recorded validation limits.
+
+Eleven missing older navigation targets documented previously remain unrelated.

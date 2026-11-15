@@ -1,0 +1,26 @@
+---
+title: Align guest club cards
+description: Equal content slots and bottom-aligned actions for the club grid.
+---
+
+## Session information
+
+2026-11-15-08, Codex, Asia/Saigon; exact start/end not recorded. Phase 04 In Progress. Outcome Completed.
+
+## Objective and completed work
+
+User requested uniform structure in the three club cards. Updated frontend/src/features/guest/guest.css: flex column cards, fixed media flex size, two-line title slot, three-line summary slot and bottom-aligned action row. Full title text remains in the accessible button and detail dialog; the card preview clamps long titles to two lines. No DB/backend changes.
+
+## Checks
+
+Frontend build/typecheck passed (existing media chunk warning). Live browser at 1440px measured identical image/title/summary/action positions across all three cards: media 210px, title 56px, summary 64.34px, actions top 1171.92px. Screenshot reviewed. At 390px no horizontal overflow. New unit tests skipped for this CSS-only reversible edit; direct geometry verified.
+
+## Next step and limits
+
+Phase 04 remains In Progress; continue guest review. Existing 11 missing historical docs navigation targets remain unrelated.
+
+## Closing checklist
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered this log and checked JSON/new target.
+- [x] Recorded checks and limits.

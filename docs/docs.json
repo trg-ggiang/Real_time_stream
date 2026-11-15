@@ -22,7 +22,24 @@
               "modules/code-walkthrough",
               "modules/module-01-team-guide",
               "modules/screen-sharing",
-              "modules/meeting-chat"
+              "modules/meeting-chat",
+              "modules/guest-mode",
+              "work-logs/2026-11-15-01-phase-04-guest-landing-concepts",
+              "work-logs/2026-11-15-02-phase-04-bright-guest-concepts",
+              "work-logs/2026-11-15-03-phase-04-campus-board",
+              "work-logs/2026-11-15-04-phase-04-navy-mix",
+              "work-logs/2026-11-15-05-phase-04-live-guest-mode",
+              "work-logs/2026-11-15-06-phase-04-remove-guest-concepts",
+              "work-logs/2026-11-15-07-phase-04-hust-public-data",
+              "work-logs/2026-11-15-08-phase-04-align-club-cards",
+              "work-logs/2026-11-15-09-phase-04-clickable-public-links",
+              "work-logs/2026-11-15-10-phase-04-active-guest-navigation",
+              "work-logs/2026-11-15-11-phase-04-hero-slideshow",
+              "work-logs/2026-11-15-12-phase-04-discovery-spacing",
+              "work-logs/2026-11-15-13-phase-04-distinct-discovery-layouts",
+              "work-logs/2026-11-15-14-phase-04-wider-page-event-images",
+              "work-logs/2026-11-15-15-phase-04-bold-active-navigation",
+              "work-logs/2026-11-15-16-phase-04-visible-mobile-navigation"
             ]
           },
           {
@@ -35,7 +52,6 @@
               "work-logs/2026-11-07-03-phase-04-auth-image-ratio",
               "work-logs/2026-11-07-04-phase-05-raise-hand",
               "work-logs/2026-11-07-05-phase-05-hand-controls",
-
               "work-logs/2026-11-07-04-phase-04-tunnel-hash-fix",
               "work-logs/2026-11-07-06-phase-05-screen-sharing",
               "work-logs/2026-11-07-07-phase-05-meeting-layout",

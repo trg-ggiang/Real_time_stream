@@ -1,0 +1,186 @@
+{
+  "dataset": "hust-public-v1",
+  "researched_at": "2026-11-15",
+  "notes": "Nội dung tham khảo phục vụ phát triển ứng dụng. published_at là ngày nhập, không phải ngày bài gốc. Không thu thập tài khoản thành viên hay số điện thoại cá nhân. Facebook giới hạn truy cập; TikTok chặn robots, không nhập nội dung chưa kiểm chứng từ hai nền tảng này.",
+  "clubs": [
+    {
+      "key": "sinno",
+      "name": "SINNO — Câu lạc bộ Sáng tạo SoICT",
+      "summary": "Cộng đồng sinh viên SoICT cùng nghiên cứu, phát triển sản phẩm công nghệ và tìm hiểu khởi nghiệp.",
+      "text": "SINNO thuộc Trường Công nghệ Thông tin và Truyền thông, Đại học Bách khoa Hà Nội. Thành viên trao đổi kiến thức qua seminar, workshop và dự án công nghệ thực tế. Các hướng hoạt động gồm nghiên cứu, kết nối và khởi nghiệp.\nFanpage: https://www.facebook.com/SINNOclub\nWebsite: https://sinno.soict.io/",
+      "mission": "Kết nối sinh viên yêu công nghệ và hỗ trợ phát triển ý tưởng thành sản phẩm thực tế.",
+      "cover_url": "/images/hust/sinno-cover.webp",
+      "logo_url": "/images/hust/sinno-logo.webp",
+      "sources": [
+        "https://srn.hust.edu.vn/network/sinno-club",
+        "https://sinno.soict.io/about-us"
+      ]
+    },
+    {
+      "key": "huros",
+      "name": "HUROS — Robotics và Thiết bị thông minh",
+      "summary": "Nơi sinh viên Bách khoa tìm hiểu cơ điện tử, lập trình IoT và chế tạo robot.",
+      "text": "HUROS kết nối sinh viên quan tâm tới cơ khí, điện tử, lập trình và truyền thông trong các dự án robot. CLB tổ chức đào tạo, tham gia các sân chơi công nghệ và phối hợp tổ chức HUST Robot Arena.\nFanpage: https://www.facebook.com/hurosclub\nWebsite: https://sites.google.com/view/hurosclub/home\nẢnh đại diện sử dụng logo CLB từ website HUROS.",
+      "mission": "Tạo môi trường học tập, nghiên cứu và ứng dụng kiến thức vào robot và thiết bị thông minh.",
+      "contact_email": "huroshust@gmail.com",
+      "cover_url": "/images/hust/huros-logo.webp",
+      "logo_url": "/images/hust/huros-logo.webp",
+      "sources": [
+        "https://srn.hust.edu.vn/network/clb-huros",
+        "https://sites.google.com/view/hurosclub/home",
+        "https://sites.google.com/view/hustrobotarena/hust-robot-arena"
+      ]
+    },
+    {
+      "key": "hbac",
+      "name": "HBAC — Câu lạc bộ Phân tích Kinh doanh",
+      "summary": "Cộng đồng học thuật về phân tích kinh doanh, dữ liệu và ứng dụng công nghệ tại Bách khoa Hà Nội.",
+      "text": "HBAC trực thuộc Trường Kinh tế, Đại học Bách khoa Hà Nội. CLB tạo cơ hội rèn luyện tư duy phân tích và các công cụ xử lý dữ liệu qua workshop, dự án và cuộc thi.\nFanpage: https://www.facebook.com/hbac.bkhn\nWebsite: https://hbac.io.vn/\nTikTok được website CLB liên kết: https://www.tiktok.com/@hbac.2021 (chưa đọc nội dung video).",
+      "mission": "Phát triển kiến thức và kỹ năng phân tích để sinh viên giải quyết bài toán kinh doanh bằng dữ liệu.",
+      "contact_email": "hustbusinessanalyticsclub@gmail.com",
+      "cover_url": "/images/hust/hbac-cover.webp",
+      "logo_url": "/images/hust/hbac-logo.webp",
+      "sources": [
+        "https://sem.hust.edu.vn/cau-lac-bo-sinh-vien-2",
+        "https://hbac.io.vn/"
+      ]
+    }
+  ],
+  "activities": [
+    {
+      "key": "hra-2025-preliminary",
+      "club": "huros",
+      "title": "HUST Robot Arena 2025 — Vòng sơ loại",
+      "summary": "Vòng sơ loại sân chơi chế tạo và điều khiển robot tại Đại học Bách khoa Hà Nội.",
+      "text": "Lịch sơ loại được trang cuộc thi công bố: 08:30–17:00 ngày 22/02/2025, tại sảnh trước Thư viện Tạ Quang Bửu. HUROS phối hợp cùng Đoàn Trường Cơ khí và BBLAB tổ chức. Hoạt động hướng tới người yêu robot, với nhóm từ 2 đến 5 thành viên.\nDữ liệu lịch sử theo lịch dự kiến của ban tổ chức; không mở đăng ký hiện tại. Ảnh là logo HUROS, đơn vị đồng tổ chức, không phải ảnh chụp vòng thi.",
+      "cover_url": "/images/hust/huros-logo.webp",
+      "starts_at": "2025-02-22T08:30:00+07:00",
+      "ends_at": "2025-02-22T17:00:00+07:00",
+      "format": "onsite",
+      "location_name": "Sảnh trước Thư viện Tạ Quang Bửu",
+      "registration_opens_at": "2025-01-01T00:00:00+07:00",
+      "registration_closes_at": "2025-02-14T23:59:59+07:00",
+      "date_precision": "Giờ thi theo nguồn; ngày đăng ký chuẩn hóa đầu/cuối ngày, nguồn không nêu giờ.",
+      "sources": [
+        "https://sites.google.com/view/hustrobotarena/hust-robot-arena"
+      ]
+    },
+    {
+      "key": "hra-2025-final",
+      "club": "huros",
+      "title": "HUST Robot Arena 2025 — Vòng chung kết",
+      "summary": "Lịch chung kết đấu trường robot dành cho cộng đồng yêu STEAM và chế tạo.",
+      "text": "Trang cuộc thi công bố vòng chung kết lúc 08:30–17:00 ngày 22/03/2025 tại sảnh trước Thư viện Tạ Quang Bửu. Cuộc thi tạo cơ hội trao đổi kỹ thuật thiết kế cơ khí, lập trình và điều khiển robot.\nDữ liệu lịch sử theo lịch dự kiến của ban tổ chức; chưa đối chiếu biên bản kết quả. Không mở đăng ký hiện tại. Ảnh là logo HUROS, đơn vị đồng tổ chức.",
+      "cover_url": "/images/hust/huros-logo.webp",
+      "starts_at": "2025-03-22T08:30:00+07:00",
+      "ends_at": "2025-03-22T17:00:00+07:00",
+      "format": "onsite",
+      "location_name": "Sảnh trước Thư viện Tạ Quang Bửu",
+      "registration_opens_at": "2025-01-01T00:00:00+07:00",
+      "registration_closes_at": "2025-02-14T23:59:59+07:00",
+      "date_precision": "Giờ thi theo nguồn; ngày đăng ký chuẩn hóa đầu/cuối ngày, nguồn không nêu giờ.",
+      "sources": [
+        "https://sites.google.com/view/hustrobotarena/hust-robot-arena"
+      ]
+    },
+    {
+      "key": "hbaac-2026",
+      "club": "hbac",
+      "title": "HUST Business Analytics & AI Challenge 2026",
+      "summary": "Cuộc thi phân tích dữ liệu và ứng dụng AI do HBAC tổ chức cho sinh viên.",
+      "text": "Theo thông báo công khai của HBAC, cuộc thi gồm vòng đơn 01–15/05/2026, Data Modeling Hackathon 16–20/05 và Pitching & Demonstration ngày 29/05. Mỗi đội có 3–4 sinh viên; vòng chung kết tổ chức trực tiếp tại Đại học Bách khoa Hà Nội.\nDữ liệu lịch sử; ngày bắt đầu/kết thúc được chuẩn hóa đầu/cuối ngày vì nguồn không công bố giờ cụ thể. Ảnh là ảnh thành viên HBAC từ trang CLB, không phải ảnh chụp cuộc thi. Không mở đăng ký hiện tại.",
+      "cover_url": "/images/hust/hbac-cover.webp",
+      "starts_at": "2026-05-01T00:00:00+07:00",
+      "ends_at": "2026-05-29T23:59:59+07:00",
+      "format": "hybrid",
+      "location_name": "Vòng chung kết tại Đại học Bách khoa Hà Nội",
+      "registration_opens_at": "2026-05-01T00:00:00+07:00",
+      "registration_closes_at": "2026-05-15T23:59:59+07:00",
+      "date_precision": "Ngày theo thông báo; giờ chuẩn hóa đầu/cuối ngày.",
+      "sources": [
+        "https://www.linkedin.com/company/hust-business-analytics-club-hbac",
+        "https://hbac.io.vn/"
+      ]
+    }
+  ],
+  "posts": [
+    {
+      "key": "sinno-projects",
+      "club": "sinno",
+      "title": "Khám phá dự án công nghệ tại SINNO",
+      "summary": "Học hỏi qua sản phẩm thực tế và trao đổi kiến thức trong cộng đồng sinh viên SoICT.",
+      "text": "Trang SINNO giới thiệu các dự án như chatbot, gấu bông AI, nền tảng CRM và Awake Drive. Các dự án là một cách để thành viên ứng dụng kiến thức và xây dựng sản phẩm cùng nhau. Đây là bài giới thiệu được biên soạn từ website CLB, không phải thông báo tuyển thành viên mới.",
+      "cover_url": "/images/hust/sinno-cover.webp",
+      "sources": [
+        "https://sinno.soict.io/",
+        "https://sinno.soict.io/about-us"
+      ]
+    },
+    {
+      "key": "huros-robot-learning",
+      "club": "huros",
+      "title": "HUROS: học từ những bài toán robot thực tế",
+      "summary": "Tìm hiểu cơ khí, điện tử và lập trình qua các dự án và sân chơi công nghệ.",
+      "text": "HUROS giới thiệu các nhóm chuyên môn cơ khí, điện tử, lập trình và truyền thông. Thành viên có thể tiếp cận dự án robot, tài liệu kỹ thuật và hoạt động đào tạo. HUST Robot Arena là một sân chơi CLB phối hợp tổ chức. Đây là nội dung tổng hợp để khám phá CLB; thông tin tuyển mới cần xem tại fanpage.",
+      "cover_url": "/images/hust/huros-logo.webp",
+      "sources": [
+        "https://srn.hust.edu.vn/network/clb-huros",
+        "https://sites.google.com/view/hurosclub/home"
+      ]
+    },
+    {
+      "key": "hbac-data-community",
+      "club": "hbac",
+      "title": "HBAC và hành trình học phân tích dữ liệu",
+      "summary": "Workshop, dự án và cuộc thi là những hoạt động học thuật được HBAC giới thiệu.",
+      "text": "HBAC giới thiệu hoạt động học SQL, Python, Power BI và tư duy phân tích, kết hợp dự án thực tế và kết nối giữa các khóa. CLB hướng tới cộng đồng sinh viên quan tâm tới dữ liệu và phân tích kinh doanh. Đây là bài giới thiệu biên soạn ngày nhập dữ liệu, không phải lịch workshop sắp diễn ra.",
+      "cover_url": "/images/hust/hbac-cover.webp",
+      "sources": [
+        "https://hbac.io.vn/",
+        "https://sem.hust.edu.vn/cau-lac-bo-sinh-vien-2"
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "path": "/images/hust/sinno-cover.webp",
+      "source_url": "https://sinno.soict.io/images/about/about1.jpg",
+      "source_page": "https://sinno.soict.io/",
+      "sha256": "e6466d8f2bff395f71e11362f408771c829533c842e5230f19606e85ea878147",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "path": "/images/hust/sinno-logo.webp",
+      "source_url": "https://sinno.soict.io/images/logo/logo.png",
+      "source_page": "https://sinno.soict.io/",
+      "sha256": "0efd86fbbf08864ba04db7a6e4ef15e663cbc7b6551bb6e302958b34d3b99d9a",
+      "width": 360,
+      "height": 72
+    },
+    {
+      "path": "/images/hust/hbac-cover.webp",
+      "source_url": "https://hbac.io.vn/images/hero-members-1200.webp",
+      "source_page": "https://hbac.io.vn/",
+      "sha256": "3ea0b42afaed1555b158673ddd03400b00281129fe61bd10d56a09d4bbc44f8a",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "path": "/images/hust/hbac-logo.webp",
+      "source_url": "https://hbac.io.vn/logo/ava.webp",
+      "source_page": "https://hbac.io.vn/",
+      "sha256": "608216ff1aca0ce65a9c31627d306a2ab7b5dfadde556053e14697ad0b2b42b3",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "path": "/images/hust/huros-logo.webp",
+      "source_url": "https://sites.google.com/sitesv-images-rt/APXyLQcAxtVCwiR980bZzl92LGJF5kYbVJIpEN-ZHogpcuyHBimrmjBTaXxhWXwOzMUGkMVUadN0AiyylO7eFW_6NB_UmScIyw2MZyVG0asYV_wk-55BGHSaSHmjNg75BT0JGZlClv9Lt74-RWeTcmpXIYiSN-hup1DUs1SsUyQiFASaD9lF1lfqYCJQW63JRmg=w16383",
+      "source_page": "https://sites.google.com/view/hurosclub/home",
+      "sha256": "66009aba935e82d1f6aa6469c06071463486f95fb357fd637972fd0fc5d191b2",
+      "width": 1200,
+      "height": 407
+    }
+  ]
+}

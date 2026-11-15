@@ -1,0 +1,24 @@
+---
+title: Strong active section navigation
+description: Bold blue active header labels with clearer underline and stable scroll tracking.
+---
+
+## Session information
+
+2026-11-15-15, Codex, Asia/Saigon; exact times not recorded. Completed; Phase 04 In Progress.
+
+## Objective and changes
+
+User reported active header emphasis was not apparent. Confirmed active links had no bold weight. guest.css now applies weight 700, accent blue, 2px underline with 7px offset and 1.15 scale. GuestLanding.tsx retains the most recently reached section while crossing section whitespace rather than clearing the active label as the previous section leaves the header line. Hero remains unselected until a discovery section is reached. No backend/DB changes.
+
+## Checks
+
+Browser scrolled clubs, activities, stories and back to activities. Each active label was verified after transition: weight 700, rgb(40,95,186), 1.15 transform, underline 2px. Header screenshot captured. Frontend build/typecheck passed; existing media chunk warning remains. No additional unit tests for the small visual correction; real scroll/computed-style checks used. Mobile header navigation remains hidden by existing layout. JSON/new navigation target verified; prior missing historical targets remain unrelated.
+
+## Next step and checklist
+
+Continue guest visual acceptance. Phase 04 remains In Progress.
+
+- [x] Updated phase/master plan, session log, changelog, guest guide.
+- [x] Registered log and checked JSON/new target.
+- [x] Recorded checks and limits.

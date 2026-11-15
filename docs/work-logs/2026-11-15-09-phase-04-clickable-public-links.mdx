@@ -1,0 +1,26 @@
+---
+title: Clickable public content URLs
+description: Safe external links in public detail text and final card title alignment.
+---
+
+## Session information
+
+2026-11-15-09, Codex, Asia/Saigon; exact start/end not recorded. Phase 04 In Progress. Outcome Completed.
+
+## Objective and completed work
+
+User requested clickable URLs while club-card alignment was being finalized. GuestLanding.tsx now renders HTTP/HTTPS URLs as anchors in description/content and mission text. Links open a new tab with noopener noreferrer, visibly underlined; text remains escaped React content. Trailing sentence punctuation is excluded from the link. No raw HTML rendering. Guest card titles now wrap a clamped span inside a top-aligned flex button, aligning actual first text lines rather than just button boxes. guest.css contains these styles. Added a focused regression test in GuestLanding.test.tsx. No database/backend changes.
+
+## Checks
+
+8 targeted tests passed across GuestLanding.test.tsx and App.test.tsx. The new test verifies query strings, punctuation, new-tab attributes, escaped HTML and no javascript anchors. Initial jsdom checks failed because showModal was absent and then the mock did not set open; corrected the modal mock and restored prototype descriptors after cleanup. Frontend build/typecheck passed; existing media chunk warning remains. Browser verified all three title text tops equal at 771.58px. Five HUROS detail links have correct href/target/rel; clicking the fanpage opened a new tab at Facebook's redirected /hurosclub address. External services may require login or restrict access.
+
+## Next step and closing checklist
+
+Phase 04 remains In Progress; continue guest acceptance. No new database or authentication workflow.
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered this log; JSON/new page target verified.
+- [x] Recorded checks and external access limits.
+
+Existing missing historical navigation pages remain as documented in session 07.

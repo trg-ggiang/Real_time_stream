@@ -1,4 +1,6 @@
 /* Auth-only tokens. Controls use 10px corners; the full-height photo has square edges. */
+.auth-guest-back { position: absolute; top: 6px; left: 16px; z-index: 5; font-size: 11px; line-height: 1.2; color: var(--auth-muted); text-decoration: none; }
+.auth-guest-back:hover { text-decoration: underline; }
 :root:has(.auth-page[data-theme='light']) { color-scheme: light; background: #ffffff; }
 :root:has(.auth-page[data-theme='dark']) { color-scheme: dark; background: #1a1a1e; }
 @media (prefers-color-scheme: light) { :root:has(.auth-page[data-theme='system']) { color-scheme: light; background: #ffffff; } }

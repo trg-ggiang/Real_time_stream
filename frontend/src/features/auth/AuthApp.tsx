@@ -27,7 +27,9 @@ function savedTheme(): Theme {
 
 export function AuthApp() {
   const [session, setSession] = useState<AuthSession | null>(restoreSession);
-  const [mode, setMode] = useState<Mode>('login');
+  const [mode, setMode] = useState<Mode>(() =>
+    new URLSearchParams(window.location.search).get('mode') === 'register' ? 'register' : 'login',
+  );
   const [theme, setTheme] = useState<Theme>(savedTheme);
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -156,6 +158,7 @@ export function AuthApp() {
 
   return (
     <div className="auth-page" data-theme={theme}>
+      <a href="/" className="auth-guest-back">← Khám phá CLB</a>
       <a href="#auth-form" className="auth-skip-link">Đến biểu mẫu</a>
       <div className="auth-layout">
         <div className="auth-primary">

@@ -1,0 +1,49 @@
+---
+title: Guest mode Navy Mix với dữ liệu Supabase thật
+description: Đọc ba nguồn public và tích hợp landing vào React.
+---
+
+## Thông tin phiên
+
+- Session ID 2026-11-15-05, Asia/Saigon. Không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Codex. Phase 04. Completed trong phạm vi guest đọc nội dung và điều hướng tài khoản; phase In Progress.
+
+## Mục tiêu và công việc hoàn thành
+
+Người dùng chốt mẫu 08 và yêu cầu đọc lại DB từ cấu hình env để triển khai với thông tin công khai hiện có. Đọc metadata và ba view public_clubs, public_club_activities, public_club_posts; không đọc hồ sơ/thành viên, không thay schema hoặc ghi dữ liệu. Cả ba view trả thành công với count 0.
+
+Backend thêm public-content module/controller/service, gắn vào AppModule, API GET phân trang có validation và rate limit. Chỉ truy vấn public views, allowlist cột ở query và response, lỗi generic không lộ SDK/credentials. Không truy vấn bảng gốc khi view rỗng hoặc lỗi.
+
+Frontend thêm App root, GuestLanding, public-content hook/types/helpers và CSS scoped. Landing Navy Mix là mặc định cho khách; auth được lazy-load cho query login/register hoặc phiên hợp lệ. Danh sách CLB đồng đều, hoạt động và bài viết public, chi tiết dialog, tìm kiếm, phân trang, loading/error/retry/empty, fallback ảnh và login gate. Đổi metadata index và thêm liên kết từ AuthApp về guest. Không thay các xử lý đăng nhập/meeting hiện hữu.
+
+Files: backend/src/app.module.ts, backend/src/public-content/*, backend/test/public-content.test.cjs; frontend/index.html, frontend/src/main.tsx, App.tsx, App.test.tsx, features/guest/*, features/auth/AuthApp.tsx và auth.css; tài liệu guest-mode và các trang tiến độ/navigation. Tái sử dụng assets mẫu đã chọn.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+|---|---|---|
+| npm run typecheck | Passed | Backend và frontend |
+| Backend build | Passed | Lỗi union type Supabase ban đầu đã sửa bằng columns kiểu string |
+| Frontend build | Passed | Auth lazy chunk tách riêng; cảnh báo chunk media lớn hiện hữu |
+| Frontend tests liên quan | Passed | 16 tests: App routing, guest fetch/empty/retry/URL, AuthApp hiện hữu |
+| Backend public-content tests | Passed | 3 tests: public-view-only, phân trang/allowlist chống lộ trường, dữ liệu rỗng, lỗi an toàn |
+| HTTP backend thật | Passed | 3 GET public trả 200/empty; limit=999, page=0 và query lạ trả 400 |
+| Browser với dữ liệu thật | Passed | Desktop/mobile 390px, không overflow, đăng ký và quay lại guest, không có pageerror trong lượt xác minh cuối |
+| Browser fixtures không ghi DB | Passed | Thẻ/chi tiết CLB, activity, post, login gate, script hiển thị text không chạy |
+| Lighthouse production preview | Đã đo | 95 performance / 100 accessibility; CLS 0, LCP 2.9s. LCP chưa đạt mục tiêu 2.5s |
+
+Lượt khởi động background bằng Start-Process bị policy tự động chặn; dùng script npm --workspace backend start trong session và xác nhận thành công. Browser fixture ban đầu dừng vì locator Khuôn viên trùng ở thẻ và dialog; sửa phạm vi locator rồi kiểm tra tiếp đạt. Lượt đầu browser dùng dependency cache Vite cũ trong khi optimize đã lỗi IconBase; reload sau optimize và kiểm tra cuối không còn pageerror.
+
+## Quyết định và giới hạn
+
+Không tạo dữ liệu minh họa trong DB và không hiển thị demo thay cho public views rỗng. Không triển khai ghi quan tâm, ứng tuyển, đăng ký hoạt động hoặc hồ sơ sinh viên. Không tự công khai nội dung nháp. Chưa kiểm chứng dữ liệu có thật ở trạng thái published vì public views hiện rỗng; kiểm tra hiển thị có dữ liệu bằng fixtures được ghi rõ.
+
+Không sửa file package-lock cũ đang bị xóa hoặc tài liệu Word của người dùng. Không commit/publish. Không đánh dấu phase Done chỉ vì guest đọc được.
+
+## Bước tiếp theo và checklist
+
+Công khai nội dung qua quy trình quản trị hiện có, nghiệm thu với dữ liệu published thật; lập phạm vi riêng cho các thao tác sau đăng nhập.
+
+- [x] Cập nhật phase/master plan, session log, changelog và tài liệu guest.
+- [x] Đăng ký trang mới trong docs.json, kiểm tra JSON và các target mới.
+- [x] Ghi kiểm tra, giới hạn xác minh và phần còn lại.

@@ -3,6 +3,8 @@ title: Auth và kết nối meeting
 description: Một backend NestJS, Supabase users và JWT trước khi vào LiveKit.
 ---
 
+Ngày 15/11/2026: trang chủ cho khách là [guest mode](/modules/guest-mode). Form tài khoản mở bằng `/?mode=login` hoặc `/?mode=register`; phiên hợp lệ tiếp tục vào meeting như trước. Các API public không yêu cầu JWT, trong khi token LiveKit và API nội bộ vẫn giữ xác thực.
+
 ## Cấu trúc sau gộp
 
 `backend/src` là app NestJS duy nhất. AuthModule, UsersModule, SupabaseModule được chuyển từ app Hải vào đây; LivekitModule giữ nguyên phòng cố định và được bảo vệ bằng JwtAuthGuard. Dependencies và lockfile nằm ở workspace gốc; không chạy/cài app `backend/my-api` nữa. Các file local bị ignore trong thư mục cũ được giữ lại.

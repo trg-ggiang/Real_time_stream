@@ -172,3 +172,78 @@ Removed the dedicated self-camera sidebar section during screen sharing; no remo
 ## Audio device dropdown arrows (2026-11-10)
 
 Replaced standalone gear with microphone/headphone caret menus, added receive-audio mute toggle and output-support fallback. FE build/typecheck and 43 tests passed; physical routing pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-15-phase-04-audio-device-arrows).
+
+
+## Guest landing concepts — 2026-11-15
+
+Completed three interactive guest landing concepts for selection: Campus, Editorial and After Hours. Demo data only; Phase 04 In Progress. Frontend build/typecheck, 9 auth tests and browser interactions passed. [Work log](/work-logs/2026-11-15-01-phase-04-guest-landing-concepts). [Preview guide](/modules/guest-landing-concepts).
+
+## Bright guest concepts (2026-11-15)
+
+Added Navy (white/navy), Sky and Coral interactive light landing concepts, bringing the selector to six designs. Generated local campus photography and responsive JPEG assets; kept preview outside the meeting bundle. Build and browser interaction checks passed; Phase 04 remains In Progress pending design selection and real guest integration. [Work log](/work-logs/2026-11-15-02-phase-04-bright-guest-concepts).
+
+## Campus Board top navigation (2026-11-15)
+
+Completed a seventh guest concept with its own discovery-board composition. At user request, interests are a horizontal sticky rail below the header rather than a left sidebar. Build, browser interactions and desktop/mobile checks passed; demo data only. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-03-phase-04-campus-board).
+
+## Navy Mix concept (2026-11-15)
+
+Added separate concept 08: Navy colors/hero from 04 and uniform club grid from 03. Desktop/mobile, filtering, login gate and build passed. Preview only; Phase 04 In Progress. [Work log](/work-logs/2026-11-15-04-phase-04-navy-mix).
+
+## Live guest mode Navy Mix (2026-11-15)
+
+Integrated selected Navy Mix as the React guest homepage with paginated NestJS reads from public_clubs, public_club_activities and public_club_posts. Live public views return zero rows; empty states are truthful. Typecheck, builds, 16 frontend tests, 3 backend tests and HTTP/browser checks passed. No schema/data writes. Phase 04 In Progress; authenticated follow/application workflows remain separate. [Work log](/work-logs/2026-11-15-05-phase-04-live-guest-mode). [Guide](/modules/guest-mode).
+
+## Guest cleanup and text actions (2026-11-15)
+
+Removed guest concepts from the served project, moved production images to /images/guest, and applied self-hosted Google Font Be Vietnam Pro. Guest actions now have transparent backgrounds, no decorative icons/avatars and underline on hover/focus. Build and browser checks passed. Recursive deletion was blocked by automatic policy; original concepts remain in a temp archive outside the project. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-06-phase-04-remove-guest-concepts).
+
+
+## HUST public dataset (2026-11-15)
+
+Imported 3 clubs (SINNO, HUROS, HBAC), 3 historical activities and 3 compiled introduction posts with 5 sourced local club images/logos. Source manifest: data/hust-public.json; repeatable importer: scripts/seed-hust-public.mjs. Public views, backend/Vite API, image loads and mobile layout verified; repeat import adds zero rows. Frontend build and 7 targeted tests passed. Facebook/TikTok reading was restricted; official HUST/club sites and HBAC LinkedIn were used. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-07-phase-04-hust-public-data).
+
+
+## Aligned club cards (2026-11-15)
+
+Equalized title/summary slots and bottom-aligned club actions. Build/typecheck and browser geometry checks passed; mobile has no horizontal overflow. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-08-phase-04-align-club-cards).
+
+
+## Clickable public URLs (2026-11-15)
+
+Public detail URLs now open in a new tab with safe anchor attributes and visible underline; HTML remains escaped. Final club title first-line alignment verified. Build/typecheck and 8 targeted tests passed; real fanpage click opened the correct external page. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-09-phase-04-clickable-public-links).
+
+
+## Active guest navigation (2026-11-15)
+
+Header section links follow scroll position with blue underline and 1.15 scale. Build/typecheck, 8 tests and desktop browser scroll/anchor checks passed. Mobile layout remains unchanged. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-10-phase-04-active-guest-navigation).
+
+
+## Full-width hero slideshow (2026-11-15)
+
+Extracted GuestHero with the original overlapping large/small image form, four local images rotating every five seconds, selectable dots and subtle lower-edge decoration. Full-width section without a card border; no pause behavior/control per user instruction. Removed club discovery subtitle. Build/typecheck, 10 tests and desktop/mobile browser checks passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-11-phase-04-hero-slideshow).
+
+
+## Discovery section spacing (2026-11-15)
+
+More whitespace between sections and consistent three-column club-style activity/story cards. Shared image heights, title/summary slots and bottom-aligned actions; one column on mobile. Build/typecheck, 10 tests and browser geometry/detail checks passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-12-phase-04-discovery-spacing).
+
+
+## Distinct activity and story layouts (2026-11-15)
+
+Activities now use a date-led horizontal agenda on pale blue; stories use a featured editorial article with compact secondary pieces. Clubs retain their grid. Desktop/tablet/mobile overflow and detail/auth-gate checks passed; build/typecheck and 10 tests passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-13-phase-04-distinct-discovery-layouts).
+
+
+## Wider page and event images (2026-11-15)
+
+Halved effective content gutters and enlarged agenda images to 280x190px on desktop, with responsive tablet/mobile sizes. Build/typecheck and browser sizing/overflow checks passed. CSS-only; no repeated unit tests. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-14-phase-04-wider-page-event-images).
+
+
+## Bold active navigation (2026-11-15)
+
+Added bold blue active header labels with 2px underline and 1.15 scale; preserved active state through section gaps. Browser scroll/computed-style checks and build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-15-phase-04-bold-active-navigation).
+
+
+## Visible mobile section navigation (2026-11-15)
+
+Reproduced hidden section links below 768px and exposed them in a second header row. Desktop/mobile real scroll checks on port 5173 verified all active effects and sticky visibility. Build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-16-phase-04-visible-mobile-navigation).

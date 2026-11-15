@@ -1,0 +1,97 @@
+---
+title: Guest mode và nội dung công khai
+description: Trang chủ Navy Mix đọc dữ liệu công khai thật từ Supabase qua NestJS.
+---
+
+## Luồng truy cập
+
+Cập nhật giao diện 15/11/2026: các concept đã được gỡ khỏi public; ảnh trang chính nằm tại `/images/guest/`. Trang guest dùng Be Vietnam Pro của Google Fonts, phục vụ cục bộ qua Fontsource. Các nút là dạng chữ không nền/không icon trang trí, hover/focus có gạch chân; nút quan tâm nằm dưới ảnh. [Work log](/work-logs/2026-11-15-06-phase-04-remove-guest-concepts).
+
+Mở `/` khi chưa có phiên đăng nhập hợp lệ để xem giao diện Navy Mix đã chọn. `/?mode=login` mở đăng nhập, `/?mode=register` mở đăng ký. Có liên kết quay lại khám phá từ form tài khoản. Phiên hợp lệ hiện tiếp tục mở ứng dụng meeting như trước; guest mode không thay luồng nghiệp vụ đã đăng nhập.
+
+Khách đọc danh sách, tìm kiếm CLB trong các bản ghi đã tải, mở chi tiết CLB, hoạt động và bài viết. Nút xem thêm phân trang từng nhóm độc lập. Quan tâm và các thao tác tài khoản hiển thị yêu cầu đăng nhập. Chưa thêm API ghi quan tâm, ứng tuyển, đăng ký hoạt động hoặc hoàn thiện hồ sơ trong phiên này.
+
+## Nguồn dữ liệu và API
+
+| Endpoint GET không yêu cầu JWT | Nguồn Supabase |
+|---|---|
+| /api/public/clubs | public_clubs |
+| /api/public/activities | public_club_activities |
+| /api/public/posts | public_club_posts |
+
+Query `page` mặc định 1, từ 1 đến 10000; `limit` mặc định 12, từ 1 đến 24. Tham số lạ hoặc sai kiểu trả 400. Response có `items`, `page`, `limit`, `total`, `hasMore`; thứ tự published_at giảm dần với ID phụ ổn định. Giới hạn đọc 120 request/phút theo ThrottlerGuard.
+
+Chỉ đọc view công khai, không fallback về bảng gốc. Khóa Supabase chỉ ở backend. Service chọn cột cụ thể rồi chiếu lại allowlist khi trả response; không trả tác giả/người duyệt, ghi chú nội bộ, join_url của hoạt động, thành viên hoặc hồ sơ sinh viên. Không thay schema/RLS/grants. Trách nhiệm lọc bản ghi xuất bản nằm trong định nghĩa các public view hiện hữu; không suy ra quyền công khai từ việc bảng gốc có thể đọc bằng service key.
+
+- CLB: tên, tóm tắt, giới thiệu, sứ mệnh, logo/cover, liên hệ public và published_at.
+- Hoạt động: CLB, nội dung, cover, thời gian, hình thức, địa điểm, thời gian nhận đăng ký, capacity, lifecycle_status và thời gian xuất bản/cập nhật.
+- Bài viết: CLB, tiêu đề, tóm tắt, nội dung, cover, activity_id liên quan và thời gian xuất bản/cập nhật.
+
+Nội dung dài hiển thị dưới dạng văn bản React, không chèn HTML. URL ảnh chỉ chấp nhận HTTP/HTTPS; thiếu hoặc lỗi ảnh dùng placeholder trung tính. Không gắn ảnh demo thành cover của bản ghi thật. Ảnh hero là hình minh họa giao diện đã được chọn.
+
+## HUST reference data — 15/11/2026
+
+The connected database now exposes 3 clubs (SINNO, HUROS, HBAC), 3 historical activities and 3 compiled introduction posts. Five real club photos/logos are served locally from `/images/hust/`. Every description includes source links; the full provenance and original image URLs are in `data/hust-public.json`. Activity pictures are organizer/member imagery, identified in the descriptions. Facebook/TikTok content could not be read due to platform restrictions; sources are HUST/club websites and HBAC's public LinkedIn announcement.
+
+Run `node scripts/seed-hust-public.mjs` from root for a dry run. To import into a configured development database, use `node scripts/seed-hust-public.mjs --apply --owner=<existing-user-uuid>`. The owner must already exist; this run used the existing demo account. Do not put credentials in command arguments. The script loads `backend/.env`, creates drafts, submits for review, publishes, then verifies the public views. Reruns preserve published records and do not duplicate rows. A partial multi-table run can be resumed; edited drafts require manual review.
+
+Events remain historical/completed; day-only dates are normalized and documented. `published_at` is the application's publication time, not the original source post date. This seed does not add real memberships, registrations or recruitment applications. Phase 04 remains In Progress. [Import work log](/work-logs/2026-11-15-07-phase-04-hust-public-data).
+
+## Dữ liệu và kiểm chứng trước khi nhập
+
+Ngày 15/11/2026, metadata và truy vấn đọc trực tiếp xác nhận cả ba view public tồn tại, truy vấn thành công và đều có 0 bản ghi. Đây là số lượng nội dung công khai, không phải kết luận rằng bảng gốc trống. Trang không dùng dữ liệu demo để thay thế kết quả rỗng/lỗi.
+
+Build và typecheck đạt; 16 tests frontend liên quan và 3 tests service backend đạt. HTTP thật xác nhận endpoints trả 200 không cần JWT; limit quá lớn, page=0 và query lạ trả 400. Browser kiểm tra giao diện desktop/mobile với dữ liệu thật rỗng; nội dung có dữ liệu, chi tiết và login gate dùng HTTP fixtures chỉ trong browser, không ghi DB. Script trong bài viết fixture được hiển thị thành text và không thực thi.
+
+Lighthouse production preview đạt performance 95, accessibility 100, CLS 0, LCP 2.9s với mobile throttle; chưa đạt mục tiêu LCP 2.5s. Kết quả dev server khác production và không dùng thay số liệu production. Build vẫn cảnh báo chunk media lớn đã có sẵn.
+
+## Chạy cục bộ
+
+Từ root: `npm run dev:backend` và `npm run dev:frontend`. Mở URL Vite in ra. Trong phiên triển khai frontend đang ở `http://127.0.0.1:5174/`, backend ở cổng 3000. Để xem build: `npm --workspace frontend run build`, rồi `npm --workspace frontend run preview`; cần backend đang chạy cho API proxy.
+
+Phase 04 vẫn In Progress. Bước tiếp theo: công khai nội dung qua quy trình quản trị hiện có rồi nghiệm thu nội dung thật có dữ liệu; các nghiệp vụ ghi dữ liệu cần triển khai riêng. [Work log](/work-logs/2026-11-15-05-phase-04-live-guest-mode).
+
+
+## Aligned club cards (2026-11-15)
+
+Equalized title/summary slots and bottom-aligned club actions. Build/typecheck and browser geometry checks passed; mobile has no horizontal overflow. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-08-phase-04-align-club-cards).
+
+
+## Clickable public URLs (2026-11-15)
+
+Public detail URLs now open in a new tab with safe anchor attributes and visible underline; HTML remains escaped. Final club title first-line alignment verified. Build/typecheck and 8 targeted tests passed; real fanpage click opened the correct external page. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-09-phase-04-clickable-public-links).
+
+
+## Active guest navigation (2026-11-15)
+
+Header section links follow scroll position with blue underline and 1.15 scale. Build/typecheck, 8 tests and desktop browser scroll/anchor checks passed. Mobile layout remains unchanged. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-10-phase-04-active-guest-navigation).
+
+
+## Full-width hero slideshow (2026-11-15)
+
+Extracted GuestHero with the original overlapping large/small image form, four local images rotating every five seconds, selectable dots and subtle lower-edge decoration. Full-width section without a card border; no pause behavior/control per user instruction. Removed club discovery subtitle. Build/typecheck, 10 tests and desktop/mobile browser checks passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-11-phase-04-hero-slideshow).
+
+
+## Discovery section spacing (2026-11-15)
+
+More whitespace between sections and consistent three-column club-style activity/story cards. Shared image heights, title/summary slots and bottom-aligned actions; one column on mobile. Build/typecheck, 10 tests and browser geometry/detail checks passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-12-phase-04-discovery-spacing).
+
+
+## Distinct activity and story layouts (2026-11-15)
+
+Activities now use a date-led horizontal agenda on pale blue; stories use a featured editorial article with compact secondary pieces. Clubs retain their grid. Desktop/tablet/mobile overflow and detail/auth-gate checks passed; build/typecheck and 10 tests passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-13-phase-04-distinct-discovery-layouts).
+
+
+## Wider page and event images (2026-11-15)
+
+Halved effective content gutters and enlarged agenda images to 280x190px on desktop, with responsive tablet/mobile sizes. Build/typecheck and browser sizing/overflow checks passed. CSS-only; no repeated unit tests. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-14-phase-04-wider-page-event-images).
+
+
+## Bold active navigation (2026-11-15)
+
+Added bold blue active header labels with 2px underline and 1.15 scale; preserved active state through section gaps. Browser scroll/computed-style checks and build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-15-phase-04-bold-active-navigation).
+
+
+## Visible mobile section navigation (2026-11-15)
+
+Reproduced hidden section links below 768px and exposed them in a second header row. Desktop/mobile real scroll checks on port 5173 verified all active effects and sticky visibility. Build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-16-phase-04-visible-mobile-navigation).
