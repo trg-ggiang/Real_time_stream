@@ -1,0 +1,41 @@
+---
+title: Club follow menu
+description: Tách trạng thái quan tâm và hành động bỏ quan tâm thành menu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-23
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sau khi quan tâm CLB, nhãn trạng thái hiển thị “Đang quan tâm”; khi bấm vào, mở menu có hành động “Bỏ quan tâm”.
+
+## Công việc hoàn thành
+
+Nút quan tâm đang hoạt động mở menu dropdown; chọn “Bỏ quan tâm” gửi yêu cầu DELETE qua API hiện có. Menu đóng khi bấm ngoài hoặc nhấn Escape. Hành động đăng ký hoạt động không đổi.
+
+Files: `frontend/src/features/personal/components/AccountAction.tsx`, `frontend/src/features/personal/personal.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Chưa chạy trong phiên. |
+
+## Quyết định và lý do
+
+Việc bỏ quan tâm yêu cầu thao tác riêng trong menu để tránh xóa theo dõi ngay khi bấm trạng thái.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh thao tác trực tiếp với backend hoặc kiểm tra menu trên trình duyệt.
+
+## Bước tiếp theo
+
+Mở một trang chi tiết CLB, quan tâm CLB rồi xác nhận menu và thao tác bỏ quan tâm.

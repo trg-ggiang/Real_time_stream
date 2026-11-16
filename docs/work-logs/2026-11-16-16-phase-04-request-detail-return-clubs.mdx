@@ -1,0 +1,35 @@
+---
+title: Return from request detail to clubs
+description: Đổi breadcrumb trang chi tiết đề nghị sang CLB tham gia.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-16
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thay liên kết "Lịch sử đề nghị" trên trang chi tiết thành "CLB tham gia".
+
+## Công việc hoàn thành
+
+Đổi nhãn và route quay lại sang `/me/clubs`. File: `frontend/src/features/personal/pages/ClubRequestPages.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Không chạy theo yêu cầu trong phiên. |
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra trực quan trên trình duyệt.
+
+## Bước tiếp theo
+
+Bấm breadcrumb trên trang chi tiết để xác nhận đích.

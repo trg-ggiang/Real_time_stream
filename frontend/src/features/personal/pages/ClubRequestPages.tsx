@@ -111,8 +111,8 @@ export function NewClubRequest({ token }: { token: string }) {
     <>
       <div className="ps-heading">
         <div>
-          <Link className="ps-back" to="/me/club-requests">
-            ← Các đề nghị của tôi
+          <Link className="ps-back" to="/me/clubs">
+            ← CLB tham gia
           </Link>
           <h1>Đưa CLB đến cộng đồng</h1>
           <p>
@@ -209,8 +209,8 @@ export function ClubRequestDetail({ token }: { token: string }) {
     <>
       <div className="ps-heading">
         <div>
-          <Link className="ps-back" to="/me/club-requests">
-            ← Lịch sử đề nghị
+          <Link className="ps-back" to="/me/clubs">
+            ← CLB tham gia
           </Link>
           <h1>{item?.name || "Hồ sơ đề nghị CLB"}</h1>
           <p>Chỉ bạn và người có quyền xét duyệt mới xem hồ sơ đề nghị này.</p>

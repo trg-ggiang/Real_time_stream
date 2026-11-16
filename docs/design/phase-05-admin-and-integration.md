@@ -102,3 +102,6 @@ Checklist nhóm: dùng một admin đã có role hợp lệ và profile đầy �
 ### Bổ sung sau review: đích đăng nhập
 
 Đã sửa mặc định từ trang gốc: admin vào /admin, sinh viên vào /me sau hoàn thiện profile và refresh role. Giữ nguyên link đích cụ thể khi đăng nhập. Tab đang ở /me không bị ép rời không gian cá nhân; chọn Quản trị hệ thống hoặc mở /admin. Kiểm tra bổ sung: 77 frontend tests, typecheck/build và browser cache role cũ→admin shell đạt. [Work log](/work-logs/2026-11-16-06-phase-04-admin-login-routing).
+# Visual follow-up — account dropdown (2026-11-16)
+
+The signed-in public header account dropdown now follows the supplied compact menu reference: initials avatar trigger, rounded floating panel, identity heading, icon-led actions and separated red sign-out row. Existing destinations and click handlers are retained. Frontend source only; no API, auth, database or room behavior changed. See [work log](/work-logs/2026-11-16-07-phase-04-account-menu-visual).

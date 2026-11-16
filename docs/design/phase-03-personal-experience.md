@@ -1,5 +1,11 @@
 # Phase 3 — Tài khoản và không gian cá nhân
 
+Visual follow-up 16/11/2026: `/me/registrations` now has list/calendar-agenda controls and tabs for registered, joined-club and completed activities, derived from current personal API data. [Work log](/work-logs/2026-11-16-18-phase-04-personal-activities).
+
+Visual follow-up 16/11/2026: `/me/clubs` now uses joined, pending-review and managed tabs with counts and an in-place create-club action. [Work log](/work-logs/2026-11-16-15-phase-04-my-clubs-tabs).
+
+Visual follow-up 16/11/2026: `/me` được cập nhật theo bố cục dashboard tham chiếu với lời chào, bốn chỉ số, banner khám phá hoạt động và phần cộng đồng. [Work log](/work-logs/2026-11-16-14-phase-04-personal-overview-dashboard).
+
 Ngày 16/11/2026. Đã triển khai mã nguồn và kiểm tra; chờ nhóm review giao diện/nghiệp vụ. Không phải thiết kế final của toàn sản phẩm. Phase này thuộc kế hoạch redesign mới, không thay trạng thái lịch sử Phase 03 database/auth của roadmap cũ.
 
 ## Đã làm
@@ -106,3 +112,6 @@ Public images giữ nguyên nguồn như Phase 2; ảnh fixture chỉ dùng logo
 ## Còn lại cho các phase sau
 
 Không gian CLB hoàn chỉnh, quản lý ban/thành viên, duyệt bài, private channels, admin shell, upload/storage và taxonomy chưa triển khai mới. Các lối Mở không gian tiếp tục bridge sang module CLB hiện có. Phase 3 đã có mã nguồn có thể dùng, chưa phải mọi màn hình final hay nghiệm thu tải production.
+# Visual follow-up — personal overview (2026-11-16)
+
+The `/me` overview now follows the supplied reference with a greeting, four statistics, an activity discovery banner and a community section. The values use the existing personal API responses; no backend or schema changes were made. Responsive styling is included. [Work log](/work-logs/2026-11-16-14-phase-04-personal-overview-dashboard).

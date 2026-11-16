@@ -1,5 +1,21 @@
 # Phase 4 — Không gian sinh hoạt và quản lý CLB
 
+2026-11-16: The unfollow dropdown now sits close to the follow button in a compact panel. Phase remains In Progress. [Session log](/work-logs/2026-11-16-26-compact-follow-menu).
+
+2026-11-16: Follow/unfollow state is reflected by the button without an extra confirmation line. Phase remains In Progress. [Session log](/work-logs/2026-11-16-25-hide-follow-confirmations).
+
+2026-11-16: Unfollowing a club no longer displays an extra confirmation line. Phase remains In Progress. [Session log](/work-logs/2026-11-16-24-phase-04-hide-unfollow-message).
+
+2026-11-16: The active club follow button now exposes a separate remove action in a dropdown. Phase remains In Progress. [Session log](/work-logs/2026-11-16-23-phase-04-follow-menu).
+
+2026-11-16: Tightened spacing between adjacent discovery story cards. Phase remains In Progress. [Session log](/work-logs/2026-11-16-22-phase-04-story-card-spacing).
+
+2026-11-16: Fixed fallback logo dimensions in followed club cards; phase remains In Progress. [Session log](/work-logs/2026-11-16-21-phase-04-followed-club-logo-fallback).
+
+2026-11-16: `/me/follows` now presents followed clubs as responsive image cards. Phase remains In Progress. [Session log](/work-logs/2026-11-16-20-phase-04-followed-club-image-cards).
+
+2026-11-16: `/me/clubs` now presents joined, managed and pending entries as responsive image cards. Phase remains In Progress. [Session log](/work-logs/2026-11-16-19-phase-04-personal-club-image-cards).
+
 Ngày 16/11/2026. Đã triển khai trong workspace; sẵn sàng để nhóm review. Đây là Phase 4 của kế hoạch redesign, không đồng nghĩa toàn bộ roadmap hay UI đã final.
 
 ## Cách mở và luồng chính

@@ -1,18 +1,27 @@
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { SquaresFour } from "@phosphor-icons/react/dist/csr/SquaresFour";
+import { Users } from "@phosphor-icons/react/dist/csr/Users";
+import { Heart } from "@phosphor-icons/react/dist/csr/Heart";
+import { CalendarCheck } from "@phosphor-icons/react/dist/csr/CalendarCheck";
+import { UserCircle } from "@phosphor-icons/react/dist/csr/UserCircle";
+import { Compass } from "@phosphor-icons/react/dist/csr/Compass";
+import { VideoCamera } from "@phosphor-icons/react/dist/csr/VideoCamera";
+import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
+import { GearSix } from "@phosphor-icons/react/dist/csr/GearSix";
+import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
 import { ProfileForm } from "../profile/ProfileForm";
-import { PersonalLists, PersonalOverview } from "./pages/PersonalLists";
+import { PersonalActivitiesPage, PersonalClubsPage, PersonalLists, PersonalOverview } from "./pages/PersonalLists";
 import { ClubRequestDetail, NewClubRequest } from "./pages/ClubRequestPages";
 import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import "./personal.css";
 const nav = [
-  ["/me", "Tổng quan"],
-  ["/me/clubs", "CLB tham gia"],
-  ["/me/follows", "Đang quan tâm"],
-  ["/me/registrations", "Hoạt động đã đăng ký"],
-  ["/me/club-requests", "Đề nghị CLB"],
-  ["/me/profile", "Hồ sơ cá nhân"],
-];
+  ["/me", "Tổng quan", SquaresFour],
+  ["/me/clubs", "CLB tham gia", Users],
+  ["/me/follows", "Đang quan tâm", Heart],
+  ["/me/registrations", "Hoạt động đã đăng ký", CalendarCheck],
+  ["/me/profile", "Hồ sơ cá nhân", UserCircle],
+] as const;
 export function PersonalApp({
   viewer,
   accessToken,
@@ -68,20 +77,32 @@ export function PersonalApp({
           className={open ? "is-open" : ""}
           aria-label="Điều hướng cá nhân"
         >
-          {nav.map(([path, label]) => (
-            <NavLink key={path} to={path} end={path === "/me"}>
-              {label}
+          {nav.map(([path, label, Icon]) => (
+            <NavLink
+              key={path}
+              to={path}
+              end={path === "/me"}
+              className={({ isActive }) =>
+                isActive ||
+                (path === "/me/clubs" &&
+                  location.pathname.startsWith("/me/club-requests/"))
+                  ? "active"
+                  : undefined
+              }
+            >
+              <Icon size={19} weight="regular" aria-hidden="true" />
+              <span>{label}</span>
             </NavLink>
           ))}
         </nav>
         <div className="ps-sidebar-bottom">
-          <Link to="/">← Khám phá công khai</Link>
+          <Link to="/"><Compass size={18} aria-hidden="true" />Khám phá công khai</Link>
           <button onClick={onMeeting} data-leave-account>
-            Mở phòng họp
+            <VideoCamera size={18} aria-hidden="true" />Mở phòng họp
           </button>
-          {role === "admin" && <Link to="/admin">Quản trị hệ thống ↗</Link>}
+          {role === "admin" && <Link to="/admin"><GearSix size={18} aria-hidden="true" />Quản trị hệ thống</Link>}
           <button onClick={onLogout} data-leave-account>
-            Đăng xuất
+            <SignOut size={18} aria-hidden="true" />Đăng xuất
           </button>
         </div>
       </aside>
@@ -101,8 +122,16 @@ export function PersonalApp({
                 />
               }
             />
+            <Route
+              path="/me/clubs"
+              element={<PersonalClubsPage token={accessToken} />}
+            />
+            <Route
+              path="/me/registrations"
+              element={<PersonalActivitiesPage token={accessToken} />}
+            />
             {(
-              ["clubs", "follows", "registrations", "club-requests"] as const
+              ["follows"] as const
             ).map((kind) => (
               <Route
                 key={kind}

@@ -10,6 +10,13 @@ import {
 import { List } from "@phosphor-icons/react/dist/csr/List";
 import { X } from "@phosphor-icons/react/dist/csr/X";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
+import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
+import { UserRectangle } from "@phosphor-icons/react/dist/csr/UserRectangle";
+import { Users } from "@phosphor-icons/react/dist/csr/Users";
+import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
+import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
+import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
+import { GearSix } from "@phosphor-icons/react/dist/csr/GearSix";
 import { DiscoveryHome } from "./pages/DiscoveryHome";
 import { CollectionPage } from "./pages/CollectionPage";
 import { PublicDetailPage } from "./pages/PublicDetailPage";
@@ -66,6 +73,13 @@ export function DiscoveryApp({
     if (viewer && accessToken) navigate("/me/club-requests/new");
     else window.location.assign("/me/club-requests/new?mode=login");
   }
+  const initials = (viewer?.displayName ?? "")
+    .trim()
+    .split(/\s+/)
+    .slice(-2)
+    .map((part) => part[0])
+    .join("")
+    .toLocaleUpperCase("vi-VN");
   if (location.pathname === "/admin" || location.pathname.startsWith("/admin/"))
     return (
       <AdminApp
@@ -144,18 +158,19 @@ export function DiscoveryApp({
             {viewer ? (
               <details ref={accountMenu}>
                 <summary>
-                  {viewer.displayName} <span aria-hidden="true">⌄</span>
+                  <span className="dc-account-avatar" aria-hidden="true">{initials || "U"}</span>
+                  <CaretDown size={16} aria-hidden="true" />
                 </summary>
                 <div className="dc-account-menu">
-                  <p>Sinh viên · {viewer.displayName}</p>
-                  <Link to="/me">Không gian của tôi</Link>
-                  <Link to="/me/clubs">CLB của tôi</Link>
-                  <button onClick={startRequest}>Đề nghị thành lập CLB</button>
-                  <button onClick={onMeeting}>Cuộc họp</button>
+                  <p className="dc-account-heading">Sinh viên · {viewer.displayName}</p>
+                  <Link to="/me"><UserRectangle size={18} aria-hidden="true" />Không gian của tôi</Link>
+                  <Link to="/me/clubs"><Users size={18} aria-hidden="true" />CLB của tôi</Link>
+                  <button onClick={startRequest}><Plus size={18} aria-hidden="true" />Tạo CLB</button>
+                  <button onClick={onMeeting}><CalendarBlank size={18} aria-hidden="true" />Cuộc họp</button>
                   {role === "admin" && (
-                    <Link to="/admin">Quản trị hệ thống</Link>
+                    <Link to="/admin"><GearSix size={18} aria-hidden="true" />Quản trị hệ thống</Link>
                   )}
-                  <button onClick={onLogout}>Đăng xuất</button>
+                  <button className="dc-account-logout" onClick={onLogout}><SignOut size={18} aria-hidden="true" />Đăng xuất</button>
                 </div>
               </details>
             ) : (

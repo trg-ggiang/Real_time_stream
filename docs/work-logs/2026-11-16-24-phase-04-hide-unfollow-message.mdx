@@ -1,0 +1,41 @@
+---
+title: Hide unfollow confirmation line
+description: Bỏ thông báo sau khi hủy quan tâm CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-24
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Bỏ dòng “Đã bỏ quan tâm CLB” sau khi người dùng hủy theo dõi.
+
+## Công việc hoàn thành
+
+Sau khi API xác nhận bỏ theo dõi, trạng thái nút đổi về “Quan tâm CLB” mà không hiển thị dòng thông báo phụ. Thông báo sau khi quan tâm vẫn được giữ.
+
+File: `frontend/src/features/personal/components/AccountAction.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Chưa chạy trong phiên. |
+
+## Quyết định và lý do
+
+Giữ giao diện gọn sau khi hủy quan tâm, theo ảnh tham chiếu.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xem trực quan trên trình duyệt.
+
+## Bước tiếp theo
+
+Hủy quan tâm một CLB để xác nhận chỉ còn nút “Quan tâm CLB”.

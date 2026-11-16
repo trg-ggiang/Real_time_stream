@@ -1,0 +1,42 @@
+---
+title: Signed-in account dropdown visual refresh
+description: Cập nhật menu tài khoản trang khám phá theo ảnh tham chiếu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-07
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ bắt đầu/kết thúc chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chỉ đổi giao diện menu tài khoản đã đăng nhập để khớp hơn với ảnh 1; không thay đổi luồng backend/auth/meeting.
+
+## Công việc hoàn thành
+
+- Thay tên hiển thị trên nút bằng avatar chữ cái tắt và mũi tên.
+- Tạo menu nền trắng bo góc, phần thông tin tài khoản, các lối tắt có icon và hàng đăng xuất màu đỏ.
+- Giữ nguyên các route và hàm xử lý hiện có.
+- Files: `frontend/src/features/discovery/DiscoveryApp.tsx`, `frontend/src/features/discovery/discovery.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Không chạy theo yêu cầu trong phiên; chưa có xác minh trình duyệt. |
+
+## Quyết định và lý do
+
+Giữ các mục menu và tương tác hiện có, chỉ cải thiện diện mạo theo tham chiếu.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xem trực tiếp trong trình duyệt.
+
+## Bước tiếp theo
+
+Mở menu tài khoản trên trang public để duyệt trực quan.

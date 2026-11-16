@@ -8,6 +8,86 @@ title: Changelog
 description: Lịch sử thay đổi dự án.
 ---
 
+## 2026-11-16 — Compact follow menu
+
+Anchored the unfollow menu immediately below its trigger and reduced its width, spacing and padding. [Work log](/work-logs/2026-11-16-26-compact-follow-menu).
+
+## 2026-11-16 — Hide follow confirmation text
+
+Removed the extra confirmation line after following or unfollowing a club; the button itself reflects the current state. [Work log](/work-logs/2026-11-16-25-hide-follow-confirmations).
+
+## 2026-11-16 — Hide unfollow confirmation line
+
+Removed the extra “Đã bỏ quan tâm CLB” line after unfollowing a club. [Work log](/work-logs/2026-11-16-24-phase-04-hide-unfollow-message).
+
+## 2026-11-16 — Follow menu
+
+On a club detail page, the active “Đang quan tâm” button now opens a menu with an explicit “Bỏ quan tâm” action. [Work log](/work-logs/2026-11-16-23-phase-04-follow-menu).
+
+## 2026-11-16 — Story card spacing
+
+Reduced the vertical gap between adjacent story cards and stopped the posts grid rows from stretching to the featured story height. Checks were not run. [Work log](/work-logs/2026-11-16-22-phase-04-story-card-spacing).
+
+## 2026-11-16 — Followed club logo fallback sizing
+
+Kept the followed club fallback logo square and prevented “uniCircle” from wrapping inside it. Checks were not run. [Work log](/work-logs/2026-11-16-21-phase-04-followed-club-logo-fallback).
+
+## 2026-11-16 — Followed club image cards
+
+Changed `/me/follows` from horizontal club rows to responsive image cards with cover, logo, follow status, summary and club link. Checks were not run. [Work log](/work-logs/2026-11-16-20-phase-04-followed-club-image-cards).
+
+## 2026-11-16 — Personal club image cards
+
+Changed joined, managed and pending club items on `/me/clubs` into responsive cover image cards with the existing name, role or request status, and destination link. Checks were not run. [Work log](/work-logs/2026-11-16-19-phase-04-personal-club-image-cards).
+
+## 2026-11-16 — Personal activities page
+
+Restyled `/me/registrations` with list/calendar-agenda controls and registration, joined-club and completed tabs using existing personal data. Automated checks were not run. [Work log](/work-logs/2026-11-16-18-phase-04-personal-activities).
+
+## 2026-11-16 — Club card wrapping
+
+Fixed compact club cards so fallback logos keep their intended size and names do not collapse into narrow vertical text. Automated checks were not run. [Work log](/work-logs/2026-11-16-17-phase-04-club-card-overflow).
+
+## 2026-11-16 — Request detail return link
+
+Changed the request detail breadcrumb to “CLB tham gia” and `/me/clubs`. [Work log](/work-logs/2026-11-16-16-phase-04-request-detail-return-clubs).
+
+## 2026-11-16 — My clubs tabs
+
+Restyled `/me/clubs` with the reference heading, create action and joined/pending/managed tabs backed by the existing personal data. Automated checks were not run. [Work log](/work-logs/2026-11-16-15-phase-04-my-clubs-tabs).
+
+## 2026-11-16 — Personal overview dashboard
+
+Redesigned `/me` with a greeting, account stats, activity discovery banner and community section, with responsive styling. Automated checks were not run. [Work log](/work-logs/2026-11-16-14-phase-04-personal-overview-dashboard).
+
+## 2026-11-16 — Personal sidebar active state
+
+The selected navigation item now receives an active highlight, including the CLB tham gia entry while creating or viewing a club request. [Work log](/work-logs/2026-11-16-13-phase-04-sidebar-active-state).
+
+## 2026-11-16 — Create club menu label
+
+Renamed the account menu action to “Tạo CLB” without changing its behavior. [Work log](/work-logs/2026-11-16-12-phase-04-create-club-menu-label).
+
+## 2026-11-16 — Create club button label
+
+Renamed the joined clubs page action to “Tạo câu lạc bộ”. Its location and destination remain the same. [Work log](/work-logs/2026-11-16-11-phase-04-create-club-label).
+
+## 2026-11-16 — Club request return link
+
+Changed the new club request form's back link to “CLB tham gia” and `/me/clubs`. Automated checks were not run. [Work log](/work-logs/2026-11-16-10-phase-04-club-request-back-link).
+
+## 2026-11-16 — Club request entry point
+
+Removed the club request list from personal navigation and moved its creation button to the joined clubs page. Request form and detail routes remain available. Automated checks were not run. [Work log](/work-logs/2026-11-16-09-phase-04-club-request-entry-point).
+
+## 2026-11-16 — Personal sidebar icons
+
+Added icons and aligned labels in the personal account sidebar while keeping existing menu items and behavior. Automated checks were not run. [Work log](/work-logs/2026-11-16-08-phase-04-personal-sidebar-icons).
+
+## 2026-11-16 — Account dropdown visual refresh
+
+Restyled the signed-in public header account menu with an initials avatar, rounded panel, icon-led actions and highlighted sign-out row. Existing navigation and handlers remain the same. No automated checks run. [Work log](/work-logs/2026-11-16-07-phase-04-account-menu-visual).
+
 ## 2026-11-07 — Tunnel startup hash fix
 
 - Replaced Get-FileHash calls with a .NET SHA256 helper to fix the reproduced npm/PowerShell startup failure, retaining pinned release verification.

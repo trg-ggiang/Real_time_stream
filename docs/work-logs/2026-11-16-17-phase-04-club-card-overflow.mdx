@@ -1,0 +1,35 @@
+---
+title: Fix club card wrapping
+description: Giữ fallback logo và tên CLB đúng bố cục khi card hẹp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-17
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa phần thẻ CLB bị ép logo và tên thành cột hẹp theo ảnh.
+
+## Công việc hoàn thành
+
+Đảm bảo grid tự chuyển về một cột khi không đủ rộng, cố định kích thước fallback logo và giới hạn tên CLB trong card. Cập nhật các fallback liên quan để không vượt chiều cao. File: `frontend/src/features/personal/personal.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Không chạy theo yêu cầu trong phiên. |
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xem trực quan trên trình duyệt.
+
+## Bước tiếp theo
+
+Mở trang CLB của tôi ở cỡ cửa sổ đang bị lỗi để duyệt lại.

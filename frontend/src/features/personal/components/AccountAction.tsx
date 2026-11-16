@@ -25,8 +25,26 @@ export function AccountAction({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [followMenuOpen, setFollowMenuOpen] = useState(false);
   const mutation = useRef<AbortController | null>(null);
+  const actionRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => () => mutation.current?.abort(), []);
+  useEffect(() => {
+    if (!followMenuOpen) return;
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (event.target instanceof Node && !actionRef.current?.contains(event.target))
+        setFollowMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFollowMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [followMenuOpen]);
   useEffect(() => {
     const controller = new AbortController();
     setLoaded(false);
@@ -75,11 +93,7 @@ export function AccountAction({
         });
         if (controller.signal.aborted) return;
         setFollowing(data.following);
-        setMessage(
-          data.following
-            ? "Đã lưu CLB vào danh sách quan tâm."
-            : "Đã bỏ quan tâm CLB.",
-        );
+        setMessage("");
       } else {
         const data = await registrationState(token, id, {
           method: remove ? "DELETE" : "PUT",
@@ -111,7 +125,7 @@ export function AccountAction({
   const active =
     kind === "follow" ? following : registration?.status === "registered";
   return (
-    <div className="ps-action">
+    <div className={`ps-action${kind === "follow" ? " ps-follow-action" : ""}`} ref={actionRef}>
       {error ? (
         <>
           <p role="alert">{error}</p>
@@ -120,25 +134,39 @@ export function AccountAction({
           </button>
         </>
       ) : (
-        <button
-          className="dc-button"
-          disabled={!loaded || busy || (unavailable && !active)}
-          onClick={change}
-        >
-          {busy
-            ? "Đang xử lý…"
-            : !loaded
-              ? "Đang kiểm tra…"
-              : kind === "follow"
-                ? following
-                  ? "Đang quan tâm · Bỏ quan tâm"
-                  : "Quan tâm CLB"
-                : active
-                  ? "Đã đăng ký · Hủy đăng ký"
-                  : unavailable
-                    ? "Đã đóng đăng ký"
-                    : "Đăng ký tham gia"}
-        </button>
+        <div className={kind === "follow" ? "ps-follow-control" : "ps-registration-control"}>
+          <button
+            className={`dc-button${kind === "follow" && following ? " is-following" : ""}`}
+            disabled={!loaded || busy || (unavailable && !active)}
+            aria-haspopup={kind === "follow" && following ? "menu" : undefined}
+            aria-expanded={kind === "follow" && following ? followMenuOpen : undefined}
+            onClick={() => {
+              if (kind === "follow" && following) setFollowMenuOpen((open) => !open);
+              else void change();
+            }}
+          >
+            {busy
+              ? "Đang xử lý…"
+              : !loaded
+                ? "Đang kiểm tra…"
+                : kind === "follow"
+                  ? following
+                    ? "Đang quan tâm"
+                    : "Quan tâm CLB"
+                  : active
+                    ? "Đã đăng ký · Hủy đăng ký"
+                    : unavailable
+                      ? "Đã đóng đăng ký"
+                      : "Đăng ký tham gia"}
+          </button>
+          {kind === "follow" && following && followMenuOpen && (
+            <div className="ps-follow-dropdown" role="menu">
+              <button type="button" role="menuitem" disabled={busy} onClick={() => void change()}>
+                {busy ? "Đang xử lý…" : "Bỏ quan tâm"}
+              </button>
+            </div>
+          )}
+        </div>
       )}
       {message && <p role="status">{message}</p>}
       <Link to={kind === "follow" ? "/me/follows" : "/me/registrations"}>
