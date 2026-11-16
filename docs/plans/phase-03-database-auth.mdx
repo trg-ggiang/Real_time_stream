@@ -62,3 +62,7 @@ Endpoint hoạt động kiểm tra membership `active` theo từng CLB. Quyền 
 ## Ph?ng ch? d?ng schema hi?n c? ? 2026-11-08
 
 B? migration ch?a ?p d?ng v? ph? thu?c requested_session_id theo y?u c?u. D?ng pending ? admitted ? c?p meeting; attendance ch? ghi khi join ???c c?p token. Build v? 19 tests BE ??t; ch?a E2E th?t. Phase 03/05 In Progress. [Work log](/work-logs/2026-11-08-10-phase-03-existing-admission-status).
+
+## 2026-11-16 — Profile gate và private account APIs
+
+Giữ năm trường onboarding bắt buộc, student_code 32, no-store và lỗi 409 thân thiện. Guard chặn nghiệp vụ personal/tạo CLB/hoạt động CLB/tạo-join meeting/token khi chưa đủ profile, không chặn cập nhật profile hoặc dọn cuộc gọi. Không thay schema hay thực hiện SQL. [Báo cáo Phase 3](/design/phase-03-personal-experience).

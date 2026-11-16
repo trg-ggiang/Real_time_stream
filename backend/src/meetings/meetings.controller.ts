@@ -11,6 +11,7 @@ import { MeetingSettingsDto } from './dto/meeting-settings.dto';
 import { SetModeratorDto } from './dto/set-moderator.dto';
 import { MeetingsService } from './meetings.service';
 import { ScreenShareDecisionDto } from './dto/screen-share.dto';
+import { CompleteProfileGuard } from '../users/complete-profile.guard';
 
 @Controller('meetings')
 @UseGuards(JwtAuthGuard)
@@ -26,11 +27,13 @@ export class MeetingsController {
   }
 
   @Post()
+  @UseGuards(CompleteProfileGuard)
   create(@CurrentUser() user: User, @Body() body: CreateMeetingDto) {
     return this.meetings.createMeeting(user, body);
   }
 
   @Post('quick')
+  @UseGuards(CompleteProfileGuard)
   createQuick(@CurrentUser() user: User, @Body() body: CreateQuickMeetingDto) {
     return this.meetings.createQuickMeeting(user, body);
   }
@@ -41,11 +44,13 @@ export class MeetingsController {
   }
 
   @Post(':meetingId/sessions')
+  @UseGuards(CompleteProfileGuard)
   createSession(@CurrentUser() user: User, @Param('meetingId', new ParseUUIDPipe()) meetingId: string, @Body() body: CreateSessionDto) {
     return this.meetings.createSession(user, meetingId, body);
   }
 
   @Post(':code/join')
+  @UseGuards(CompleteProfileGuard)
   join(@CurrentUser() user: User, @Param('code') code: string, @Body() body: JoinSessionDto) {
     return this.meetings.join(user, code, body.sessionId);
   }

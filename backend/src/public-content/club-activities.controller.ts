@@ -5,6 +5,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { PublicPageQuery } from './public-content.controller';
 import { ClubActivitiesService, type ActivityList } from './club-activities.service';
+import { CompleteProfileGuard } from '../users/complete-profile.guard';
 
 class CreateActivityDto {
   @IsUUID('4') activity_id!: string;
@@ -29,7 +30,7 @@ class RejectActivityDto {
 }
 
 @Controller('my-clubs')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, CompleteProfileGuard)
 export class ClubActivitiesController {
   constructor(private readonly activities: ClubActivitiesService) {}
 

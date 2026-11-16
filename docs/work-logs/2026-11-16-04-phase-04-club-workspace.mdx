@@ -1,0 +1,20 @@
+---
+title: Club workspace and chairperson workflows
+description: Redesign Phase 4, nội dung, thành viên và cơ cấu CLB.
+---
+
+## Kết quả
+
+Ngày 16/11/2026, Asia/Bangkok. Codex hoàn thành phạm vi code Phase 4 redesign, ready for review; historical roadmap Phase 03/04 vẫn In Progress.
+
+Triển khai workspace riêng theo CLB, chuyển ngữ cảnh/role, posts và activities draft/submit/review, quản lý thành viên/ban, RPC chuyển chủ nhiệm, sửa allowlist liên hệ/ảnh, và lối vào meeting có đường quay lại. Chủ nhiệm đăng hoạt động ngay; thành viên gửi duyệt. Không tự bổ sung tuyển dụng/chat nội bộ hoặc liên kết DB meeting-club chưa có.
+
+## Kiểm tra
+
+57 backend và 70 frontend tests đạt; typecheck/build đạt, giữ cảnh báo chunk meeting. Browser fixtures 45 checks tại 1440/768/390/320, 0 lỗi flow/overflow/ảnh/console, 0 app-screen FAIL. Đã xem screenshot và sửa datetime overflow trên tablet. Bổ sung kiểm thử chống ghi đè và giữ bản soạn khi lỗi; không tự retry mutation.
+
+Không chạy SQL migration/seed hoặc ghi Supabase thật. Metadata chỉ đọc; browser API bị intercept hoàn toàn. Không commit/push, giữ thay đổi các phase trước. Chưa chứng minh concurrency trên DB live hoặc kiểm thử tích hợp ghi với tài khoản thật.
+
+## Bàn giao
+
+[Báo cáo Phase 4](/design/phase-04-club-workspace) có flow, API, file, cách mở, giới hạn và checklist review. Admin shell dành cho Phase 5; không coi toàn UI final. Có preflight SQL chỉ đọc cho catalog/RPC/constraint; không tự thực thi.

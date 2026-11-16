@@ -5,6 +5,8 @@ description: Trang chủ Navy Mix đọc dữ liệu công khai thật từ Supa
 
 ## Luồng truy cập
 
+Cập nhật 16/11/2026: public experience mới dùng route `/clubs`, `/activities`, `/posts` và trang detail theo UUID, search phía server và filter thời gian. Navigation public tách khỏi menu tài khoản; auth/onboarding/meeting và các trang quản lý cũ giữ qua adapter. Các đoạn ghi ngày 15/11 bên dưới mô tả phiên cũ, không còn là đặc tả layout hiện tại. Xem [báo cáo Phase 2](/design/phase-02-public-experience).
+
 Cập nhật giao diện 15/11/2026: các concept đã được gỡ khỏi public; ảnh trang chính nằm tại `/images/guest/`. Trang guest dùng Be Vietnam Pro của Google Fonts, phục vụ cục bộ qua Fontsource. Các nút là dạng chữ không nền/không icon trang trí, hover/focus có gạch chân; nút quan tâm nằm dưới ảnh. [Work log](/work-logs/2026-11-15-06-phase-04-remove-guest-concepts).
 
 Mở `/` khi chưa có phiên đăng nhập hợp lệ để xem giao diện Navy Mix đã chọn. `/?mode=login` mở đăng nhập, `/?mode=register` mở đăng ký. Có liên kết quay lại khám phá từ form tài khoản. Phiên hợp lệ hiện tiếp tục mở ứng dụng meeting như trước; guest mode không thay luồng nghiệp vụ đã đăng nhập.
@@ -103,3 +105,15 @@ Sau khi đăng nhập, chọn **CLB của tôi** cạnh **Câu lạc bộ** rồ
 API có JWT dưới `/api/my-clubs`, lấy vai trò từ membership `active` của từng CLB đã công khai. Backend dùng các trạng thái `draft`, `pending_review`, `published` và `rejected` trong `club_activities`. Mục công khai tiếp tục đọc `public_club_activities`. Đường dẫn họp trực tuyến chỉ có trong màn hình hoạt động dành cho thành viên được phép xem.
 
 [Work log](/work-logs/2026-11-15-35-phase-04-club-activities).
+
+## Phase 3 — chuyển từ khám phá sang cá nhân
+
+Sau login/onboarding mặc định vào /me; từ public detail giữ lại URL để tiếp tục bằng thao tác xác nhận của người dùng. Quan tâm/đăng ký không còn là thông báo chưa triển khai của Phase 2: đã nối private API và trạng thái thật. Không chạy ghi live trong kiểm thử. [Chi tiết](/design/phase-03-personal-experience).
+
+## Workspace CLB — redesign Phase 4
+
+Đăng nhập → CLB tham gia → Mở không gian: `/workspace/:clubId`. Shell và quyền scoped theo membership active của CLB published. Chủ nhiệm quản lý ban/thành viên/liên hệ, xét duyệt bài và hoạt động; member soạn đề xuất. Meeting vẫn là module độc lập theo tài khoản. Xem [báo cáo Phase 4](/design/phase-04-club-workspace); không chạy migration mới trong phiên này.
+
+## Quản trị hệ thống — redesign Phase 5
+
+Admin truy cập /admin từ menu tài khoản hoặc Không gian cá nhân. Queue đề nghị, detail xét duyệt, directory CLB có shell riêng; không dùng admin trên landing nữa. API /api/admin yêu cầu role admin hiện tại và hồ sơ hoàn chỉnh, quyết định có expected_updated_at/lý do từ chối. Xem [báo cáo Phase 5](/design/phase-05-admin-and-integration) cho contract, kiểm tra và giới hạn. Không tự cấp role ở đăng ký; không có migration mới trong phiên.

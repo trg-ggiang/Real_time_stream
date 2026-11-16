@@ -1,6 +1,14 @@
 # Real-time Stream — Meeting Module
 
+## Đề xuất khung giao diện mới
+
+Phase thiết kế sản phẩm 1 (16/11/2026): [bản đồ màn hình, quyền và API](docs/design/phase-01-product-frame.md), [storyboard sáu màn hình](docs/design/phase-01-review/index.html). Mở storyboard bằng trình duyệt; đây là bản phác thảo độc lập, không phải frontend đã được thay thế và không ghi dữ liệu. Phần ứng dụng hiện tại vẫn chạy theo hướng dẫn bên dưới.
+
 ## Guest mode
+
+Cập nhật Phase 3 (16/11): có [Không gian cá nhân](docs/design/phase-03-personal-experience.md) ở `/me`, quan tâm/bỏ quan tâm, đăng ký/hủy hoạt động, lịch sử đề nghị CLB và hồ sơ. Đăng nhập mặc định đi qua onboarding rồi vào `/me`; tài khoản cũ thiếu hồ sơ cũng cần bổ sung. Không cần env/dependency mới ngoài Phase 2. Kiểm tra capacity DB theo file read-only `supabase/verification/phase-03-personal-preflight.sql` khi triển khai; chưa chạy SQL hoặc ghi dữ liệu live trong phiên phát triển.
+
+Cập nhật 16/11/2026: đã triển khai [Phase 2 public discovery](docs/design/phase-02-public-experience.md): home mới, `/clubs`, `/activities`, `/posts`, detail theo URL, search/phân trang/filter thời gian qua backend. Chạy `npm install` sau khi lấy code để có React Router. Không thay Supabase schema hoặc dữ liệu live. Các mô tả phiên cũ bên dưới được giữ làm ngữ cảnh lịch sử.
 
 Trang chủ hiện dùng Navy Mix cho khách, đọc CLB/hoạt động/bài viết từ ba public view Supabase qua NestJS. Mở `/?mode=login` hoặc `/?mode=register` để vào tài khoản; phiên hợp lệ tiếp tục mở meeting. The public views now contain 3 HUST clubs, 3 historical activities and 3 introduction posts; sources and image provenance are recorded in data/hust-public.json. Xem [API, phạm vi và hướng dẫn guest mode](docs/modules/guest-mode.mdx).
 
@@ -91,3 +99,11 @@ Tham khảo [quy tắc gitignore](https://git-scm.com/docs/gitignore) và [xử 
 ## Tổng kết triển khai
 
 Xem [PHASE_05_SUMMARY.md](PHASE_05_SUMMARY.md) để nắm công việc đã làm, lỗi đã xử lý, kết quả kiểm tra và phần còn chờ nghiệm thu. Các file Markdown hướng dẫn agent vẫn được phép commit/push; credentials và session cục bộ tiếp tục bị ignore.
+
+### Redesign Phase 4 — Club workspace
+
+Đăng nhập và hoàn thiện hồ sơ → CLB tham gia → Mở không gian (`/workspace/:clubId`). Có bài/hoạt động nháp và xét duyệt, quản lý thành viên/ban theo vai trò CLB, chỉnh liên hệ/ảnh và mở module họp hiện có. Không cần chạy migration mới trong phiên này; chưa nghiệm thu ghi DB live. Xem `docs/design/phase-04-club-workspace.md` để biết flow, kiểm thử và giới hạn.
+
+### Redesign Phase 5 — Admin
+
+Tài khoản role admin, hồ sơ đầy đủ: menu tài khoản → Quản trị hệ thống hoặc `/admin`. Có queue/detail duyệt CLB, lý do từ chối và danh sách CLB đã được duyệt. Không tự chọn role khi đăng ký; không tự cấp role trong phiên này. Code không cần migration mới; xem `docs/design/phase-05-admin-and-integration.md` trước nghiệm thu ghi dữ liệu thật. Typecheck/build, 65 backend + 75 frontend tests, 121 browser fixture checks đạt; chưa thay dữ liệu Supabase live.

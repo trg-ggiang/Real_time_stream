@@ -1,0 +1,34 @@
+---
+title: Discovery typography and motion polish
+description: Tinh chỉnh quang học tiêu đề và chuyển động trước khi duyệt Phase 2.
+---
+
+## Phiên
+
+Ngày 16/11/2026, Asia/Bangkok. Agent Codex. Historical Phase 04 vẫn In Progress; redesign Phase 2: polish implemented, chờ nhóm nghiệm thu thị giác. Kết quả: Completed trong phạm vi tinh chỉnh được giao. Không có dữ liệu giờ bắt đầu/kết thúc chính xác.
+
+## Yêu cầu và kết quả
+
+Người dùng đánh giá giao diện ổn nhưng chưa nổi bật, hai dòng hero hơi lệch. Đã tách hai dòng thành block, chỉnh line-height/letter-spacing và bù side bearing giữa T/M bằng -0.03em. Responsive title clamp 36–44px ở mobile, sửa overflow 320px.
+
+Thêm choreography: hero title hai nhịp, supporting copy/search/links xuất hiện lần lượt, hero photo arrival và drift tối đa 14px khi cuộn desktop, reveal từng nhóm khi vào viewport, ảnh hover và arrow/nav feedback. Search có focus-within và nút navy rõ hơn.
+
+Hook use-discovery-motion quản lý IntersectionObserver, MutationObserver cho nội dung tải bất đồng bộ, passive scroll + requestAnimationFrame và cleanup khi đổi route/unmount. Nội dung vẫn hiện khi không có observer; không dùng opacity 0 chờ JS. Reduced motion tắt animation/transition/drift, mobile không parallax. Không thay dữ liệu, API, schema hoặc logic auth/meeting.
+
+## Kiểm tra
+
+- Frontend typecheck, 60 tests và production build đạt. Chunk meeting lớn vẫn là cảnh báo hiện hữu.
+- Đo trên browser 320/390/768/1440, cả normal/reduced: 8 trường hợp không overflow, không JS exception; mép nét chữ lệch <0.4px theo canvas/font metrics tại môi trường thử. Kết quả không cam kết giống tuyệt đối giữa các OS/font renderer.
+- Scroll thực: section reveal được kích hoạt, sau animation tất cả opacity=1; desktop drift được clamp 14px; reduced không animation và không drift.
+- Inspector ba viewport: 0 FAIL trước lượt chỉnh cuối optical offset/mobile clamp, giữ hai WARN về số cỡ chữ và không video. Chạy lại inspector và xem ảnh cuối sau thay đổi; artifacts ở output/phase-02-polish.
+- Không chạy lại backend tests: backend không thay đổi trong lượt này. Không test cuộc gọi thật hoặc ghi dữ liệu Supabase.
+
+## Visual review
+
+Trước: mép M có side bearing khác T, phần search chưa rõ trọng tâm, animation section chạy khi mount dù người dùng chưa cuộn tới.
+Sau: title cân theo nét nhìn thấy, search CTA navy, reveal gắn viewport và có stagger vừa phải. Ảnh film/fold/fullpage desktop/tablet/mobile đã được xem; nguồn ảnh giữ nguyên như báo cáo Phase 2.
+Tự đánh giá: design 7.7, usability 8, creativity 6.7, content 7 → overall 7.5. Đây là tự đánh giá định hướng, không thay nghiệm thu của nhóm. Dataset còn bản ghi test và ảnh logo dùng làm cover; không che giấu/xóa chúng để nâng điểm.
+
+## Tiếp theo
+
+Nhóm xem trực tiếp / và cuộn trang, kiểm tra cảm giác title/motion trước khi chốt public v1. Không tự chuyển sang phase tiếp theo hoặc push Git.

@@ -1,0 +1,68 @@
+flowchart TB
+    ENTRY["Mở website"] --> PUBLIC["Khám phá - Trang chủ / "]
+    PUBLIC --> CLUBS["Danh sách CLB /clubs"]
+    PUBLIC --> ACTIVITIES["Danh sách hoạt động /activities"]
+    PUBLIC --> POSTS["Danh sách bài viết /posts"]
+    CLUBS --> CLUB_DETAIL["Chi tiết CLB /clubs/:id"]
+    ACTIVITIES --> ACTIVITY_DETAIL["Chi tiết hoạt động /activities/:id"]
+    POSTS --> POST_DETAIL["Chi tiết bài viết /posts/:id"]
+    PUBLIC --> AUTH["Đăng nhập hoặc đăng ký - query mode"]
+    CLUB_DETAIL -->|"Quan tâm khi chưa đăng nhập"| AUTH
+    ACTIVITY_DETAIL -->|"Đăng ký khi chưa đăng nhập"| AUTH
+    AUTH --> PROFILE_CHECK{"Hồ sơ đầy đủ?"}
+    PROFILE_CHECK -->|"Chưa"| ONBOARDING["Hoàn thiện hồ sơ sinh viên"]
+    ONBOARDING -->|"Lưu thành công"| DESTINATION{"Có trang đích cụ thể?"}
+    PROFILE_CHECK -->|"Có"| DESTINATION
+    DESTINATION -->|"Có"| RESUME["Quay lại trang đã mở - xác nhận lại thao tác"]
+    DESTINATION -->|"Không"| ROLE{"Role nền tảng?"}
+    ROLE -->|"admin"| ADMIN_HOME
+    ROLE -->|"Sinh viên hoặc role khác"| PERSONAL_HOME
+    RESUME --> CLUB_DETAIL
+    RESUME --> ACTIVITY_DETAIL
+
+    subgraph PERSONAL["KHÔNG GIAN CÁ NHÂN"]
+        PERSONAL_HOME["Tổng quan /me"]
+        MY_CLUBS["CLB tham gia /me/clubs"]
+        FOLLOWS["CLB quan tâm /me/follows"]
+        REGISTRATIONS["Đăng ký hoạt động /me/registrations"]
+        REQUESTS["Lịch sử đề nghị CLB /me/club-requests"]
+        REQUEST_NEW["Tạo đề nghị /me/club-requests/new"]
+        REQUEST_DETAIL["Theo dõi đề nghị /me/club-requests/:id"]
+        PROFILE["Hồ sơ /me/profile"]
+        PERSONAL_HOME --> MY_CLUBS
+        PERSONAL_HOME --> FOLLOWS
+        PERSONAL_HOME --> REGISTRATIONS
+        PERSONAL_HOME --> REQUESTS
+        PERSONAL_HOME --> PROFILE
+        REQUESTS --> REQUEST_NEW
+        REQUEST_NEW -->|"Gửi thành công"| REQUEST_DETAIL
+        REQUESTS --> REQUEST_DETAIL
+        REQUEST_DETAIL -->|"Bị từ chối - tạo hồ sơ mới"| REQUEST_NEW
+    end
+
+    subgraph ADMIN["QUẢN TRỊ HỆ THỐNG - CHỈ ADMIN"]
+        ADMIN_HOME["Tổng quan /admin"]
+        ADMIN_QUEUE["Danh sách đề nghị /admin/club-requests"]
+        ADMIN_DETAIL["Xét duyệt /admin/club-requests/:id"]
+        ADMIN_CLUBS["Danh sách CLB đã duyệt /admin/clubs"]
+        ADMIN_CLUB_DETAIL["Chi tiết CLB /admin/clubs/:id"]
+        ADMIN_HOME --> ADMIN_QUEUE
+        ADMIN_HOME --> ADMIN_CLUBS
+        ADMIN_QUEUE --> ADMIN_DETAIL
+        ADMIN_CLUBS --> ADMIN_CLUB_DETAIL
+        ADMIN_DETAIL -->|"Duyệt hoặc từ chối - tải lại"| ADMIN_DETAIL
+    end
+
+    PUBLIC -->|"Menu tài khoản"| PERSONAL_HOME
+    PERSONAL_HOME -->|"Có role admin"| ADMIN_HOME
+    ADMIN_HOME -->|"Không gian cá nhân"| PERSONAL_HOME
+    FOLLOWS --> CLUB_DETAIL
+    REGISTRATIONS --> ACTIVITY_DETAIL
+    ADMIN_DETAIL -->|"Đã công khai"| CLUB_DETAIL
+    ADMIN_CLUB_DETAIL -->|"Đang công khai"| CLUB_DETAIL
+    MY_CLUBS -->|"Membership active - CLB published"| WORKSPACE["Không gian CLB /workspace/:clubId - xem sơ đồ 02"]
+    PERSONAL_HOME --> MEETING["Công cụ phòng họp - query view=meeting"]
+    WORKSPACE --> MEETING
+    MEETING -->|"Thoát công cụ - về trang đã mở"| RETURN["Không gian cá nhân hoặc trang phòng họp của workspace"]
+    PERSONAL_HOME -->|"Đăng xuất hoặc hết phiên"| AUTH
+    ADMIN_HOME -->|"Đăng xuất hoặc hết phiên"| AUTH

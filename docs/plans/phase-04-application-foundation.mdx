@@ -325,3 +325,27 @@ CLB mới tiếp tục dùng cùng dialog chi tiết; ảnh bìa ưu tiên, logo
 ## Hoạt động CLB — 2026-11-15
 
 Thêm điều hướng **CLB của tôi**, màn hình theo từng CLB và biểu mẫu tạo hoạt động. Thành viên theo dõi đề xuất của mình. Chủ nhiệm xét duyệt hoặc công khai trực tiếp hoạt động do mình tạo. Phase 04 vẫn In Progress, chờ thử luồng trên Supabase thật. [Work log](/work-logs/2026-11-15-35-phase-04-club-activities).
+
+## 2026-11-16 — Public discovery redesign
+
+Đã tách module discovery, router public và shared public GET, làm home/list/detail và giữ legacy adapter cho workflow quản lý. Không đổi auth/meeting hoặc schema. Phần public đã kiểm tra, toàn Phase 04 vẫn In Progress. [Báo cáo](/design/phase-02-public-experience), [work log](/work-logs/2026-11-16-01-phase-04-public-discovery).
+
+## 2026-11-16 — Discovery polish
+
+Đã tinh chỉnh hero typography, viewport reveals, hover/focus và reduced motion; giữ nghiệp vụ/API. Chờ nhóm duyệt public v1; không đổi trạng thái toàn Phase 04. [Work log](/work-logs/2026-11-16-02-phase-04-discovery-polish).
+
+## 2026-11-16 — Personal frontend và API
+
+Tách module personal/profile, nối quan tâm và đăng ký từ public detail, lịch sử đề nghị nhiều bản và giữ bridge CLB/admin. Frontend cá nhân được review ở 1440/768/390/320; mutation browser dùng fixture, không ghi live. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-16-03-phase-04-personal-space).
+
+## 2026-11-16 — Redesign Phase 4: club workspace
+
+Workspace CLB có context/role riêng, draft/submit/review posts/activities, quản lý ban/thành viên, chuyển chủ nhiệm qua RPC, liên hệ/ảnh allowlist và meeting entry giữ return path. 57 backend + 70 frontend tests, typecheck/build và 45 browser fixture checks đạt. Không mutation DB/migration/commit/push; UI ready for review, admin shell Phase 5 chưa triển khai. [Báo cáo](/design/phase-04-club-workspace), [work log](/work-logs/2026-11-16-04-phase-04-club-workspace).
+
+## 2026-11-16 — Redesign Phase 5: admin and integration
+
+Đã hoàn thiện shell /admin, queue/detail/directory, search/phân trang và approve/reject có version/lý do; API admin tách module, bỏ provisioning/rollback membership cũ. Typecheck/build, 65 backend + 75 frontend tests và 121 browser fixture checks đạt (35 admin, 41 personal, 45 workspace), 0 live writes. Historical roadmap vẫn In Progress; code redesign Phase 5 ready for review, chờ nhóm nghiệm thu UI và ghi DB thật trên môi trường test. [Báo cáo](/design/phase-05-admin-and-integration), [work log](/work-logs/2026-11-16-05-phase-04-admin-shell).
+
+## 2026-11-16 — Admin default login destination fix
+
+Auth/profile từ trang gốc nay chờ refresh role rồi admin → /admin, student → /me; giữ deep link/meeting. Đã xác nhận read-only admin@gmail.com có role admin và profile đầy đủ. Typecheck/frontend build, 77 frontend tests và browser stale-role→admin landing đạt. Không ghi DB/commit/push. [Work log](/work-logs/2026-11-16-06-phase-04-admin-login-routing).
