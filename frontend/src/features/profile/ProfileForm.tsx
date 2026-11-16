@@ -1,3 +1,4 @@
+import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { accountRequest } from "../../shared/api/account-http";
 import {
@@ -99,7 +100,7 @@ export function ProfileForm({
       {onboarding && (
         <header className="pf-top">
           <a href="/" className="pf-brand">
-            uni<span>circle</span>.
+            <UniCircleLogo />
           </a>
           <button type="button" onClick={onLogout} data-leave-account>
             Đăng xuất

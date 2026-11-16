@@ -1,0 +1,30 @@
+---
+title: Discovery landing header refinement
+description: Highlight the landing header and simplify navigation and account controls.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-31
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+Updated `frontend/src/features/discovery/discovery-home.css` to make the landing header distinct from the content, display plain signed-in navigation links and show only the avatar in the account trigger. The native account menu retains its accessible name and focus indicator. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | 58 frontend tests. |
+| Header color contrast calculation | Passed | Navigation text 13.41:1, blue focus and hover 5.98:1, avatar initials 7.03:1. |
+| Browser visual check | Skipped | The prior landing pass established a loopback restriction in this environment. |
+
+## Next step
+
+Review the header in desktop and mobile layouts. Resume with the public club list after landing-page review.

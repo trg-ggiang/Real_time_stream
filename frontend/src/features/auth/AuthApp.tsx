@@ -1,3 +1,4 @@
+import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { Eye } from "@phosphor-icons/react/dist/csr/Eye";
@@ -9,6 +10,7 @@ import { MeetingPage } from "../meeting/MeetingPage";
 import { PersonalProfile } from "./PersonalProfile";
 import { GuestLanding } from "../guest/GuestLanding";
 import { authenticate, type AuthSession } from "./auth-api";
+import { resolvePostLoginPath, sanitizeReturnTo } from "./redirect";
 import {
   restoreSession,
   saveSession,
@@ -61,6 +63,7 @@ export function AuthApp() {
     Partial<Record<Field, string>>
   >({});
   const pending = useRef<AbortController | null>(null);
+  const submittedAuth = useRef(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const errorRef = useRef<HTMLParagraphElement | null>(null);
   const registering = mode === "register";
@@ -91,6 +94,7 @@ export function AuthApp() {
   }
 
   function logout() {
+    submittedAuth.current = false;
     saveSession(null);
     returnToLanding();
     setTheme(savedTheme());
@@ -108,21 +112,25 @@ export function AuthApp() {
   }
 
   useEffect(() => {
-    if (!session || !profileReady || checkedToken !== session.access_token)
+    if (!session || !profileReady || checkedToken !== session.access_token || landingToken === session.access_token)
       return;
-    if (
-      window.location.pathname === "/" &&
-      !window.location.hash &&
-      !new URLSearchParams(window.location.search).has("view")
-    ) {
-      window.history.replaceState(
-        null,
-        "",
-        session.user.role === "admin" ? "/admin" : "/me",
-      );
+    const { pathname, search, hash } = window.location;
+    const params = new URLSearchParams(search);
+    const defaultEntry = pathname === "/" && !hash && !params.has("view");
+    if (submittedAuth.current || params.has("returnTo") || defaultEntry) {
+      const explicitPath = sanitizeReturnTo(params.get("returnTo"));
+      const legacyUrl = new URL(window.location.href);
+      for (const key of ["mode", "returnTo"]) {
+        if (legacyUrl.searchParams.has(key)) legacyUrl.searchParams.delete(key);
+      }
+      const legacyPath = `${legacyUrl.pathname}${legacyUrl.search}${legacyUrl.hash}`;
+      const destination = resolvePostLoginPath(explicitPath ?? legacyPath, session.user.role);
+      window.history.replaceState(window.history.state, "", destination);
+      setEnterMeeting(new URL(window.location.href).searchParams.get("view") === "meeting");
     }
+    submittedAuth.current = false;
     setLandingToken(session.access_token);
-  }, [profileReady, checkedToken, session]);
+  }, [profileReady, checkedToken, landingToken, session]);
 
   useEffect(() => {
     const expired = () => logout();
@@ -306,6 +314,7 @@ export function AuthApp() {
         controller.signal,
       );
       if (!controller.signal.aborted) {
+        submittedAuth.current = true;
         saveSession(result);
         const nextUrl = new URL(window.location.href);
         nextUrl.searchParams.delete("mode");
@@ -383,12 +392,7 @@ export function AuthApp() {
         <div className="auth-primary">
           <div className="auth-topbar">
             <div className="auth-brand">
-              <span className="auth-brand-icon" aria-hidden="true">
-                u.
-              </span>
-              <span>
-                uni<b>circle</b>
-              </span>
+              <UniCircleLogo />
             </div>
             <a href="/" className="auth-guest-back">
               ← Khám phá

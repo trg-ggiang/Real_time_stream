@@ -1,0 +1,30 @@
+---
+title: Discovery landing search and actions
+description: Adjust search focus, account hover and hero actions on the public landing page.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-33
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+Updated `frontend/src/features/discovery/discovery-home.css` to replace the blue focus frame around the search input with a neutral underline, remove link underlines on hover in the account panel, and align the two hero actions. The club action uses a tonal fill, the activity action uses a border, and both stack at widths up to 400px. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | All 59 tests passed. |
+| Landing CSS scope and interaction selectors | Passed | Parsed the stylesheet and verified the updated selectors are landing-scoped. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review search focus and hero actions at desktop and mobile widths, then continue the page-by-page update with the public club list.

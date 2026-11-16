@@ -1,0 +1,21 @@
+---
+title: Student pagination visibility
+description: Hide pagination when student results fit on a single page.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-47
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04
+- Outcome: Completed
+- Phase status: In Progress
+
+## Completed work
+
+Updated both student pagination containers in `frontend/src/features/personal/pages/PersonalLists.tsx` to render only when the API total exceeds the page limit. The last page of a multi-page list still shows navigation. Click handlers, disabled conditions, routes and data requests were preserved. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification and next step
+
+Frontend build and all 59 frontend tests passed. Source, documentation navigation and whitespace checks passed. Review the controls on a single-page list and at both ends of a multi-page list. Browser review remains pending because of the preceding localhost restriction.

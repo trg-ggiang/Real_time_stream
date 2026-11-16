@@ -4,6 +4,8 @@ Ngày 16/11/2026, Asia/Bangkok. Hoàn thành phạm vi code của Phase 5 redesi
 
 ## Đã hoàn thiện
 
+Admin shell hiện có sidebar navy, breadcrumb, menu tài khoản và dashboard dùng số liệu hiện có. Menu tài khoản chỉ có thao tác đăng xuất. [Work log](/work-logs/2026-11-16-52-phase-04-admin-menu-cleanup).
+
 Admin có shell riêng, không nằm trong trang khám phá hoặc workspace của một CLB. Sidebar sáng, navy/xanh và Be Vietnam Pro thống nhất toàn sản phẩm; mobile thu gọn điều hướng, có skip link, focus, Escape và thông báo trạng thái.
 
 | Route | Nội dung |
@@ -51,7 +53,8 @@ backend/src/admin/
   admin.service         quyền admin, đọc hồ sơ, summary, quyết định có điều kiện
   admin.module          dependency injection; export service cho alias cũ
 frontend/src/features/admin/
-  AdminApp              shell, route và cổng quyền
+  AdminApp              route và cổng quyền
+  AdminLayout           sidebar, header, footer và Outlet
   admin-model           kiểu summary/list/detail và nhãn trạng thái
   pages/AdminOverview   số liệu và hàng đợi ngắn
   pages/ClubList        search/filter/pagination trên URL

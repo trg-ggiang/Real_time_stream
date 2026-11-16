@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
-import { safePublicUrl, publicDate } from "../../../shared/lib/content-format";
+import { safePublicUrl, publicDate, publicDateOnly } from "../../../shared/lib/content-format";
 import {
   itemPath,
   type PublicItem,
@@ -13,11 +13,15 @@ export function ContentImage({
   alt = "",
   className = "",
   eager = false,
+  showFallbackText = true,
+  fallbackText = "uniCircle",
 }: {
   src?: string | null;
   alt?: string;
   className?: string;
   eager?: boolean;
+  showFallbackText?: boolean;
+  fallbackText?: string;
 }) {
   const [failed, setFailed] = useState<string | undefined>();
   const url = safePublicUrl(src);
@@ -35,7 +39,7 @@ export function ContentImage({
       role="img"
       aria-label={alt || "Chưa có hình ảnh"}
     >
-      <span>uniCircle</span>
+      {showFallbackText && <span>{fallbackText}</span>}
     </div>
   );
 }
@@ -108,7 +112,10 @@ export function ClubCard({ item }: { item: PublicItem }) {
         tabIndex={-1}
         aria-hidden="true"
       >
-        <ContentImage src={item.cover_url || item.logo_url} />
+        <ContentImage
+          src={item.cover_url || item.logo_url}
+          className={!item.cover_url && item.logo_url ? "dc-club-photo-logo" : undefined}
+        />
       </Link>
       <div className="dc-club-identity">
         <ContentImage src={item.logo_url} className="dc-logo" />
@@ -170,7 +177,12 @@ export function ActivityCard({ item }: { item: PublicItem }) {
             {item.lifecycle_status === "cancelled"
               ? " · Đã hủy"
               : ended
-                ? " · Đã kết thúc"
+                ? (
+                  <span className="dc-event-ended">
+                    <span className="dc-event-status-separator">{" · "}</span>
+                    Đã kết thúc
+                  </span>
+                )
                 : ""}
           </p>
         </div>
@@ -181,9 +193,11 @@ export function ActivityCard({ item }: { item: PublicItem }) {
 export function PostCard({
   item,
   featured = false,
+  landing = false,
 }: {
   item: PublicItem;
   featured?: boolean;
+  landing?: boolean;
 }) {
   return (
     <article className={`dc-post ${featured ? "dc-post-featured" : ""}`}>
@@ -193,11 +207,11 @@ export function PostCard({
         tabIndex={-1}
         aria-hidden="true"
       >
-        <ContentImage src={item.cover_url} />
+        <ContentImage src={item.cover_url} showFallbackText={!landing} />
       </Link>
       <div>
         <p className="dc-meta">
-          {item.club_name} · {publicDate(item.published_at)}
+          {item.club_name} · {landing ? publicDateOnly(item.published_at) : publicDate(item.published_at)}
         </p>
         <h3>
           <Link to={itemPath("posts", item)}>{item.title}</Link>
@@ -213,9 +227,11 @@ export function PostCard({
 export function ContentCards({
   kind,
   items,
+  landing = false,
 }: {
   kind: Collection;
   items: PublicItem[];
+  landing?: boolean;
 }) {
   return (
     <div
@@ -233,7 +249,7 @@ export function ContentCards({
         ) : kind === "activities" ? (
           <ActivityCard key={item.activity_id} item={item} />
         ) : (
-          <PostCard key={item.post_id} item={item} featured={i === 0} />
+          <PostCard key={item.post_id} item={item} featured={i === 0} landing={landing} />
         ),
       )}
     </div>

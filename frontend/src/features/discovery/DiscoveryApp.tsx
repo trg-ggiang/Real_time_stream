@@ -1,3 +1,5 @@
+import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
+import { authFormHref } from "../auth/redirect";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -11,6 +13,7 @@ import { List } from "@phosphor-icons/react/dist/csr/List";
 import { X } from "@phosphor-icons/react/dist/csr/X";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
+import { Bell } from "@phosphor-icons/react/dist/csr/Bell";
 import { UserRectangle } from "@phosphor-icons/react/dist/csr/UserRectangle";
 import { Users } from "@phosphor-icons/react/dist/csr/Users";
 import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
@@ -28,6 +31,7 @@ import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
 import "./discovery.css";
+import "./discovery-home.css";
 
 export interface DiscoveryViewer {
   viewer?: { displayName: string };
@@ -44,21 +48,37 @@ export function DiscoveryApp({
   onLogout,
 }: DiscoveryViewer) {
   const location = useLocation();
+  const isHome = location.pathname === "/";
   const navigate = useNavigate();
   const [menu, setMenu] = useState(false);
   const main = useRef<HTMLElement>(null);
   useDiscoveryMotion(main, `${location.pathname}${location.search}`);
   const accountMenu = useRef<HTMLDetailsElement>(null);
+  const notifications = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
-    const close = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setMenu(false);
-        if (accountMenu.current) accountMenu.current.open = false;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setMenu(false);
+      for (const panel of [accountMenu.current, notifications.current]) {
+        if (!panel?.open) continue;
+        const restoreFocus = isHome && panel.contains(document.activeElement);
+        panel.open = false;
+        if (restoreFocus) panel.querySelector("summary")?.focus();
       }
     };
-    document.addEventListener("keydown", close);
-    return () => document.removeEventListener("keydown", close);
-  }, []);
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!(event.target instanceof Node)) return;
+      for (const panel of [accountMenu.current, notifications.current]) {
+        if (panel?.open && !panel.contains(event.target)) panel.open = false;
+      }
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    if (isHome) document.addEventListener("click", closeOnOutsideClick, true);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("click", closeOnOutsideClick, true);
+    };
+  }, [isHome]);
   useEffect(() => {
     setMenu(false);
     window.scrollTo(0, 0);
@@ -67,11 +87,11 @@ export function DiscoveryApp({
   useEffect(() => {
     document.title = `${location.pathname.startsWith("/clubs") ? "Câu lạc bộ" : location.pathname.startsWith("/activities") ? "Hoạt động" : location.pathname.startsWith("/posts") ? "Bài viết" : "Khám phá"} · uniCircle`;
   }, [location.pathname]);
-  const authUrl = (mode: string) =>
-    `${location.pathname}${location.search ? `${location.search}&` : "?"}mode=${mode}`;
+  const authUrl = (mode: "login" | "register") =>
+    authFormHref(mode, `${location.pathname}${location.search}${location.hash}`);
   function startRequest() {
     if (viewer && accessToken) navigate("/me/club-requests/new");
-    else window.location.assign("/me/club-requests/new?mode=login");
+    else window.location.assign(authFormHref("login", "/me/club-requests/new"));
   }
   const initials = (viewer?.displayName ?? "")
     .trim()
@@ -136,15 +156,14 @@ export function DiscoveryApp({
     );
   }
   return (
-    <div className="dc-app">
+    <div className={isHome ? "dc-app dc-home" : "dc-app"}>
       <a className="dc-skip" href="#public-content">
         Đến nội dung
       </a>
-      <header className="dc-header">
+      <header className={viewer && isHome ? "dc-header dc-header-signed-in" : "dc-header"}>
         <div className="dc-container dc-header-inner">
           <Link className="dc-brand" to="/" aria-label="uniCircle — Khám phá">
-            uni<span>circle</span>
-            <i aria-hidden="true">.</i>
+            <UniCircleLogo />
           </Link>
           <nav
             className={`dc-nav ${menu ? "is-open" : ""}`}
@@ -155,11 +174,22 @@ export function DiscoveryApp({
             <NavLink to="/posts">Bài viết</NavLink>
           </nav>
           <div className="dc-account">
+            {viewer && isHome && (
+              <details className="dc-notifications" ref={notifications}>
+                <summary aria-label="Thông báo">
+                  <Bell size={22} aria-hidden="true" />
+                </summary>
+                <div className="dc-account-menu dc-notification-panel">
+                  <h2>Thông báo</h2>
+                  <p>Tính năng nhận thông báo chưa được kết nối.</p>
+                </div>
+              </details>
+            )}
             {viewer ? (
               <details ref={accountMenu}>
-                <summary>
+                <summary aria-label={`Menu tài khoản của ${viewer.displayName}`}>
                   <span className="dc-account-avatar" aria-hidden="true">{initials || "U"}</span>
-                  <CaretDown size={16} aria-hidden="true" />
+                  {!isHome && <CaretDown size={16} aria-hidden="true" />}
                 </summary>
                 <div className="dc-account-menu">
                   <p className="dc-account-heading">Sinh viên · {viewer.displayName}</p>
@@ -245,8 +275,7 @@ export function DiscoveryApp({
           <div className="dc-footer-top">
             <div>
               <Link className="dc-brand" to="/">
-                uni<span>circle</span>
-                <i aria-hidden="true">.</i>
+                <UniCircleLogo />
               </Link>
               <p>
                 Cùng một mái trường.

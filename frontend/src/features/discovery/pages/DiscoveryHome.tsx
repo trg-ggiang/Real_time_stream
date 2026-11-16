@@ -75,11 +75,13 @@ export function DiscoveryHome() {
           </div>
         </div>
         <figure className="dc-hero-figure">
-          <ContentImage
-            src="/images/guest/campus-bright-1000.jpg"
-            alt="Ảnh minh họa sinh viên cùng học tập và kết nối"
-            eager
-          />
+          <div className="dc-hero-image-frame">
+            <ContentImage
+              src="/images/guest/campus-bright-1000.jpg"
+              alt="Ảnh minh họa sinh viên cùng học tập và kết nối"
+              eager
+            />
+          </div>
           <figcaption>
             <span>Những cuộc gặp tạo nên cộng đồng.</span>
             <Link to="/clubs" aria-label="Khám phá cộng đồng Bách khoa">
@@ -97,7 +99,7 @@ export function DiscoveryHome() {
         </div>
       </div>
       <section
-        className="dc-container dc-section"
+        className="dc-container dc-section dc-preview-section dc-activities-section"
         aria-labelledby="home-activities"
       >
         <div className="dc-section-heading">
@@ -111,7 +113,7 @@ export function DiscoveryHome() {
                 : "Khám phá những hoạt động đã và đang kết nối sinh viên."}
             </p>
           </div>
-          <Link className="dc-inline" to="/activities">
+          <Link className="dc-button dc-section-link" to="/activities">
             Tất cả hoạt động <ArrowUp />
           </Link>
         </div>
@@ -130,21 +132,15 @@ export function DiscoveryHome() {
             empty="Chưa có hoạt động công khai. Hẹn bạn khi lịch mới được cập nhật."
           />
         )}
-        {!hasUpcoming && !upcoming.loading && !upcoming.error && (
-          <p className="dc-section-note">
-            Chưa có hoạt động sắp diễn ra được công khai. Các hoạt động dưới đây
-            là nội dung đã được đăng trên nền tảng.
-          </p>
-        )}
       </section>
-      <section className="dc-clubs-section">
+      <section className="dc-clubs-section dc-preview-section">
         <div className="dc-container dc-section">
           <div className="dc-section-heading">
             <div>
               <h2>Cùng tần số, cùng đam mê.</h2>
               <p>Từ một sở thích nhỏ đến một hành trình cùng nhau.</p>
             </div>
-            <Link className="dc-inline" to="/clubs">
+            <Link className="dc-button dc-section-link" to="/clubs">
               Khám phá các CLB <ArrowUp />
             </Link>
           </div>
@@ -164,12 +160,12 @@ export function DiscoveryHome() {
             <h2>Chuyện kể từ các CLB</h2>
             <p>Góc nhìn, ý tưởng và những điều muốn chia sẻ.</p>
           </div>
-          <Link className="dc-inline" to="/posts">
-            Đọc bài viết <ArrowUp />
+          <Link className="dc-button dc-section-link" to="/posts">
+            Xem tất cả bài viết <ArrowUp />
           </Link>
         </div>
         {posts.data?.items.length ? (
-          <ContentCards kind="posts" items={posts.data.items} />
+          <ContentCards kind="posts" items={posts.data.items} landing />
         ) : (
           <QueryState
             {...posts}

@@ -1603,6 +1603,75 @@
 .dc-app .dc-nav a:hover:after {
   transform: scaleX(1);
 }
+.dc-header-signed-in {
+  border-bottom: 1px solid #e3eaf4;
+}
+.dc-header-signed-in .dc-header-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(12px, 2vw, 28px);
+}
+.dc-header-signed-in .dc-brand {
+  justify-self: start;
+}
+.dc-header-signed-in .dc-nav {
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #e3eaf4;
+  border-radius: 12px;
+  background: #f4f7fc;
+}
+.dc-header-signed-in .dc-nav a {
+  padding: 9px clamp(10px, 1.4vw, 19px);
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.dc-header-signed-in .dc-nav a:hover {
+  background: #fff;
+  color: var(--dc-blue);
+  text-decoration: none;
+}
+.dc-app .dc-header-signed-in .dc-nav a::after {
+  content: none;
+}
+.dc-header-signed-in .dc-account {
+  justify-self: end;
+  min-width: 0;
+  max-width: 100%;
+}
+.dc-header-signed-in .dc-account details {
+  min-width: 0;
+}
+.dc-header-signed-in .dc-account summary {
+  border-color: #e3eaf4;
+  border-radius: 12px;
+  background: #fff;
+}
+.dc-header-signed-in .dc-account summary:hover,
+.dc-header-signed-in .dc-account details[open] summary {
+  background: #f4f7fc;
+}
+.dc-header-signed-in .dc-account summary svg {
+  flex: none;
+}
+.dc-account-name {
+  max-width: 145px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+@media (max-width: 800px) {
+  .dc-account-name { display: none; }
+}
+@media (max-width: 600px) {
+  .dc-header-signed-in .dc-header-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .dc-header-signed-in .dc-mobile-nav {
+    border-top: 1px solid #e3eaf4;
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
   .dc-app .dc-hero-copy {
     animation: none;

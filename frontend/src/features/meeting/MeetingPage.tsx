@@ -1,5 +1,5 @@
+import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { ArrowLeft } from '@phosphor-icons/react/dist/csr/ArrowLeft';
 import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { LinkSimple } from '@phosphor-icons/react/dist/csr/LinkSimple';
@@ -144,7 +144,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
 
   return <div className={`meeting-app${flow.active ? ' meeting-app--incall' : ''}`} data-theme={theme}>
     <a className="meeting-skip" href="#meeting-main">Đến nội dung chính</a>
-    <header className="meeting-topbar"><div className="meeting-brand"><span className="meeting-brand-symbol"><VideoCamera size={23} weight="fill" aria-hidden="true" /></span><span translate="no">Real-time Stream</span></div>
+    <header className="meeting-topbar"><div className="meeting-brand"><UniCircleLogo /></div>
       {onBack && <button className="meeting-home-link" type="button" onClick={() => { void flow.leave(); onBack(); }}><ArrowLeft size={17} aria-hidden="true" />Trang chủ</button>}
       <div className="meeting-account"><span className="meeting-account-name" title={name}>{name}</span><span className="meeting-avatar-small" aria-hidden="true">{initials}</span><AccountSettings theme={theme} onThemeChange={setTheme} onLogout={async () => { await flow.leave(); onLogout(); }} /></div>
     </header>

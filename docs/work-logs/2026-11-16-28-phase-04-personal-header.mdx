@@ -1,0 +1,29 @@
+---
+title: Personal header layout
+description: Clarify navigation and account links in the signed-in personal space.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-28
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and changes
+
+Restructure the personal-space header after login. The current section and its icon appear to the left. The discovery and profile links appear to the right with a divider, and the groups can wrap on small screens. Changed `frontend/src/features/personal/PersonalApp.tsx` and `frontend/src/features/personal/personal.css`.
+
+## Verification
+
+| Check | Result |
+| --- | --- |
+| Frontend build, including TypeScript | Passed. Vite emitted its existing chunk size warning. |
+| Frontend tests | 58 passed across 14 files. |
+| Browser visual review | Skipped. |
+
+## Next step
+
+Review the personal header on desktop and mobile.

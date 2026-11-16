@@ -3,7 +3,6 @@ import { usePersonalQuery } from "../../personal/use-personal-query";
 import { PersonalState } from "../../personal/components/PersonalState";
 import {
   ContentImage,
-  LinkedText,
 } from "../../discovery/components/PublicContent";
 import { publicDate } from "../../../shared/lib/content-format";
 import { useState } from "react";
@@ -83,7 +82,7 @@ function RequestDetail({
     return (
       <>
         <h1>Hồ sơ CLB</h1>
-        <PersonalState {...result} />
+        <PersonalState {...result} showDiscoveryLink={false} />
         <Link to="/admin/club-requests">← Danh sách đề nghị</Link>
       </>
     );
@@ -118,27 +117,22 @@ function RequestDetail({
             className="ad-cover"
           />
           <h2>Giới thiệu CLB</h2>
-          <LinkedText text={item.description} />
+          {item.description}
           {item.mission && (
             <>
               <h2>Sứ mệnh</h2>
-              <LinkedText text={item.mission} />
+              {item.mission}
             </>
           )}
           <h2>Thông tin liên hệ</h2>
           <dl className="ad-meta">
             <dt>Email</dt>
             <dd>
-              <LinkedText text={item.contact_email || "Chưa cung cấp"} />
+              {item.contact_email || "Chưa cung cấp"}
             </dd>
             <dt>Điện thoại</dt>
             <dd>{item.contact_phone || "Chưa cung cấp"}</dd>
           </dl>
-          {item.status === "published" && (
-            <Link className="ad-link" to={`/clubs/${id}`}>
-              Mở trang CLB công khai ↗
-            </Link>
-          )}
         </article>
         <aside className="ad-review-column">
           <section className="ad-panel">

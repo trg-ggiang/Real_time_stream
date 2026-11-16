@@ -1,0 +1,183 @@
+.ps-dashboard {
+  --ps-dashboard-heading: #1a2550;
+}
+
+.ps-dashboard :is(.ps-topbar, .ps-footer, .ps-identity small) {
+  font-size: 14px;
+  color: var(--ps-student-muted);
+}
+
+.ps-dashboard .ps-overview {
+  gap: 32px;
+}
+
+.ps-dashboard .ps-overview-eyebrow {
+  margin-bottom: 8px;
+  color: var(--ps-student-link);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.ps-dashboard .ps-overview-hero p {
+  margin-top: 8px;
+  color: var(--ps-student-muted);
+  font-size: 16px;
+}
+
+.ps-dashboard .ps-overview .ps-primary {
+  min-height: 44px;
+  white-space: normal;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ps-dashboard .ps-stat-grid,
+.ps-dashboard .ps-community-list {
+  gap: 16px;
+}
+
+.ps-dashboard .ps-stat-card {
+  min-height: 112px;
+  padding: 20px;
+}
+
+.ps-dashboard .ps-stat-card > strong {
+  padding-inline-end: 40px;
+}
+
+.ps-dashboard .ps-stat-card > small {
+  margin-top: 8px;
+  padding: 0;
+  color: var(--ps-student-muted);
+  font-size: 15px;
+}
+
+.ps-dashboard .ps-stat-icon {
+  top: 20px;
+  right: 20px;
+}
+
+.ps-dashboard .ps-stat-icon.blue { color: #2457a6; }
+.ps-dashboard .ps-stat-icon.purple { color: #67449a; }
+.ps-dashboard .ps-stat-icon.amber { color: #805117; }
+.ps-dashboard .ps-stat-icon.green { color: #236646; }
+
+.ps-dashboard .ps-journey-banner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.ps-dashboard .ps-journey-banner > svg {
+  color: var(--ps-student-link);
+}
+
+.ps-dashboard .ps-journey-banner strong {
+  color: var(--ps-dashboard-heading);
+  font-size: 19px;
+}
+
+.ps-dashboard :is(.ps-journey-banner small, .ps-community-card small) {
+  color: var(--ps-student-muted);
+  font-size: 15px;
+}
+
+.ps-dashboard :is(.ps-journey-action, .ps-community-heading a) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--ps-student-link);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ps-dashboard :is(.ps-journey-action, .ps-community-heading a) svg,
+.ps-dashboard .ps-community-card > svg {
+  flex-shrink: 0;
+}
+
+.ps-dashboard .ps-community-section {
+  padding-top: 0;
+}
+
+.ps-dashboard .ps-community-heading {
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.ps-dashboard .ps-community-card {
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.ps-dashboard .ps-community-card > :is(img, .dc-image-fallback) {
+  width: 48px;
+  height: 48px;
+  min-height: 48px;
+  flex: 0 0 48px;
+  padding: 4px;
+  border-radius: 50%;
+  background: #eef3ff;
+  object-fit: contain;
+}
+
+.ps-dashboard .ps-community-card > .dc-image-fallback {
+  display: grid;
+  place-items: center;
+  color: var(--ps-student-link);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ps-dashboard .ps-community-card strong {
+  white-space: normal;
+  font-size: 16px;
+}
+
+.ps-dashboard .ps-community-card:is(:hover, :focus-visible) {
+  box-shadow: 0 8px 20px #1a255022;
+  text-decoration: none;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ps-dashboard .ps-community-card {
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .ps-dashboard .ps-community-card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 1150px) {
+  .ps-dashboard .ps-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .ps-dashboard .ps-overview {
+    gap: 24px;
+  }
+
+  .ps-dashboard .ps-journey-banner {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ps-dashboard .ps-journey-action {
+    grid-column: 2;
+    margin-left: 0;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 560px) {
+  .ps-dashboard .ps-stat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

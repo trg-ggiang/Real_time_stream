@@ -18,3 +18,14 @@ export function publicDate(value?: string | null) {
         timeStyle: "short",
       }).format(date);
 }
+
+export function publicDateOnly(value?: string | null) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "Chưa cập nhật";
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
+}

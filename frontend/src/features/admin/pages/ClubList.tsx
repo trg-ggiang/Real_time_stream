@@ -115,6 +115,7 @@ export function ClubList({
           </div>
         ) : (
           <PersonalState
+            showDiscoveryLink={false}
             {...result}
             empty={
               q

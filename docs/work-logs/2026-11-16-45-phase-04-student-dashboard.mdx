@@ -1,0 +1,24 @@
+---
+title: Student dashboard layout
+description: Improve the personal overview typography, cards and responsive navigation.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-45
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04
+- Outcome: Completed
+- Phase status: In Progress
+
+## Completed work
+
+- `PersonalApp.tsx` scopes dashboard styling to the overview and groups the sidebar content for the drawer using the existing open state and handlers.
+- `personal-dashboard.css` updates typography, spacing, statistics, journey links, community cards and sidebar layout. It uses four, two and one statistics columns and a drawer below 900 px.
+- `PersonalLists.tsx` and `PublicContent.tsx` present the club name's first letter when a logo is unavailable, using the existing image fallback.
+- Routes, navigation targets, handlers, state, API requests and statistic calculations were preserved. Updated phase and master plans, session log, changelog and documentation navigation.
+
+## Verification and next step
+
+`npm.cmd --workspace frontend run build` passed, and `npm.cmd --workspace frontend run test` passed all 59 tests. Documentation navigation and `git diff --check` passed. Sampled text and background contrast ratios ranged from 5.58:1 to 13.24:1. Browser layout and keyboard interaction review remain pending due to the preceding localhost restriction. Review the drawer and dashboard grid at desktop, tablet and phone widths.

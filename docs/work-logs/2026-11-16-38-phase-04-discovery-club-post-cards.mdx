@@ -1,0 +1,33 @@
+---
+title: Discovery landing club and post cards
+description: Match the club and post previews to the activity section on the landing page.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-38
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+- `frontend/src/features/discovery/pages/DiscoveryHome.tsx` uses common section and button classes for all three landing previews.
+- `frontend/src/features/discovery/components/PublicContent.tsx` adds a presentation class when a club cover falls back to its existing logo URL.
+- `frontend/src/features/discovery/discovery-home.css` shares the equal-height grid, 16:10 media frames, 70% contained logos, raised hover and one-column layout below 640 px. The landing post preview uses uniform cards without affecting the collection layouts.
+- Preserved data selection, order, links, and loading, error, and empty behavior. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | All 59 frontend tests passed. |
+| Link and CSS source check | Passed | Verified all three route destinations and the shared media and responsive grid declarations. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the three landing previews at desktop and mobile widths before continuing the page-by-page update.

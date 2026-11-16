@@ -1,3 +1,4 @@
+import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -80,7 +81,7 @@ function WorkspaceScope({
     return (
       <div className="cw-app cw-loading-page">
         <Link className="cw-brand" to="/me/clubs">
-          uni<span>circle</span>.
+          <UniCircleLogo />
         </Link>
         <main>
           <h1>Không gian CLB</h1>
@@ -116,7 +117,7 @@ function WorkspaceScope({
         </a>
         <aside className="cw-sidebar">
           <Link className="cw-brand" to="/">
-            uni<span>circle</span>.
+            <UniCircleLogo />
           </Link>
           <div className="cw-club-identity">
             <ContentImage

@@ -1,0 +1,24 @@
+---
+title: Explicit post-login destination
+description: Validate returnTo and preserve legacy redirect behavior.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-50
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04
+- Outcome: Completed
+- Phase status: In Progress
+
+## Completed work
+
+- Added `frontend/src/features/auth/redirect.ts` and resolver unit tests. Explicit valid destinations take priority over the URL pathname, query and hash. The resolver selects a destination without granting access.
+- `AuthApp.tsx` applies the destination with replace after profile and account checks. Existing login API, token storage and saved role fallback are preserved. Integration tests cover role refresh and fallback to a legacy URL.
+- `DiscoveryApp.tsx`, `PublicDetailPage.tsx`, `AdminApp.tsx` and `LegacyGuestArea.tsx` use the explicit form-link helper. The admin denial screen stays in place.
+- Updated phase and master plans, session log, changelog and documentation navigation.
+
+## Verification and next step
+
+Frontend production build, all 87 frontend tests, documentation navigation and whitespace checks passed. Browser review remains pending due to preceding localhost restrictions. Verify a real login from the home page and a protected URL.

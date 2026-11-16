@@ -1,0 +1,30 @@
+---
+title: Discovery landing section buttons
+description: Match the landing post button to the club and activity buttons.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-40
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+`frontend/src/features/discovery/pages/DiscoveryHome.tsx` applies the existing section button classes to the post link. `frontend/src/features/discovery/discovery-home.css` removes the hover underline for the three section buttons. Link targets and the featured-story layout were preserved. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| Button class and destination check | Passed | Verified the three targets and shared underline rule. |
+| Frontend test suite | Skipped | The change is limited to one class and one CSS declaration. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the landing buttons in the browser before continuing the page-by-page update.

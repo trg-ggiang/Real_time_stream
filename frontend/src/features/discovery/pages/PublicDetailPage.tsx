@@ -1,4 +1,5 @@
 import { Link, useLocation, useParams } from "react-router-dom";
+import { authFormHref } from "../../auth/redirect";
 import { AccountAction } from "../../personal/components/AccountAction";
 import "../../personal/personal.css";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
@@ -24,7 +25,7 @@ export function PublicDetailPage({
   const location = useLocation();
   const result = usePublicDetail(kind, id);
   const item = result.data;
-  const login = `${location.pathname}?mode=login`;
+  const login = authFormHref("login", `${location.pathname}${location.search}${location.hash}`);
   if (!item)
     return (
       <div className="dc-container dc-detail-state">

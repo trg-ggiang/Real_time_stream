@@ -1,0 +1,12 @@
+---
+title: Admin account menu cleanup
+description: Remove the student-view shortcut from the account menu.
+---
+
+- Session: 2026-11-16-52, Asia/Saigon
+- Phase: 04, In Progress
+- Outcome: Completed
+
+`AdminLayout.tsx` now shows only logout in the account menu. `AdminApp.test.tsx` checks the remaining action, dismissal and focus. Phase, session, changelog, design and navigation documentation were updated.
+
+The targeted admin tests passed. Full build and browser checks were skipped for the isolated menu change. Review the menu in the admin header during the next visual check.

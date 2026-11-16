@@ -1,0 +1,36 @@
+---
+title: Discovery landing page styling
+description: Material Design 3 styling and visual accessibility for the discovery home.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-30
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and scope
+
+Improve the public landing page for visitors and signed-in users within the requested CSS, presentation classes and layout scope.
+
+## Completed work
+
+- `frontend/src/features/discovery/DiscoveryApp.tsx` imports the landing stylesheet and applies its scope class on `/`.
+- `frontend/src/features/discovery/discovery-home.css` applies Material Design 3 color roles, rounded surfaces, search and card styling, focus indicators, and a responsive header. Registration is visible on small screens and signed-in navigation retains the existing brand, navigation and account groups.
+- Updated the Phase 04 page, master plan, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported its bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | 58 tests across 14 files. |
+| Palette contrast calculation | Passed | Sampled text pairs measured 5.43:1 to 15.04:1. The search border measured 4.24:1 against its background. |
+| Browser visual, keyboard and reflow checks | Blocked | Loopback connection returned `EACCES` and the isolated Edge process could not render the offline fallback. |
+
+## Next step
+
+Check the landing page in a browser at 320 CSS px and 200% text resize. Tab through the search, account and mobile navigation in both session states. Continue with the public club list as the next page in the requested sequence.

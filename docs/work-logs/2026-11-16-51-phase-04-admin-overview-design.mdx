@@ -1,0 +1,25 @@
+---
+title: Admin overview redesign
+description: Refresh admin navigation, account controls and approval overview.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-51
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04
+- Outcome: Completed
+- Phase status: In Progress
+
+## Completed work
+
+- `AdminLayout.tsx` and `admin.css` add a navy sidebar, mobile drawer, breadcrumbs, aligned content and a dismissible keyboard-operable account menu. The menu uses the existing logout handler and opens the student view in a new tab.
+- `AdminOverview.tsx` adds linked statistic cards, approval row badges and actions, club initials and the note treatment using the existing data.
+- `ClubList.tsx`, `ClubRequestDetail.tsx` and `PersonalState.tsx` keep navigation within the signed-in admin shell, except the requested account-menu link. The sign-in and access-denied screens retain their access and links.
+- `AdminApp.test.tsx` verifies account-menu dismissal, focus, link attributes and the logout handler.
+- Updated phase and master plans, session log, changelog, administration design docs and navigation.
+
+## Verification and next step
+
+Frontend production build and all 88 frontend tests passed. Documentation navigation and whitespace checks passed. The sampled sidebar, active item, badge, label and statistic color pairs measured 4.97:1 to 12.42:1. Browser visual verification remains pending due to the preceding localhost restriction. Review the drawer and dashboard rows at small widths.

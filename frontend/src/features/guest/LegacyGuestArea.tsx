@@ -1,3 +1,5 @@
+import { authFormHref } from "../auth/redirect";
+import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import { GuestHero } from './GuestHero';
@@ -160,7 +162,7 @@ export function LegacyGuestArea({ viewer, role, accessToken, onMeeting, onLogout
   }, [landingPage]);
   return <div className="guest-landing" data-signed-in={!!viewer}>
     <a href="#guest-content" className="guest-skip">Đến nội dung</a>
-    <header className="guest-header"><a className="guest-brand" href="/">uni<b>circle</b></a>
+    <header className="guest-header"><a className="guest-brand" href="/"><UniCircleLogo /></a>
       <nav aria-label="Điều hướng công khai">{sectionNavigation.map(({ id, label }, index) => <Fragment key={id}>
         <a href={`#${id}`} aria-current={landingPage && activeSection === id ? 'location' : undefined}
           onClick={() => {
@@ -169,14 +171,14 @@ export function LegacyGuestArea({ viewer, role, accessToken, onMeeting, onLogout
           }}>{label}</a>
         {index === 0 && viewer && accessToken && <a className="my-clubs-link" href="#my-clubs" aria-current={myClubsPage ? 'page' : undefined}>CLB của tôi</a>}
       </Fragment>)}{role === 'admin' && <a href="#admin-clubs" onMouseDown={event => event.preventDefault()} onClick={event => { event.preventDefault(); setAdminPage(true); setActiveSection(null); history.pushState(null, '', '#admin-clubs'); setClubRoute('#admin-clubs'); }}>Quản lý CLB</a>}</nav>
-      <div className="guest-auth">{viewer ? <><span className="guest-viewer">Sinh viên · {viewer.displayName}</span><button className="guest-primary" type="button" onClick={onMeeting}>Cuộc họp</button><button type="button" onClick={onLogout}>Đăng xuất</button></> : <><a href="/?mode=login">Đăng nhập</a><a className="guest-primary" href="/?mode=register">Đăng ký </a></>}</div>
+      <div className="guest-auth">{viewer ? <><span className="guest-viewer">Sinh viên · {viewer.displayName}</span><button className="guest-primary" type="button" onClick={onMeeting}>Cuộc họp</button><button type="button" onClick={onLogout}>Đăng xuất</button></> : <><a href={authFormHref("login", "/")}>Đăng nhập</a><a className="guest-primary" href={authFormHref("register", "/")}>Đăng ký </a></>}</div>
     </header>
     {landingPage && <GuestHero />}
     {myClubsPage && accessToken ? <ClubActivitiesPage clubId={selectedClubId} token={accessToken} onPublished={activities.refresh} /> : landingPage ? <main id="guest-content">
 <section id="guest-clubs" className="guest-section"><h2>Cùng tần số, <span>cùng đam mê.</span></h2>
         {myClubRequest && accessToken && <ClubApplicationProgress request={myClubRequest} />}
         {clubRequestError && accessToken && <p className="guest-club-request-error" role="alert">{clubRequestError} <button type="button" onClick={() => setClubRequestRefresh(value => value + 1)}>Thử lại</button></p>}
-        <div className="guest-toolbar"><label>Tìm CLB<input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Tên hoặc sở thích…" /></label>{clubRequestChecked && !myClubRequest && !clubRequestError && <button className="guest-primary guest-create-club" type="button" onClick={() => { if (viewer && accessToken) setClubApplicationOpen(true); else if (!viewer) window.location.assign('/?mode=login'); }}>+ Thành lập CLB</button>}{!clubRequestChecked && accessToken && <span className="guest-club-request-loading" role="status">Đang kiểm tra đơn…</span>}</div>
+        <div className="guest-toolbar"><label>Tìm CLB<input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Tên hoặc sở thích…" /></label>{clubRequestChecked && !myClubRequest && !clubRequestError && <button className="guest-primary guest-create-club" type="button" onClick={() => { if (viewer && accessToken) setClubApplicationOpen(true); else if (!viewer) window.location.assign(authFormHref("login", "/")); }}>+ Thành lập CLB</button>}{!clubRequestChecked && accessToken && <span className="guest-club-request-loading" role="status">Đang kiểm tra đơn…</span>}</div>
 <div className="guest-club-grid">{visibleClubs.map(item => <article className="guest-club-card" key={item.club_id}><div className="guest-club-media"><PublicImage src={item.cover_url || item.logo_url} alt="" /></div><div className="guest-club-copy"><button className="guest-card-title" onClick={() => setSelection({ item, kind: 'clubs' })}><span>{item.name}</span></button><p>{item.summary}</p><div className="guest-card-actions"><button className="guest-text-action" onClick={() => setSelection({ item, kind: 'clubs' })}>Xem CLB</button><button className="guest-save" aria-label={`Quan tâm ${item.name}`} onClick={() => requestLogin(`Đăng nhập để quan tâm ${item.name}.`)}>Quan tâm</button></div></div></article>)}</div>
         {!visibleClubs.length && clubs.items.length > 0 && <p className="guest-empty">Không có CLB phù hợp trong danh sách đã tải. Thử từ khóa khác hoặc tải thêm CLB.</p>}
         <CollectionStatus state={clubs} empty="Chưa có câu lạc bộ được công khai. Bạn có thể quay lại sau để khám phá." />
@@ -210,12 +212,12 @@ export function LegacyGuestArea({ viewer, role, accessToken, onMeeting, onLogout
         </article>)}</div>
         <CollectionStatus state={posts} empty="Chưa có bài viết công khai từ các CLB." />
       </section>
-      <section className="guest-join"><h2>Câu chuyện sinh viên của bạn,<br /><span>còn nhiều trang để viết.</span></h2>{viewer ? <button className="guest-primary" type="button" onClick={onMeeting}>Mở cuộc họp</button> : <a className="guest-primary" href="/?mode=register">Đăng ký </a>}<p>{viewer ? 'Khám phá cộng đồng và kết nối với bạn bè.' : 'Tạo tài khoản để kết nối cùng cộng đồng.'}</p></section>
+      <section className="guest-join"><h2>Câu chuyện sinh viên của bạn,<br /><span>còn nhiều trang để viết.</span></h2>{viewer ? <button className="guest-primary" type="button" onClick={onMeeting}>Mở cuộc họp</button> : <a className="guest-primary" href={authFormHref("register", "/")}>Đăng ký </a>}<p>{viewer ? 'Khám phá cộng đồng và kết nối với bạn bè.' : 'Tạo tài khoản để kết nối cùng cộng đồng.'}</p></section>
     </main> : <ClubManagementPage token={accessToken || ''} />}
-    {landingPage && <footer className="guest-footer"><a className="guest-brand" href="/">unicircle</a><p>Kết nối đam mê. Mở rộng thế giới.</p></footer>}
+    {landingPage && <footer className="guest-footer"><a className="guest-brand" href="/"><UniCircleLogo /></a><p>Kết nối đam mê. Mở rộng thế giới.</p></footer>}
     {clubApplicationSent && <p className="guest-club-application-status" role="status">Đã gửi đăng ký thành lập CLB để chờ xem xét.</p>}
     {clubApplicationOpen && accessToken && <ClubApplicationDialog token={accessToken} onClose={() => setClubApplicationOpen(false)} onSubmitted={() => { setClubApplicationOpen(false); setClubApplicationSent(true); setClubRequestRefresh(value => value + 1); }} />}
     {selection && <ContentDialog selection={selection} close={() => setSelection(null)} requestLogin={requestLogin} signedIn={!!viewer} />}
-    {gate && <dialog className="guest-dialog" ref={gateRef} onCancel={() => setGate(null)} aria-labelledby="guest-gate-title"><button className="guest-dialog-close" aria-label="Đóng" onClick={() => setGate(null)}><X size={24} /></button><h2 id="guest-gate-title">Một bước để kết nối</h2><p>{gate}</p><div className="guest-dialog-actions"><a className="guest-primary" href="/?mode=login">Đăng nhập </a><a className="guest-secondary" href="/?mode=register">Đăng ký</a></div><button className="guest-text-action" onClick={() => setGate(null)}>Tiếp tục khám phá</button></dialog>}
+    {gate && <dialog className="guest-dialog" ref={gateRef} onCancel={() => setGate(null)} aria-labelledby="guest-gate-title"><button className="guest-dialog-close" aria-label="Đóng" onClick={() => setGate(null)}><X size={24} /></button><h2 id="guest-gate-title">Một bước để kết nối</h2><p>{gate}</p><div className="guest-dialog-actions"><a className="guest-primary" href={authFormHref("login", "/")}>Đăng nhập </a><a className="guest-secondary" href={authFormHref("register", "/")}>Đăng ký</a></div><button className="guest-text-action" onClick={() => setGate(null)}>Tiếp tục khám phá</button></dialog>}
   </div>;
 }

@@ -18,7 +18,7 @@ import {
   type PrivatePage,
   type RegisteredActivity,
 } from "../services/personal-api";
-import { PersonalState } from "../components/PersonalState";
+import { PersonalEmpty, PersonalState } from "../components/PersonalState";
 
 const labels = {
   pending: "Chờ xét duyệt",
@@ -59,31 +59,31 @@ export function PersonalClubsPage({ token }: { token: string }) {
       </div>
       <div className="ps-club-tabs" role="tablist" aria-label="Danh sách CLB">
         <button role="tab" aria-selected={tab === "joined"} className={tab === "joined" ? "active" : ""} onClick={() => setTab("joined")}>
-          Đã tham gia ({clubs.data?.total ?? "…"})
+          Đã tham gia <span className="ps-tab-count">({clubs.data?.total ?? "…"})</span>
         </button>
         <button role="tab" aria-selected={tab === "pending"} className={tab === "pending" ? "active" : ""} onClick={() => setTab("pending")}>
-          Đang chờ duyệt ({requests.data ? pending.length : "…"})
+          Đang chờ duyệt <span className="ps-tab-count">({requests.data ? pending.length : "…"})</span>
         </button>
         <button role="tab" aria-selected={tab === "managed"} className={tab === "managed" ? "active" : ""} onClick={() => setTab("managed")}>
-          Đang quản lý ({clubs.data ? managed.length : "…"})
+          Đang quản lý <span className="ps-tab-count">({clubs.data ? managed.length : "…"})</span>
         </button>
       </div>
       <div className="ps-club-tab-content" role="tabpanel">
         {tab === "pending" ? (
           pending.length ? <div className="ps-club-cards">{pending.map((request) => (
             <Link className="ps-club-card" to={`/me/club-requests/${request.club_id}`} key={request.club_id}>
-              <div className="ps-club-card-media"><ContentImage src={request.cover_url || request.logo_url} alt="" /></div>
+              <div className="ps-club-card-media"><ContentImage src={request.cover_url} alt="" fallbackText={request.name.trim().charAt(0).toLocaleUpperCase("vi-VN")} /></div>
               <div className="ps-club-card-copy"><strong>{request.name}</strong><small>{requestStatus(request.status)} · Gửi ngày {publicDate(request.created_at)}</small><span className="ps-club-card-link">Xem yêu cầu <ArrowRight size={15} aria-hidden="true" /></span></div>
             </Link>
-          ))}</div> : <p className="ps-club-empty">{requests.loading ? "Đang tải đề nghị…" : "Bạn chưa có đề nghị CLB nào đang chờ duyệt."}</p>
+          ))}</div> : requests.loading ? <p className="ps-club-empty">Đang tải đề nghị…</p> : <PersonalEmpty><p>Bạn chưa có đề nghị CLB nào đang chờ duyệt.</p></PersonalEmpty>
         ) : entries.length ? (
           <div className="ps-club-cards">{entries.map((membership) => (
             <Link className="ps-club-card" to={`/workspace/${membership.club.club_id}`} key={membership.membership_id}>
-              <div className="ps-club-card-media"><ContentImage src={membership.club.cover_url || membership.club.logo_url} alt="" /></div>
-              <div className="ps-club-card-copy"><strong>{membership.club.name}</strong><small>{membership.role === "chairperson" ? "Chủ nhiệm · Đang quản lý" : "Thành viên"}</small><span className="ps-club-card-link">Mở không gian <ArrowRight size={15} aria-hidden="true" /></span></div>
+              <div className="ps-club-card-media"><ContentImage src={membership.club.cover_url} alt="" fallbackText={membership.club.name.trim().charAt(0).toLocaleUpperCase("vi-VN")} /></div>
+              <div className="ps-club-card-copy"><strong>{membership.club.name}</strong><small className="ps-status ps-club-role">{membership.role === "chairperson" ? "Chủ nhiệm · Đang quản lý" : "Thành viên"}</small><span className="ps-club-card-link ps-club-card-action">Mở không gian <ArrowRight size={15} aria-hidden="true" /></span></div>
             </Link>
           ))}</div>
-        ) : <p className="ps-club-empty">{clubs.loading ? "Đang tải CLB…" : tab === "managed" ? "Bạn chưa quản lý CLB nào." : "Bạn chưa tham gia CLB nào."}</p>}
+        ) : clubs.loading ? <p className="ps-club-empty">Đang tải CLB…</p> : <PersonalEmpty><p>{tab === "managed" ? "Bạn chưa quản lý CLB nào." : "Bạn chưa tham gia CLB nào."}</p></PersonalEmpty>}
       </div>
     </section>
   );
@@ -121,12 +121,12 @@ export function PersonalActivitiesPage({ token }: { token: string }) {
       <div className="ps-activities-heading">
         <div><h1>Hoạt động của tôi</h1><p>Lưu giữ trải nghiệm và lên lịch cho những điều mới.</p></div>
         <div className="ps-activity-view-toggle" role="group" aria-label="Kiểu hiển thị hoạt động">
-          <button className={view === "list" ? "active" : ""} aria-pressed={view === "list"} aria-label="Xem dạng danh sách" onClick={() => setView("list")}><ListBullets size={19} /></button>
-          <button className={view === "calendar" ? "active" : ""} aria-pressed={view === "calendar"} aria-label="Xem dạng lịch" onClick={() => setView("calendar")}><CalendarBlank size={19} /></button>
+          <button className={view === "list" ? "active" : ""} aria-pressed={view === "list"} aria-label="Xem dạng danh sách" title="Xem dạng danh sách" onClick={() => setView("list")}><ListBullets size={19} /></button>
+          <button className={view === "calendar" ? "active" : ""} aria-pressed={view === "calendar"} aria-label="Xem dạng lịch" title="Xem dạng lịch" onClick={() => setView("calendar")}><CalendarBlank size={19} /></button>
         </div>
       </div>
       <div className="ps-activity-tabs" role="tablist" aria-label="Lọc hoạt động">
-        {tabs.map(([id, label, count]) => <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? "active" : ""} onClick={() => setTab(id)}>{label} ({count})</button>)}
+        {tabs.map(([id, label, count]) => <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? "active" : ""} onClick={() => setTab(id)}>{label} <span className="ps-tab-count">({count})</span></button>)}
       </div>
       {registrations.error ? <PersonalState {...registrations} /> : visibleRows.length ? (
         <div className={view === "calendar" ? "ps-activity-list is-calendar" : "ps-activity-list"}>
@@ -140,12 +140,14 @@ export function PersonalActivitiesPage({ token }: { token: string }) {
             {row.activity && <Link className="ps-text-link" to={`/activities/${row.activity_id}`}>Chi tiết <ArrowRight size={16} /></Link>}
           </article>)}
         </div>
-      ) : <p className="ps-activity-empty">{registrations.loading || clubs.loading ? "Đang tải hoạt động…" : tab === "clubs" ? "Chưa có hoạt động từ các CLB bạn tham gia." : tab === "completed" ? "Chưa có hoạt động nào đã hoàn thành." : "Bạn chưa đăng ký hoạt động nào."}</p>}
-      <nav className="ps-pagination" aria-label="Phân trang hoạt động">
-        <button disabled={page <= 1 || registrations.loading} onClick={() => setParams({ page: String(page - 1) })}>← Trang trước</button>
-        <span>Trang {page}</span>
-        <button disabled={!registrations.data?.hasMore || registrations.loading} onClick={() => setParams({ page: String(page + 1) })}>Trang sau →</button>
-      </nav>
+      ) : registrations.loading || clubs.loading ? <p className="ps-activity-empty">Đang tải hoạt động…</p> : <PersonalEmpty><p>{tab === "clubs" ? "Chưa có hoạt động từ các CLB bạn tham gia." : tab === "completed" ? "Chưa có hoạt động nào đã hoàn thành." : "Bạn chưa đăng ký hoạt động nào."}</p></PersonalEmpty>}
+      {registrations.data && registrations.data.total > registrations.data.limit && (
+        <nav className="ps-pagination" aria-label="Phân trang hoạt động">
+          <button disabled={page <= 1 || registrations.loading} onClick={() => setParams({ page: String(page - 1) })}>← Trang trước</button>
+          <span>Trang {page}</span>
+          <button disabled={!registrations.data?.hasMore || registrations.loading} onClick={() => setParams({ page: String(page + 1) })}>Trang sau →</button>
+        </nav>
+      )}
     </section>
   );
 }
@@ -188,7 +190,7 @@ export function PersonalLists({
           </Link>
         )}
       </div>
-      <p className="ps-count">
+      <p className="ps-count" hidden={kind === "follows" && state.data?.total === 0}>
         {state.data ? `${state.data.total} mục · Trang ${page}` : "Đang tải…"}
       </p>
       {state.data?.items.length ? (
@@ -248,73 +250,44 @@ export function PersonalLists({
                 </article>
               );
             }
-            if (kind === "registrations") {
-              const item = row as RegisteredActivity;
-              return (
-                <article className="ps-object" key={item.registration_id}>
-                  <ContentImage
-                    src={item.activity?.cover_url}
-                    alt=""
-                    className="ps-object-image"
-                  />
-                  <div>
-                    <span className={`ps-status ${item.status}`}>
-                      {item.status === "registered" ? "Đã đăng ký" : "Đã hủy"}
-                    </span>
-                    <h2>
-                      {item.activity ? (
-                        <Link to={`/activities/${item.activity_id}`}>
-                          {item.activity.title}
-                        </Link>
-                      ) : (
-                        "Hoạt động không còn công khai"
-                      )}
-                    </h2>
-                    <p>
-                      {item.activity
-                        ? `${item.activity.club_name} · ${publicDate(item.activity.starts_at)}`
-                        : "Lịch sử đăng ký vẫn được giữ; nội dung riêng tư không hiển thị."}
-                    </p>
-                    {item.activity?.lifecycle_status === "cancelled" && (
-                      <p>Hoạt động đã bị hủy bởi CLB.</p>
-                    )}
-                  </div>
-                  {item.activity && (
-                    <Link
-                      className="ps-text-link"
-                      to={`/activities/${item.activity_id}`}
-                    >
-                      Quản lý đăng ký →
-                    </Link>
-                  )}
-                </article>
-              );
-            }
-            const item = row as ClubRequest;
+            const item = row as RegisteredActivity;
             return (
-              <article className="ps-object" key={item.club_id}>
+              <article className="ps-object" key={item.registration_id}>
                 <ContentImage
-                  src={item.logo_url || item.cover_url}
+                  src={item.activity?.cover_url}
                   alt=""
                   className="ps-object-image"
                 />
                 <div>
                   <span className={`ps-status ${item.status}`}>
-                    {requestStatus(item.status)}
+                    {item.status === "registered" ? "Đã đăng ký" : "Đã hủy"}
                   </span>
                   <h2>
-                    <Link to={`/me/club-requests/${item.club_id}`}>
-                      {item.name}
-                    </Link>
+                    {item.activity ? (
+                      <Link to={`/activities/${item.activity_id}`}>
+                        {item.activity.title}
+                      </Link>
+                    ) : (
+                      "Hoạt động không còn công khai"
+                    )}
                   </h2>
-                  <p>Gửi lúc {publicDate(item.created_at)}</p>
+                  <p>
+                    {item.activity
+                      ? `${item.activity.club_name} · ${publicDate(item.activity.starts_at)}`
+                      : "Lịch sử đăng ký vẫn được giữ; nội dung riêng tư không hiển thị."}
+                  </p>
+                  {item.activity?.lifecycle_status === "cancelled" && (
+                    <p>Hoạt động đã bị hủy bởi CLB.</p>
+                  )}
                 </div>
-                <Link
-                  className="ps-text-link"
-                  to={`/me/club-requests/${item.club_id}`}
-                >
-                  Xem hồ sơ →
-                </Link>
+                {item.activity && (
+                  <Link
+                    className="ps-text-link"
+                    to={`/activities/${item.activity_id}`}
+                  >
+                    Quản lý đăng ký →
+                  </Link>
+                )}
               </article>
             );
           })}
@@ -333,21 +306,23 @@ export function PersonalLists({
           }
         />
       )}
-      <nav className="ps-pagination" aria-label="Phân trang cá nhân">
-        <button
-          disabled={page <= 1 || state.loading}
-          onClick={() => setParams({ page: String(page - 1) })}
-        >
-          ← Trang trước
-        </button>
-        <span>Trang {page}</span>
-        <button
-          disabled={!state.data?.hasMore || state.loading}
-          onClick={() => setParams({ page: String(page + 1) })}
-        >
-          Trang sau →
-        </button>
-      </nav>
+      {state.data && state.data.total > state.data.limit && (
+        <nav className="ps-pagination" aria-label="Phân trang cá nhân">
+          <button
+            disabled={page <= 1 || state.loading}
+            onClick={() => setParams({ page: String(page - 1) })}
+          >
+            ← Trang trước
+          </button>
+          <span>Trang {page}</span>
+          <button
+            disabled={!state.data?.hasMore || state.loading}
+            onClick={() => setParams({ page: String(page + 1) })}
+          >
+            Trang sau →
+          </button>
+        </nav>
+      )}
     </>
   );
 }
@@ -400,7 +375,11 @@ export function PersonalOverview({
         {clubs.data?.items.length ? (
           <div className="ps-community-list">{clubs.data.items.slice(0, 3).map((m) => (
             <Link className="ps-community-card" to={`/workspace/${m.club.club_id}`} key={m.membership_id}>
-              <ContentImage src={m.club.logo_url} alt="" />
+              <ContentImage
+                src={m.club.logo_url}
+                alt=""
+                fallbackText={m.club.name.trim().charAt(0).toLocaleUpperCase("vi-VN")}
+              />
               <span><strong>{m.club.name}</strong><small>{m.role === "chairperson" ? "Chủ nhiệm" : "Thành viên"}</small></span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>

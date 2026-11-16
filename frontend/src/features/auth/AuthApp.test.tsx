@@ -14,6 +14,30 @@ vi.mock('../guest/GuestLanding', () => ({
 afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); vi.unstubAllGlobals(); window.history.replaceState(null, '', '/'); });
 const completedProfile = { full_name: 'Test User', student_code: 'SV001', school_or_faculty: 'CNTT', major: 'IT', cohort: '2026' };
 
+it.each([
+  ['/me/clubs?mode=login&returnTo=%2Fadmin', 'user', 'admin', '/admin'],
+  ['/me/clubs?mode=login&returnTo=%2Fadmin', 'admin', 'user', '/me'],
+  ['/me/clubs?mode=login&returnTo=https://evil.com', 'admin', null, '/me/clubs'],
+  ['/?mode=login&returnTo=%2F', 'admin', null, '/admin'],
+] as const)('resolves the destination for %s after the account check', async (url, loginRole, checkedRole, expected) => {
+  window.history.replaceState(null, '', url);
+  const user = { userId: 'u1', email: 'user@test.dev', displayName: 'Route User', role: loginRole };
+  vi.stubGlobal('fetch', vi.fn(async (path: string) => {
+    if (path.endsWith('/auth/me')) {
+      if (checkedRole === null) throw new Error('Account check unavailable');
+      return { ok: true, json: async () => ({ ...user, role: checkedRole }) };
+    }
+    return { ok: true, json: async () => path.endsWith('/profile')
+      ? completedProfile : { access_token: 'test-jwt', user } };
+  }));
+  render(<AuthApp />);
+  const email = screen.getByLabelText('Email');
+  fireEvent.change(email, { target: { value: user.email } });
+  fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+  fireEvent.submit(email.closest('form')!);
+  await waitFor(() => expect(`${location.pathname}${location.search}${location.hash}`).toBe(expected));
+});
+
 it('restores and persists the shared theme preference on the login screen', () => {
   localStorage.setItem('rts.meeting-theme.v1', 'dark');
   const first = render(<AuthApp />);
@@ -46,7 +70,7 @@ it('shows student profile after a successful new registration', async () => {
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'new@test.dev' } });
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
-  await screen.findByRole('heading', { name: /Một chút về bạn/ });
+  await screen.findByLabelText('Mã sinh viên');
   expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/register');
   expect(window.location.search).toBe('');
   expect(screen.getByLabelText('Mã sinh viên')).toBeTruthy();
@@ -62,7 +86,7 @@ it('keeps an incomplete account on the profile form until save succeeds', async 
   fireEvent.change(screen.getByLabelText('Email'), { target: { value: 's@test.dev' } });
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
-  await screen.findByRole('heading', { name: /Một chút về bạn/ });
+  await screen.findByLabelText('Mã sinh viên');
   expect(screen.queryByTestId('token')).toBeNull();
   for (const [label, value] of [['Họ và tên', 'Sinh Vien'], ['Mã sinh viên', 'SV01'], ['Trường / khoa', 'CNTT'], ['Ngành học', 'IT'], ['Khóa', '2026']]) {
     fireEvent.change(screen.getByLabelText(label), { target: { value } });

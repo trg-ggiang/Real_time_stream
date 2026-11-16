@@ -1,3 +1,4 @@
+import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { SquaresFour } from "@phosphor-icons/react/dist/csr/SquaresFour";
@@ -15,6 +16,8 @@ import { PersonalActivitiesPage, PersonalClubsPage, PersonalLists, PersonalOverv
 import { ClubRequestDetail, NewClubRequest } from "./pages/ClubRequestPages";
 import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import "./personal.css";
+import "./personal-dashboard.css";
+import "./personal-layout.css";
 const nav = [
   ["/me", "Tổng quan", SquaresFour],
   ["/me/clubs", "CLB tham gia", Users],
@@ -47,13 +50,13 @@ export function PersonalApp({
   }, []);
   if (!viewer || !accessToken) return null;
   return (
-    <div className="ps-app">
+    <div className={`ps-app ps-student-shell${location.pathname === "/me" ? " ps-dashboard" : ""}`}>
       <a className="ps-skip" href="#personal-content">
         Đến nội dung
       </a>
       <aside className="ps-sidebar">
         <Link className="ps-brand" to="/">
-          uni<span>circle</span>.
+          <UniCircleLogo />
         </Link>
         <div className="ps-identity">
           <span className="ps-avatar" aria-hidden="true">
@@ -72,38 +75,39 @@ export function PersonalApp({
         >
           Điều hướng cá nhân {open ? "−" : "+"}
         </button>
-        <nav
-          id="personal-navigation"
-          className={open ? "is-open" : ""}
-          aria-label="Điều hướng cá nhân"
-        >
-          {nav.map(([path, label, Icon]) => (
-            <NavLink
-              key={path}
-              to={path}
-              end={path === "/me"}
-              className={({ isActive }) =>
-                isActive ||
-                (path === "/me/clubs" &&
-                  location.pathname.startsWith("/me/club-requests/"))
-                  ? "active"
-                  : undefined
-              }
-            >
-              <Icon size={19} weight="regular" aria-hidden="true" />
-              <span>{label}</span>
-            </NavLink>
-          ))}
-        </nav>
-        <div className="ps-sidebar-bottom">
-          <Link to="/"><Compass size={18} aria-hidden="true" />Khám phá công khai</Link>
-          <button onClick={onMeeting} data-leave-account>
-            <VideoCamera size={18} aria-hidden="true" />Mở phòng họp
-          </button>
-          {role === "admin" && <Link to="/admin"><GearSix size={18} aria-hidden="true" />Quản trị hệ thống</Link>}
-          <button onClick={onLogout} data-leave-account>
-            <SignOut size={18} aria-hidden="true" />Đăng xuất
-          </button>
+        <div id="personal-navigation" className={`ps-sidebar-menu${open ? " is-open" : ""}`}>
+          <nav
+            className={open ? "is-open" : ""}
+            aria-label="Điều hướng cá nhân"
+          >
+            {nav.map(([path, label, Icon]) => (
+              <NavLink
+                key={path}
+                to={path}
+                end={path === "/me"}
+                className={({ isActive }) =>
+                  isActive ||
+                  (path === "/me/clubs" &&
+                    location.pathname.startsWith("/me/club-requests/"))
+                    ? "active"
+                    : undefined
+                }
+              >
+                <Icon size={19} weight="regular" aria-hidden="true" />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+          <div className="ps-sidebar-bottom">
+            <Link to="/"><Compass size={18} aria-hidden="true" />Khám phá công khai</Link>
+            <button onClick={onMeeting} data-leave-account>
+              <VideoCamera size={18} aria-hidden="true" />Mở phòng họp
+            </button>
+            {role === "admin" && <Link to="/admin"><GearSix size={18} aria-hidden="true" />Quản trị hệ thống</Link>}
+            <button className="ps-logout" onClick={onLogout} data-leave-account>
+              <SignOut size={18} aria-hidden="true" />Đăng xuất
+            </button>
+          </div>
         </div>
       </aside>
       <div className="ps-workspace">

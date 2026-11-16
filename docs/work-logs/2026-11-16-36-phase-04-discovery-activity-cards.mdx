@@ -1,0 +1,33 @@
+---
+title: Discovery landing activity cards
+description: Update the landing activity note, card grid, images, dates, and ended badge.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-36
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+- `frontend/src/features/discovery/pages/DiscoveryHome.tsx` moves the existing fallback note under the description and adds a CSS scope for the section.
+- `frontend/src/features/discovery/components/PublicContent.tsx` wraps the existing ended text in presentational spans. Collection pages retain the inline separator and text.
+- `frontend/src/features/discovery/discovery-home.css` aligns the list link, uses equal-height cards and 16:10 media, contains recognized logos at 70%, adds date padding and a gray ended badge, and switches to one column below 640 px. Hover lift respects reduced motion and the existing blue focus-visible outline remains.
+- Public query inputs, item selection and order, note visibility, status priority, item links, and handlers were preserved. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | All 59 frontend tests passed. |
+| CSS and color contrast | Passed | Scoped rules and the 640 px breakpoint verified. Note text 7.05:1, badge text 7.84:1, focus outline on focused card 6.67:1. |
+| Browser visual and keyboard checks | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the activity section in a browser at desktop and mobile sizes with upcoming, historical, and empty activity data.

@@ -1,0 +1,44 @@
+.uni-brand {
+  --uni-brand-accent: #2457a6;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.uni-brand > .uni-brand-mark {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  flex: none;
+  inline-size: 1.1em;
+  block-size: 1.1em;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  color: var(--uni-brand-accent);
+}
+
+.uni-brand-mark::after {
+  content: "";
+  inline-size: 0.36em;
+  block-size: 0.36em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.uni-brand > .uni-brand-name,
+.uni-brand-name > b {
+  font-weight: 600;
+}
+
+.uni-brand-name > b {
+  color: var(--uni-brand-accent);
+}
+
+.meeting-app[data-theme="dark"] .uni-brand {
+  --uni-brand-accent: #a9c7ff;
+}

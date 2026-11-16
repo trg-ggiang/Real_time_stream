@@ -1,0 +1,32 @@
+---
+title: Discovery landing post layout
+description: Restore the featured story and remove extra links from landing cards.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-39
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+- `frontend/src/features/discovery/pages/DiscoveryHome.tsx` restores the post section's previous presentation classes and inline section link.
+- `frontend/src/features/discovery/discovery-home.css` restores the post section's featured and mobile layouts by removing the shared card overrides. It hides the secondary club and post links only on the landing page. Card titles retain their detail links.
+- Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | All 59 frontend tests passed. |
+| CSS source check | Passed | Confirmed landing-only link suppression and removal of post layout overrides. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the restored post section at desktop and mobile widths before continuing the page-by-page update.
