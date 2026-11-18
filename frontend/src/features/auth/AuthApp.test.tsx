@@ -49,7 +49,7 @@ it('shows student profile after a successful new registration', async () => {
   await screen.findByRole('heading', { name: /Một chút về bạn/ });
   expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/register');
   expect(window.location.search).toBe('');
-  expect(screen.getByLabelText('Mã sinh viên')).toBeTruthy();
+  expect(await screen.findByLabelText('Mã sinh viên')).toBeTruthy();
   expect(screen.queryByTestId('token')).toBeNull();
 });
 
@@ -63,6 +63,7 @@ it('keeps an incomplete account on the profile form until save succeeds', async 
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
   await screen.findByRole('heading', { name: /Một chút về bạn/ });
+  await screen.findByLabelText('Họ và tên');
   expect(screen.queryByTestId('token')).toBeNull();
   for (const [label, value] of [['Họ và tên', 'Sinh Vien'], ['Mã sinh viên', 'SV01'], ['Trường / khoa', 'CNTT'], ['Ngành học', 'IT'], ['Khóa', '2026']]) {
     fireEvent.change(screen.getByLabelText(label), { target: { value } });
@@ -103,6 +104,7 @@ it.each(['{bad json', JSON.stringify({ access_token: 'broken', user: {} }), JSON
 });
 
 it('logs in with the API contract and clears the in-memory session on logout', async () => {
+  window.history.replaceState(null, '', '/?mode=login');
   const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve({ ok: true, json: async () => url.includes('/profile')
     ? completedProfile : { access_token: 'app-jwt', user: { userId: 'u1', email: 'a@test.dev', displayName: 'Tester', avatarUrl: null } } }));
   vi.stubGlobal('fetch', fetchMock);
@@ -111,6 +113,8 @@ it('logs in with the API contract and clears the in-memory session on logout', a
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
   fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
   await waitFor(() => expect(screen.getByText('Trang chủ Tester')).toBeTruthy());
+  expect(window.location.pathname).toBe('/');
+  expect(window.location.search).toBe('');
   expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/login');
   expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ email: 'a@test.dev', password: 'password123' });
   expect(screen.queryByTestId('token')).toBeNull();

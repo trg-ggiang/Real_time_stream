@@ -349,3 +349,39 @@ Workspace CLB có context/role riêng, draft/submit/review posts/activities, qu�
 ## 2026-11-16 — Admin default login destination fix
 
 Auth/profile từ trang gốc nay chờ refresh role rồi admin → /admin, student → /me; giữ deep link/meeting. Đã xác nhận read-only admin@gmail.com có role admin và profile đầy đủ. Typecheck/frontend build, 77 frontend tests và browser stale-role→admin landing đạt. Không ghi DB/commit/push. [Work log](/work-logs/2026-11-16-06-phase-04-admin-login-routing).
+
+## Cập nhật 2026-11-18 — Không gian sinh hoạt sinh viên
+
+Frontend có header dẫn đến `/workspace`, mở ngay shell ba vùng và tự chọn CLB đã tham gia, với kênh giao diện và thao tác theo vai trò dưới kênh. Phase 04 vẫn **In Progress** vì kênh chưa có workspace API, meeting chưa gắn CLB và UI chưa nghiệm thu với tài khoản thật. [Work log giao diện](/work-logs/2026-11-18-01-phase-04-student-club-space-frontend).
+
+## Cập nhật 2026-11-18 — Đối chiếu schema đúng
+
+Schema đã có `club_channels`, `channel_messages`, `meetings.club_id` và `meetings.recurrence_rule`. Frontend họp định kỳ nay mở công cụ meeting hiện có; kênh vẫn là bản xem trước vì chưa có route workspace kênh. Phase giữ **In Progress**. [Work log](/work-logs/2026-11-18-02-phase-04-schema-alignment).
+
+## Cập nhật 2026-11-18 — Chỉnh UX sinh viên
+
+Đăng nhập sinh viên có hồ sơ hoàn chỉnh về trang chủ. Không gian sinh hoạt mở thẳng kênh CLB, bỏ khung thẻ chat; sidebar phân kênh/công việc/CLB. Trang cá nhân đổi thành tổng quan tài khoản và chuyển `/me/clubs` sang `/workspace`; menu avatar còn một điểm mở. Build và 59 frontend tests đạt. Chưa kiểm tra trực quan browser, API kênh vẫn chờ backend; Phase 04 **In Progress**. [Work log](/work-logs/2026-11-18-03-phase-04-student-ux-navigation).
+
+## Cập nhật 2026-11-18 — Avatar ở dải CLB
+
+Bỏ avatar lặp ở sidebar, cho ảnh CLB chiếm trọn ô dải trái và thu hẹp sidebar. Build và 2 test workspace đạt; Phase 04 **In Progress**. [Work log](/work-logs/2026-11-18-04-phase-04-club-rail-avatar).
+
+## Cập nhật 2026-11-18 — Sidebar gọn và kênh gọi nhanh
+
+Danh sách kênh có vùng cuộn riêng, công việc/thông tin CLB có thể gập; thêm Phòng chung, Họp nhóm và form tạo bản nháp kênh cho chủ nhiệm. Bản nháp chỉ ở frontend; kênh gọi mở công cụ meeting tài khoản hiện có. Build và 60 frontend tests đạt; Phase 04 **In Progress**. [Work log](/work-logs/2026-11-18-05-phase-04-compact-club-sidebar).
+
+## Cập nhật 2026-11-18 — Dải CLB và cột bên phải
+
+Dải CLB đổi màu, Trang chủ ở đầu và avatar tài khoản ở cuối. Cột Xem nhanh bên phải lấy hoạt động sắp tới từ API workspace và dẫn đến công cụ họp; lịch họp theo CLB chưa có API. Build và 60 frontend tests đạt; Phase 04 **In Progress**. [Work log](/work-logs/2026-11-18-06-phase-04-workspace-rail-quick-view).
+
+## Cập nhật 2026-11-18 — Phân vai hai sidebar
+
+Sidebar trái ưu tiên kênh/công việc hay dùng, Phòng họp chuyển vào Công việc CLB; các mục ít dùng gập trong Khác. Cột phải chỉ hiển thị thông tin CLB, trạng thái lịch họp và hoạt động sắp tới, không có nút/liên kết. Build và 60 frontend tests đạt; Phase 04 **In Progress**. [Work log](/work-logs/2026-11-18-07-phase-04-sidebar-priority-readonly-panel).
+
+## Cập nhật 2026-11-18 — Chuyển Khác sang phải
+
+Nhóm Khác chuyển sang cuối cột phải; phần xem nhanh bỏ mục tiêu/liên hệ CLB. Các thông tin phía trên nhóm Khác vẫn chỉ để đọc. Build và 60 frontend tests đạt; Phase 04 **In Progress**. [Work log](/work-logs/2026-11-18-08-phase-04-move-secondary-links-right).
+
+## Cập nhật 2026-11-18 — Công việc CLB cố định
+
+Công việc CLB ở đáy sidebar trái; vùng giữa cuộn chung kênh văn bản/gọi nhanh, không cuộn cả sidebar. Build và 60 frontend tests đạt; Phase 04 **In Progress**. [Work log](/work-logs/2026-11-18-09-phase-04-pinned-work-sidebar).

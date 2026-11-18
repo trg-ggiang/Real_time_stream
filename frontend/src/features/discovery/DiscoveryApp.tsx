@@ -17,13 +17,14 @@ import { useDiscoveryMotion } from "./hooks/use-discovery-motion";
 import { PersonalApp } from "../personal/PersonalApp";
 import { AdminApp } from "../admin/AdminApp";
 import { WorkspaceApp } from "../club-workspace/WorkspaceApp";
+import { WorkspaceHub } from "../club-workspace/WorkspaceHub";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
 import "./discovery.css";
 
 export interface DiscoveryViewer {
-  viewer?: { displayName: string };
+  viewer?: { displayName: string; avatarUrl?: string | null };
   role?: string | null;
   accessToken?: string;
   onMeeting?: () => void;
@@ -98,6 +99,11 @@ export function DiscoveryApp({
       </div>
     );
   }
+  if (location.pathname === "/workspace") {
+    if (viewer && accessToken)
+      return <WorkspaceHub viewer={viewer} accessToken={accessToken} onLogout={onLogout} />;
+    return <div className="dc-app"><main className="dc-container dc-detail-state"><h1>Không gian sinh hoạt</h1><p>Đăng nhập để xem các CLB bạn đã tham gia.</p><a className="dc-button" href={authUrl("login")}>Đăng nhập</a></main></div>;
+  }
   if (location.pathname === "/me" || location.pathname.startsWith("/me/")) {
     if (viewer && accessToken)
       return (
@@ -139,18 +145,20 @@ export function DiscoveryApp({
             <NavLink to="/clubs">Câu lạc bộ</NavLink>
             <NavLink to="/activities">Hoạt động</NavLink>
             <NavLink to="/posts">Bài viết</NavLink>
+            {viewer && <NavLink to="/workspace">Không gian sinh hoạt</NavLink>}
           </nav>
           <div className="dc-account">
             {viewer ? (
               <details ref={accountMenu}>
-                <summary>
-                  {viewer.displayName} <span aria-hidden="true">⌄</span>
+                <summary aria-label={`Mở menu tài khoản của ${viewer.displayName}`} title={viewer.displayName}>
+                  <span className="dc-account-avatar" aria-hidden="true">{viewer.displayName.trim().charAt(0).toUpperCase() || "S"}</span>
+                  <span className="dc-account-name">{viewer.displayName}</span>
+                  <span aria-hidden="true">⌄</span>
                 </summary>
                 <div className="dc-account-menu">
-                  <p>Sinh viên · {viewer.displayName}</p>
-                  <Link to="/me">Không gian của tôi</Link>
-                  <Link to="/me/clubs">CLB của tôi</Link>
-                  <button onClick={startRequest}>Đề nghị thành lập CLB</button>
+                  <p>{viewer.displayName}</p>
+                  <Link to="/me">Tài khoản và hoạt động</Link>
+                  <Link to="/me/profile">Hồ sơ sinh viên</Link>
                   <button onClick={onMeeting}>Cuộc họp</button>
                   {role === "admin" && (
                     <Link to="/admin">Quản trị hệ thống</Link>
@@ -188,6 +196,7 @@ export function DiscoveryApp({
           <Link to="/clubs">Câu lạc bộ</Link>
           <Link to="/activities">Hoạt động</Link>
           <Link to="/posts">Bài viết</Link>
+          {viewer && <Link to="/workspace">Không gian sinh hoạt</Link>}
         </nav>
       </header>
       <main id="public-content" ref={main} tabIndex={-1}>

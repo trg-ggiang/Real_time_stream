@@ -1,0 +1,46 @@
+---
+title: Chuyển mục Khác sang cột phải
+description: Thanh trái dành cho thao tác hay dùng; bỏ mục tiêu và liên hệ khỏi thông tin nhanh.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-08
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chuyển mục Khác ở sidebar trái sang cột phải; không hiển thị mục tiêu và liên hệ CLB ở phần xem nhanh.
+
+## Công việc hoàn thành
+
+- Bỏ nhóm Khác khỏi điều hướng trái. Cột phải có nhóm Khác gập được, giữ lối Thành viên, Cơ cấu CLB, Thông tin CLB theo vai trò và Trang CLB công khai.
+- Phần thông tin xem nhanh bên phải chỉ còn tên/giới thiệu ngắn CLB, trạng thái lịch họp và hoạt động sắp tới. Bỏ mục tiêu và email liên hệ.
+- File code: `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `WorkspaceQuickPanel.tsx`, `workspace.css`, `frontend/src/features/guest/ClubActivitiesPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo chunk LiveKit hiện hữu |
+| `npm.cmd --workspace frontend run test` | Passed | 14 files, 60 tests |
+| Browser trực quan | Skipped | Phiên điều khiển browser không khả dụng |
+
+## Quyết định và giới hạn
+
+Mục Khác là điều hướng ít dùng theo yêu cầu mới, nên có liên kết ở cột phải; các phần thông tin phía trên vẫn chỉ để đọc. Lịch họp theo CLB chưa có API. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Kiểm tra bố cục cột phải trên browser desktop/mobile khi khả dụng; nối lịch họp theo CLB khi có API.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

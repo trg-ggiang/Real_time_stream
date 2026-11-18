@@ -110,16 +110,10 @@ export function AuthApp() {
   useEffect(() => {
     if (!session || !profileReady || checkedToken !== session.access_token)
       return;
-    if (
-      window.location.pathname === "/" &&
-      !window.location.hash &&
-      !new URLSearchParams(window.location.search).has("view")
-    ) {
-      window.history.replaceState(
-        null,
-        "",
-        session.user.role === "admin" ? "/admin" : "/me",
-      );
+    if (window.location.pathname === "/" && !window.location.hash &&
+      !new URLSearchParams(window.location.search).has("view") &&
+      session.user.role === "admin") {
+      window.history.replaceState(null, "", "/admin");
     }
     setLandingToken(session.access_token);
   }, [profileReady, checkedToken, session]);

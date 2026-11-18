@@ -1,0 +1,48 @@
+---
+title: Sidebar CLB gọn và kênh gọi nhanh
+description: Giảm cuộn sidebar, thêm bản nháp kênh và lối gọi nhanh ở frontend.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-05
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Tối ưu sidebar Không gian sinh hoạt để ít phải cuộn khi CLB có thể tạo nhiều kênh; thêm các kênh gọi nhanh.
+
+## Công việc hoàn thành
+
+- Cố định đầu sidebar và lối về trang chủ/tài khoản; danh sách điều hướng chỉ cuộn khi cần. Danh sách kênh văn bản/gọi nhanh có vùng cuộn riêng và giới hạn chiều cao để kênh gọi nhanh không bị đẩy xuống xa.
+- Thu gọn chiều cao từng mục, đưa công việc CLB và thông tin CLB vào nhóm có thể gập. Đường dẫn tới mục đang chọn tự hiện trong vùng danh sách.
+- Thêm hai lối gọi nhanh “Phòng chung” và “Họp nhóm”. Chúng mở màn hình kênh và dẫn tới công cụ meeting hiện có.
+- Chủ nhiệm có thể tạo bản nháp kênh văn bản hoặc gọi nhanh bằng form. Bản nháp xuất hiện trong sidebar, lưu trong `sessionStorage` theo CLB và có thông báo rõ chưa được tạo trên hệ thống. Không gọi API ghi kênh.
+- File code: `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `pages/WorkspaceChannel.tsx`, `workspace.css`, `frontend/src/features/guest/ClubActivitiesPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo kích thước chunk LiveKit |
+| `npm.cmd --workspace frontend run test` | Passed | 14 files, 60 tests; gồm tạo bản nháp và mở gọi nhanh |
+| Browser trực quan | Skipped | Phiên điều khiển browser không khả dụng |
+
+## Quyết định và giới hạn
+
+Schema đúng có `club_channels` với `kind`, `name`, `description`, nhưng backend workspace chưa có API tạo/đọc kênh. Giá trị `kind` được dùng trong bản nháp UI, không giả định giá trị enum DB. Gọi nhanh mở công cụ họp đang có, chưa tạo phòng riêng cho từng kênh. Phase 04 tiếp tục In Progress.
+
+## Bước tiếp theo
+
+Khi được giao backend, xác định quyền và contract tạo kênh, danh sách kênh, phòng gọi theo CLB; thay bản nháp UI bằng dữ liệu thật. Kiểm tra bố cục ở browser desktop/mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

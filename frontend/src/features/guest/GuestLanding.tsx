@@ -18,7 +18,7 @@ function WorkspaceBridge(props: DiscoveryViewer) {
       <Navigate
         replace
         to={
-          match[1] ? `/workspace/${encodeURIComponent(match[1])}` : "/me/clubs"
+          match[1] ? `/workspace/${encodeURIComponent(match[1])}` : "/workspace"
         }
       />
     );

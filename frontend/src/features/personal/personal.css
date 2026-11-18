@@ -656,3 +656,21 @@
     align-self: start;
   }
 }
+.ps-eyebrow { display: block; margin-bottom: 8px; color: #285fba; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.ps-account-heading { margin-bottom: 42px; }
+.ps-account-heading h1 { font-size: clamp(27px, 3vw, 36px); }
+.ps-account-section { max-width: 1000px; }
+.ps-account-section h2 { font-size: 17px; margin-bottom: 15px; }
+.ps-account-list { border-top: 1px solid #dce4ee; }
+.ps-account-row { display: flex; justify-content: space-between; align-items: center; gap: 22px; padding: 21px 4px; border-bottom: 1px solid #dce4ee; }
+.ps-account-row:hover { background: #eaf0f8; text-decoration: none !important; }
+.ps-account-row strong, .ps-account-row small { display: block; }
+.ps-account-row strong { font-size: 15px; font-weight: 600; }
+.ps-account-row small { margin-top: 5px; color: #53647b; font-size: 13px; }
+.ps-account-action { flex: none; color: #285fba; font-size: 13px; font-weight: 600; }
+.ps-account-workspace { display: flex; justify-content: space-between; align-items: center; gap: 25px; max-width: 1000px; padding: 25px 0; margin-top: 36px; border-top: 2px solid #285fba; }
+.ps-account-workspace p { margin-top: 7px; max-width: 580px; color: #53647b; font-size: 13px; }
+.ps-sidebar { background: #fafcff; }
+.ps-sidebar nav a { border-radius: 7px; }
+.ps-sidebar nav a.active { background: #e7effa; color: #1a4c9b; }
+@media (max-width: 700px) { .ps-account-workspace { align-items: flex-start; flex-direction: column; } .ps-account-row { align-items: flex-start; flex-direction: column; gap: 10px; } }

@@ -118,7 +118,7 @@ export function ProfileForm({
         )}
         <p>
           {onboarding
-            ? "Hoàn thiện hồ sơ để bắt đầu sử dụng tài khoản. Lần sau bạn có thể cập nhật tại Không gian của tôi."
+            ? "Hoàn thiện hồ sơ để bắt đầu. Sau này bạn có thể cập nhật trong mục Tài khoản."
             : "Thông tin dùng khi đăng ký hoạt động và tham gia cộng đồng."}
         </p>
       </div>

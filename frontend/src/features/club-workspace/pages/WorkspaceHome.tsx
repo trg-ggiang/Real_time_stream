@@ -5,106 +5,12 @@ import { useWorkspaceMutation } from "../use-workspace-mutation";
 import {
   workspaceRequest,
   type WorkspaceContext,
-  type WorkspaceList,
-  type ContentItem,
 } from "../services/workspace-api";
-import { usePersonalQuery } from "../../personal/use-personal-query";
-import { PersonalState } from "../../personal/components/PersonalState";
 import {
   ContentImage,
   LinkedText,
 } from "../../discovery/components/PublicContent";
 import { useUnsavedChanges } from "../../../shared/lib/use-unsaved-changes";
-export function WorkspaceHome() {
-  const { club, clubId, membership, token } = useClub();
-  const posts = usePersonalQuery<WorkspaceList<ContentItem>>(
-    token,
-    `workspace/${clubId}/content/posts?list=published&page=1&limit=3`,
-  );
-  return (
-    <>
-      <div className="cw-heading">
-        <div>
-          <h1>Không gian {club.name}</h1>
-          <p>{club.summary}</p>
-        </div>
-        <Link className="cw-link" to={`/clubs/${clubId}`}>
-          Trang công khai ↗
-        </Link>
-      </div>
-      <div className="cw-home-grid">
-        <section className="cw-panel cw-home-main">
-          <h2>Câu chuyện trong cộng đồng</h2>
-          <p className="cw-muted">Nội dung được CLB chia sẻ với thành viên.</p>
-          {posts.data?.items.length ? (
-            posts.data.items.map((p) => (
-              <Link
-                className="cw-summary-row"
-                key={p.post_id}
-                to={`/workspace/${clubId}/posts/${p.post_id}`}
-              >
-                <span>
-                  <strong>{p.title}</strong>
-                  <small>
-                    {p.visibility === "internal"
-                      ? "Nội bộ CLB"
-                      : "Bài viết công khai"}
-                  </small>
-                </span>
-                <span aria-hidden="true">→</span>
-              </Link>
-            ))
-          ) : (
-            <PersonalState
-              {...posts}
-              empty="Chưa có bài viết được đăng trong CLB."
-            />
-          )}
-        </section>
-        <section className="cw-panel">
-          <h2>Gặp nhau ở một hoạt động</h2>
-          <p>Khám phá hoạt động của CLB, cùng đóng góp một ý tưởng mới.</p>
-          <Link className="cw-link" to={`/workspace/${clubId}/activities`}>
-            Mở hoạt động →
-          </Link>
-          <Link className="cw-link" to={`/workspace/${clubId}/activities/new`}>
-            Tạo hoạt động mới ↗
-          </Link>
-        </section>
-        <section className="cw-panel">
-          <h2>
-            {membership.role === "chairperson"
-              ? "Công việc của chủ nhiệm"
-              : "Bạn là một phần của CLB"}
-          </h2>
-          <p>
-            {membership.role === "chairperson"
-              ? "Quản lý thành viên và xem những nội dung đang chờ quyết định."
-              : "Tham gia sinh hoạt, soạn bài và đề xuất hoạt động cho cộng đồng."}
-          </p>
-          <Link
-            className="cw-link"
-            to={`/workspace/${clubId}/${membership.role === "chairperson" ? "review" : "posts?list=mine"}`}
-          >
-            {membership.role === "chairperson"
-              ? "Xem hàng đợi duyệt →"
-              : "Nội dung của tôi →"}
-          </Link>
-        </section>
-        <section className="cw-panel">
-          <h2>Phòng họp trực tuyến</h2>
-          <p>
-            Một công cụ để trao đổi, chia sẻ màn hình và trò chuyện khi gặp
-            nhau.
-          </p>
-          <Link className="cw-link" to={`/workspace/${clubId}/meetings`}>
-            Đi đến phòng họp →
-          </Link>
-        </section>
-      </div>
-    </>
-  );
-}
 export function MeetingsEntry() {
   const { club, onMeeting } = useClub();
   return (
@@ -131,6 +37,13 @@ export function MeetingsEntry() {
       </section>
     </>
   );
+}
+export function RecurringMeetings() {
+  const { club, onMeeting } = useClub();
+  return <>
+    <div className="cw-heading"><div><span className="cw-eyebrow">Lịch sinh hoạt</span><h1>Họp định kỳ</h1><p>Tạo chuỗi buổi họp và chọn lịch lặp trong công cụ họp hiện có.</p></div></div>
+    <section className="cw-panel cw-meeting-entry"><h2>Lên lịch họp cho {club.name}</h2><p>Công cụ họp hỗ trợ tạo cuộc họp lặp hằng ngày, hằng tuần, hằng tháng hoặc hằng năm. Chọn “Họp theo lịch” rồi thiết lập chu kỳ và buổi đầu tiên.</p><button className="cw-primary" onClick={onMeeting}>Mở công cụ tạo họp định kỳ ↗</button><p className="cw-muted">Cuộc họp được lưu theo tài khoản. Công cụ hiện chưa gắn cuộc họp với CLB này, nên thành viên khác cần được mời bằng đường dẫn hoặc mã họp.</p></section>
+  </>;
 }
 export function ClubInformation() {
   const { club, clubId, token, membership, reload } = useClub();

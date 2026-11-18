@@ -218,6 +218,8 @@
   align-items: center;
   max-width: 220px;
 }
+.dc-account-avatar { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: #e8eef8; color: #285fba; font-weight: 600; }
+.dc-account-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .dc-account summary::-webkit-details-marker {
   display: none;
 }
@@ -1460,6 +1462,12 @@
 }
 .dc-mobile-nav[hidden] {
   display: none;
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .dc-app .dc-nav { display: none; }
+  .dc-app .dc-menu-toggle { display: flex; align-items: center; justify-content: center; }
+  .dc-app .dc-mobile-nav:not([hidden]) { display: flex; flex-direction: column; padding: 12px 28px 22px; gap: 5px; background: white; }
+  .dc-app .dc-mobile-nav a { padding: 10px 0; }
 }
 @media (max-width: 600px) {
   .dc-app .dc-section {

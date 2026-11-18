@@ -1,17 +1,17 @@
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { Link, Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ProfileForm } from "../profile/ProfileForm";
-import { PersonalLists, PersonalOverview } from "./pages/PersonalLists";
+import { PersonalLists } from "./pages/PersonalLists";
+import { AccountOverview } from "./pages/AccountOverview";
 import { ClubRequestDetail, NewClubRequest } from "./pages/ClubRequestPages";
 import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import "./personal.css";
 const nav = [
-  ["/me", "Tổng quan"],
-  ["/me/clubs", "CLB tham gia"],
-  ["/me/follows", "Đang quan tâm"],
+  ["/me", "Tổng quan tài khoản"],
+  ["/me/profile", "Hồ sơ sinh viên"],
   ["/me/registrations", "Hoạt động đã đăng ký"],
-  ["/me/club-requests", "Đề nghị CLB"],
-  ["/me/profile", "Hồ sơ cá nhân"],
+  ["/me/follows", "CLB đang quan tâm"],
+  ["/me/club-requests", "Đề nghị thành lập CLB"],
 ];
 export function PersonalApp({
   viewer,
@@ -25,7 +25,7 @@ export function PersonalApp({
   const content = useRef<HTMLElement>(null);
   useEffect(() => {
     setOpen(false);
-    document.title = "Không gian của tôi · uniCircle";
+    document.title = "Tài khoản · uniCircle";
     window.scrollTo(0, 0);
     content.current?.focus({ preventScroll: true });
   }, [location.pathname, location.search]);
@@ -52,7 +52,7 @@ export function PersonalApp({
           </span>
           <div>
             <strong>{viewer.displayName}</strong>
-            <small>Không gian cá nhân</small>
+            <small>Tài khoản sinh viên</small>
           </div>
         </div>
         <button
@@ -75,7 +75,8 @@ export function PersonalApp({
           ))}
         </nav>
         <div className="ps-sidebar-bottom">
-          <Link to="/">← Khám phá công khai</Link>
+          <Link to="/">Trang chủ</Link>
+          <Link to="/workspace">Không gian sinh hoạt</Link>
           <button onClick={onMeeting} data-leave-account>
             Mở phòng họp
           </button>
@@ -87,22 +88,20 @@ export function PersonalApp({
       </aside>
       <div className="ps-workspace">
         <header className="ps-topbar">
-          <Link to="/">Khám phá Bách khoa ↗</Link>
-          <span>Tài khoản sinh viên</span>
+          <Link to="/">← Trang chủ</Link>
+          <Link to="/workspace">Không gian sinh hoạt →</Link>
         </header>
         <main id="personal-content" ref={content} tabIndex={-1}>
           <Routes>
+            <Route path="/me/clubs" element={<Navigate replace to="/workspace" />} />
             <Route
               path="/me"
               element={
-                <PersonalOverview
-                  token={accessToken}
-                  displayName={viewer.displayName}
-                />
+                <AccountOverview displayName={viewer.displayName} />
               }
             />
             {(
-              ["clubs", "follows", "registrations", "club-requests"] as const
+              ["follows", "registrations", "club-requests"] as const
             ).map((kind) => (
               <Route
                 key={kind}
@@ -124,7 +123,7 @@ export function PersonalApp({
                 <>
                   <div className="ps-heading">
                     <div>
-                      <h1>Hồ sơ cá nhân</h1>
+                      <h1>Hồ sơ sinh viên</h1>
                       <p>Cập nhật thông tin sinh viên của bạn.</p>
                     </div>
                   </div>
@@ -144,7 +143,7 @@ export function PersonalApp({
           </Routes>
         </main>
         <footer className="ps-footer">
-          uniCircle · Cộng đồng bắt đầu từ những kết nối.
+          uniCircle · Tài khoản sinh viên
         </footer>
       </div>
     </div>

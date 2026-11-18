@@ -1,0 +1,52 @@
+---
+title: Student club space frontend
+description: Điều hướng sinh viên và bố cục CLB kiểu Discord trong phạm vi frontend.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-01
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — NestJS API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sau đăng nhập sinh viên vào trang theo role hiện có, thêm Không gian sinh hoạt ở header và làm lại frontend CLB theo bố cục Discord: CLB đã tham gia, kênh, tạo CLB, thao tác thành viên và chủ nhiệm dưới danh sách kênh. Chỉ thay frontend.
+
+## Công việc hoàn thành
+
+- Thêm lối vào `/workspace` từ header công khai khi đã đăng nhập, header trang cá nhân và menu tài khoản. Đích đăng nhập student `/me`, admin `/admin` hiện có được giữ.
+- `/workspace` hiện khung CLB ngay, lấy membership từ API hiện có rồi tự mở CLB đầu tiên; trường hợp chưa có CLB vẫn giữ khung và lối khám phá/tạo đề nghị.
+- Shell `/workspace/:clubId` có dải CLB, danh sách kênh và vùng công việc riêng bên dưới. Công cụ duyệt chỉ hiện cho chủ nhiệm của CLB hiện hành.
+- Giao diện bốn kênh ở frontend với trạng thái chưa kết nối tin nhắn, không hiển thị tin giả. Form họp định kỳ lưu bản nháp trên thiết bị, không gọi API hoặc tạo cuộc họp thật.
+- Cập nhật test điều hướng theo luồng mới.
+
+File code: `frontend/src/features/discovery/DiscoveryApp.tsx`, `discovery.css`, `frontend/src/features/personal/PersonalApp.tsx`, `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `WorkspaceHub.tsx`, `workspace.css`, `pages/WorkspaceChannel.tsx`, `pages/WorkspaceHome.tsx`, `frontend/src/features/guest/ClubActivitiesPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; cảnh báo chunk LiveKit lớn còn hiện hữu |
+| `npm.cmd --workspace frontend exec vitest run src/features/guest/ClubActivitiesPage.test.tsx` | Passed | 2 test: mở CLB trực tiếp và khung rỗng |
+| `npm.cmd --workspace frontend run test` | Failed | Lần cuối: 55 đạt, 4 lỗi ở `AuthApp.test.tsx` và `GuestLanding.test.tsx`; số lỗi AuthApp thay đổi giữa các lần chạy, chưa điều tra nguyên nhân trong phiên này |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Kiểm tra trình duyệt / Supabase live | Skipped | Không có phiên tài khoản thử hoặc dữ liệu ghi live; chỉ thay frontend |
+
+## Quyết định và giới hạn
+
+Repo hiện chưa có API kênh/chat CLB và lịch họp lặp. Kênh chỉ là giao diện điều hướng; ô nhắn tin vô hiệu hóa và giải thích rõ. Lịch họp định kỳ chỉ lưu nháp bằng localStorage theo tài khoản/CLB. Tạo CLB dùng form đề nghị hiện có, cần admin duyệt theo luồng cũ. Danh sách nhanh hiển thị 24 CLB đầu tiên và có link danh sách đầy đủ.
+
+## Bước tiếp theo
+
+Review UI desktop/mobile bằng tài khoản có ít nhất hai membership khác role. Khi được giao phần backend, thiết kế API/channel ACL và persistence lịch họp định kỳ trước khi bật gửi tin hoặc tạo lịch thật. Điều tra ba test còn lỗi ở phạm vi riêng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh
