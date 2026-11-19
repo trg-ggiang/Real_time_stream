@@ -50,7 +50,9 @@ test('token API enforces room, identity, permissions, expiry and rate limit', as
   const { JwtService } = require('@nestjs/jwt');
   const user = { userId: 'test-user', email: 'test@example.test', displayName: 'Tester', avatarUrl: null };
   const module = await Test.createTestingModule({ imports: [AppModule] })
-    .overrideProvider(UsersService).useValue({ findById: async id => id === user.userId ? user : null }).compile();
+    .overrideProvider(UsersService).useValue({ findById: async id => id === user.userId ? user : null,
+      getProfile: async () => ({ full_name: 'Test Student', student_code: 'TEST001', school_or_faculty: 'Test school', major: 'Test major', cohort: 'K1' }),
+    }).compile();
   const app = module.createNestApplication({ logger: false });
   const jwt = new JwtService({ secret: process.env.JWT_SECRET });
   const accessToken = jwt.sign({ sub: user.userId });

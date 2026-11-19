@@ -11,40 +11,7 @@ import {
   LinkedText,
 } from "../../discovery/components/PublicContent";
 import { useUnsavedChanges } from "../../../shared/lib/use-unsaved-changes";
-export function MeetingsEntry() {
-  const { club, onMeeting } = useClub();
-  return (
-    <>
-      <div className="cw-heading">
-        <div>
-          <h1>Gặp nhau, cùng trao đổi</h1>
-          <p>Mở công cụ họp trực tuyến từ không gian {club.name}.</p>
-        </div>
-      </div>
-      <section className="cw-panel cw-meeting-entry">
-        <h2>Camera, màn hình và cuộc trò chuyện</h2>
-        <p>
-          Mọi thành viên có thể tạo phòng. Quyền host/moderator được quản lý
-          trong từng cuộc họp, độc lập với vai trò CLB.
-        </p>
-        <button className="cw-primary" onClick={onMeeting}>
-          Mở công cụ phòng họp ↗
-        </button>
-        <p className="cw-muted">
-          Công cụ họp hiện hiển thị phòng theo tài khoản, chưa có danh sách
-          phòng riêng cho từng CLB. Rời công cụ họp sẽ quay về trang này.
-        </p>
-      </section>
-    </>
-  );
-}
-export function RecurringMeetings() {
-  const { club, onMeeting } = useClub();
-  return <>
-    <div className="cw-heading"><div><span className="cw-eyebrow">Lịch sinh hoạt</span><h1>Họp định kỳ</h1><p>Tạo chuỗi buổi họp và chọn lịch lặp trong công cụ họp hiện có.</p></div></div>
-    <section className="cw-panel cw-meeting-entry"><h2>Lên lịch họp cho {club.name}</h2><p>Công cụ họp hỗ trợ tạo cuộc họp lặp hằng ngày, hằng tuần, hằng tháng hoặc hằng năm. Chọn “Họp theo lịch” rồi thiết lập chu kỳ và buổi đầu tiên.</p><button className="cw-primary" onClick={onMeeting}>Mở công cụ tạo họp định kỳ ↗</button><p className="cw-muted">Cuộc họp được lưu theo tài khoản. Công cụ hiện chưa gắn cuộc họp với CLB này, nên thành viên khác cần được mời bằng đường dẫn hoặc mã họp.</p></section>
-  </>;
-}
+export { MeetingsEntry, RecurringMeetings } from "./WorkspaceMeetingsEntries";
 export function ClubInformation() {
   const { club, clubId, token, membership, reload } = useClub();
   const [values, setValues] = useState({

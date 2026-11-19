@@ -8,7 +8,7 @@ export interface ClubSummary {
 }
 export interface Membership {
   membership_id: string;
-  role: "chairperson" | "member";
+  role: "chairperson" | "head" | "member";
   department_id: string;
   joined_at: string;
   club: ClubSummary;

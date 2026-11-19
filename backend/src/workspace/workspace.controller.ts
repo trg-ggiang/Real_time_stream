@@ -43,6 +43,17 @@ export class WorkspaceController {
     private readonly people: WorkspacePeople,
     private readonly content: WorkspaceContent,
   ) {}
+  @Get('meetings') @Header('Cache-Control', 'private, no-store') async meetings(
+    @CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string, @Query() q: WorkspacePage,
+  ) {
+    await this.access.require(u.userId, clubId);
+    const result = await this.access.supabase.client.from('meetings')
+      .select('meeting_id,meeting_code,title,recurrence_rule,meeting_sessions(session_id,status,scheduled_start_at,scheduled_end_at)', { count: 'exact' })
+      .eq('club_id', clubId).order('created_at', { ascending: false }).order('meeting_id')
+      .range((q.page - 1) * q.limit, q.page * q.limit - 1);
+    this.access.check(result.error);
+    return { items: result.data ?? [], total: result.count ?? 0, hasMore: q.page * q.limit < (result.count ?? 0) };
+  }
   @Get() @Header("Cache-Control", "private, no-store") context(
     @CurrentUser() u: User,
     @Param("clubId", ParseUUIDPipe) c: string,

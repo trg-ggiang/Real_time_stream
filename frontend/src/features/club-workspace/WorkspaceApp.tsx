@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Link,
   NavLink,
@@ -6,7 +6,6 @@ import {
   Routes,
   useLocation,
   useMatch,
-  useNavigate,
 } from "react-router-dom";
 import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import { usePersonalQuery } from "../personal/use-personal-query";
@@ -18,14 +17,14 @@ import {
 import { ClubContext } from "./workspace-context";
 import { WorkspaceRail } from "./WorkspaceRail";
 import { WorkspaceQuickPanel } from "./WorkspaceQuickPanel";
-import { type WorkspaceContext } from "./services/workspace-api";
+import { type WorkspaceContext, type ClubChannel, type WorkspaceList } from "./services/workspace-api";
 import {
   ContentDetail,
   ContentEditor,
   ContentList,
 } from "./pages/WorkspaceContent";
 import { DepartmentsPage, MembersPage } from "./pages/WorkspacePeople";
-import { WorkspaceChannel, type DraftChannel } from "./pages/WorkspaceChannel";
+import { WorkspaceChannel } from "./pages/WorkspaceChannel";
 import { WorkspaceOverview } from "./pages/WorkspaceOverview";
 import {
   ClubInformation,
@@ -34,6 +33,8 @@ import {
   ReviewHome,
 } from "./pages/WorkspaceHome";
 import "./workspace.css";
+import './workspace-polish.css';
+import { channelLabel } from './channel-label';
 export function WorkspaceApp(props: DiscoveryViewer) {
   const match = useMatch("/workspace/:clubId/*");
   const clubId = match?.params.clubId || "";
@@ -53,7 +54,7 @@ function WorkspaceScope({
   onLogout,
 }: { clubId: string } & DiscoveryViewer) {
   const location = useLocation();
-  const navigate = useNavigate();
+
   const state = usePersonalQuery<WorkspaceContext>(
     accessToken,
     `workspace/${clubId}`,
@@ -64,11 +65,7 @@ function WorkspaceScope({
   );
   const [open, setOpen] = useState(false);
   const [workOpen, setWorkOpen] = useState(true);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [channelName, setChannelName] = useState("");
-  const [channelKind, setChannelKind] = useState<"text" | "voice">("text");
-  const [createError, setCreateError] = useState("");
-  const [draftChannels, setDraftChannels] = useState<DraftChannel[]>(() => loadDraftChannels(clubId));
+  const [infoCollapsed, setInfoCollapsed] = useState(false);
   const main = useRef<HTMLElement>(null);
   useEffect(() => {
     setOpen(false);
@@ -78,7 +75,7 @@ function WorkspaceScope({
   }, [location.pathname, location.search]);
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setOpen(false); setCreateOpen(false); }
+      if (e.key === "Escape") { setOpen(false); }
     };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
@@ -86,25 +83,6 @@ function WorkspaceScope({
   useEffect(() => {
     document.title = `${state.data?.club.name || "Không gian CLB"} · uniCircle`;
   }, [state.data?.club.name]);
-  function createChannel(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const name = channelName.trim().replace(/\s+/g, " ");
-    if (!name || name.length > 40) { setCreateError("Tên kênh phải có từ 1 đến 40 ký tự."); return; }
-    const allNames = ["thông-báo", "thảo-luận", "tài-liệu", "hỏi-đáp", "Phòng chung", "Họp nhóm", ...draftChannels.map(item => item.name)];
-    if (allNames.some(item => item.toLocaleLowerCase("vi").normalize("NFC") === name.toLocaleLowerCase("vi").normalize("NFC"))) {
-      setCreateError("Tên kênh đã tồn tại trong CLB này.");
-      return;
-    }
-    const draft: DraftChannel = { id: `draft-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, kind: channelKind };
-    const next = [...draftChannels, draft];
-    setDraftChannels(next);
-    try { sessionStorage.setItem(`uc:channels:${clubId}`, JSON.stringify(next)); } catch { /* Browser storage can be unavailable. */ }
-    setChannelName("");
-    setChannelKind("text");
-    setCreateError("");
-    setCreateOpen(false);
-    navigate(`/workspace/${clubId}/channels/${draft.id}`);
-  }
   if (!state.data)
     return (
       <div className="cw-app cw-loading-page">
@@ -122,16 +100,6 @@ function WorkspaceScope({
     chair = ctx.membership.role === "chairperson",
     base = `/workspace/${clubId}`;
   const inChannel = location.pathname.startsWith(`${base}/channels/`);
-  const textChannels = [
-    ["channels/announcements", "# thông-báo"],
-    ["channels/general", "# thảo-luận"],
-    ["channels/resources", "# tài-liệu"],
-    ["channels/questions", "# hỏi-đáp"],
-  ];
-  const voiceChannels = [
-    ["channels/voice-general", "Phòng chung"],
-    ["channels/voice-team", "Họp nhóm"],
-  ];
   return (
     <ClubContext.Provider
       value={{
@@ -142,7 +110,7 @@ function WorkspaceScope({
         onMeeting,
       }}
     >
-      <div className={`cw-app ${inChannel ? "cw-app--channel" : ""}`}>
+      <div className={`cw-app ${inChannel ? "cw-app--channel" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
         <a className="cw-skip" href="#workspace-content">
           Đến nội dung
         </a>
@@ -169,19 +137,7 @@ function WorkspaceScope({
           >
             <NavLink to={base} end className="cw-overview-link">Tổng quan CLB</NavLink>
             <div className="cw-channel-scroll" role="group" aria-label="Danh sách kênh">
-            <div className="cw-channel-group"><div className="cw-group-heading"><span>Kênh văn bản</span>{chair && <button type="button" onClick={() => setCreateOpen(true)} aria-label="Tạo kênh văn bản" title="Tạo kênh văn bản">+</button>}</div></div>
-            <div className="cw-channel-list">{textChannels.map(([path, label]) => (
-              <NavLink
-                key={path}
-                to={`${base}${path ? "/" + path : ""}`}
-              >
-                {label}
-              </NavLink>
-            ))}
-            {draftChannels.filter(item => item.kind === "text").map(item => <NavLink key={item.id} to={`${base}/channels/${item.id}`} title="Bản nháp trên trình duyệt"># {item.name}</NavLink>)}</div>
-            <div className="cw-channel-group"><div className="cw-group-heading"><span>Kênh gọi nhanh</span>{chair && <button type="button" onClick={() => { setChannelKind("voice"); setCreateOpen(true); }} aria-label="Tạo kênh gọi nhanh" title="Tạo kênh gọi nhanh">+</button>}</div></div>
-            <div className="cw-channel-list cw-voice-list">{voiceChannels.map(([path, label]) => <NavLink key={path} to={`${base}/${path}`} className="cw-voice-link"><span aria-hidden="true">◖</span> {label}</NavLink>)}
-            {draftChannels.filter(item => item.kind === "voice").map(item => <NavLink key={item.id} className="cw-voice-link" to={`${base}/channels/${item.id}`} title="Bản nháp trên trình duyệt"><span aria-hidden="true">◖</span> {item.name}</NavLink>)}</div>
+            <ChannelNavigation token={accessToken} clubId={clubId} chair={chair} />
             </div>
             <details className="cw-nav-details cw-work-pinned" open={workOpen} onToggle={event => setWorkOpen(event.currentTarget.open)}><summary>Công việc CLB</summary><div>
               <NavLink to={`${base}/posts/new`}>Viết bài</NavLink>
@@ -194,11 +150,11 @@ function WorkspaceScope({
           </nav>
         </aside>
         <div className="cw-workspace">
-          {!inChannel && <header className="cw-topbar"><span>{ctx.club.name}</span><span>{viewer?.displayName} · {chair ? "Chủ nhiệm" : "Thành viên"}</span></header>}
+          {!inChannel && <header className="cw-topbar"><span>{ctx.club.name}</span><span>{viewer?.displayName} · {chair ? "Chủ nhiệm" : ctx.membership.role === "head" ? "Trưởng ban" : "Thành viên"}</span></header>}
           <main id="workspace-content" ref={main} tabIndex={-1} className={inChannel ? "cw-channel-main" : undefined}>
             <Routes>
               <Route path={base} element={<WorkspaceOverview />} />
-              <Route path={`${base}/channels/:channel`} element={<WorkspaceChannel drafts={draftChannels} />} />
+              <Route path={`${base}/channels/:channel`} element={<WorkspaceChannel />} />
               {(["posts", "activities"] as const).map((kind) => (
                 <Route
                   key={kind}
@@ -251,24 +207,30 @@ function WorkspaceScope({
           </main>
           <footer className="cw-footer">uniCircle · {ctx.club.name}</footer>
         </div>
-        <WorkspaceQuickPanel club={ctx.club} token={accessToken} chair={chair} />
-        {createOpen && <div className="cw-dialog-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setCreateOpen(false); }}><section className="cw-create-dialog" role="dialog" aria-modal="true" aria-labelledby="cw-create-title"><form onSubmit={createChannel}>
-          <div className="cw-create-title"><div><h2 id="cw-create-title">Tạo kênh</h2><p>Bản nháp giao diện cho {ctx.club.name}</p></div><button type="button" onClick={() => setCreateOpen(false)} aria-label="Đóng">×</button></div>
-          <fieldset><legend>Loại kênh</legend><label><input type="radio" name="kind" checked={channelKind === "text"} onChange={() => setChannelKind("text")} /> Văn bản</label><label><input type="radio" name="kind" checked={channelKind === "voice"} onChange={() => setChannelKind("voice")} /> Gọi nhanh</label></fieldset>
-          <label className="cw-create-name">Tên kênh<input autoFocus value={channelName} onChange={event => { setChannelName(event.target.value); setCreateError(""); }} maxLength={40} placeholder={channelKind === "text" ? "ví dụ: ý-tưởng" : "ví dụ: nhóm sự kiện"} /></label>
-          {createError && <p role="alert" className="cw-create-error">{createError}</p>}
-          <p className="cw-create-note">Kênh chỉ lưu trong phiên trình duyệt này, chưa được tạo trên hệ thống.</p>
-          <div className="cw-create-actions"><button type="button" onClick={() => setCreateOpen(false)}>Hủy</button><button type="submit" className="cw-primary">Tạo bản nháp</button></div>
-        </form></section></div>}
+        <WorkspaceQuickPanel club={ctx.club} token={accessToken} chair={chair} collapsed={infoCollapsed} onToggle={() => setInfoCollapsed(value => !value)} />
+
       </div>
     </ClubContext.Provider>
   );
 }
-function loadDraftChannels(clubId: string): DraftChannel[] {
-  try {
-    const value: unknown = JSON.parse(sessionStorage.getItem(`uc:channels:${clubId}`) || "[]");
-    return Array.isArray(value) ? value.filter((item): item is DraftChannel => Boolean(item) && typeof item.id === "string" && item.id.startsWith("draft-") && typeof item.name === "string" && item.name.length <= 40 && (item.kind === "text" || item.kind === "voice")).slice(0, 30) : [];
-  } catch { return []; }
+function ChannelNavigation({ token, clubId, chair }: { token: string; clubId: string; chair: boolean }) {
+  const channels = usePersonalQuery<WorkspaceList<ClubChannel>>(token, `workspace/${clubId}/channels`);
+  useEffect(() => {
+    const refresh = (event: Event) => { if ((event as CustomEvent).detail === clubId) channels.retry(); };
+    window.addEventListener('uc:workspace-channels-changed', refresh);
+    return () => window.removeEventListener('uc:workspace-channels-changed', refresh);
+  }, [clubId]);
+  return <>
+    <div className="cw-channel-group"><div className="cw-group-heading"><span>Kênh sinh hoạt</span>{chair && <Link to={`/workspace/${clubId}/departments`} title="Quản lý ban và kênh của ban" aria-label="Quản lý ban và kênh">+</Link>}</div></div>
+    <div className="cw-channel-list">
+      {channels.loading && <p role="status">Đang tải kênh…</p>}
+      {channels.error && <><p role="alert">{channels.error}</p><button onClick={channels.retry}>Thử lại</button></>}
+      {channels.data?.items.map(channel => <NavLink key={channel.channel_id} to={`/workspace/${clubId}/channels/${channel.channel_id}`}>{channelLabel(channel)}</NavLink>)}
+      {channels.data && !channels.data.items.length && <p>Chưa có kênh bạn có thể truy cập.</p>}
+    </div>
+    <div className="cw-channel-group"><div className="cw-group-heading"><span>Gọi và gặp mặt</span></div></div>
+    <div className="cw-channel-list cw-voice-list"><NavLink to={`/workspace/${clubId}/meetings`} className="cw-voice-link"><span aria-hidden="true">◖</span> Phòng họp CLB</NavLink><NavLink to={`/workspace/${clubId}/recurring-meetings`} className="cw-voice-link"><span aria-hidden="true">◖</span> Họp theo lịch</NavLink></div>
+  </>;
 }
 function EditorRoute({ kind }: { kind: "posts" | "activities" }) {
   const id = useMatch("/workspace/:clubId/:kind/:id/edit")?.params.id;

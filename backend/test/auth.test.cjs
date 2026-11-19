@@ -16,6 +16,7 @@ const { configureApp } = require('../dist/configure-app');
 test('HTTP auth validates, hashes passwords, signs JWT and never returns password hashes', async t => {
   let stored;
   const users = {
+    getProfile: async () => ({ full_name: 'Test Student', student_code: 'TEST001', school_or_faculty: 'Test school', major: 'Test major', cohort: 'K1' }),
     findByEmail: async email => stored?.email === email ? stored : null,
     findByEmailWithPassword: async email => stored?.email === email ? stored : null,
     findById: async id => stored?.userId === id ? { ...stored, passwordHash: undefined } : null,

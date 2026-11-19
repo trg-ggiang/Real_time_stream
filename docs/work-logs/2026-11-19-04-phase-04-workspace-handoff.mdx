@@ -1,0 +1,84 @@
+---
+title: Workspace integration and UI handoff
+description: Current workspace behavior, approved visual decisions, data setup and verification limits.
+---
+
+## Session information
+
+- Date: 2026-11-19 (Asia/Saigon)
+- Agent: Codex
+- Scope: complete existing workspace connections, then refine its interface following user feedback.
+- Outcome: implementation completed within requested scope; live acceptance remains limited as described below. No commit or push.
+
+## Read this first
+
+This entry supersedes earlier descriptions of preview-only channels, disabled chat and meetings without club ownership. It also supersedes intermediate UI proposals in this conversation. Do not restore those earlier implementations from historical work logs.
+
+## Current functionality
+
+- Channel list comes from the backend and existing Supabase tables. Access follows active membership, published club and the existing `clubspace_can_read_channel` permission function. A chairperson does not bypass private-channel access.
+- Chat supports history pagination, polling while the tab is visible, sending, retained drafts after failure and retry UUIDs to prevent duplicate sends. This is polling, not a WebSocket subscription. Deleted messages hide their original content.
+- Meetings created from the workspace carry `clubId`; backend verifies club membership and stores `meetings.club_id`. Club meeting lists and the right panel use real meetings/sessions. Existing host and admission rules remain in effect.
+- Existing posts, activities, member tools, departments, content review and meeting creation interfaces were retained and styled. No new recruitment or notification system was added.
+- Overview counts use actual API totals, with an ellipsis while loading.
+
+Implementation details: [workspace completion report](../reviews/2026-11-19-workspace-completion.md).
+
+## Final UI decisions approved by the user
+
+| Area | Final behavior |
+| --- | --- |
+| Outer layout | Keep the original rail, sidebar and central working area arrangement. Do not redesign navigation structure as part of a content-panel polish. |
+| Sidebar palette | Light palette restored after trying a dark navy sidebar. The dark sidebar in intermediate screenshots is not the final choice. |
+| Work section | “Công việc CLB” stays at the bottom and its background spans the sidebar's full inner width; labels retain padding. |
+| Overview | Earlier light palette restored independently of navigation. |
+| Central content | Refined member/department cards, content lists, editors, statuses, review panels and meeting forms. |
+| Channel names | No `#` prefix. Department channel names render as “Ban …” without duplicating an existing “Ban”; general channel keeps its name. This is display formatting, not a DB rename. |
+| Information panel | Toggle collapses/reopens the right panel; on desktop the center gains width. State is component state, not persisted. |
+| Panel dates | Day/month uses `dd/mm`; a displayed year occupies its own line. Meeting dates include the year; activity dates include it when outside the current year. Chat uses `HH:mm`, with the full date in the time tooltip. |
+| Chat row | Avatar next to text, sender and time above content, no large bubble. Sender and time remain visible on the first message, matching the supplied reference; the earlier hover-only design was replaced. No “Đã chỉnh sửa” label. |
+| Alignment | Other members on the left; current account on the right with avatar on the right. |
+| Grouping | Consecutive messages with identical `sender_membership_id` form a visual group. Only the first shows avatar, sender and time; continuation messages keep the text column aligned. A different sender starts a new group. No time-window or date-boundary grouping rule was added. |
+| Spacing | Groups have 14px top spacing; continuation messages have compact spacing. Each message retains an accessible sender/date label. |
+
+## Files to start with
+
+- `frontend/src/features/club-workspace/WorkspaceApp.tsx`: shell, routes, API channel navigation and right-panel collapsed state.
+- `WorkspaceQuickPanel.tsx`: information panel, dates, meeting and activity summaries.
+- `channel-label.ts`: channel display naming.
+- `pages/WorkspaceChat.tsx`: message loading/sending and grouping by adjacent sender membership ID. `WorkspaceChannel.tsx` reexports this implementation.
+- `pages/WorkspaceOverview.tsx`, `WorkspacePeople.tsx`, `WorkspaceMeetings.tsx`, `WorkspaceMeetingsEntries.tsx`: existing workspace views.
+- `workspace.css`: original styles. `workspace-polish.css`: imported afterward; central-area styling and later targeted shell refinements. Later overrides win. Some intermediate declarations remain overridden: consolidate carefully if refactoring.
+- `backend/src/workspace/workspace-channels.service.ts` and controller: channel permission checks, history and idempotent sends.
+- `backend/src/meetings/meetings.service.ts`, create DTO and workspace controller: club-scoped meeting creation/listing.
+
+Paths in this list are relative to `frontend/src/features/club-workspace` unless stated otherwise.
+
+## Data and authorization history
+
+Initial implementation and verification were DB read-only. The user subsequently explicitly requested additional data for `an1@gmail.com`, then asked to remove visible demo wording. Additive seed and targeted content refinement were performed separately; interface refinements did not modify DB schema or data.
+
+- `scripts/seed-an1-workspace.cjs`: additive setup for that account; tracked records in `data/an1-workspace-demo.json`.
+- `scripts/refine-an1-workspace.cjs`: natural-looking content for manifest records, preserving identities and publication workflow.
+- These are synthetic test records with natural wording, not independently verified real club activity. Internal script/manifest names still include “demo”.
+- Do not rerun the initial seed to refresh content: refined titles may conflict with its original expectations. Read both scripts and the manifest before any further data operation.
+- Credentials are intentionally omitted from documentation. Use the existing login and ask the user if credentials are needed; never print `.env`, JWTs or password hashes.
+
+See [data setup report](../reviews/2026-11-19-an1-demo-data.md).
+
+## Verification and limits
+
+- During integration: 44 backend tests and 93 frontend tests passed; root typecheck and production build passed.
+- During the initial UI pass: desktop browser reads covered overview, posts, activities, members, departments, review, editor, meetings, recurring meetings and chat. Selected pages were also reviewed at 390px and 900px with no horizontal document overflow.
+- After the latest chat grouping change: frontend typecheck and 4 workspace tests passed. Those existing tests cover workspace behavior; they do not constitute screenshot assertions for every grouping and responsive case.
+- Browser screenshots from the first UI pass predate the later palette, message layout and grouping refinements. Do not treat them as final visual acceptance evidence.
+- Live browser writes were blocked during visual review. Sending, membership mutation, approval and meeting creation were not all accepted end-to-end against the live DB in that pass.
+- Existing large meeting-media build chunk warning remains. Fast repeated full-page navigation hit the existing auth rate limit once; no rate-limit settings were changed.
+
+## Next maintainer / AI
+
+1. Read this entry and the linked completion report before older phase notes.
+2. User runs dev servers themselves; do not auto-open or start them without a new request. Workspace used in this session was `D:/HUST 2026.1/Real_time_stream`; resolve the current checkout instead of assuming the older path.
+3. Review latest chat grouping visually with alternating senders, consecutive messages, long text and mobile widths. Check right-panel collapse/reopen at desktop and mobile. Keep existing user decisions above.
+4. Do not reset the shared working tree: the session includes uncommitted integration, UI, data scripts and preexisting changes to `package-lock.json` / `.ua/`.
+5. Do not broaden functionality or write DB data merely to validate styling. No schema migration is required for these UI changes.

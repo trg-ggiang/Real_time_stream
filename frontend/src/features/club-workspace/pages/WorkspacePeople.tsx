@@ -204,14 +204,15 @@ function MemberRow({
         src={member.users.avatar_url}
         alt=""
         className="cw-member-photo"
+        fallbackText={Array.from(member.users.display_name.trim())[0] || "?"}
       />
       <div>
         <h2>{member.users.display_name}</h2>
         <p>
-          {member.role === "chairperson" ? "Chủ nhiệm" : "Thành viên"} ·{" "}
+          {member.role === "chairperson" ? "Chủ nhiệm" : member.role === "head" ? "Trưởng ban" : "Thành viên"} ·{" "}
           {member.club_departments.name}
         </p>
-        {chair && member.role !== "chairperson" && (
+        {chair && member.role === "member" && (
           <div className="cw-member-tools">
             <label className="cw-sr-label">
               Chuyển ban cho {member.users.display_name}
@@ -295,6 +296,7 @@ export function DepartmentsPage() {
           done={() => {
             setShow(false);
             result.retry();
+            window.dispatchEvent(new CustomEvent('uc:workspace-channels-changed', { detail: clubId }));
           }}
         />
       )}

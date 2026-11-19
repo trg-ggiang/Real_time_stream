@@ -916,6 +916,36 @@
 .cw-channel-club { margin-left: auto; color: #6c7e94; font-size: 12px; white-space: nowrap; }
 .cw-channel-hash { font-size: 29px; line-height: 1; color: #8aa0bb; }
 .cw-channel-history { flex: 1; min-height: 0; overflow-y: auto; display: flex; align-items: flex-end; padding: 30px 36px; }
+.cw-channel-history.cw-live-history{display:block;overflow-anchor:none}
+.cw-message{padding:14px 0;border-bottom:1px solid #edf1f6;overflow-wrap:anywhere}
+.cw-message header{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 14px;color:#25486f;font-size:13px}
+.cw-message time,.cw-message small{font-size:11px;color:#60748e}
+.cw-message p{margin:8px 0 0;white-space:pre-wrap;line-height:1.65;font-size:14px;color:#203c61}
+.cw-message.is-mine{border-left:3px solid #285fba;padding-left:14px}
+.cw-channel-composer.cw-live-composer{flex-wrap:wrap;align-items:center}
+.cw-app .cw-live-composer textarea{flex:1;min-width:120px;margin:0;background:#fff;resize:vertical;max-height:150px}
+.cw-live-composer>p{flex-basis:100%;font-size:12px;color:#a63737}
+.cw-meetings .workspace-section-title{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.cw-app .cw-meetings .workspace-create{background:transparent;border:0;border-radius:0;padding:0;color:#193b69;box-shadow:none}
+.cw-app .cw-meetings .workspace-section-title svg{color:#285fba}
+.cw-app .cw-meetings .workspace-mode{background:#f3f7fc;border:1px solid #d9e3ef;border-radius:9px;padding:5px}
+.cw-app .cw-meetings .workspace-form label{color:#25486f}
+.cw-app .cw-meetings .workspace-form :is(input:not([type=checkbox]),select){background:#fff;color:#203c61;border:1px solid #cbd8e9}
+.cw-app .cw-meetings .workspace-form button[type=submit]{background:#285fba;color:#fff;border:1px solid #285fba;border-radius:8px;padding:12px 16px}
+.cw-meetings .workspace-section-title h2{margin:0;font-size:20px}
+.cw-meetings .workspace-mode{display:flex;gap:12px;margin-bottom:20px}
+.cw-meetings .workspace-mode button{padding:10px 14px;display:flex;align-items:center;gap:8px;border:1px solid #d9e3ef;border-radius:8px;background:#fff;color:#25486f}
+.cw-meetings .workspace-mode button[aria-pressed=true]{border-color:#285fba;color:#285fba;background:#eef4fd}
+.cw-meetings fieldset{border:0;padding:0;margin:0;min-width:0}
+.cw-meetings .workspace-form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cw-meetings .workspace-check{display:flex;align-items:center;gap:10px}
+.cw-meetings input[type=checkbox]{width:auto}
+.cw-meetings .workspace-help{font-size:12px;color:#60748e}
+.cw-meeting-list>article{padding:22px 0;border-bottom:1px solid #dde6f1}
+.cw-meeting-list h3{font-size:18px;margin:0 0 10px}
+.cw-meeting-list p{font-size:13px;color:#60748e}
+.cw-meeting-session{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:8px 0;font-size:13px}
+@media(max-width:640px){.cw-meetings .workspace-form-row{grid-template-columns:1fr}.cw-meeting-session{align-items:flex-start;flex-direction:column;gap:4px}}
 .cw-channel-empty { max-width: 580px; }
 .cw-channel-empty-symbol { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 17px; border-radius: 16px; background: #e9f0f9; color: #285fba; font-size: 34px; }
 .cw-channel-empty h2 { font-size: 21px; }
