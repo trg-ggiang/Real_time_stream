@@ -36,6 +36,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/main.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test test/*.test.cjs"
+    "test": "npm run build && node --test test/*.test.cjs",
+    "test:recruitment-db": "node test/recruitment-db.cjs",
+    "test:recruitment-db:single": "node test/recruitment-db.cjs --single"
   }
 }

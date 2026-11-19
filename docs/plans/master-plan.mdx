@@ -3,6 +3,10 @@ title: Master Plan
 description: Tiến trình phase và thứ tự triển khai theo context.
 ---
 
+2026-11-19: Recruitment stages 2–5 code completed at the user's request to test together: form builder, public applications/history, review/bulk/CSV and persistent notifications with Socket.IO. Root typecheck/build, 104 frontend tests, 20 targeted backend tests and isolated SQL checks passed; full backend 56/58 (two existing localhost EACCES failures). Both development migrations/live acceptance pending; Phase 04 In Progress. [Guide](/modules/club-recruitment), [work log](/work-logs/2026-11-19-05-phase-04-recruitment-ui-notifications).
+
+2026-11-19: Recruitment stage 1 database/API code completed; no live migration. The later user request authorized stages 2–5 together. [Stage 1 work log](/work-logs/2026-11-19-04-phase-04-recruitment-api).
+
 2026-11-19: Default student login now opens `/`, while admin opens `/admin` and explicit internal destinations remain. Targeted auth tests (39) and frontend build passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-03-phase-04-student-login-home).
 
 2026-11-19: Kept `haimoi1` as the application UI and integrated only the `final` club workspace. My Clubs and a desktop/mobile header link open `/workspace`; admin remains. Frontend build and 90 tests passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-02-phase-04-haimoi1-ui-final-workspace).
@@ -525,3 +529,11 @@ Workspace CLB có context/role riêng, draft/submit/review posts/activities, qu�
 ## 2026-11-16 — Admin default login destination fix
 
 Auth/profile từ trang gốc nay chờ refresh role rồi admin → /admin, student → /me; giữ deep link/meeting. Đã xác nhận read-only admin@gmail.com có role admin và profile đầy đủ. Typecheck/frontend build, 77 frontend tests và browser stale-role→admin landing đạt. Không ghi DB/commit/push. [Work log](/work-logs/2026-11-16-06-phase-04-admin-login-routing).
+
+## 2026-11-19 — Recruitment choice control layout
+
+Fixed recruitment checkbox/radio controls inheriting full-width workspace input
+styles. Compact 18px controls keep labels alongside them. JSDOM computed styles
+in both stylesheet orders and frontend build passed; browser geometry unverified.
+Phase 04 In Progress.
+[Work log](/work-logs/2026-11-19-06-phase-04-recruitment-choice-layout).

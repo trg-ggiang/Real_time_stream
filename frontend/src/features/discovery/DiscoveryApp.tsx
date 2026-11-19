@@ -13,7 +13,6 @@ import { List } from "@phosphor-icons/react/dist/csr/List";
 import { X } from "@phosphor-icons/react/dist/csr/X";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
-import { Bell } from "@phosphor-icons/react/dist/csr/Bell";
 import { UserRectangle } from "@phosphor-icons/react/dist/csr/UserRectangle";
 import { Users } from "@phosphor-icons/react/dist/csr/Users";
 import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
@@ -28,6 +27,8 @@ import { PersonalApp } from "../personal/PersonalApp";
 import { AdminApp } from "../admin/AdminApp";
 import { WorkspaceApp } from "../club-workspace/WorkspaceApp";
 import { WorkspaceHub } from "../club-workspace/WorkspaceHub";
+import { RecruitmentList, RecruitmentPublicDetail, RecruitmentApply } from "../recruitment/RecruitmentPublic";
+import { NotificationBell } from "../notifications/Notifications";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -55,12 +56,11 @@ export function DiscoveryApp({
   const main = useRef<HTMLElement>(null);
   useDiscoveryMotion(main, `${location.pathname}${location.search}`);
   const accountMenu = useRef<HTMLDetailsElement>(null);
-  const notifications = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       setMenu(false);
-      for (const panel of [accountMenu.current, notifications.current]) {
+      for (const panel of [accountMenu.current]) {
         if (!panel?.open) continue;
         const restoreFocus = isHome && panel.contains(document.activeElement);
         panel.open = false;
@@ -69,7 +69,7 @@ export function DiscoveryApp({
     };
     const closeOnOutsideClick = (event: MouseEvent) => {
       if (!(event.target instanceof Node)) return;
-      for (const panel of [accountMenu.current, notifications.current]) {
+      for (const panel of [accountMenu.current]) {
         if (panel?.open && !panel.contains(event.target)) panel.open = false;
       }
     };
@@ -189,17 +189,7 @@ export function DiscoveryApp({
             {viewer && <NavLink to="/workspace">Không gian sinh hoạt</NavLink>}
           </nav>
           <div className="dc-account">
-            {viewer && isHome && (
-              <details className="dc-notifications" ref={notifications}>
-                <summary aria-label="Thông báo">
-                  <Bell size={22} aria-hidden="true" />
-                </summary>
-                <div className="dc-account-menu dc-notification-panel">
-                  <h2>Thông báo</h2>
-                  <p>Tính năng nhận thông báo chưa được kết nối.</p>
-                </div>
-              </details>
-            )}
+            {viewer && accessToken && <NotificationBell key={accessToken} token={accessToken} />}
             {viewer ? (
               <details ref={accountMenu}>
                 <summary aria-label={`Menu tài khoản của ${viewer.displayName}`}>
@@ -210,6 +200,7 @@ export function DiscoveryApp({
                   <p className="dc-account-heading">Sinh viên · {viewer.displayName}</p>
                   <Link to="/me"><UserRectangle size={18} aria-hidden="true" />Không gian của tôi</Link>
                   <Link to="/workspace"><Users size={18} aria-hidden="true" />CLB của tôi</Link>
+                  <Link to="/me/recruitment-applications">Đơn ứng tuyển của tôi</Link>
                   <button onClick={startRequest}><Plus size={18} aria-hidden="true" />Tạo CLB</button>
                   <button onClick={onMeeting}><CalendarBlank size={18} aria-hidden="true" />Cuộc họp</button>
                   {role === "admin" && (
@@ -254,6 +245,9 @@ export function DiscoveryApp({
       <main id="public-content" ref={main} tabIndex={-1}>
         <Routes>
           <Route path="/" element={<DiscoveryHome />} />
+          <Route path="/recruitments" element={<RecruitmentList />} />
+          <Route path="/recruitments/:campaignId" element={<RecruitmentPublicDetail token={accessToken} />} />
+          <Route path="/recruitments/:campaignId/apply" element={<RecruitmentApply token={accessToken} />} />
           {(["clubs", "activities", "posts"] as const).map((kind) => (
             <Route
               key={kind}

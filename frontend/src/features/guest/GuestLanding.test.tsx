@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, expect, it, vi } from 'vitest';
 import { GuestLanding } from './GuestLanding';
 import { safePublicUrl } from './public-content';
+vi.mock('socket.io-client', () => ({ io: () => ({ on: vi.fn(), disconnect: vi.fn() }) }));
 
 afterEach(() => { cleanup(); history.replaceState(null, '', '/'); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 it('shows the signed-in student landing and opens meetings only on request', async () => {
@@ -18,13 +19,12 @@ it('shows the signed-in student landing and opens meetings only on request', asy
 it('closes the landing header panels when clicking outside or pressing Escape', async () => {
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [], hasMore: false }) }));
-  render(<GuestLanding viewer={{ displayName: 'An' }} />);
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="synthetic-token" />);
   await screen.findByText(/Chưa có câu lạc bộ được công khai/);
 
   const avatar = screen.getByLabelText('Menu tài khoản của An');
   const bell = screen.getByLabelText('Thông báo');
   const accountPanel = avatar.closest('details');
-  const notificationPanel = bell.closest('details');
 
   fireEvent.click(avatar);
   expect(accountPanel?.open).toBe(true);
@@ -36,10 +36,13 @@ it('closes the landing header panels when clicking outside or pressing Escape', 
   fireEvent.click(avatar);
   fireEvent.click(bell);
   expect(accountPanel?.open).toBe(false);
-  expect(notificationPanel?.open).toBe(true);
+  expect(screen.getByRole('dialog', { name: 'Thông báo' })).toBeTruthy();
+  fireEvent.pointerDown(screen.getByRole('heading', { level: 1 }));
+  expect(screen.queryByRole('dialog', { name: 'Thông báo' })).toBeNull();
+  fireEvent.click(bell);
   bell.focus();
   fireEvent.keyDown(bell, { key: 'Escape' });
-  expect(notificationPanel?.open).toBe(false);
+  expect(screen.queryByRole('dialog', { name: 'Thông báo' })).toBeNull();
   expect(document.activeElement).toBe(bell);
 });
 it('loads real public endpoints and shows honest empty states', async () => {

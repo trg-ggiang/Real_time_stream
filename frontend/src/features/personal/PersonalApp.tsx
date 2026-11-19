@@ -18,11 +18,15 @@ import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import "./personal.css";
 import "./personal-dashboard.css";
 import "./personal-layout.css";
+import { MyRecruitmentApplications, MyRecruitmentApplication } from "../recruitment/RecruitmentApplications";
+import { NotificationBell, NotificationsPage } from "../notifications/Notifications";
 const nav = [
   ["/me", "Tổng quan", SquaresFour],
   ["/me/clubs", "CLB tham gia", Users],
   ["/me/follows", "Đang quan tâm", Heart],
   ["/me/registrations", "Hoạt động đã đăng ký", CalendarCheck],
+  ["/me/recruitment-applications", "Đơn ứng tuyển", CalendarCheck],
+  ["/me/notifications", "Thông báo", CalendarCheck],
   ["/me/profile", "Hồ sơ cá nhân", UserCircle],
 ] as const;
 export function PersonalApp({
@@ -114,9 +118,13 @@ export function PersonalApp({
         <header className="ps-topbar">
           <Link to="/">Khám phá Bách khoa ↗</Link>
           <span>Tài khoản sinh viên</span>
+          <NotificationBell key={accessToken} token={accessToken} />
         </header>
         <main id="personal-content" ref={content} tabIndex={-1}>
           <Routes>
+            <Route path="/me/recruitment-applications" element={<MyRecruitmentApplications token={accessToken} />} />
+            <Route path="/me/recruitment-applications/:applicationId" element={<MyRecruitmentApplication token={accessToken} />} />
+            <Route path="/me/notifications" element={<NotificationsPage token={accessToken} />} />
             <Route
               path="/me"
               element={

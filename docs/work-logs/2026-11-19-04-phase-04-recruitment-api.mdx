@@ -1,0 +1,105 @@
+---
+title: Recruitment database and API
+description: Complete implementation of recruitment stage 1 against the supplied schema.
+---
+
+## Session information
+
+- Session ID: 2026-11-19-04
+- Time: 2026-11-19, Asia/Saigon; exact start unavailable; verification completed after 20:45 +07:00
+- Agent: Codex
+- Phase: 04 — application foundation, recruitment stage 1
+- Session outcome: Completed
+- Phase status: In Progress
+
+## Authorized objective
+
+Implement the database/API stage after the user approved the discovery/design.
+Approval creates a membership, active members cannot apply, and descriptions use
+Markdown. Stop before the form-builder frontend stage so the user can review.
+
+## Completed implementation
+
+- Reused the actual recruitment tables, public views, application identity,
+  notification jobs and domain/audit triggers from the supplied schema exports.
+- Added immutable form versions, 11 field types, JSONB answers, basic profile
+  snapshots and version conflict checks; backfilled legacy answers and forms.
+- Implemented campaign/department/form management, public discovery, own
+  applications, scoped review, batch decisions and CSV export.
+- Adapted recruitment-only row guards to chairperson decisions without a
+  mandatory interview or department head. Acceptance inserts one membership
+  into an ordinary active department of the same club in the same transaction.
+- Added private attachment/public cover storage, byte-signature and field-rule
+  validation, authorized short-lived downloads and staged-file cleanup.
+- Kept server/database deadline checks, unique submission keys, optimistic
+  concurrency, row/advisory locks and server-only RPC privileges.
+- Added unit/service tests plus a disposable PostgreSQL runner, a synthetic
+  baseline matching the supplied core schema and SQL regression assertions.
+- Created the API contract, migration procedure and manual acceptance checklist.
+
+## Changed files
+
+- `backend/src/recruitment/recruitment.dto.ts`
+- `backend/src/recruitment/recruitment-validation.ts`
+- `backend/src/recruitment/recruitment.repository.ts`
+- `backend/src/recruitment/recruitment.service.ts`
+- `backend/src/recruitment/recruitment-files.service.ts`
+- `backend/src/recruitment/recruitment.controller.ts`
+- `backend/src/recruitment/recruitment.module.ts`
+- `backend/src/app.module.ts`
+- `backend/package.json`
+- `backend/test/recruitment.test.cjs`
+- `backend/test/recruitment-db.cjs`
+- `backend/test/fixtures/recruitment-schema.sql`
+- `backend/test/fixtures/recruitment-seed.sql`
+- `backend/test/fixtures/recruitment-assertions.sql`
+- `supabase/migrations/202611190001_recruitment_forms_api.sql`
+- `supabase/verification/recruitment-preflight.sql`
+- `supabase/verification/recruitment-trigger-preflight.sql`
+- `docs/modules/club-recruitment.mdx`
+- This work log, the phase/master plan, session log, changelog, navigation and README.
+
+## Verification
+
+| Command/check | Result | Evidence/limits |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend and frontend TypeScript. |
+| `npm.cmd --workspace backend run build` | Passed | Also ran as part of the final backend suite. |
+| Recruitment suite within the final backend run | Passed | 15 tests: type/range/date/choice/file validation, DTO ownership, safe errors, RPC response shape, scoped reads, unauthorized downloads, cleanup claim and CSV injection. |
+| `npm.cmd --workspace backend test` | Failed — environment limit | 51/53 passed, including all 15 new tests. Existing HTTP auth and token tests failed with `connect EACCES 127.0.0.1`; no successful HTTP acceptance claimed. |
+| `npm.cmd --workspace backend run test:recruitment-db:single` | Passed | PostgreSQL 17 disposable cluster: original core schema, legacy rows, migration and SQL assertions. Checks direct approval/admission, unauthorized head/other club, 11 types, atomic rollback, duplicate submission, form history, file ownership, RPC privileges, search/stats and wall-clock deadline across a transaction. |
+| TCP database runner / simultaneous submissions and decisions | Blocked | `pg_ctl` startup/probe timed out under localhost restrictions. Single-user mode explicitly skips concurrency cases; the TCP runner contains them for local review. |
+| Supabase live migration/API/Storage integration | Not run | No live schema/data changes; actual storage upload and schema extensions still need development deployment acceptance. |
+| Frontend tests/build/browser review | Skipped | No frontend code changed in this stage. Root TypeScript was checked. |
+
+`docs/docs.json` parses correctly. Both new navigation targets exist. The same
+11 historical work-log targets are missing in HEAD and the working copy; this
+change adds no missing navigation target and does not repair unrelated history.
+Tracked diff checks and a whitespace scan of all 25 changed/new files passed.
+
+## Decisions and limits
+
+The existing DB already separates recruitment campaigns from activities, so the
+future activities UI will consume the recruitment API rather than duplicating
+campaign content into a second activity row. Existing raw statuses are preserved
+and mapped to `pending/approved/rejected` for display.
+
+The migration intentionally changes the verified recruitment guards and adds
+columns/tables/functions. It must be reviewed and applied once to development;
+it has not been applied to the user's Supabase. Regression fixtures cover the
+core recruitment constraints/guards and are not a full copy of the live DB.
+No commit, push, UI implementation or notification delivery worker was performed.
+
+## Next step
+
+User reviews/applies the development migration and tests the API using
+[the module guide](/modules/club-recruitment). After the user confirms stage 1,
+implement stage 2: the chairperson form builder using the current UI system.
+Phase 04 remains In Progress; stages 2–5 and live integration acceptance remain.
+
+## Close checklist
+
+- [x] Updated phase page and master plan
+- [x] Updated session log, changelog and setup/API guide
+- [x] Registered the new guide and work log in docs.json
+- [x] Recorded checks and concrete verification limits

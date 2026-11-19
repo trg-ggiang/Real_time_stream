@@ -4,6 +4,8 @@ import { MagnifyingGlass } from "@phosphor-icons/react/dist/csr/MagnifyingGlass"
 import { useCollection } from "../hooks/use-public-query";
 import { ContentCards, QueryState } from "../components/PublicContent";
 import type { Collection } from "../services/discovery-api";
+import { RecruitmentList } from "../../recruitment/RecruitmentPublic";
+const activityTabs = <nav className="rc rc-activity-tabs dc-container" aria-label="Loại hoạt động"><Link to="/activities">Hoạt động CLB</Link><Link to="/activities?type=recruitment">Tuyển thành viên</Link></nav>;
 const titles = {
   clubs: [
     "Tìm một nơi thuộc về.",
@@ -44,7 +46,10 @@ export function CollectionPage({ kind }: { kind: Collection }) {
       value ? next.set(key, value) : next.delete(key);
     setParams(next);
   }
+  if (kind === "activities" && params.get("type") === "recruitment") return <>{activityTabs}<RecruitmentList /></>;
   return (
+    <>
+    {kind === "activities" && activityTabs}
     <div className="dc-container dc-list-page">
       <Link className="dc-back" to="/">
         ← Khám phá
@@ -138,5 +143,6 @@ export function CollectionPage({ kind }: { kind: Collection }) {
         </button>
       </nav>
     </div>
+    </>
   );
 }

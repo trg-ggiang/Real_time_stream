@@ -1,0 +1,267 @@
+---
+title: Tuyển thành viên CLB
+description: Giai đoạn 1–5 — database, form builder, ứng tuyển, xét duyệt và thông báo.
+---
+
+## Phạm vi hiện tại
+
+Đã hoàn thành code giai đoạn 1–5. Theo yêu cầu mới, giai đoạn 2–5 được triển khai
+liền mạch để người dùng test sau cùng. Chưa áp dụng migration hoặc ghi dữ liệu
+Supabase live. Phase 04 vẫn In Progress cho đến khi nghiệm thu tích hợp thật.
+
+| Giai đoạn | Chức năng | Điểm mở |
+| --- | --- | --- |
+| 2 | Quản lý đợt tuyển, ảnh bìa, Markdown, ban, builder 11 loại trường, preview, phiên bản form, mở/đóng/lưu trữ | Không gian CLB → Tuyển thành viên |
+| 3 | Khám phá công khai, chọn ban, điền sẵn hồ sơ, validation, upload, xem lại/xác nhận và lịch sử đơn | Hoạt động → Tuyển thành viên, `/me/recruitment-applications` |
+| 4 | Tìm/lọc/sắp xếp/phân trang, thống kê, chi tiết câu hỏi cũ/file, duyệt/thêm thành viên, từ chối, bulk và CSV | Tuyển thành viên → Xét duyệt đơn |
+| 5 | Worker outbox, inbox theo người nhận, chuông/số chưa đọc, đọc một/tất cả, Socket.IO và polling | Header công khai/cá nhân, sidebar CLB, `/me/notifications` |
+
+Quyết định đã xác nhận: chủ nhiệm duyệt trực tiếp và tự thêm người được duyệt vào
+CLB/ban; không nhận người đã có membership active; mô tả lưu Markdown.
+
+## Đối chiếu DB và lựa chọn tích hợp
+
+Schema và private trigger functions do người dùng xuất ngày 19/11/2026 là nguồn
+đối chiếu. Dùng lại `recruitment_campaigns`, `recruitment_departments`,
+`recruitment_questions`, `recruitment_applications`, `application_answers`.
+Không tạo hệ `club_applications`/`club_recruitments` song song.
+
+DB đã có `notifications`, `notification_jobs`, audit và domain event triggers.
+Thay đổi trạng thái đơn tiếp tục tạo job trong cùng giao dịch. Worker phát thông
+báo, API đọc thông báo và Socket.IO đã được nối ở giai đoạn 5, không tạo bảng trùng.
+
+Chiến dịch tuyển đã là một thực thể riêng trong DB. Frontend giai đoạn 3 sẽ đưa
+chúng vào màn hình hoạt động qua API tuyển dụng và dùng lại component hiển thị;
+không sao chép chiến dịch thành một hàng hoạt động thứ hai cần đồng bộ.
+
+## Migration
+
+File: `supabase/migrations/202611190001_recruitment_forms_api.sql`.
+
+Sau file trên, áp dụng `supabase/migrations/202611190002_recruitment_notifications.sql`.
+Chỉ áp dụng những file chưa chạy. Sau đó khởi động lại backend và frontend.
+Migration thứ hai bổ sung hai RPC service-role, không tạo thêm bảng thông báo.
+
+## Test giao diện
+
+1. Chủ nhiệm có hồ sơ đầy đủ: Không gian CLB → Tuyển thành viên → Tạo đợt tuyển;
+   lưu thông tin, tải ảnh bìa và thêm ban thường đang hoạt động.
+2. Mở từng ban, thêm câu hỏi hoặc bộ thông tin sinh viên, xem trước, lưu phiên
+   bản form và mở đợt tuyển với thời gian nhận đơn phù hợp.
+3. Tài khoản sinh viên khác, chưa thuộc CLB: Hoạt động → Tuyển thành viên (hoặc
+   trang công khai CLB), mở đợt tuyển, chọn ban, điền và tải file.
+4. Bấm Xem lại đơn, đồng ý và xác nhận nộp. Đơn xuất hiện trong Không gian của
+   tôi → Đơn ứng tuyển; không có thao tác gửi tự động ở bước xem lại.
+5. Chủ nhiệm mở chuông hoặc danh sách ứng viên, xem đơn/file, duyệt/thêm thành
+   viên hoặc từ chối rồi xác nhận. Thử tìm/lọc, bulk và CSV.
+6. Sinh viên kiểm tra thông báo kết quả; khi được duyệt, mở không gian CLB từ đơn.
+7. Sửa form sau khi có đơn cần xác nhận phiên bản mới. Đơn cũ giữ câu hỏi cũ;
+   sinh viên đang mở form cũ phải tải lại nếu server báo FORM_CHANGED.
+
+Worker chạy mỗi 5 giây, xử lý job tuyển dụng bằng khóa SKIP LOCKED; ghi inbox và
+hoàn tất job cùng transaction. Dedup theo người nhận, retry backoff tối đa 5 lần,
+thu hồi lease cũ. Job domain khác không bị worker này nhận. Đơn mới thông báo cho
+chủ nhiệm; quyết định cho ứng viên; lifecycle chiến dịch cho chủ nhiệm. Không gửi email.
+Socket namespace `/notifications` dùng handshake `{ token }`, phát
+`notifications:changed` vào room xác định từ JWT; frontend tải inbox qua API và
+poll mỗi 30 giây khi offline/nhiều backend instance.
+
+API: `GET /api/me/notifications?page=1&filter=all|unread`,
+`PATCH /api/me/notifications/:id/read`, `PATCH /api/me/notifications/read-all`.
+Không nhận recipient/user ID từ frontend.
+
+Kiểm tra: typecheck/build backend/frontend, 104 frontend tests, 20 targeted backend
+tests và cả hai migration cùng SQL assertions trên PostgreSQL tạm đạt. Backend
+suite 56/58: hai test HTTP có sẵn bị connect EACCES localhost. Chưa nghiệm thu
+live DB/Storage/TCP concurrency; mở trình duyệt localhost bị từ chối cấp quyền.
+
+Chỉ chạy một lần trên Supabase **development** sau khi review và sao lưu DB mục
+tiêu. Không chạy lại toàn bộ các migration lịch sử lên DB đang có dữ liệu.
+Phiên phát triển này không tự áp dụng migration hay ghi dữ liệu lên Supabase live.
+
+Migration bổ sung phiên bản form, câu trả lời JSONB, metadata file và RPC giao
+dịch. Câu hỏi/đơn cũ được gắn vào phiên bản nền; câu trả lời cũ được giữ dưới dạng
+chuỗi JSONB. Backfill tạm tắt đúng bốn row guard được nêu trong file, rồi bật lại
+trong cùng transaction và trước COMMIT; không tắt RLS.
+
+Các trigger tuyển dụng được điều chỉnh từ quy trình trưởng ban/phỏng vấn sang
+quyết định của chủ nhiệm. Không thay helper phân quyền ban, meeting, chat hay
+trạng thái đơn lịch sử. Các đơn `interviewing` cũ được hiển thị như chờ duyệt.
+
+Hai bucket mới: `recruitment-covers` công khai cho ảnh bìa và
+`recruitment-attachments` riêng tư cho CV/ảnh ứng tuyển. Nếu bucket có cùng ID đã
+tồn tại, migration giữ cấu hình của nó và dừng nếu quyền public/private không đúng
+mục đích; cần đối chiếu giới hạn loại/dung lượng trước khi test file.
+
+## Chạy và kiểm tra
+
+Từ thư mục gốc:
+
+```powershell
+npm run dev:backend
+npm run typecheck
+npm --workspace backend run build
+node --test backend/test/recruitment.test.cjs
+```
+
+Kiểm thử database dùng PostgreSQL 17 đã cài, tạo cluster tạm bằng dữ liệu giả và
+không đọc `.env`/kết nối vào database của người dùng:
+
+```powershell
+npm --workspace backend run test:recruitment-db
+```
+
+Nếu môi trường chặn TCP localhost, kiểm tra các hành vi SQL ở single-user mode:
+
+```powershell
+$env:RECRUITMENT_TEST_TEMP_ROOT = 'C:\Users\Acer\AppData\Local\Temp'
+npm --workspace backend run test:recruitment-db:single
+```
+
+`RECRUITMENT_TEST_PG_BIN` cho phép chỉ định thư mục bin PostgreSQL khác.
+Single-user mode không thực hiện hai ca tranh chấp song song; cần chạy lệnh TCP
+trên máy không bị chặn để nghiệm thu chúng.
+
+## Hợp đồng API
+
+Prefix `/api`. API cá nhân/quản lý/file yêu cầu Bearer JWT ứng dụng và hồ sơ hoàn
+chỉnh. Actor lấy từ JWT; payload không nhận applicant/reviewer tùy ý.
+
+| Method | Endpoint | Chức năng |
+| --- | --- | --- |
+| GET | `/public/recruitments` | Danh sách công khai, phân trang, tìm tiêu đề, lọc trạng thái |
+| GET | `/public/recruitments/:id` | Thông tin, ban và form hiện hành |
+| GET/POST | `/workspace/:clubId/recruitments` | Danh sách quản lý/tạo nháp |
+| GET/PATCH/DELETE | `/workspace/:clubId/recruitments/:id` | Chi tiết/sửa/lưu trữ |
+| POST | `/workspace/:clubId/recruitments/:id/publish` | Mở đợt tuyển; cho phép lên lịch mở trong tương lai |
+| POST | `/workspace/:clubId/recruitments/:id/close` | Đóng thủ công |
+| POST | `/workspace/:clubId/recruitments/:id/departments` | Thêm ban đang hoạt động, không phải Ban quản trị |
+| PUT | `/workspace/:clubId/recruitments/:id/departments/:departmentId/form` | Tạo phiên bản form mới |
+| GET | `/recruitments/:id/application-context` | Điền sẵn hồ sơ, đơn hiện có, quyền nộp |
+| POST | `/recruitments/:id/applications` | Nộp đơn và câu trả lời trong một giao dịch |
+| GET | `/me/recruitment-applications` | Đơn của tôi |
+| GET | `/me/recruitment-applications/:id` | Câu trả lời, phiên bản câu hỏi và file của đơn của tôi |
+| GET | `/workspace/:clubId/recruitments/:id/applications` | Danh sách, tìm họ tên/MSSV/email, lọc, sắp xếp, thống kê |
+| GET | `/workspace/:clubId/recruitments/:id/applications/:applicationId` | Chi tiết đơn cho chủ nhiệm |
+| PATCH | `/workspace/:clubId/recruitments/:id/applications/:applicationId/decision` | Duyệt/từ chối |
+| POST | `/workspace/:clubId/recruitments/:id/applications/bulk-decision` | Tối đa 50 đơn; giao dịch riêng và kết quả từng đơn |
+| GET | `/workspace/:clubId/recruitments/:id/applications/export.csv` | CSV UTF-8 có BOM, chống công thức khi mở Excel |
+| POST | `/recruitments/:id/files` | Multipart field `file`, `purpose=answer/cover`; câu hỏi hoặc expected timestamp tương ứng |
+| GET | `/recruitment-files/:id/download` | URL tải file có thời hạn 60 giây, sau kiểm tra quyền |
+
+List dùng `page`, `limit`; danh sách đơn dùng thêm `q`,
+`status=all/pending/approved/rejected`, `sort=newest/oldest`. `stats` tính toàn đợt
+tuyển; `total` tính trên bộ lọc. JSON không có ghi chú nội bộ của trưởng ban.
+
+Trạng thái lưu trong DB vẫn dùng `submitted/interviewing/accepted/rejected`;
+`display_status` trả `pending/approved/rejected` cho UI. Giữ nguyên timestamp
+`updated_at` nhận từ API, không parse rồi làm mất độ chính xác trước khi gửi
+`expected_updated_at`.
+
+## Luồng test API từng bước
+
+1. Dùng tài khoản chủ nhiệm có membership active của CLB published và hồ sơ đầy đủ.
+2. POST tạo chiến dịch, gồm `title`, `description` (Markdown),
+   `application_opens_at`, `application_closes_at`; tùy chọn `summary`, `benefits`,
+   `contact_email`, `contact_phone`, `cover_url`. Lưu `item.campaign_id` và `item.updated_at`.
+3. POST thêm ban với `department_id`, `description`, tùy chọn `requirements`,
+   `target_quantity` và `expected_updated_at` của chiến dịch. Dùng timestamp mới
+   trong `campaign.updated_at` cho bước tiếp.
+4. PUT form của ban, ví dụ payload dưới đây. Lưu phiên bản/câu hỏi trả về.
+5. POST publish với `expected_updated_at` mới nhất.
+6. Dùng tài khoản sinh viên khác, GET application-context rồi POST đơn theo
+   `recruitment_department_id`, `form_version_id`, `answers` của form đó.
+7. Chủ nhiệm GET danh sách/chi tiết, PATCH decision và kiểm tra membership được tạo.
+
+```json
+{
+  "expected_updated_at": "TIMESTAMP_FROM_API",
+  "acknowledge_existing_applications": false,
+  "questions": [
+    {
+      "question_text": "Vì sao bạn muốn tham gia CLB?",
+      "question_type": "paragraph",
+      "is_required": true,
+      "validation": { "min_length": 10, "max_length": 2000 }
+    }
+  ]
+}
+```
+
+Loại câu hỏi: `short_text`, `paragraph`, `single_choice`, `checkboxes`,
+`dropdown`, `number`, `email`, `phone`, `date`, `file`, `rating`.
+Lựa chọn có `{ option_id: UUID, label: string }`; câu trả lời lựa chọn lưu UUID,
+nhiều lựa chọn lưu mảng UUID, file lưu mảng `file_id`, số/thang điểm lưu số JSON.
+`field_id` là định danh logic tùy chọn để builder giữ câu hỏi qua các lần lưu;
+`question_id` vật lý thuộc phiên bản cụ thể và dùng khi nộp đơn.
+
+```json
+{
+  "recruitment_department_id": "RECRUITING_DEPARTMENT_UUID",
+  "form_version_id": "CURRENT_VERSION_UUID",
+  "answers": [{ "question_id": "QUESTION_UUID", "value": "Câu trả lời của sinh viên" }]
+}
+```
+
+```json
+{
+  "expected_updated_at": "APPLICATION_TIMESTAMP_FROM_API",
+  "decision": "approve",
+  "department_id": "ACTIVE_ORDINARY_DEPARTMENT_UUID"
+}
+```
+
+`department_id` khi duyệt có thể bỏ qua để dùng ban sinh viên đã chọn; chỉ nhận ban
+thường đang hoạt động của đúng CLB. Từ chối dùng `decision=reject` và tùy chọn
+`reason`. DB điền câu thông báo mặc định nếu không nhập lý do.
+
+## Quy tắc dữ liệu và file
+
+Form mới luôn tạo phiên bản mới, câu hỏi đã niêm phong không sửa/xóa. Khi đã có
+đơn, cần `acknowledge_existing_applications=true`; form đang mở cũ bị thay sẽ trả
+409 `FORM_CHANGED`, yêu cầu sinh viên tải lại. Đơn cũ luôn đọc câu hỏi của phiên
+bản cũ, bao gồm legacy rows được chuyển đổi khi migration.
+
+Giờ đóng dùng `clock_timestamp()` ở DB, kể cả transaction bắt đầu trước hạn.
+Unique key `(campaign_id, applicant_id)`, row locks và advisory lock theo CLB/người
+nộp bảo vệ nộp trùng và tạo membership trùng. Quyết định so sánh timestamp và chỉ
+chấp nhận đơn đang chờ. Job thông báo/audit tiếp tục nằm trong cùng transaction.
+
+Upload tối đa 5 MB, kiểm tra MIME và chữ ký định dạng; cấu hình câu hỏi có thể
+giới hạn nhỏ hơn. File chờ có hạn 2 giờ. Cleanup nhận claim trên hàng metadata
+trước khi xóa, không xóa file mà transaction nộp đơn vừa gắn vào đơn. Chủ nhiệm
+chỉ được tải file ứng viên sau khi file được nộp cùng đơn. Không ghi URL có chữ ký
+hoặc secret ra log.
+
+## Checklist nghiệm thu thủ công
+
+- [ ] Tạo nháp, cấu hình ban/form, preview API và publish; tài khoản member/head/CLB khác bị chặn quản lý.
+- [ ] Tự điền hồ sơ; gửi đủ các loại câu hỏi; thiếu bắt buộc và sai định dạng bị chặn.
+- [ ] Gửi hai request cùng lúc: chỉ một đơn được ghi nhận.
+- [ ] Sinh viên khác không xem được đơn/file; chủ nhiệm CLB khác không được xem/duyệt.
+- [ ] Nộp trước giờ mở, sau hạn và sau đóng thủ công đều bị chặn ở DB.
+- [ ] Người đã có membership active bị chặn nộp.
+- [ ] Sửa form sau khi có đơn cần xác nhận; đơn cũ/câu hỏi cũ không đổi.
+- [ ] Duyệt trực tiếp tạo đúng một membership vào ban hợp lệ; từ chối không tạo membership và lý do là tùy chọn.
+- [ ] Hai quyết định đồng thời không ghi đè nhau; bulk trả kết quả từng đơn.
+- [ ] File giả loại, quá dung lượng, sai chủ sở hữu, hết thời gian chờ bị chặn.
+- [ ] CSV đúng tiếng Việt, bộ lọc và không thực thi công thức từ nội dung ứng viên.
+- [ ] Gửi/duyệt/từ chối tạo notification job bền vững; nhận thông báo ở hai giao diện sẽ kiểm tra sau giai đoạn 5.
+
+## File giai đoạn 1
+
+- `backend/src/recruitment/`: DTO, validation, repository, service nghiệp vụ,
+  service file, controller và module.
+- `backend/src/app.module.ts`: đăng ký module mới.
+- `backend/package.json`: lệnh chạy test DB tạm.
+- `backend/test/recruitment.test.cjs`, `recruitment-db.cjs` và ba fixture SQL.
+- Migration và hai truy vấn preflight trong `supabase/`.
+- Tài liệu module, work log và các trang chỉ mục/trạng thái liên quan.
+
+## 2026-11-19 — Recruitment choice control layout
+
+Fixed recruitment checkbox/radio controls inheriting full-width workspace input
+styles. Compact 18px controls keep labels alongside them. JSDOM computed styles
+in both stylesheet orders and frontend build passed; browser geometry unverified.
+Phase 04 In Progress.
+[Work log](/work-logs/2026-11-19-06-phase-04-recruitment-choice-layout).

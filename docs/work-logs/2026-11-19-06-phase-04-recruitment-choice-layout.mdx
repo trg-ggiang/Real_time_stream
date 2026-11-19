@@ -1,0 +1,54 @@
+---
+title: Recruitment checkbox layout
+description: Fix compact choice controls inside club workspace recruitment forms.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-06
+- Thời gian: 2026-11-19, Asia/Saigon; không ghi nhận giờ bắt đầu/kết thúc chính xác.
+- Agent: Codex
+- Phase: 04 — application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa checkbox và chữ Bắt buộc trả lời bị kéo ngang/xuống từng ký tự trong form
+tuyển dụng theo ảnh người dùng gửi.
+
+## Công việc hoàn thành
+
+Sửa `frontend/src/features/recruitment/recruitment.css`: giới hạn checkbox/radio
+trong `.rc-choice` ở 18px, không co giãn, bỏ padding kế thừa. Nhãn căn đầu dòng
+và ngắt theo từ. Selector giới hạn trong recruitment, thắng quy tắc input rộng
+100% của workspace. Không thay nghiệp vụ hoặc database.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| JSDOM computed-style check | Passed | Checkbox/radio rộng/cao 18px, padding 0; label flex; text input vẫn 100%, thử cả hai thứ tự stylesheet. Không đo hình học trình duyệt. |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo chunk lớn có sẵn. |
+| `git diff --check` | Passed | Có thông báo LF/CRLF ở tài liệu cũ. |
+| Browser visual/full suites | Skipped | Thay CSS nhỏ; browser localhost từng bị từ chối quyền. Người dùng kiểm tra lại trang thật. |
+
+## Quyết định và lý do
+
+Giới hạn sửa tại nhóm lựa chọn tuyển dụng, tránh ảnh hưởng những form khác.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra hình học bằng trình duyệt thật. Phase 04 tiếp tục In Progress.
+
+## Bước tiếp theo
+
+Người dùng tải lại trang cấu hình ban và kiểm tra Bắt buộc trả lời, các lựa chọn
+radio/checkbox và xác nhận phiên bản biểu mẫu.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page/master plan.
+- [x] Cập nhật session log/changelog/module guide.
+- [x] Đăng ký work log và xác minh JSON/navigation mới.
+- [x] Ghi kết quả kiểm tra và giới hạn.

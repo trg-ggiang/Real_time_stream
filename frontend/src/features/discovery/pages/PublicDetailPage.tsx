@@ -11,6 +11,7 @@ import {
 } from "../components/PublicContent";
 import { publicDate } from "../../../shared/lib/content-format";
 import type { Collection } from "../services/discovery-api";
+import { RecruitmentList } from "../../recruitment/RecruitmentPublic";
 
 export function PublicDetailPage({
   kind,
@@ -199,6 +200,7 @@ export function PublicDetailPage({
           </p>
         </aside>
       </div>
+      {club && <RecruitmentList clubId={id} compact />}
     </article>
   );
 }

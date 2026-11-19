@@ -1,5 +1,16 @@
 # Real-time Stream — Meeting Module
 
+## Tuyển thành viên CLB — database/API
+
+Đã triển khai code giai đoạn 1–5: API, form builder 11 loại câu hỏi, ứng tuyển
+hai bước, xét duyệt/duyệt hàng loạt/CSV và thông báo qua inbox + Socket.IO.
+Trước khi test: áp dụng lần lượt `202611190001_recruitment_forms_api.sql` và
+`202611190002_recruitment_notifications.sql` vào Supabase development nếu chưa
+chạy, rồi khởi động lại backend. Không chạy lại migration đã áp dụng.
+Chủ nhiệm: Không gian CLB → Tuyển thành viên. Sinh viên: Hoạt động → Tuyển thành
+viên; theo dõi kết quả tại Không gian của tôi → Đơn ứng tuyển.
+Xem [hướng dẫn triển khai và test](docs/modules/club-recruitment.mdx).
+
 ## Đề xuất khung giao diện mới
 
 Phase thiết kế sản phẩm 1 (16/11/2026): [bản đồ màn hình, quyền và API](docs/design/phase-01-product-frame.md), [storyboard sáu màn hình](docs/design/phase-01-review/index.html). Mở storyboard bằng trình duyệt; đây là bản phác thảo độc lập, không phải frontend đã được thay thế và không ghi dữ liệu. Phần ứng dụng hiện tại vẫn chạy theo hướng dẫn bên dưới.

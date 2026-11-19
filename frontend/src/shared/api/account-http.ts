@@ -3,6 +3,7 @@ export class AccountApiError extends Error {
     public readonly status: number,
     message: string,
     public readonly code?: string,
+    public readonly fields?: Record<string, string>,
   ) {
     super(message);
   }
@@ -12,6 +13,7 @@ export async function accountRequest<T>(
   token: string,
   path: string,
   options: RequestInit = {},
+  responseKind: "json" | "text" = "json",
 ): Promise<T> {
   const base = (import.meta.env.VITE_API_URL?.trim() || "").replace(/\/$/, "");
   const controller = new AbortController();
@@ -27,10 +29,10 @@ export async function accountRequest<T>(
       headers: {
         ...options.headers,
         Authorization: `Bearer ${token}`,
-        ...(options.body && { "Content-Type": "application/json" }),
+        ...(options.body && !(options.body instanceof FormData) && { "Content-Type": "application/json" }),
       },
     });
-    const data = await response.json().catch(() => null);
+    const data = response.ok && responseKind === "text" ? await response.text() : await response.json().catch(() => null);
     if (!response.ok) {
       if (response.status === 401)
         window.dispatchEvent(new Event("uc:auth-expired"));
@@ -42,7 +44,7 @@ export async function accountRequest<T>(
           : Array.isArray(data?.message)
             ? "Một số thông tin chưa hợp lệ. Kiểm tra lại biểu mẫu."
             : "Không thực hiện được thao tác. Vui lòng thử lại.";
-      throw new AccountApiError(response.status, message, data?.code);
+      throw new AccountApiError(response.status, message, data?.code, data?.fields);
     }
     if (data === null)
       throw new Error(

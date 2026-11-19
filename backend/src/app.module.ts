@@ -12,6 +12,8 @@ import { PublicContentModule } from "./public-content/public-content.module";
 import { PersonalModule } from "./personal/personal.module";
 import { WorkspaceModule } from "./workspace/workspace.module";
 import { AdminModule } from "./admin/admin.module";
+import { RecruitmentModule } from "./recruitment/recruitment.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { AdminModule } from "./admin/admin.module";
     PersonalModule,
     WorkspaceModule,
     AdminModule,
+    RecruitmentModule,
+    NotificationsModule,
   ],
   controllers: [HealthController],
 })

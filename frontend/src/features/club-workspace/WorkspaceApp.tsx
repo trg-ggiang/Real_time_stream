@@ -34,6 +34,9 @@ import {
   ReviewHome,
 } from "./pages/WorkspaceHome";
 import "./workspace.css";
+import { RecruitmentManagement, RecruitmentEditor } from "../recruitment/RecruitmentManagement";
+import { RecruitmentReview, RecruitmentReviewDetail } from "../recruitment/RecruitmentApplications";
+import { NotificationBell } from "../notifications/Notifications";
 export function WorkspaceApp(props: DiscoveryViewer) {
   const match = useMatch("/workspace/:clubId/*");
   const clubId = match?.params.clubId || "";
@@ -153,6 +156,7 @@ function WorkspaceScope({
               <strong>{ctx.club.name}</strong>
               <small>{chair ? "Chủ nhiệm" : "Thành viên"}</small>
             </div>
+            <NotificationBell key={accessToken} token={accessToken} />
           </div>
           <button
             className="cw-mobile-toggle"
@@ -190,6 +194,7 @@ function WorkspaceScope({
               <NavLink to={`${base}/meetings`}>Phòng họp</NavLink>
               <NavLink to={`${base}/recurring-meetings`}>Tạo họp định kỳ</NavLink>
               {chair && <NavLink to={`${base}/review`}>Duyệt nội dung</NavLink>}
+              {chair && <NavLink to={`${base}/recruitments`}>Tuyển thành viên</NavLink>}
             </div></details>
           </nav>
         </aside>
@@ -197,6 +202,11 @@ function WorkspaceScope({
           {!inChannel && <header className="cw-topbar"><span>{ctx.club.name}</span><span>{viewer?.displayName} · {chair ? "Chủ nhiệm" : "Thành viên"}</span></header>}
           <main id="workspace-content" ref={main} tabIndex={-1} className={inChannel ? "cw-channel-main" : undefined}>
             <Routes>
+              <Route path={`${base}/recruitments`} element={chair ? <RecruitmentManagement /> : <Denied />} />
+              <Route path={`${base}/recruitments/new`} element={chair ? <RecruitmentEditor /> : <Denied />} />
+              <Route path={`${base}/recruitments/:campaignId/edit`} element={chair ? <RecruitmentEditor /> : <Denied />} />
+              <Route path={`${base}/recruitments/:campaignId/applications`} element={chair ? <RecruitmentReview /> : <Denied />} />
+              <Route path={`${base}/recruitments/:campaignId/applications/:applicationId`} element={chair ? <RecruitmentReviewDetail /> : <Denied />} />
               <Route path={base} element={<WorkspaceOverview />} />
               <Route path={`${base}/channels/:channel`} element={<WorkspaceChannel drafts={draftChannels} />} />
               {(["posts", "activities"] as const).map((kind) => (

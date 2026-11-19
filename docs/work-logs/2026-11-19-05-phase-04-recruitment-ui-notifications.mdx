@@ -1,0 +1,77 @@
+---
+title: Recruitment UI and notifications
+description: Completed recruitment stages 2–5 code; development deployment and manual acceptance pending.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-05
+- Thời gian: 2026-11-19, Asia/Saigon; giờ bắt đầu không có; kiểm tra cuối khoảng 21:16 +07:00.
+- Agent: Codex
+- Phase: 04 — recruitment stages 2–5
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Triển khai liên tục giai đoạn 2–5 để người dùng test sau cùng. Giữ thay đổi giai
+đoạn 1 đang có trong working tree; không commit/push hoặc ghi Supabase live.
+
+## Công việc hoàn thành
+
+- Builder 11 loại câu hỏi, validation/options/điền sẵn, sắp xếp/nhân bản, preview,
+  version/acknowledgement; quản lý chiến dịch/ban, ảnh bìa, Markdown, mở/đóng/lưu trữ.
+- Public discovery qua Hoạt động và trang CLB, ứng tuyển hai bước, validation,
+  file riêng tư, chặn gửi lặp, xử lý FORM_CHANGED, lịch sử đơn/câu hỏi cũ.
+- Review có tìm/lọc/sort/phân trang/stats, timestamp chính xác, file có quyền,
+  duyệt và admission qua RPC cũ, từ chối, bulk từng đơn và CSV qua Bearer JWT.
+- Notification worker dùng outbox/inbox hiện có, transaction/skip locked/dedup,
+  retry backoff tối đa 5 lần, thu hồi lease. Inbox/read API, Socket.IO xác thực
+  JWT và hạn token; chuông public/personal/workspace, polling dự phòng.
+- Shared HTTP hỗ trợ multipart không JSON content-type, CSV text và field errors;
+  public API lọc club_id, application detail thêm tên ban/thông tin chiến dịch.
+
+File thay đổi: `frontend/src/features/recruitment/`, `features/notifications/`,
+DiscoveryApp/CollectionPage/PublicDetailPage, WorkspaceApp, PersonalApp,
+shared account-http, GuestLanding test; `backend/src/notifications/`, AppModule,
+recruitment.dto/service; notification migration, notifications.test.cjs,
+recruitment-db runner/notification SQL fixture; README và tài liệu liên quan.
+
+## Kiểm tra
+
+| Lệnh/kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend/frontend. |
+| `npm.cmd run build` | Passed | Backend + Vite production; cảnh báo chunk lớn. |
+| `npm.cmd --workspace frontend test` | Passed | 104/104, DOM fixtures, không ghi live. |
+| `node --test backend/test/notifications.test.cjs backend/test/recruitment.test.cjs` | Passed | 20/20. |
+| `node --test backend/test/*.test.cjs` sau build | Failed — environment | 56/58; hai test auth/token HTTP có sẵn bị connect EACCES localhost. |
+| `npm.cmd --workspace backend run test:recruitment-db:single` với temp root | Passed | Hai migration, legacy/form/admission và notification delivery/dedup/read/recovery/retry assertions. |
+| TCP concurrency/live API/Storage/migration | Not run | Localhost bị chặn, không thay DB thật. |
+| Browser visual review | Blocked | Quyền mở localhost bị từ chối; không thử đường vòng. |
+
+Frontend dev server đã khởi động ở `http://127.0.0.1:5173`.
+Không xác nhận backend development đã restart hoặc UI live.
+
+## Quyết định và lý do
+
+Đơn mới thông báo chủ nhiệm, quyết định thông báo ứng viên, lifecycle chiến dịch
+thông báo chủ nhiệm. Không email/không nhận job domain khác. Realtime chỉ phát
+invalidation; inbox lưu bền vững và polling hỗ trợ reconnect/nhiều instance.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa áp dụng hai migration lên development, nghiệm thu live writes/Storage,
+tranh chấp TCP hoặc giao diện thực tế; Phase 04 chưa Done.
+
+## Bước tiếp theo
+
+Áp dụng migration chưa chạy theo thứ tự 202611190001 rồi 202611190002, restart
+backend, test checklist module guide với chủ nhiệm và một sinh viên chưa thuộc CLB.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan.
+- [x] Cập nhật session log/changelog/hướng dẫn test.
+- [x] Đăng ký work log trong docs.json.
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh.

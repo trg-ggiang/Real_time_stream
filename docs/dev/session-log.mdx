@@ -488,3 +488,30 @@ Kept the haimoi1 layout, routed My Clubs and the desktop/mobile header to the fi
 ## 2026-11-19 - Student login opens home
 
 Default student login now opens `/`, retaining admin and explicit destinations. Targeted auth tests (39) and frontend build passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-03-phase-04-student-login-home).
+
+## 2026-11-19 — Recruitment database/API stage
+
+Implemented the approved first stage using the supplied actual schema: immutable
+form versions, typed answers, scoped APIs, direct chairperson approval/admission,
+private files and existing notification jobs. Typecheck/build, 15 new tests and
+isolated PostgreSQL assertions passed. Full backend suite: 51/53; two existing
+HTTP tests blocked by localhost EACCES. Simultaneous-request/TCP acceptance and
+live integration remain unverified. No live migration or frontend work; stage 2
+awaits user review. Phase 04 In Progress.
+[Work log](/work-logs/2026-11-19-04-phase-04-recruitment-api).
+
+## 2026-11-19 — Recruitment stages 2–5
+
+Completed form builder, public applications/history, review/bulk/CSV and durable
+notification inbox/Socket.IO. Root build/typecheck, 104 frontend tests, 20 targeted
+backend tests and isolated SQL checks passed. Full backend 56/58; two existing
+HTTP tests blocked by localhost EACCES. No live migration; Phase 04 In Progress.
+[Work log](/work-logs/2026-11-19-05-phase-04-recruitment-ui-notifications).
+
+## 2026-11-19 — Recruitment choice control layout
+
+Fixed recruitment checkbox/radio controls inheriting full-width workspace input
+styles. Compact 18px controls keep labels alongside them. JSDOM computed styles
+in both stylesheet orders and frontend build passed; browser geometry unverified.
+Phase 04 In Progress.
+[Work log](/work-logs/2026-11-19-06-phase-04-recruitment-choice-layout).
