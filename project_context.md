@@ -1,5 +1,7 @@
 # PROJECT CONTEXT — HỆ THỐNG PHÒNG HỌP TRỰC TUYẾN VÀ NỀN TẢNG QUẢN LÝ CÂU LẠC BỘ ĐẠI HỌC
 
+> Current workspace implementation (2026-11-19): see [workspace handoff](docs/work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx). This supersedes older statements below about preview-only channels, disabled chat and meetings without club ownership. Latest UI decisions and acceptance limits are recorded there.
+
 > Ghi nhận ngày 2026-10-19 (Asia/Saigon) từ nội dung người dùng cung cấp.
 >
 > Cập nhật triển khai ngày 2026-10-19: Module 1 đã có token API, meeting UI, scripts build/test và `.env` cục bộ. Credentials LiveKit chưa được điền; chưa xác minh media thật trên hai thiết bị. Tài liệu nguồn bên dưới giữ nguyên để tham khảo yêu cầu, không phải bản mô tả tính năng đã nghiệm thu.

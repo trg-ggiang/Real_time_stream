@@ -1,6 +1,7 @@
-import { IsBoolean, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 
 export class CreateMeetingDto {
+  @IsOptional() @IsUUID() clubId?: string;
   @IsString()
   @MinLength(1)
   @MaxLength(160)
@@ -17,6 +18,7 @@ export class CreateMeetingDto {
 }
 
 export class CreateQuickMeetingDto {
+  @IsOptional() @IsUUID() clubId?: string;
   @IsString()
   @MinLength(1)
   @MaxLength(160)

@@ -296,7 +296,15 @@ export class MeetingsService {
     return member;
   }
 
-  private async insertMeeting(owner: User, title: string, waitingRoomEnabled: boolean, recurrenceRule: string | null) {
+  private async insertMeeting(owner: User, title: string, waitingRoomEnabled: boolean, recurrenceRule: string | null, clubId?: string) {
+    if (clubId) {
+      const [membership, club] = await Promise.all([
+        this.supabase.from('club_memberships').select('membership_id').eq('club_id', clubId).eq('user_id', owner.userId).eq('status', 'active').maybeSingle(),
+        this.supabase.from('clubs').select('club_id').eq('club_id', clubId).eq('status', 'published').maybeSingle(),
+      ]);
+      if (membership.error || club.error) throw new ServiceUnavailableException('Không kiểm tra được quyền tạo cuộc họp CLB.');
+      if (!membership.data || !club.data) throw new ForbiddenException('Chỉ thành viên đang hoạt động được tạo cuộc họp cho CLB.');
+    }
     const cleanTitle = title.trim();
     if (!cleanTitle) throw new BadRequestException('Meeting title cannot be empty.');
     const meetingId = randomUUID();
@@ -308,6 +316,7 @@ export class MeetingsService {
       title: cleanTitle,
       recurrence_rule: recurrenceRule,
       waiting_room_enabled: waitingRoomEnabled,
+      ...(clubId ? { club_id: clubId } : {}),
     }).select(MEETING_SELECT).single();
     if (error || !meeting) {
       if (error?.code === '23505') throw new ConflictException('Could not allocate a unique meeting link; please retry.');
@@ -327,13 +336,13 @@ export class MeetingsService {
     return meeting as Meeting;
   }
 
-  async createMeeting(owner: User, body: { title: string; waitingRoomEnabled?: boolean; recurrenceRule?: string | null }) {
+  async createMeeting(owner: User, body: { title: string; waitingRoomEnabled?: boolean; recurrenceRule?: string | null; clubId?: string }) {
     if (body.recurrenceRule?.trim()) parseRecurrenceRule(body.recurrenceRule);
-    return this.insertMeeting(owner, body.title, body.waitingRoomEnabled !== false, body.recurrenceRule?.trim() || null);
+    return this.insertMeeting(owner, body.title, body.waitingRoomEnabled !== false, body.recurrenceRule?.trim() || null, body.clubId);
   }
 
-  async createQuickMeeting(owner: User, body: { title: string; waitingRoomEnabled?: boolean }) {
-    const meeting = await this.insertMeeting(owner, body.title, body.waitingRoomEnabled !== false, null);
+  async createQuickMeeting(owner: User, body: { title: string; waitingRoomEnabled?: boolean; clubId?: string }) {
+    const meeting = await this.insertMeeting(owner, body.title, body.waitingRoomEnabled !== false, null, body.clubId);
     const now = new Date().toISOString();
     const session = await this.insertSession(meeting.meeting_id, {
       scheduledStartAt: now,

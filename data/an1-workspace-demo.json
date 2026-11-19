@@ -1,0 +1,184 @@
+{
+  "dataset": "an1-workspace-demo-v1",
+  "owner": "an1@gmail.com",
+  "clubs": [
+    {
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "name": "AE 18"
+    },
+    {
+      "club_id": "796108d9-8a5a-431e-8d10-8be9541c8846",
+      "name": "AE siêu nhân"
+    }
+  ],
+  "users": [
+    {
+      "user_id": "165dc973-9c55-4532-abb3-314fa2f083ce",
+      "display_name": "Nguyễn Khánh Linh",
+      "email": "an1-workspace-demo-v1.linh@example.invalid"
+    },
+    {
+      "user_id": "bd3d097d-1408-48e6-af9a-ba5f41e837b0",
+      "display_name": "Trần Minh Nam",
+      "email": "an1-workspace-demo-v1.nam@example.invalid"
+    },
+    {
+      "user_id": "4db9ce3a-3241-4a76-a211-b081ab39297e",
+      "display_name": "Lê Ngọc Mai",
+      "email": "an1-workspace-demo-v1.mai@example.invalid"
+    }
+  ],
+  "posts": [
+    {
+      "post_id": "26e1f571-a28c-4665-ae20-daa6fd8b68bc",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Chào mừng đến không gian AE 18",
+      "status": "published"
+    },
+    {
+      "post_id": "3d6dcbb0-6d36-45fe-aa8f-9b5454c61dfd",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Kế hoạch sinh hoạt tuần tới",
+      "status": "pending_review"
+    },
+    {
+      "post_id": "9f3cf64e-b29c-46c6-a61d-ea46ae7c1ee2",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Đề xuất buổi chia sẻ kỹ năng thuyết trình",
+      "status": "pending_review"
+    },
+    {
+      "post_id": "faed9499-f555-4516-a388-1afbc601883a",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Tổng kết hoạt động tháng 11",
+      "status": "draft"
+    },
+    {
+      "post_id": "d27b224c-a565-4978-a210-0e9b8e9e7540",
+      "club_id": "796108d9-8a5a-431e-8d10-8be9541c8846",
+      "title": "Góc sinh hoạt AE siêu nhân",
+      "status": "published"
+    },
+    {
+      "post_id": "09aadc62-c253-4e1b-a1b0-1da52ee55d28",
+      "club_id": "796108d9-8a5a-431e-8d10-8be9541c8846",
+      "title": "Ý tưởng tổ chức ngày hoạt động nhóm",
+      "status": "pending_review"
+    }
+  ],
+  "activities": [
+    {
+      "activity_id": "162fb48b-76cc-4ba3-af51-358899b1e0aa",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Giao lưu thành viên AE 18",
+      "status": "published"
+    },
+    {
+      "activity_id": "5a9e7857-6939-4195-a972-b4c5f27ff927",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Chia sẻ kỹ năng làm việc nhóm",
+      "status": "published"
+    },
+    {
+      "activity_id": "13578393-03bc-4a66-a4ee-801b37dc6a2e",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Thực hành tổ chức chương trình",
+      "status": "pending_review"
+    },
+    {
+      "activity_id": "5324f277-3262-46d3-a0b3-bfc170934847",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Sinh hoạt tổng kết cuối tháng",
+      "status": "draft"
+    },
+    {
+      "activity_id": "e9e98793-fb4c-4293-ab2f-2739fd5d5f6b",
+      "club_id": "796108d9-8a5a-431e-8d10-8be9541c8846",
+      "title": "Sinh hoạt AE siêu nhân",
+      "status": "published"
+    }
+  ],
+  "messages": [
+    {
+      "message_id": "34eaf665-8222-4193-86fc-607db14c1496",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "4f544498-2cb4-4052-8c9d-04a62034d514",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "9f43a12d-b46f-4904-89e5-0563cf241adb",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "ce45ec62-3f5e-4b9f-aa19-93f9cbfee426",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "3367a60d-6396-40c0-8d8d-958b34937d83",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "22189090-c9f2-4096-bf54-96a50bde76f9",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "54cf64ac-b14e-4b14-8f5f-ccdfee175483",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "bba2f204-75f0-43b5-93f1-3c0cd6d73f5d",
+      "channel_id": "fe0f6704-9e33-4169-8cb6-9eb758c7b7ff"
+    },
+    {
+      "message_id": "d1590562-8ac3-415d-982a-8c2e657dda14",
+      "channel_id": "e844e030-6f12-4e55-90ad-2ae1418c73a6"
+    },
+    {
+      "message_id": "c418d8d8-1909-4685-a515-3bd291921c87",
+      "channel_id": "e844e030-6f12-4e55-90ad-2ae1418c73a6"
+    },
+    {
+      "message_id": "7386bf72-01b4-4db0-960a-8489fc4889b5",
+      "channel_id": "e844e030-6f12-4e55-90ad-2ae1418c73a6"
+    },
+    {
+      "message_id": "962cfaec-276b-412e-96af-b02654efb4ab",
+      "channel_id": "e844e030-6f12-4e55-90ad-2ae1418c73a6"
+    },
+    {
+      "message_id": "45c53b32-5354-4e8d-9260-6059a02f2395",
+      "channel_id": "490d7fa8-518f-4edd-b632-aaeb9a076418"
+    },
+    {
+      "message_id": "a5a5923c-7c90-49d5-b3c6-d0923813fd4c",
+      "channel_id": "490d7fa8-518f-4edd-b632-aaeb9a076418"
+    },
+    {
+      "message_id": "5a91a710-1de6-44c8-be9d-432538683630",
+      "channel_id": "490d7fa8-518f-4edd-b632-aaeb9a076418"
+    }
+  ],
+  "meetings": [
+    {
+      "meeting_id": "915e598c-1c5f-4878-800f-cc11bfc3caa8",
+      "meeting_code": "C5AC986080",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Trao đổi cùng ban chủ nhiệm"
+    },
+    {
+      "meeting_id": "51ce162d-c68e-48c6-b1f7-db9f6a4aa4d2",
+      "meeting_code": "A536A29EF9",
+      "club_id": "13c0b29b-225d-4514-87b6-5fcc395b6ff8",
+      "title": "Sinh hoạt AE 18 hằng tuần"
+    },
+    {
+      "meeting_id": "d05448d6-4677-47f0-9bb2-9c0c0fa913b0",
+      "meeting_code": "3F9FA8EAEB",
+      "club_id": "796108d9-8a5a-431e-8d10-8be9541c8846",
+      "title": "Gặp mặt thành viên AE siêu nhân"
+    }
+  ],
+  "presentation": "Nội dung đã chỉnh theo cách trình bày tự nhiên, không gắn nhãn trong giao diện."
+}

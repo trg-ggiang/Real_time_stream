@@ -1,5 +1,7 @@
 # Phase 4 — Không gian sinh hoạt và quản lý CLB
 
+> Current workspace implementation (2026-11-19): see [workspace handoff](../work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx). This supersedes older statements below about preview-only channels, disabled chat and meetings without club ownership. Latest UI decisions and acceptance limits are recorded there.
+
 
 2026-11-19: The application shell and public/personal pages follow `haimoi1`. My Clubs and the authenticated desktop/mobile header link open the `final` club workspace at `/workspace`; `/me/clubs` redirects there. [Work log](/work-logs/2026-11-19-02-phase-04-haimoi1-ui-final-workspace).
 

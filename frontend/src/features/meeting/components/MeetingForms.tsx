@@ -20,8 +20,8 @@ function ScheduleFields() {
   </div>;
 }
 
-export function CreateMeetingForm({ busy, onCreate }: { busy: boolean; onCreate: (values: CreateValues, quick: boolean) => Promise<void> }) {
-  const [kind, setKind] = useState<'quick' | 'scheduled'>('quick');
+export function CreateMeetingForm({ busy, onCreate, initialKind = 'quick' }: { busy: boolean; onCreate: (values: CreateValues, quick: boolean) => Promise<void>; initialKind?: 'quick' | 'scheduled' }) {
+  const [kind, setKind] = useState<'quick' | 'scheduled'>(initialKind);
   const [error, setError] = useState('');
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (busy) return;

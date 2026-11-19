@@ -17,7 +17,7 @@ export interface WorkspaceContext {
     membership_id: string;
     user_id: string;
     club_id: string;
-    role: "chairperson" | "member";
+    role: "chairperson" | "head" | "member";
     department_id: string;
   };
 }
@@ -32,7 +32,7 @@ export interface Department {
 export interface Member {
   membership_id: string;
   user_id: string;
-  role: "chairperson" | "member";
+  role: "chairperson" | "head" | "member";
   department_id: string;
   joined_at: string;
   users: { display_name: string; avatar_url: string | null };
@@ -68,6 +68,22 @@ export interface WorkspaceList<T> {
   items: T[];
   total?: number;
   hasMore?: boolean;
+}
+export interface ClubChannel {
+  channel_id: string; club_id: string; department_id: string | null;
+  kind: 'general' | 'department'; name: string; description: string | null;
+}
+export interface ChannelMessage {
+  message_id: string; channel_id: string; sender_membership_id: string; content: string;
+  sender: string; avatar_url: string | null; created_at: string; edited_at: string | null;
+  deleted_at: string | null; mine: boolean; client_message_id?: string;
+}
+export interface ChannelHistory {
+  items: ChannelMessage[]; hasMore: boolean; cursor: { before: string; before_id: string } | null;
+}
+export interface ClubMeeting {
+  meeting_id: string; meeting_code: string; title: string; recurrence_rule: string | null;
+  meeting_sessions: { session_id: string; status: 'scheduled' | 'ongoing' | 'ended'; scheduled_start_at: string | null; scheduled_end_at: string | null }[];
 }
 export const contentId = (item: ContentItem) =>
   item.post_id || item.activity_id!;
