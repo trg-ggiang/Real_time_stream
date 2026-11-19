@@ -1,0 +1,54 @@
+---
+title: Bảng thành viên dành cho member
+description: Đổi danh sách dạng thẻ sang bảng theo hình tham chiếu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-02
+- Thời gian kết thúc: 2026-11-19 15:03 +07:00; không ghi nhận giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thiết kế màn hình Thành viên cho tài khoản member theo hình 2: bảng có họ tên, ban, vai trò, ngày tham gia và trạng thái.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/club-workspace/pages/WorkspacePeople.tsx`: dùng chung bảng thành viên cho member, head và chủ nhiệm; member/head chỉ thấy năm cột, chủ nhiệm giữ cột thao tác. Bỏ component thẻ ảnh cũ không còn được sử dụng.
+- Hiển thị avatar tròn hoặc chữ viết tắt, ngày tham gia dạng dd/mm/yyyy và nhãn Đang hoạt động. Trạng thái tương ứng API hiện tại chỉ trả membership active.
+- `frontend/src/features/club-workspace/members.css`: bố trí độ rộng năm cột theo mẫu; bảng cuộn ngang khi màn hình hẹp, giữ các quy tắc giới hạn kích thước avatar hiện có.
+- Giữ bố cục workspace, dữ liệu API, bộ lọc ban theo URL và phân trang hiện tại; không sửa backend hoặc schema.
+- Cập nhật tài liệu workspace, phase, master plan, session log, changelog và navigation.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo bundle lớn hơn 500 kB |
+| `npm.cmd --workspace frontend run typecheck` | Passed | Kiểm tra lại mã cuối cùng sau khi giới hạn thông báo lọc trống cho chủ nhiệm |
+| `npm.cmd --workspace frontend test -- src/features/club-workspace/WorkspaceApp.test.tsx src/features/club-workspace/pages/WorkspaceDepartments.test.tsx src/features/club-workspace/pages/AddMemberPanel.test.tsx` | Passed | 3 file, 13 kiểm thử hiện có; dùng fixture, không ghi DB |
+| JSON/navigation tài liệu | Passed có giới hạn | Work log mới được đăng ký; 11 trang lịch sử thiếu sẵn, giữ nguyên ngoài phạm vi |
+| Browser và Supabase live | Skipped | Không có công cụ trình duyệt; thay đổi giao diện dùng API hiện có, không thao tác DB live |
+
+## Quyết định và lý do
+
+Tái sử dụng bảng quản lý đã có để hai vai trò dùng cùng dữ liệu và cách trình bày. Quyền chủ nhiệm lấy từ context CLB; cột, menu và dòng mở rộng quản lý chỉ render cho chủ nhiệm, hàm mutation cũng kiểm tra vai trò trước khi gọi API.
+
+## Blocker và việc chưa hoàn thành
+
+Đã hoàn thành thay đổi giao diện trong phạm vi yêu cầu. Chưa nghiệm thu trực quan với phiên đăng nhập thật; Phase 04 giữ In Progress.
+
+## Bước tiếp theo
+
+Tải lại `/workspace/:clubId/members` bằng tài khoản member để đối chiếu bảng với hình 2, kiểm tra avatar thật và cuộn ngang trên màn hình nhỏ.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu workspace
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

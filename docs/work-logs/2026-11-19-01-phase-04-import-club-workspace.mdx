@@ -1,0 +1,56 @@
+---
+title: Chuyển không gian sinh hoạt vào Real_time_stream1
+description: Lấy module workspace từ bản E, giữ nguyên phần còn lại của bản C.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-01
+- Thời gian kết thúc: 2026-11-19 14:44 +07:00; không ghi nhận giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Dùng `C:/Real_time_stream1` làm dự án chính. Thay không gian sinh hoạt bằng bản đang có ở `E:/Real_time_stream`; giữ nguyên những phần khác của dự án đích.
+
+## Công việc hoàn thành
+
+- Chuyển các file mới/thay đổi trong `frontend/src/features/club-workspace/`: dải CLB, trang vào `/workspace`, kênh xem trước, cột thông tin, tổng quan, họp định kỳ, tuyển thành viên, ban và bảng quản lý thành viên/form thêm người.
+- Chuyển bốn file backend trong `backend/src/workspace/`: access service, people service, controller và DTO. Giữ hợp đồng tìm tài khoản theo quyền chủ nhiệm, thêm member/head, ngày tham gia, lọc ban và quản lý cờ ban.
+- Chỉ bổ sung import/route `/workspace` và liên kết desktop/mobile trong `frontend/src/features/discovery/DiscoveryApp.tsx`. Giữ nguyên phần trang chủ, account menu, auth, personal, admin, meeting, component dùng chung và tài nguyên của bản đích.
+- Chuyển ba bộ kiểm thử backend workspace và ba bộ kiểm thử trang workspace. Thêm `WorkspaceApp.test.tsx` từ fixture nguồn, cập nhật thứ tự sidebar theo mục Thành viên hiện tại; sửa `guest/ClubActivitiesPage.test.tsx` để kiểm tra luồng CLB cũ với điều hướng workspace mới.
+- Cài dependency từ lockfile của bản đích để kiểm tra; khôi phục nguyên nội dung lockfile sau thay đổi metadata của npm. Không đổi dependency hoặc `.env`, không sửa bản nguồn.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd install --no-audit --no-fund` | Passed | Cài dependency tại root bản C; có thông báo allow-scripts của npm |
+| `npm.cmd run build` | Passed | TypeScript backend/frontend và Vite; cảnh báo bundle trên 500 kB |
+| `npm.cmd --workspace frontend test` | Passed | 20 file, 106 tests; có thông báo scrollTo chưa được jsdom triển khai |
+| `node --test backend/test/workspace-departments.test.cjs backend/test/workspace-member-picker.test.cjs backend/test/workspace-members.test.cjs` | Passed | 9 tests dùng mock, không ghi DB live |
+| Đối chiếu module với bản nguồn và kiểm tra phạm vi diff | Passed | Module ứng dụng chuyển nguyên bản; chỉ điểm nối discovery và test được điều chỉnh |
+| JSON/navigation tài liệu | Passed có giới hạn | Trang mới có file; 11 trang work log lịch sử thiếu sẵn, không sửa ngoài phạm vi |
+| Browser, Supabase live, toàn bộ backend suite | Skipped | Chưa có browser tool; bản đích chưa có `.env`; chạy bộ backend liên quan thay vì toàn bộ suite |
+
+## Quyết định và lý do
+
+Không chép toàn bộ discovery/personal/admin từ nguồn vì sẽ mất giao diện và hành vi riêng của `Real_time_stream1`. Các đường dẫn `/me/clubs`, luồng đăng nhập và quyền admin của bản đích được giữ lại. `ContentImage` bản đích đã hỗ trợ fallback cần dùng nên không cần thay component chung.
+
+## Blocker và việc chưa hoàn thành
+
+Không còn công việc chuyển module trong phạm vi này. Chưa nghiệm thu DB/media thật. Kênh/chat và form tuyển tiếp tục có giới hạn như bản nguồn: kênh là xem trước/bản nháp, tuyển chưa có API lưu; không triển khai thêm backend tương ứng.
+
+## Bước tiếp theo
+
+Cấu hình `.env` riêng cho bản C theo mẫu dự án, chạy backend/frontend từ `C:/Real_time_stream1`, đăng nhập và mở Không gian sinh hoạt để nghiệm thu bằng tài khoản thành viên và chủ nhiệm.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu workspace
+- [x] Đăng ký work log trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

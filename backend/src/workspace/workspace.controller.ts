@@ -25,6 +25,7 @@ import {
   ContentQuery,
   ContentVersion,
   DepartmentDto,
+  MemberSearchQuery,
   MoveMemberDto,
   PostDraftDto,
   ReviewDto,
@@ -75,14 +76,21 @@ export class WorkspaceController {
     @Param("clubId", ParseUUIDPipe) c: string,
     @Query() q: WorkspacePage,
   ) {
-    return this.people.members(u.userId, c, q.page, q.limit);
+    return this.people.members(u.userId, c, q.page, q.limit, q.department_id);
+  }
+  @Get("member-candidates") @Header("Cache-Control", "private, no-store") candidates(
+    @CurrentUser() u: User,
+    @Param("clubId", ParseUUIDPipe) c: string,
+    @Query() q: MemberSearchQuery,
+  ) {
+    return this.people.candidates(u.userId, c, q.q);
   }
   @Post("members") add(
     @CurrentUser() u: User,
     @Param("clubId", ParseUUIDPipe) c: string,
     @Body() b: AddMemberDto,
   ) {
-    return this.people.add(u.userId, c, b.email, b.department_id);
+    return this.people.add(u.userId, c, b.email, b.department_id, b.role);
   }
   @Patch("members/:id/department") move(
     @CurrentUser() u: User,

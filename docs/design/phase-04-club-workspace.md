@@ -1,5 +1,19 @@
 # Phase 4 — Không gian sinh hoạt và quản lý CLB
 
+## Bản chính Real_time_stream1 — 2026-11-19
+
+Cập nhật màn hình Thành viên: member/head xem bảng năm cột Họ và tên, Ban, Vai trò, Ngày tham gia, Trạng thái theo mẫu; avatar tròn với chữ viết tắt khi thiếu ảnh, ngày dd/mm/yyyy và badge xanh cho membership active. Chủ nhiệm có thêm cột Thao tác. Bảng cuộn ngang khi thiếu chiều rộng. Không đổi API hoặc phân trang. [Work log](../work-logs/2026-11-19-02-phase-04-member-directory-table.mdx).
+
+`C:/Real_time_stream1` là bản chính cho yêu cầu này. Không gian sinh hoạt lấy từ `E:/Real_time_stream`; các phần còn lại tiếp tục dùng code bản C. Những mô tả selector/bố cục cũ bên dưới được giữ làm lịch sử.
+
+- Header desktop/mobile có lối vào Không gian sinh hoạt (`/workspace`). Trang này mở ngay khung CLB và chuyển vào kênh thảo luận của CLB đầu tiên đã tham gia; nếu chưa có CLB, hiển thị trạng thái trống và lối khám phá/tạo CLB. Khách được yêu cầu đăng nhập, giữ đích quay lại.
+- `/workspace/:clubId` hiển thị tổng quan; dải avatar trái chuyển CLB; sidebar có kênh, Các ban, Thành viên, tuyển dụng theo quyền và công việc CLB. Cột phải có thông tin, lịch chưa đồng bộ và hoạt động sắp tới.
+- Quản lý ban/thành viên dùng API workspace được chuyển cùng frontend: `GET /member-candidates?q=...` chỉ cho chủ nhiệm, tối đa 8 kết quả chưa có membership; `POST /members` nhận role member/head (mặc định member), cấm head trong ban quản lý; `GET /members` hỗ trợ `department_id`; DTO ban hỗ trợ `is_management`. Kiểm tra CLB/quyền ở backend, không có thay đổi schema.
+- Chat/kênh vẫn là xem trước, bản nháp kênh theo phiên trình duyệt; tuyển dụng có form/preview/nháp nhưng chưa có API lưu đợt tuyển. Lối họp mở công cụ hiện có, chưa tự gắn meeting vào CLB.
+- Giữ nguyên `/me/clubs`, trang chủ, personal, admin, auth và meeting bản C. Không đổi component ảnh chung, dependency hoặc `.env`.
+
+Build backend/frontend, 106 frontend tests và 9 backend workspace tests đạt. Chưa chạy browser/DB thật; bản C chưa có `.env`. Phase 04 In Progress. [Work log](../work-logs/2026-11-19-01-phase-04-import-club-workspace.mdx).
+
 2026-11-16: The unfollow dropdown now sits close to the follow button in a compact panel. Phase remains In Progress. [Session log](/work-logs/2026-11-16-26-compact-follow-menu).
 
 2026-11-16: Follow/unfollow state is reflected by the button without an extra confirmation line. Phase remains In Progress. [Session log](/work-logs/2026-11-16-25-hide-follow-confirmations).

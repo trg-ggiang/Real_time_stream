@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { SupabaseService } from "../supabase/supabase.service";
@@ -9,13 +10,15 @@ export const workspaceClubFields =
   "club_id,name,summary,description,mission,logo_url,cover_url,contact_email,contact_phone,status";
 @Injectable()
 export class WorkspaceAccess {
+  private readonly logger = new Logger(WorkspaceAccess.name);
   constructor(readonly supabase: SupabaseService) {}
-  check(error: { code?: string } | null) {
+  check(error: { code?: string } | null, operation = "workspace query") {
     if (!error) return;
     if (["23505", "23503", "23514", "P0001"].includes(error.code || ""))
       throw new ConflictException(
         "Dữ liệu đã thay đổi hoặc không thỏa điều kiện nghiệp vụ. Tải lại trước khi thử lại.",
       );
+    this.logger.error(`${operation} failed (Supabase code ${error.code || "unknown"})`);
     throw new ServiceUnavailableException(
       "Không xử lý được dữ liệu CLB. Vui lòng thử lại.",
     );
@@ -36,8 +39,8 @@ export class WorkspaceAccess {
         .eq("status", "published")
         .maybeSingle(),
     ]);
-    this.check(membership.error);
-    this.check(club.error);
+    this.check(membership.error, "workspace membership lookup");
+    this.check(club.error, "workspace club lookup");
     if (
       !membership.data ||
       !club.data ||

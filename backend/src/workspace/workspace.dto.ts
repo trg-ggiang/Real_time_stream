@@ -13,10 +13,12 @@ import {
   MaxLength,
   Min,
   MinLength,
+  ValidateIf,
 } from "class-validator";
 export class WorkspacePage {
   @Type(() => Number) @IsInt() @Min(1) @Max(10000) page = 1;
   @Type(() => Number) @IsInt() @Min(1) @Max(24) limit = 12;
+  @IsOptional() @IsUUID() department_id?: string;
 }
 export class ContentQuery extends WorkspacePage {
   @IsIn(["published", "mine", "review"]) list: "published" | "mine" | "review" =
@@ -26,11 +28,16 @@ export class DepartmentDto {
   @IsString() @MinLength(2) @MaxLength(160) name!: string;
   @IsOptional() @IsString() @MaxLength(5000) description?: string;
   @IsBoolean() is_private!: boolean;
+  @ValidateIf((_object, value) => value !== undefined) @IsBoolean() is_management?: boolean;
   @IsIn(["active", "inactive"]) status: "active" | "inactive" = "active";
+}
+export class MemberSearchQuery {
+  @IsString() @MinLength(2) @MaxLength(100) q!: string;
 }
 export class AddMemberDto {
   @IsEmail() @MaxLength(320) email!: string;
   @IsUUID() department_id!: string;
+  @IsIn(["member", "head"]) role: "member" | "head" = "member";
 }
 export class MoveMemberDto {
   @IsUUID() department_id!: string;

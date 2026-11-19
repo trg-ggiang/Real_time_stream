@@ -28,17 +28,17 @@ it('opens the correct club from the signed-in navigation and only shows review f
   render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
   const navigation = screen.getByRole('navigation', { name: 'Điều hướng công khai' });
   expect(within(navigation).getAllByRole('link').map(link => link.textContent)).toEqual([
-    'Câu lạc bộ', 'Hoạt động', 'Bài viết',
+    'Câu lạc bộ', 'Hoạt động', 'Bài viết', 'Không gian sinh hoạt',
   ]);
   fireEvent.click(screen.getByLabelText('Menu tài khoản của An'));
   fireEvent.click(screen.getByRole('link', { name: 'CLB của tôi' }));
   fireEvent.click(await screen.findByRole('link', { name: /CLB Alpha/ }));
-  expect((await screen.findByRole('link', { name: /Tạo hoạt động mới/ })).getAttribute('href')).toBe('/workspace/alpha/activities/new');
-  expect(screen.queryByRole('link', { name: 'Nội dung chờ duyệt' })).toBeNull();
+  fireEvent.click(await screen.findByRole('link', { name: 'Hoạt động' }));
+  expect((await screen.findByRole('link', { name: /Tạo hoạt động/ })).getAttribute('href')).toBe('/workspace/alpha/activities/new');
+  expect(screen.queryByRole('link', { name: 'Duyệt nội dung' })).toBeNull();
 
-  await screen.findByRole('option', { name: /CLB Beta/ });
-  fireEvent.change(screen.getByRole('combobox', { name: 'Chọn CLB' }), { target: { value: 'beta' } });
-  fireEvent.click(await screen.findByRole('link', { name: 'Nội dung chờ duyệt' }));
+  fireEvent.click(await screen.findByRole('link', { name: 'Mở CLB Beta' }));
+  fireEvent.click(await screen.findByRole('link', { name: 'Duyệt nội dung' }));
   fireEvent.click(await screen.findByRole('link', { name: /Xem hoạt động chờ duyệt/ }));
   await waitFor(() => expect(request).toHaveBeenCalledWith(
     '/api/workspace/beta/content/activities?list=review&page=1&limit=12',

@@ -17,7 +17,7 @@ export interface WorkspaceContext {
     membership_id: string;
     user_id: string;
     club_id: string;
-    role: "chairperson" | "member";
+    role: "chairperson" | "member" | "head";
     department_id: string;
   };
 }
@@ -32,7 +32,7 @@ export interface Department {
 export interface Member {
   membership_id: string;
   user_id: string;
-  role: "chairperson" | "member";
+  role: "chairperson" | "member" | "head";
   department_id: string;
   joined_at: string;
   users: { display_name: string; avatar_url: string | null };
