@@ -12,7 +12,9 @@ Trình duyệt (React / Vite)
   ├─ Đăng ký / đăng nhập ─ POST /api/auth/* ───────────────┤
   ├─ Hồ sơ sinh viên ───── GET/PATCH /api/users/me/profile ┤
   ├─ Sảnh / điều khiển ─── REST /api/meetings/* ───────────┤
-  ├─ Chat ──────────────── Socket.IO /chat ────────────────┤
+  ├─ Workspace CLB ────── REST /api/workspace/* ──────────┤
+  ├─ Cá nhân / Admin ───── REST /api/me/*, /api/admin/* ───┤
+  ├─ Chat phiên họp ────── Socket.IO /chat ────────────────┤
   └─ Media ─────────────── LiveKit client SDK ──────────┐  │
                                                         │  │
 NestJS API                                               │  │
@@ -126,8 +128,7 @@ JWT, `JwtStrategy` tải lại user hiện hành từ Supabase rồi gắn user 
 `student_profiles`. Frontend coi các trường họ tên, mã sinh viên, trường/khoa,
 ngành và khóa là bắt buộc; backend DTO giới hạn độ dài các trường.
 
-Sau profile, người dùng vào landing đã đăng nhập. Họ chỉ mở giao diện meeting
-khi chọn nút **Cuộc họp**. Logout xóa phiên và query điều hướng meeting.
+Sau profile, đích mặc định của sinh viên là `/`, của admin là `/admin`. Đích nội bộ hợp lệ được ưu tiên theo luồng đăng nhập. Sinh viên mở `/workspace` từ mục Không gian sinh hoạt và có thể mở meeting từ workspace hoặc đường dẫn mời. Logout xóa phiên và query điều hướng meeting.
 
 ## 4. Landing và nội dung công khai
 
@@ -145,42 +146,16 @@ publish và trả `{items, page, limit, total, hasMore}`. Không có fallback sa
 bảng riêng tư hay dữ liệu mẫu khi API lỗi. Frontend hỗ trợ retry, tải trang
 tiếp, tìm CLB, chi tiết nội dung và chỉ cho phép URL ảnh/link HTTP(S).
 
-Các nút **Quan tâm** hiện yêu cầu đăng nhập; việc theo dõi CLB, đăng ký hoạt
-động và workflow quản trị CLB chưa được backend hiện tại thực hiện.
+Trang khám phá dùng route danh sách và chi tiết riêng, chẳng hạn `/clubs/:id`. Guest vẫn đọc được nội dung công khai. Khi quan tâm CLB hay đăng ký hoạt động, giao diện yêu cầu đăng nhập. Module Personal xử lý thao tác cá nhân qua `/api/me/*`; module Admin xử lý danh sách và quyết định duyệt CLB qua `/api/admin/*`.
 
-### Gợi ý mở rộng: trang thông tin riêng cho mỗi CLB
+### Không gian sinh hoạt và chat CLB
 
-Hiện nút **Xem CLB** và tên CLB mở `ContentDialog` ngay trên landing, dùng dữ
-liệu có sẵn từ danh sách đã tải. Cách này phù hợp để xem nhanh, nhưng chưa tạo
-được đường dẫn riêng để chia sẻ hoặc tải lại trang chi tiết.
+1. `/workspace` lấy CLB đã tham gia và mở kênh Chung của CLB đầu tiên. `WorkspaceApp` lấy lại context khi đổi CLB. NestJS yêu cầu application JWT, hồ sơ đầy đủ, CLB published và membership active.
+2. `GET /api/workspace/:clubId/channels` chỉ trả kênh mà `clubspace_can_read_channel` cho phép. Kênh ban mở dùng chung trong CLB. Kênh private phụ thuộc ban của người dùng hoặc quyền được cấp riêng.
+3. `GET/POST /api/workspace/:clubId/channels/:channelId/messages` đọc hoặc ghi `channel_messages`. Backend xác định người gửi từ membership và dùng `client_message_id` để xử lý lần gửi lại. UI lấy 50 tin mỗi lượt, tải tin cũ theo cursor, polling khoảng 3 giây khi tab hiển thị. Enter gửi, Shift+Enter xuống dòng. Theme workspace lưu trong trình duyệt.
+4. Trang thành viên, ban, bài viết và hoạt động gọi API workspace. Trang họp liệt kê theo `clubId`. Tạo cuộc họp từ workspace gửi `clubId`, sau đó mở module họp bằng mã/phần định danh buổi. Quyền vào và vai trò host vẫn thuộc module meeting.
 
-Có thể phát triển trang chi tiết theo luồng sau:
-
-1. Khi chọn **Xem CLB**, điều hướng tới URL ổn định như
-   `/clubs/<club_id>`; dùng ID thay vì tên để tránh lỗi dấu, đổi tên hoặc tên
-   trùng. Nếu dự án chưa có router, có thể tạm dùng query
-   `/?club=<club_id>` và đồng bộ điều hướng với browser history.
-2. Tạo `ClubDetailPage` riêng. Khi trang mở hoặc được tải lại, lấy `club_id`
-   từ URL và gọi `GET /api/public/clubs/:clubId`.
-3. Thêm endpoint này vào `PublicContentController` và một hàm tương ứng trong
-   `PublicContentService`. Service chỉ đọc đúng public view được allowlist,
-   giới hạn cột trả về và chỉ trả CLB đang được công khai; không truy vấn thẳng
-   bảng riêng tư.
-4. Hiển thị ảnh cover/logo, tên, giới thiệu, sứ mệnh và thông tin liên hệ nếu
-   có. Bên dưới có thể tải các hoạt động và bài viết của CLB theo từng trang,
-   dùng các public view hiện có và lọc theo `club_id`.
-5. Có trạng thái đang tải, lỗi kèm nút thử lại, trường hợp CLB không tồn tại
-   hoặc chưa công khai, và nút quay về danh sách. Trên điện thoại, xếp nội dung
-   thành một cột; giữ URL để người dùng chia sẻ hoặc tải lại trang.
-6. Giữ **Quan tâm** ở trạng thái yêu cầu đăng nhập cho tới khi backend có API
-   theo dõi CLB thật. Việc đăng ký hoạt động cũng cần endpoint và kiểm tra quyền
-   riêng; không mô phỏng thành công chỉ từ giao diện.
-
-Phạm vi đề xuất chỉ là đọc thông tin công khai. Trước khi triển khai, kiểm tra
-view Supabase hiện có những cột nào; chỉ bổ sung migration/view hoặc workflow
-ghi dữ liệu nếu được yêu cầu riêng. Các file dự kiến liên quan là
-`GuestLanding.tsx`, component trang chi tiết mới,
-`public-content.ts`, `PublicContentController` và `PublicContentService`.
+Xem [bàn giao workspace](docs/design/phase-04-club-workspace.md) để biết các đầu mối code, ca lỗi tải bù chat, phân quyền head và lịch họp tạo dở.
 
 ## 5. Tạo hoặc mở cuộc họp
 
@@ -378,17 +353,9 @@ workspaces backend/frontend.
 
 ## 11. Trạng thái và giới hạn cần nhớ
 
-- `AGENTS.md`/roadmap có thể chứa mô tả PoC cũ; source hiện có thêm auth,
-  profile, meeting session/admission, chat và public-content như mô tả trên.
-- Phase 03/04/05/06 được ghi nhận là **In Progress** trong tài liệu dự án.
-  Unit tests/build không thay cho nghiệm thu với Supabase và LiveKit thật.
-- Migration chat có trong source và phase docs nói đã được áp dụng/xác nhận,
-  nhưng việc thử chat bằng fixtures không tương đương xác minh persistence mới
-  trên DB thật. Cần đối chiếu môi trường Supabase được dùng khi nghiệm thu.
-- Nghiệm thu media hai thiết bị/hai mạng và persistence chat thật vẫn là phần
-  riêng cần kiểm tra.
-- Trang guest hiện chỉ đọc dữ liệu qua public views; các chức năng CLB/hoạt động
-  như đăng ký, tham gia hoặc quản trị chưa nằm trong luồng này.
+- Phase 03–06 đang **In Progress**. Đã có API và giao diện cho các luồng chính của CLB, meeting và hai loại chat. Tuyển dụng/phỏng vấn chưa nối vào workspace.
+- Lượt rà gần nhất trên source `36ff795` đạt **44 test backend và 94 test frontend**. Đã thử giao diện với API mô phỏng, đồng thời đọc quyền kênh thật của AE 18. [Work log](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx)
+- Nghiệm thu ghi Supabase và media LiveKit trên hai thiết bị vẫn còn. Gói SQL mở rộng được lưu cùng [tài liệu migration](output/unicircle-platform-migration-20261117/README.md).
 
 ## 12. Đọc tiếp
 

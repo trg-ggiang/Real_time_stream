@@ -3,7 +3,16 @@ title: Phase 04 — API và React nền tảng
 description: Theo dõi Module 1 trong phạm vi đã được giao.
 ---
 
-## Student login destination (2026-11-19)
+**Mốc bàn giao 19/11/2026** · Source đã rà ở `36ff795`, kết quả chi tiết trong [work log](/work-logs/2026-11-19-07-phase-04-workspace-chat-enter). **Phase 04 vẫn In Progress**.
+
+- Đã có khám phá công khai, hồ sơ bắt buộc, không gian cá nhân, theo dõi CLB, đăng ký hoạt động, đề nghị thành lập và trang admin duyệt CLB.
+- Workspace đã dùng kênh thật, chat qua HTTP polling, họp gắn CLB và công cụ quản lý nội dung/thành viên/ban. Chat có bong bóng gửi/nhận, theme Sáng/Tối và phím Enter để gửi.
+- Lượt rà đạt 44 test backend và 94 test frontend. Browser dùng API mô phỏng ở desktop/mobile; quyền kênh AE 18 được kiểm tra chỉ đọc trên Supabase.
+- Việc tiếp theo: đối chiếu quyền đổi private và quyền quản lý kênh của head với DB, tải bù tin chat, khôi phục tạo lịch dở dang và chốt quyền vào họp bằng mã. Sau đó nghiệm thu thao tác ghi và media hai thiết bị. Tuyển dụng/phỏng vấn chưa nối vào workspace.
+
+## Lịch sử triển khai
+
+### Student login destination (2026-11-19)
 
 Default student login now opens `/`; admin still opens `/admin`, and explicit internal return paths remain. Targeted auth/redirect tests (39) and frontend build passed. Phase 04 remains **In Progress**. [Work log](/work-logs/2026-11-19-03-phase-04-student-login-home).
 

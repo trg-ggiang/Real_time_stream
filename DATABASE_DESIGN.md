@@ -1,5 +1,7 @@
 ﻿# Thiết kế database sinh viên và CLB
 
+> Tài liệu này lưu thiết kế ban đầu ngày 14/11. Để triển khai hoặc đối chiếu tên bảng, cột, chức năng và quyền hiện hành, xem [từ điển schema mở rộng](output/unicircle-platform-migration-20261117/docs/database/20261117-platform-schema-dictionary.md), [gói migration](output/unicircle-platform-migration-20261117/README.md) và [bàn giao workspace](docs/design/phase-04-club-workspace.md).
+
 Ngày tổng hợp: 14/11/2026 (Asia/Saigon). Tài liệu thảo luận, chưa phải migration và chưa thay đổi database. Kiểu dữ liệu, tên cột và ràng buộc mới là đề xuất kỹ thuật để review.
 
 ## Quy ước

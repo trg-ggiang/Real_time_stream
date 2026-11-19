@@ -1,18 +1,18 @@
-# Real-time Stream — Meeting Module
+# uniCircle — Nền tảng CLB và phòng họp
 
-## Đề xuất khung giao diện mới
+## Bắt đầu phiên làm việc
 
-Phase thiết kế sản phẩm 1 (16/11/2026): [bản đồ màn hình, quyền và API](docs/design/phase-01-product-frame.md), [storyboard sáu màn hình](docs/design/phase-01-review/index.html). Mở storyboard bằng trình duyệt; đây là bản phác thảo độc lập, không phải frontend đã được thay thế và không ghi dữ liệu. Phần ứng dụng hiện tại vẫn chạy theo hướng dẫn bên dưới.
+1. Xem [luồng hệ thống](CODE_FLOW.md) và [trạng thái roadmap](docs/plans/master-plan.mdx).
+2. Nếu làm phần Không gian sinh hoạt, đọc [bàn giao workspace](docs/design/phase-04-club-workspace.md) và [work log kiểm thử mới nhất](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx).
+3. Kiểm tra nhánh và thay đổi local bằng `git status -sb`. Khi working tree sạch, cập nhật `final` bằng `git pull --ff-only origin final`. Giữ lại công việc local cần dùng trước khi đồng bộ.
 
-## Guest mode
+## Dự án đang có gì
 
-Cập nhật Phase 3 (16/11): có [Không gian cá nhân](docs/design/phase-03-personal-experience.md) ở `/me`, quan tâm/bỏ quan tâm, đăng ký/hủy hoạt động, lịch sử đề nghị CLB và hồ sơ. Đăng nhập mặc định đi qua onboarding rồi vào `/me`; tài khoản cũ thiếu hồ sơ cũng cần bổ sung. Không cần env/dependency mới ngoài Phase 2. Kiểm tra capacity DB theo file read-only `supabase/verification/phase-03-personal-preflight.sql` khi triển khai; chưa chạy SQL hoặc ghi dữ liệu live trong phiên phát triển.
-
-Cập nhật 16/11/2026: đã triển khai [Phase 2 public discovery](docs/design/phase-02-public-experience.md): home mới, `/clubs`, `/activities`, `/posts`, detail theo URL, search/phân trang/filter thời gian qua backend. Chạy `npm install` sau khi lấy code để có React Router. Không thay Supabase schema hoặc dữ liệu live. Các mô tả phiên cũ bên dưới được giữ làm ngữ cảnh lịch sử.
-
-Trang chủ hiện dùng Navy Mix cho khách, đọc CLB/hoạt động/bài viết từ ba public view Supabase qua NestJS. Mở `/?mode=login` hoặc `/?mode=register` để vào tài khoản; phiên hợp lệ tiếp tục mở meeting. The public views now contain 3 HUST clubs, 3 historical activities and 3 introduction posts; sources and image provenance are recorded in data/hust-public.json. Xem [API, phạm vi và hướng dẫn guest mode](docs/modules/guest-mode.mdx).
-
-Ứng dụng thử nghiệm audio/video và chat: React/Vite đăng nhập qua NestJS/Supabase, dùng JWT ứng dụng xin token rồi kết nối LiveKit Cloud. Người đã được admitted có thể chọn session ongoing và chat theo phiên bằng Socket.IO; phòng PoC cố định vẫn giữ để thử media, không có chat. Code Hải đã gộp vào `backend/src`; không chạy app `backend/my-api` riêng. Xem [hướng dẫn auth và DB](docs/modules/auth-integration.mdx) và [module chat](docs/modules/meeting-chat.mdx).
+- **Khám phá** tại `/`, `/clubs`, `/activities`, `/posts`. Guest xem dữ liệu công khai. Quan tâm và đăng ký hoạt động cần đăng nhập.
+- **Tài khoản** yêu cầu hoàn thiện hồ sơ sau khi đăng ký hoặc khi đăng nhập bằng tài khoản còn thiếu hồ sơ. Sinh viên mặc định về `/`, admin về `/admin`, còn đích nội bộ hợp lệ được giữ. Trang `/me` chứa hồ sơ, theo dõi CLB, hoạt động đã đăng ký và lịch sử đề nghị thành lập CLB.
+- **Không gian sinh hoạt** tại `/workspace` có kênh Chung/kênh ban, chat lưu trên Supabase, quản lý thành viên/ban, nội dung và lịch họp gắn CLB.
+- **Quản trị** tại `/admin` có danh sách CLB và quy trình duyệt hoặc từ chối đề nghị thành lập.
+- **Meeting** dùng LiveKit Cloud cho media, NestJS/Supabase cho phiên/quyền vào, Socket.IO cho chat theo phiên. Chat CLB là luồng riêng qua HTTP polling. Module tuyển dụng/phỏng vấn chưa nối vào workspace.
 
 ## Cài đặt và cấu hình
 
@@ -63,13 +63,13 @@ Preview chạy cổng 4173 và dùng cùng API proxy khi `VITE_API_URL` để tr
 
 ## Thử nhiều thiết bị qua HTTPS
 
-Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel tới frontend preview; script khởi động backend nếu chưa chạy. Gửi URL HTTPS được in cho nhóm thử nghiệm. Dừng bằng Ctrl+C hoặc `npm run tunnel:stop`. Giữ `VITE_API_URL=` trống. Link yêu cầu đăng nhập nhưng vẫn dùng phòng chung; chỉ dùng cho PoC. Xem [hướng dẫn tunnel](docs/modules/https-tunnel.mdx) về luồng, log và giới hạn.
+Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel tới frontend preview; script khởi động backend nếu chưa chạy. Gửi URL HTTPS được in cho nhóm thử nghiệm. Dừng bằng Ctrl+C hoặc `npm run tunnel:stop`. Giữ `VITE_API_URL=` trống. Đăng nhập để mở cuộc họp bằng mã hoặc vào qua workspace. Phòng cố định chỉ áp dụng cho luồng PoC. Xem [hướng dẫn tunnel](docs/modules/https-tunnel.mdx) về luồng, log và giới hạn.
 
 ## Tổ chức source
 
 - [Chat trong phiên họp](docs/modules/meeting-chat.mdx): cần session ongoing và member admitted/chưa removed; chọn cùng phiên trước khi join. Chat dùng bảng meeting_messages đã được nhóm áp dụng. Backend kiểm tra participant thực tế qua LiveKit; không tự tạo session/duyệt thành viên/ghi attendance. Restart backend trước khi chạy tunnel nếu backend cũ đang chạy.
 
-- [Chia sẻ màn hình](docs/modules/screen-sharing.mdx): mọi thành viên được share, hỗ trợ nhiều người trình chiếu và checklist thử hai thiết bị. Restart backend và tham gia lại để nhận quyền mới.
+- [Chia sẻ màn hình](docs/modules/screen-sharing.mdx): với phiên họp động, host có quyền chia sẻ ban đầu và có thể duyệt yêu cầu của người tham gia. Xem luồng hiện hành trong [CODE_FLOW.md](CODE_FLOW.md).
 
 - [Tài liệu giải thích code cho nhóm](docs/modules/module-01-team-guide.mdx): từng file, hàm, biến, tham số, cấu hình và các luồng Join/Leave/lỗi.
 
@@ -83,7 +83,7 @@ Xem [hướng dẫn Module 1](docs/modules/module-01-media-poc.mdx) để biết
 ## Tài liệu và workflow
 
 - [Project context](project_context.md): nội dung nguồn và hiện trạng cập nhật.
-- [Master plan](docs/plans/master-plan.mdx): Phase 02 Done; Phase 04/05 In Progress. PoC triển khai trước Phase 03 database/auth.
+- [Master plan](docs/plans/master-plan.mdx): Phase 01–02 Done, Phase 03–06 In Progress, Phase 07 Todo.
 - Codex đọc `AGENTS.md` và `.codex/AGENTS.md`; Claude đọc `CLAUDE.md`.
 - Only create a work log after completing code changes; follow docs/ai-workflow.mdx.
 - Docs MDX/Mintlify chưa có CLI validation; dự án đã có Git, không tự commit.
@@ -96,14 +96,8 @@ Chỉ commit `.env.example` với các ô key/secret trống. Mỗi thành viên
 
 Tham khảo [quy tắc gitignore](https://git-scm.com/docs/gitignore) và [xử lý secret đã lộ](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
 
-## Tổng kết triển khai
+## Schema và nghiệm thu
 
-Xem [PHASE_05_SUMMARY.md](PHASE_05_SUMMARY.md) để nắm công việc đã làm, lỗi đã xử lý, kết quả kiểm tra và phần còn chờ nghiệm thu. Các file Markdown hướng dẫn agent vẫn được phép commit/push; credentials và session cục bộ tiếp tục bị ignore.
+Bản SQL mở rộng CLB, tuyển dụng, kênh và thông báo được theo dõi trong [gói migration 17/11](output/unicircle-platform-migration-20261117/README.md). Thư mục `supabase/migrations/` ở root hiện chứa migration điều khiển và chat cuộc họp. Khi dựng môi trường mới, kiểm tra schema nền và preflight của gói trước khi áp dụng. Các bảng trong migration có thể phục vụ nghiệp vụ tương lai ngay cả khi ứng dụng chưa gọi chúng.
 
-### Redesign Phase 4 — Club workspace
-
-Đăng nhập và hoàn thiện hồ sơ → CLB tham gia → Mở không gian (`/workspace/:clubId`). Có bài/hoạt động nháp và xét duyệt, quản lý thành viên/ban theo vai trò CLB, chỉnh liên hệ/ảnh và mở module họp hiện có. Không cần chạy migration mới trong phiên này; chưa nghiệm thu ghi DB live. Xem `docs/design/phase-04-club-workspace.md` để biết flow, kiểm thử và giới hạn.
-
-### Redesign Phase 5 — Admin
-
-Tài khoản role admin, hồ sơ đầy đủ: menu tài khoản → Quản trị hệ thống hoặc `/admin`. Có queue/detail duyệt CLB, lý do từ chối và danh sách CLB đã được duyệt. Không tự chọn role khi đăng ký; không tự cấp role trong phiên này. Code không cần migration mới; xem `docs/design/phase-05-admin-and-integration.md` trước nghiệm thu ghi dữ liệu thật. Typecheck/build, 65 backend + 75 frontend tests, 121 browser fixture checks đạt; chưa thay dữ liệu Supabase live.
+Lượt rà gần nhất đạt **44 test backend và 94 test frontend**. Đã thử UI với API mô phỏng và kiểm tra chỉ đọc quyền kênh trên Supabase. Nghiệm thu ghi thật và LiveKit hai thiết bị vẫn còn. Xem [bàn giao workspace](docs/design/phase-04-club-workspace.md) để chọn việc cho phiên tiếp theo. [Tổng kết PoC](PHASE_05_SUMMARY.md) lưu lịch sử triển khai media ban đầu.

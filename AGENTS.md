@@ -1,9 +1,9 @@
 # Real-time Stream — Agent Instructions
 
 ## Scope and stack
-- Current authorized scope: integrate Hai's auth/users/Supabase backend into the main NestJS app and connect React login to the fixed-room LiveKit meeting. Do not implement dynamic rooms, chat or club workflows until requested.
-- Backend: Node.js / NestJS. Frontend: React / Vite. Stream: LiveKit Cloud. Database: Supabase. Chat: Socket.IO over WebSocket.
-- Source is organized as a NestJS livekit module and a frontend meeting feature. See `docs/modules/module-01-media-poc.mdx`.
+- Use the current user request to determine scope. The source already includes dynamic meetings, meeting chat, public/personal/admin flows and a club workspace. Start with [CODE_FLOW.md](CODE_FLOW.md) and the [workspace handoff](docs/design/phase-04-club-workspace.md).
+- Backend: Node.js / NestJS. Frontend: React / Vite. Stream: LiveKit Cloud. Database: Supabase. Chat: Socket.IO for meeting sessions and HTTP polling for club channels.
+- Source is organized by feature in `backend/src` and `frontend/src/features`. The historical media PoC is documented in `docs/modules/module-01-media-poc.mdx`.
 
 ## Session start
 1. Read `README.md`, this file, `.codex/AGENTS.md` (Codex) or `CLAUDE.md` (Claude), `docs/index.mdx`, `docs/ai-workflow.mdx`, `docs/plans/master-plan.mdx`, and `docs/dev/session-log.mdx`.

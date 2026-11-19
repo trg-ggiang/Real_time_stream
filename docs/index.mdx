@@ -3,18 +3,15 @@ title: Real-time Stream
 description: Khung công nghệ và tiến trình dự án.
 ---
 
-> Auth update: the current implementation requires login and a Bearer application JWT before issuing LiveKit tokens. Older PoC descriptions below are historical; see [current setup and API contract](/modules/auth-integration).
+## Hiện trạng 19/11/2026
 
-## Hiện trạng
+uniCircle dùng React/Vite, NestJS, Supabase, LiveKit Cloud và Socket.IO. Có khám phá công khai, auth/hồ sơ, trang cá nhân, quản lý CLB, admin và họp theo phiên. Workspace đã nối kênh thật, chat HTTP và các cuộc họp gắn CLB. Chat trong phiên họp dùng Socket.IO.
 
-Đã cài dependencies cho NestJS, React/Vite, LiveKit Cloud, Supabase và Socket.IO.
-Đã triển khai mã Module 1: token API và meeting UI; chưa có schema/auth/chat. Đã điền env LiveKit và nhận token qua backend; người dùng xác nhận media nhiều tab cùng máy, chưa nghiệm thu hai thiết bị.
+Phase 04 vẫn **In Progress**. Lượt rà đạt 44 test backend và 94 test frontend, browser với API mô phỏng và đối chiếu quyền kênh chỉ đọc trên Supabase. Xem [work log mới nhất](/work-logs/2026-11-19-07-phase-04-workspace-chat-enter) và [luồng workspace](/design/phase-04-club-workspace).
 
 - [Chạy và nghiệm thu Module 1](/modules/module-01-media-poc)
 - [Thử nhiều thiết bị qua HTTPS tunnel](/modules/https-tunnel)
 - [Giải thích code Module 1 cho nhóm](/modules/module-01-team-guide)
-
-Ngày 2026-11-06: người dùng xác nhận nghe/thấy giữa nhiều tab trên một máy. Đã bổ sung HTTPS tunnel để tiếp tục kiểm thử hai thiết bị; chưa hoàn thành nghiệm thu toàn bộ checklist.
 
 ## Theo dõi tiến trình
 

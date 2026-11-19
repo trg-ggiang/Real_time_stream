@@ -1,6 +1,6 @@
 # PROJECT CONTEXT — HỆ THỐNG PHÒNG HỌP TRỰC TUYẾN VÀ NỀN TẢNG QUẢN LÝ CÂU LẠC BỘ ĐẠI HỌC
 
-> Current workspace implementation (2026-11-19): see [workspace handoff](docs/work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx). This supersedes older statements below about preview-only channels, disabled chat and meetings without club ownership. Latest UI decisions and acceptance limits are recorded there.
+> **Hiện trạng 19/11/2026.** Đọc [luồng hệ thống](CODE_FLOW.md), [bàn giao Không gian sinh hoạt](docs/design/phase-04-club-workspace.md) và [work log rà soát](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx) trước phần bối cảnh lịch sử bên dưới. Nền tảng đã có auth/hồ sơ, khám phá, cá nhân, admin, workspace, chat kênh và họp theo CLB. Tuyển dụng/phỏng vấn vẫn là phạm vi phát triển sau.
 
 > Ghi nhận ngày 2026-10-19 (Asia/Saigon) từ nội dung người dùng cung cấp.
 >
