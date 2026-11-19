@@ -1,0 +1,46 @@
+---
+title: Avatar CLB ở dải trái
+description: Bỏ avatar lặp trong sidebar Không gian sinh hoạt.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-04
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đặt avatar CLB ở dải biểu tượng ngoài cùng bên trái và bỏ avatar lặp trong sidebar để tiết kiệm diện tích.
+
+## Công việc hoàn thành
+
+- Bỏ ảnh CLB khỏi đầu sidebar của CLB đang mở và bỏ biểu tượng `uc` ở sidebar trạng thái chưa có CLB.
+- Ảnh CLB lấp đầy ô trong dải trái; sidebar hẹp hơn nhưng vẫn giữ tên CLB, vai trò và điều hướng.
+- File code: `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `WorkspaceHub.tsx`, `workspace.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo kích thước chunk LiveKit |
+| `npm.cmd --workspace frontend exec vitest run src/features/guest/ClubActivitiesPage.test.tsx` | Passed | 2 test luồng workspace |
+| Browser trực quan | Skipped | Phiên điều khiển browser không khả dụng |
+
+## Quyết định và giới hạn
+
+Avatar CLB lấy `logo_url` hiện có; CLB không có ảnh dùng chữ cái đầu của tên. Không đổi API hay dữ liệu CLB. Phase 04 vẫn In Progress vì còn phần channel API và nghiệm thu browser/media thật.
+
+## Bước tiếp theo
+
+Kiểm tra bố cục dải CLB và sidebar trên browser desktop/mobile khi môi trường browser khả dụng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

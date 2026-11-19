@@ -1,0 +1,47 @@
+---
+title: Điều hướng trái và thông tin phải
+description: Ưu tiên thao tác ở trái, giữ cột phải chỉ để xem.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-07
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Tối ưu sidebar bên trái cho kênh và thao tác hay dùng; cột phải chỉ hiển thị thông tin CLB, lịch họp và hoạt động để xem.
+
+## Công việc hoàn thành
+
+- Đưa Phòng họp vào nhóm Công việc CLB cùng bài viết, hoạt động và họp định kỳ. Các lối ít dùng (thành viên, cơ cấu, thông tin, trang công khai) nằm trong nhóm Khác có thể gập.
+- Cột phải bỏ nút và liên kết thao tác. Hiển thị tên/giới thiệu/mục tiêu/liên hệ CLB từ workspace context, trạng thái lịch họp trung thực và tối đa ba hoạt động sắp tới từ API published activities.
+- Trạng thái chưa tham gia CLB ở cột phải cũng chỉ là thông tin, không có nút thao tác.
+- File code: `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `WorkspaceQuickPanel.tsx`, `WorkspaceHub.tsx`, `workspace.css`, `frontend/src/features/discovery/DiscoveryApp.tsx`, `frontend/src/features/guest/ClubActivitiesPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo chunk LiveKit hiện hữu |
+| `npm.cmd --workspace frontend run test` | Passed | 14 files, 60 tests; xác nhận cột phải có dữ liệu và không có nút/liên kết |
+| Browser trực quan | Skipped | Phiên điều khiển browser không khả dụng |
+
+## Quyết định và giới hạn
+
+API hiện chưa có lịch họp theo CLB nên cột phải ghi rõ trạng thái chưa đồng bộ. Cột trái giữ liên kết tới các trang quản lý hiện có trong nhóm Khác để không mất đường truy cập. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Kiểm tra bố cục desktop/mobile trên browser. Khi có API lịch họp CLB, thay thông báo trạng thái bằng lịch thật.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

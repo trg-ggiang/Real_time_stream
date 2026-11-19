@@ -27,6 +27,7 @@ import { useDiscoveryMotion } from "./hooks/use-discovery-motion";
 import { PersonalApp } from "../personal/PersonalApp";
 import { AdminApp } from "../admin/AdminApp";
 import { WorkspaceApp } from "../club-workspace/WorkspaceApp";
+import { WorkspaceHub } from "../club-workspace/WorkspaceHub";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -132,6 +133,19 @@ export function DiscoveryApp({
       </div>
     );
   }
+  if (location.pathname === "/workspace") {
+    if (viewer && accessToken)
+      return <WorkspaceHub viewer={viewer} accessToken={accessToken} onLogout={onLogout} />;
+    return (
+      <div className="dc-app">
+        <main className="dc-container dc-detail-state">
+          <h1>Không gian sinh hoạt</h1>
+          <p>Đăng nhập để xem các CLB bạn đã tham gia.</p>
+          <a className="dc-button" href={authFormHref("login", "/workspace")}>Đăng nhập</a>
+        </main>
+      </div>
+    );
+  }
   if (location.pathname === "/me" || location.pathname.startsWith("/me/")) {
     if (viewer && accessToken)
       return (
@@ -172,6 +186,7 @@ export function DiscoveryApp({
             <NavLink to="/clubs">Câu lạc bộ</NavLink>
             <NavLink to="/activities">Hoạt động</NavLink>
             <NavLink to="/posts">Bài viết</NavLink>
+            {viewer && <NavLink to="/workspace">Không gian sinh hoạt</NavLink>}
           </nav>
           <div className="dc-account">
             {viewer && isHome && (
@@ -194,7 +209,7 @@ export function DiscoveryApp({
                 <div className="dc-account-menu">
                   <p className="dc-account-heading">Sinh viên · {viewer.displayName}</p>
                   <Link to="/me"><UserRectangle size={18} aria-hidden="true" />Không gian của tôi</Link>
-                  <Link to="/me/clubs"><Users size={18} aria-hidden="true" />CLB của tôi</Link>
+                  <Link to="/workspace"><Users size={18} aria-hidden="true" />CLB của tôi</Link>
                   <button onClick={startRequest}><Plus size={18} aria-hidden="true" />Tạo CLB</button>
                   <button onClick={onMeeting}><CalendarBlank size={18} aria-hidden="true" />Cuộc họp</button>
                   {role === "admin" && (
@@ -233,6 +248,7 @@ export function DiscoveryApp({
           <Link to="/clubs">Câu lạc bộ</Link>
           <Link to="/activities">Hoạt động</Link>
           <Link to="/posts">Bài viết</Link>
+          {viewer && <Link to="/workspace">Không gian sinh hoạt</Link>}
         </nav>
       </header>
       <main id="public-content" ref={main} tabIndex={-1}>

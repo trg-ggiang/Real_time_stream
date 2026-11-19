@@ -1,0 +1,50 @@
+---
+title: Combine haimoi1 UI with final workspace
+description: Keep the haimoi1 application layout and route My Clubs to the final club workspace.
+---
+
+## Session information
+
+- Session ID: 2026-11-19-02
+- Time: 2026-11-19 (Asia/Saigon); exact start time unavailable
+- Agent: Codex
+- Phase: 04 - application foundation
+- Session outcome: Completed
+- Phase status: In Progress
+
+## Objective and scope
+
+Use `haimoi1` commit `11b515e` as the application UI base. Bring in only the `final` club workspace, expose it through My Clubs and a new header link, and retain admin.
+
+## Completed code
+
+- Restored the `haimoi1` login, public discovery, personal account, profile, meeting, and related component and CSS files. Kept the `final` workspace layout and its rail, channel, overview, and quick panel components.
+- Added `/workspace` routing to the haimoi1 discovery shell. The existing `/workspace/:clubId` route uses the final workspace. Authenticated desktop and mobile headers now include a Workspace link.
+- The haimoi1 account menu My Clubs item points to `/workspace`; the old `/me/clubs` route redirects to the workspace. Admin remains a separate `/admin` route with its existing role check.
+- Updated the workspace navigation test for the header, mobile menu, My Clubs link, and club role tools. Removed an unused final-only personal overview file from the merge.
+
+## Verification
+
+| Command or check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run typecheck` | Passed | TypeScript passed. |
+| `npm.cmd --workspace frontend run build` | Passed | Vite build passed; existing large MeetingRoom chunk warning. |
+| `npm.cmd --workspace frontend run test` | Passed | 16 files, 90 tests. |
+| `npm.cmd --workspace frontend run test -- ClubActivitiesPage` | Passed | 3 relevant navigation/workspace tests. |
+| Backend tests | Skipped | No backend code changed in this session; prior session reported 2 failing HTTP token tests. |
+| Browser visual review | Skipped | Browser access was not available to this session. |
+
+## Decisions and remaining work
+
+The haimoi1 layout is authoritative outside the club workspace. The final workspace keeps its own scoped `cw-` layout. Phase 04 remains In Progress because the workspace channel API and live browser acceptance are pending. No database writes, commit, or push were performed.
+
+## Next step
+
+Review `/`, `/me`, `/workspace`, and `/admin` at desktop and mobile widths, then verify login and club switching with test accounts.
+
+## Close checklist
+
+- [x] Updated phase page and master plan
+- [x] Updated session log, changelog, and workspace design doc
+- [x] Registered the new page in docs.json
+- [x] Recorded checks and verification limits

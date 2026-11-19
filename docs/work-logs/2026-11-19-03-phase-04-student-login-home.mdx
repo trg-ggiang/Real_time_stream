@@ -1,0 +1,48 @@
+---
+title: Student login opens home
+description: Send students to the public home after a default login while retaining explicit destinations.
+---
+
+## Session information
+
+- Session ID: 2026-11-19-03
+- Time: 2026-11-19 (Asia/Saigon); exact start time unavailable
+- Agent: Codex
+- Phase: 04 - application foundation
+- Session outcome: Completed
+- Phase status: In Progress
+
+## Objective and scope
+
+After a student logs in to the system, open the home page.
+
+## Completed code
+
+- Changed the non-admin default post-login destination from `/me` to `/` in `frontend/src/features/auth/redirect.ts`.
+- Kept explicit internal return paths, meeting links, and the admin default destination `/admin`.
+- Updated `redirect.test.ts` and `AuthApp.test.tsx` to verify the student home destination and role refresh behavior.
+
+## Verification
+
+| Command or check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run test -- AuthApp redirect` | Passed | 2 files, 39 tests. |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite; existing large MeetingRoom chunk warning. |
+| Full frontend test suite | Skipped | The targeted auth and redirect tests cover this isolated change. |
+| Browser visual review | Skipped | No visual layout was changed. |
+| Backend tests | Skipped | No backend code was changed. |
+
+## Decision and remaining work
+
+Only the default destination changed. A student opening a specific protected route through login still returns to that route. Phase 04 remains In Progress for existing workspace and live acceptance tasks. No database writes, commit, or push were performed.
+
+## Next step
+
+Verify login with a real student account at `/`; investigate the previously reported admin sign-in issue with the exact displayed error.
+
+## Close checklist
+
+- [x] Updated phase page and master plan
+- [x] Updated session log and changelog
+- [x] Registered the new page in docs.json
+- [x] Recorded checks and verification limits

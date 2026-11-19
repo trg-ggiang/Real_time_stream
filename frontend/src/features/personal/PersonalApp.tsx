@@ -1,5 +1,5 @@
 import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { Link, Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { SquaresFour } from "@phosphor-icons/react/dist/csr/SquaresFour";
 import { Users } from "@phosphor-icons/react/dist/csr/Users";
@@ -12,7 +12,7 @@ import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
 import { GearSix } from "@phosphor-icons/react/dist/csr/GearSix";
 import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
 import { ProfileForm } from "../profile/ProfileForm";
-import { PersonalActivitiesPage, PersonalClubsPage, PersonalLists, PersonalOverview } from "./pages/PersonalLists";
+import { PersonalActivitiesPage, PersonalLists, PersonalOverview } from "./pages/PersonalLists";
 import { ClubRequestDetail, NewClubRequest } from "./pages/ClubRequestPages";
 import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import "./personal.css";
@@ -126,10 +126,7 @@ export function PersonalApp({
                 />
               }
             />
-            <Route
-              path="/me/clubs"
-              element={<PersonalClubsPage token={accessToken} />}
-            />
+            <Route path="/me/clubs" element={<Navigate replace to="/workspace" />} />
             <Route
               path="/me/registrations"
               element={<PersonalActivitiesPage token={accessToken} />}

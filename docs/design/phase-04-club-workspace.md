@@ -1,5 +1,27 @@
 # Phase 4 — Không gian sinh hoạt và quản lý CLB
 
+
+2026-11-19: The application shell and public/personal pages follow `haimoi1`. My Clubs and the authenticated desktop/mobile header link open the `final` club workspace at `/workspace`; `/me/clubs` redirects there. [Work log](/work-logs/2026-11-19-02-phase-04-haimoi1-ui-final-workspace).
+
+## Đối chiếu schema đúng 18/11/2026
+
+Schema người dùng gửi lại khớp hệ thống CLB hiện tại: `users.role` mặc định `student`; `club_memberships` lưu quyền theo CLB; `club_channels` có `club_id`, `department_id` tùy chọn, `kind` và `name`; `channel_members`, `channel_messages`, `channel_read_states` lưu tham gia, tin nhắn và trạng thái đọc. `meetings` có `club_id` tùy chọn và `recurrence_rule`; `meeting_sessions` lưu các buổi. Danh sách cột không đủ để kết luận chính sách RLS, quyền private channel hoặc giá trị hợp lệ của `kind`.
+
+Backend workspace hiện chưa có route đọc/ghi kênh. Các tên kênh trong frontend là bản xem trước, chưa lấy từ `club_channels`. Công cụ họp hiện có đã tạo lịch lặp qua `recurrenceRule`; endpoint tạo cuộc họp chưa nhận/ghi `club_id`, nên cuộc họp tạo từ lối vào CLB vẫn chưa thuộc CLB trong DB. [Work log đối chiếu](/work-logs/2026-11-18-02-phase-04-schema-alignment).
+
+## Cập nhật frontend 18/11/2026
+
+Sinh viên có hồ sơ hoàn chỉnh vào trang chủ `/` sau đăng nhập. Header có lối **Không gian sinh hoạt** tới `/workspace`, mở thẳng kênh `# thảo-luận` của CLB đầu tiên đã tham gia. Nếu chưa có CLB, khung vẫn hiện cùng lối khám phá/tạo CLB. Trong `/workspace/:clubId`, dải ngoài cùng bên trái hiển thị avatar để chuyển CLB; sidebar kế bên chỉ có tên, vai trò, tổng quan và các kênh xem trước `# thông-báo`, `# thảo-luận`, `# tài-liệu`, `# hỏi-đáp`. Bên dưới kênh là công việc: viết bài, bài viết, hoạt động, tạo họp định kỳ; tiếp theo là phòng họp và thành viên. Chủ nhiệm thấy thêm duyệt nội dung, cơ cấu và thông tin CLB. Vai trò được lấy lại theo từng CLB. [Work log avatar](/work-logs/2026-11-18-04-phase-04-club-rail-avatar).
+
+Kênh chiếm toàn bộ vùng nội dung, không có khung thẻ quanh chat. Các kênh chỉ là giao diện xem trước, chưa có API chat hoặc quyền kênh; ô nhắn tin bị vô hiệu hóa. Lối họp định kỳ mở công cụ họp hiện có, chưa gắn cuộc họp với CLB. `/me` chỉ quản lý tài khoản/hoạt động cá nhân và `/me/clubs` chuyển sang `/workspace`. Xem [work log chỉnh UX](/work-logs/2026-11-18-03-phase-04-student-ux-navigation) và [work log đối chiếu schema](/work-logs/2026-11-18-02-phase-04-schema-alignment).
+
+Sidebar có vùng kênh cuộn chung để giữ nhóm Công việc CLB ở đáy; công việc có thể gập. Chủ nhiệm tạo bản nháp kênh văn bản/gọi nhanh trong phiên trình duyệt. Đây chưa phải kênh lưu trên hệ thống vì workspace API chưa có endpoint. “Phòng chung” và “Họp nhóm” dẫn tới công cụ meeting hiện có, chưa là phòng gọi riêng của từng kênh. [Work log sidebar](/work-logs/2026-11-18-05-phase-04-compact-club-sidebar).
+
+Dải CLB dùng nền xanh nhạt; góc trên trái là nút Trang chủ, cuối dải là avatar mở Tài khoản/Đăng xuất. Cột **bên phải** cho mọi thành viên xem thông tin CLB, trạng thái lịch họp và hoạt động sắp tới từ API. Backend chưa có danh sách lịch họp sắp tới theo CLB nên cột này không hiện lịch giả. [Work log dải CLB](/work-logs/2026-11-18-06-phase-04-workspace-rail-quick-view).
+
+Cập nhật sau đó: cột trái ưu tiên kênh và công việc hay dùng (gồm Phòng họp). Cột phải hiển thị giới thiệu ngắn, trạng thái lịch họp và hoạt động sắp tới; nhóm Khác gập được ở cuối cột phải giữ các lối ít dùng. Không hiển thị mục tiêu và liên hệ trong phần xem nhanh. [Work log phân vai hai cột](/work-logs/2026-11-18-07-phase-04-sidebar-priority-readonly-panel), [work log chuyển mục Khác](/work-logs/2026-11-18-08-phase-04-move-secondary-links-right).
+
+Nhóm Công việc CLB cố định ở đáy sidebar trái; Tổng quan CLB ở đầu và vùng giữa cuộn chung kênh văn bản/gọi nhanh. [Work log sidebar cố định](/work-logs/2026-11-18-09-phase-04-pinned-work-sidebar).
 2026-11-16: The unfollow dropdown now sits close to the follow button in a compact panel. Phase remains In Progress. [Session log](/work-logs/2026-11-16-26-compact-follow-menu).
 
 2026-11-16: Follow/unfollow state is reflected by the button without an extra confirmation line. Phase remains In Progress. [Session log](/work-logs/2026-11-16-25-hide-follow-confirmations).
@@ -20,12 +42,16 @@ Ngày 16/11/2026. Đã triển khai trong workspace; sẵn sàng để nhóm rev
 
 ## Cách mở và luồng chính
 
-Chạy backend và frontend như trước (`npm run dev:backend`, `npm run dev:frontend` ở hai terminal). Đăng nhập, hoàn thiện hồ sơ → Không gian của tôi → CLB tham gia → Mở không gian. URL `/workspace/:clubId` có thể refresh trực tiếp; môi trường deploy cần SPA rewrite. Phải là membership active trong CLB published. Tài khoản chưa thuộc CLB sẽ thấy danh sách trống; không tự tạo membership demo.
+Chạy backend và frontend như trước (`npm run dev:backend`, `npm run dev:frontend` ở hai terminal). Đăng nhập, hoàn thiện hồ sơ → Trang chủ → Không gian sinh hoạt → kênh thảo luận. URL `/workspace/:clubId/channels/general` có thể refresh trực tiếp; môi trường deploy cần SPA rewrite. Phải là membership active trong CLB published. Tài khoản chưa thuộc CLB sẽ thấy trạng thái trống; không tự tạo membership demo.
 
-Mỗi CLB có không gian riêng, selector đổi CLB và vai trò lấy lại từ backend. Một người có thể là chủ nhiệm ở CLB này và thành viên ở CLB khác. Đăng nhập admin không tự được quyền thao tác workspace của CLB không tham gia. Shell công khai, cá nhân và CLB tách nhau; admin vẫn dùng module cũ, dành cho Phase 5.
+Mỗi CLB có không gian riêng, dải CLB đổi ngữ cảnh và vai trò lấy lại từ backend. Một người có thể là chủ nhiệm ở CLB này và thành viên ở CLB khác. Đăng nhập admin không tự được quyền thao tác workspace của CLB không tham gia. Shell công khai, cá nhân và CLB tách nhau; admin vẫn dùng module cũ, dành cho Phase 5.
 
 | Trang | Thành viên | Chủ nhiệm |
-| --- | --- | --- |
+| ---
+
+2026-11-19: The merged club workspace retains the `final` layout. Administration remains at its separate `/admin` route. Frontend build and 86 tests passed; browser review remains pending. [Work log](/work-logs/2026-11-19-01-phase-04-final-ui-admin-merge).
+
+ | --- | --- |
 | Tổng quan | Bài đã đăng, hoạt động, lối vào họp | Thêm lối vào hàng đợi duyệt |
 | Bài viết | Đọc public/internal của CLB; soạn/sửa nội dung của mình, lưu nháp/gửi duyệt | Xét duyệt, yêu cầu chỉnh sửa có lý do; bài của chủ nhiệm vẫn có bước duyệt rõ ràng |
 | Hoạt động | Đọc, soạn/sửa đề xuất của mình và gửi duyệt | Tự tạo và đăng ngay; duyệt đề xuất của thành viên |
@@ -103,9 +129,9 @@ Các route `my-clubs` cũ vẫn giữ tương thích; shell mới không sử d�
 - Chưa nghiệm thu thao tác ghi với tài khoản thật trên Supabase. Trigger constraint/RPC bản live cần kiểm tra theo catalog và thử trong môi trường test; thấy endpoint RPC không chứng minh thân hàm/transaction đúng phiên bản.
 - Membership được kiểm tra đầu request; thao tác chuyển chủ nhiệm dùng RPC nguyên tử, nhưng không bảo đảm mọi mutation khác nguyên tử với việc thu hồi quyền diễn ra đồng thời. Chưa có load test hay row-lock toàn bộ policy.
 - Chưa có upload ảnh, quản lý danh sách người đăng ký/điểm danh hoạt động, thay đổi vòng đời hoạt động, thông báo hoặc realtime feed. Không giả lập các mục này thành chức năng đã hoàn thành.
-- Chưa có lời mời thành viên, tự tham gia CLB, tuyển dụng hay chat ban. is_private mới là thuộc tính chuẩn bị cho channel; xem metadata ban không có nghĩa được đọc tin nhắn ban.
+- Chưa có lời mời thành viên, tự tham gia CLB, tuyển dụng hay chat ban trong module workspace. Schema đã có bảng channel, nhưng workspace API chưa triển khai kênh; xem metadata ban không có nghĩa được đọc tin nhắn ban.
 - Chưa sửa tên/nội dung giới thiệu CLB published: chờ thiết kế revision/admin approval. Phải giữ bản công khai hiện tại khi bổ sung luồng đó.
-- Meeting chưa có club_id: lối vào workspace không đồng nghĩa phòng đã gắn CLB hoặc bị chặn bởi membership CLB. Quyền cuộc họp vẫn theo module meeting hiện tại.
+- Schema `meetings` đã có `club_id`, nhưng API tạo cuộc họp hiện chưa ghi trường này. Lối vào workspace chưa gắn cuộc họp với CLB hoặc áp membership CLB cho meeting. Quyền cuộc họp vẫn theo module meeting hiện tại.
 - Cảnh báo chưa lưu hỗ trợ link, logout, reload/close và selector CLB; nút Back/Forward SPA chưa chặn đầy đủ.
 - Selector lấy 24 CLB đầu, có link Tất cả CLB của tôi để dùng danh sách phân trang.
 

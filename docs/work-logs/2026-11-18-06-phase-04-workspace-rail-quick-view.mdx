@@ -1,0 +1,47 @@
+---
+title: Dải CLB và cột xem nhanh
+description: Trang chủ ở đầu dải CLB, avatar tài khoản ở cuối và cột thông tin bên phải.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-06
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đổi màu dải CLB, đặt nút Trang chủ ở góc trên trái, avatar người dùng ở cuối dải với menu Tài khoản/Đăng xuất, thêm cột xem nhanh **bên phải** cho lịch họp và thông tin CLB.
+
+## Công việc hoàn thành
+
+- Chuyển dải CLB sang nền xanh nhạt, ô CLB sáng và trạng thái đang chọn rõ hơn. Nút Trang chủ dùng icon ở đầu dải; avatar người dùng ở cuối dải mở menu Tài khoản/Đăng xuất.
+- Dùng chung dải CLB ở trang có CLB và trạng thái chưa tham gia CLB. Bỏ lối tài khoản/đăng xuất lặp trong sidebar kênh.
+- Thêm cột Xem nhanh bên phải: lối mở công cụ họp và tạo họp định kỳ, tối đa ba hoạt động sắp tới từ API workspace published activities, liên kết thành viên/bài viết. Ở màn hình hẹp, cột này chuyển xuống dưới nội dung.
+- File code: `frontend/src/features/club-workspace/WorkspaceRail.tsx`, `WorkspaceQuickPanel.tsx`, `WorkspaceApp.tsx`, `WorkspaceHub.tsx`, `workspace.css`, `frontend/src/features/discovery/DiscoveryApp.tsx`, `frontend/src/features/guest/ClubActivitiesPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo chunk LiveKit hiện hữu |
+| `npm.cmd --workspace frontend run test` | Passed | 14 files, 60 tests; xác nhận vị trí Trang chủ/avatar và cột xem nhanh |
+| Browser trực quan | Skipped | Phiên điều khiển browser không khả dụng |
+
+## Quyết định và giới hạn
+
+Backend chỉ có danh sách phiên họp **đang diễn ra** theo tài khoản, chưa có API lịch họp sắp tới theo CLB. Cột phải không hiển thị lịch giả; ghi rõ chưa đồng bộ và dẫn tới công cụ họp hiện có. Hoạt động sắp tới lấy dữ liệu thật từ API CLB. Phase 04 giữ In Progress.
+
+## Bước tiếp theo
+
+Kiểm tra bố cục desktop/mobile trong browser. Khi được giao backend lịch họp theo CLB, nối danh sách lịch thật vào cột Xem nhanh.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

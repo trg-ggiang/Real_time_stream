@@ -3,6 +3,12 @@ title: Master Plan
 description: Tiến trình phase và thứ tự triển khai theo context.
 ---
 
+2026-11-19: Default student login now opens `/`, while admin opens `/admin` and explicit internal destinations remain. Targeted auth tests (39) and frontend build passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-03-phase-04-student-login-home).
+
+2026-11-19: Kept `haimoi1` as the application UI and integrated only the `final` club workspace. My Clubs and a desktop/mobile header link open `/workspace`; admin remains. Frontend build and 90 tests passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-02-phase-04-haimoi1-ui-final-workspace).
+
+2026-11-19: Resolved the merge of `final` into `haimoi1`, preserving the final layout and admin access. Frontend build and 86 tests passed; two backend HTTP token tests returned 500. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-19-01-phase-04-final-ui-admin-merge).
+
 2026-11-16: Removed the student-view shortcut from the admin account menu. [Work log](/work-logs/2026-11-16-52-phase-04-admin-menu-cleanup). Phase 04 remains In Progress.
 
 2026-11-16: Updated the admin shell and overview presentation. [Work log](/work-logs/2026-11-16-51-phase-04-admin-overview-design). Phase 04 remains In Progress.
@@ -55,6 +61,23 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 
 ## Trạng thái hiện tại
 
+Cập nhật 2026-11-18: Công việc CLB cố định ở đáy sidebar trái, các kênh dùng vùng cuộn chung ở giữa. Build và 60 frontend tests đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-09-phase-04-pinned-work-sidebar).
+
+Cập nhật 2026-11-18: mục Khác chuyển từ sidebar trái sang cuối cột phải, phần xem nhanh bỏ mục tiêu và liên hệ. Build và 60 frontend tests đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-08-phase-04-move-secondary-links-right).
+
+Cập nhật 2026-11-18: sidebar trái ưu tiên thao tác hay dùng, cột phải chỉ đọc thông tin CLB, lịch họp và hoạt động sắp tới. Build và 60 frontend tests đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-07-phase-04-sidebar-priority-readonly-panel).
+
+Cập nhật 2026-11-18: dải CLB xanh nhạt có Trang chủ ở đầu, avatar tài khoản ở cuối; cột Xem nhanh bên phải hiển thị lối họp và hoạt động sắp tới từ API. Build và 60 frontend tests đạt; lịch họp theo CLB còn chờ backend, Phase 04 In Progress. [Work log](/work-logs/2026-11-18-06-phase-04-workspace-rail-quick-view).
+
+Cập nhật 2026-11-18: sidebar CLB gọn hơn, danh sách kênh cuộn riêng, nhóm công việc có thể gập; có hai lối gọi nhanh và bản nháp tạo kênh chỉ trong frontend. Build và 60 frontend tests đạt; Phase 04 In Progress vì chưa có API kênh/phòng gọi theo CLB. [Work log](/work-logs/2026-11-18-05-phase-04-compact-club-sidebar).
+
+Cập nhật 2026-11-18: avatar CLB chỉ ở dải ngoài cùng bên trái, sidebar bỏ avatar lặp và thu hẹp. Build và 2 test workspace đạt; Phase 04 giữ In Progress. [Work log](/work-logs/2026-11-18-04-phase-04-club-rail-avatar).
+
+Cập nhật UX sinh viên 2026-11-18: sau đăng nhập vào trang chủ, `/workspace` mở kênh CLB trực tiếp; chat hiển thị toàn vùng, sidebar theo kênh/công việc, tài khoản cá nhân tách khỏi CLB và avatar chỉ còn một menu. Frontend build và 59 tests đạt; chưa kiểm tra trực quan browser. Phase 04 giữ In Progress. [Work log](/work-logs/2026-11-18-03-phase-04-student-ux-navigation).
+
+Đối chiếu schema đúng 2026-11-18: DB đã có bảng kênh và trường lịch lặp/CLB trên meeting; frontend mở công cụ họp định kỳ hiện có, kênh vẫn là bản xem trước do workspace API chưa có endpoint. Phase 04 giữ In Progress. [Work log](/work-logs/2026-11-18-02-phase-04-schema-alignment).
+
+Cập nhật 2026-11-18: frontend Không gian sinh hoạt sinh viên mở ngay bố cục CLB/kênh/công việc theo role và tự chọn CLB đã tham gia; kênh và lịch họp định kỳ chưa có backend. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-18-01-phase-04-student-club-space-frontend).
 2026-11-16: Removed an unreachable personal list branch and fixed onboarding test synchronization. Updated public and club workspace test fixtures for current routes. Typecheck, build, and all 58 frontend tests passed after dependency installation. Two backend HTTP tests remain blocked by localhost access. [Work log](/work-logs/2026-11-16-27-phase-04-frontend-build-repair). Phase 04 remains In Progress.
 2026-11-16: Anchored the unfollow dropdown directly below its button and compacted its width and padding. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-16-26-compact-follow-menu).
 2026-11-16: Removed follow/unfollow confirmation text below the club action button. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-16-25-hide-follow-confirmations).

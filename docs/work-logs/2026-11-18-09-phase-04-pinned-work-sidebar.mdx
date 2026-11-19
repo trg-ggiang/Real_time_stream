@@ -1,0 +1,47 @@
+---
+title: Cố định Công việc CLB ở đáy sidebar
+description: Dành phần còn lại của sidebar trái cho kênh văn bản và gọi nhanh cuộn chung.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-09
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Cố định nhóm Công việc CLB từ đáy thanh trái lên; phần còn lại dùng để cuộn kênh văn bản và kênh gọi nhanh.
+
+## Công việc hoàn thành
+
+- Tách danh sách kênh văn bản/gọi nhanh thành một vùng cuộn chung trong sidebar. Liên kết Tổng quan CLB ở đầu, nhóm Công việc CLB ở cuối sidebar.
+- Bỏ giới hạn cuộn riêng từng loại kênh. Nhóm công việc giữ vị trí ở đáy; nội dung nhóm có thể cuộn riêng khi màn hình quá thấp.
+- Trên mobile, menu mở với chiều cao giới hạn và vẫn giữ nhóm công việc ở dưới vùng kênh.
+- File code: `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `workspace.css`, `frontend/src/features/guest/ClubActivitiesPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo chunk LiveKit hiện hữu |
+| `npm.cmd --workspace frontend run test` | Passed | 14 files, 60 tests; kiểm tra cấu trúc vùng kênh và nhóm công việc |
+| Browser trực quan | Skipped | Phiên điều khiển browser không khả dụng |
+
+## Quyết định và giới hạn
+
+Vùng kênh cuộn khi số kênh vượt chiều cao còn lại; nhóm công việc luôn ở đáy sidebar và chỉ tự cuộn nội bộ trên màn hình rất thấp. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Kiểm tra sidebar desktop/mobile ở browser, nhất là khi có nhiều kênh và viewport thấp.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

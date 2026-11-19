@@ -129,7 +129,7 @@ Minh là chairperson SINNO và member HUROS. /me/clubs hiển thị cả hai, gh
 
 ### Meeting
 
-Lưu returnTo tại lúc mở meeting, chỉ nhận đích nội bộ. Rời cuộc gọi quay về workspace/lịch/meeting hub tương ứng. Refresh/link mời vẫn xác thực lại session và membership theo policy meeting. Không tự gắn mọi meeting cũ vào một CLB: DB meeting hiện chưa có club_id; cần contract liên kết nếu muốn tạo phòng thuộc CLB thật.
+Lưu returnTo tại lúc mở meeting, chỉ nhận đích nội bộ. Rời cuộc gọi quay về workspace/lịch/meeting hub tương ứng. Refresh/link mời vẫn xác thực lại session và membership theo policy meeting. Cập nhật đối chiếu 18/11: schema `meetings` có `club_id` tùy chọn, nhưng API tạo cuộc họp hiện chưa ghi trường này; cần contract quyền và liên kết để tạo phòng thuộc CLB thật.
 
 ## 6. Năng lực API hiện có và phần còn thiếu
 

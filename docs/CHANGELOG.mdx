@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-11-19 - Student login opens home
+
+The default student post-login destination is `/`; admin and explicit internal destinations are preserved. Targeted auth/redirect tests (39) and frontend build passed. [Work log](/work-logs/2026-11-19-03-phase-04-student-login-home).
+
+## 2026-11-19 - haimoi1 UI with final club workspace
+
+Restored the haimoi1 application layout while retaining the final club workspace. My Clubs and a new desktop/mobile header link open `/workspace`; the admin area remains separate. Frontend build and 90 tests passed. [Work log](/work-logs/2026-11-19-02-phase-04-haimoi1-ui-final-workspace).
+
+## 2026-11-19 - Final UI and admin merge
+
+Resolved merge conflicts while retaining the `final` layout and the existing admin area. Restored admin login return path and added a regression test. Frontend build and 86 tests passed; two backend HTTP token tests returned 500. [Work log](/work-logs/2026-11-19-01-phase-04-final-ui-admin-merge).
+
 ## Admin account menu cleanup (2026-11-16)
 
 Removed the student-view shortcut from the admin account menu. [Work log](/work-logs/2026-11-16-52-phase-04-admin-menu-cleanup).
@@ -113,6 +125,41 @@ title: Changelog
 description: Lịch sử thay đổi dự án.
 ---
 
+## 2026-11-18 — Công việc CLB ở đáy sidebar
+
+Nhóm Công việc CLB cố định ở cuối sidebar trái; kênh văn bản và gọi nhanh cuộn chung trong vùng còn lại. [Work log](/work-logs/2026-11-18-09-phase-04-pinned-work-sidebar).
+
+## 2026-11-18 — Mục Khác sang cột phải
+
+Nhóm điều hướng Khác chuyển khỏi sidebar trái sang cuối cột phải; phần xem nhanh bỏ mục tiêu và liên hệ CLB. [Work log](/work-logs/2026-11-18-08-phase-04-move-secondary-links-right).
+
+## 2026-11-18 — Trái thao tác, phải thông tin
+
+Sidebar trái ưu tiên kênh và công việc hay dùng; cột phải chỉ đọc giới thiệu CLB, trạng thái lịch họp và hoạt động sắp tới. [Work log](/work-logs/2026-11-18-07-phase-04-sidebar-priority-readonly-panel).
+
+## 2026-11-18 — Dải CLB và cột xem nhanh
+
+Dải CLB đổi sang xanh nhạt; Trang chủ ở đầu, avatar tài khoản ở cuối. Cột Xem nhanh bên phải hiển thị lối họp, hoạt động sắp tới từ API và liên kết CLB. [Work log](/work-logs/2026-11-18-06-phase-04-workspace-rail-quick-view).
+
+## 2026-11-18 — Sidebar CLB và kênh gọi nhanh
+
+Giới hạn vùng cuộn danh sách kênh, thu gọn nhóm công việc/thông tin CLB; thêm hai lối gọi nhanh và form tạo bản nháp kênh cho chủ nhiệm. [Work log](/work-logs/2026-11-18-05-phase-04-compact-club-sidebar).
+
+## 2026-11-18 — Avatar CLB ở dải trái
+
+Ảnh CLB nằm trong ô chuyển CLB ngoài cùng bên trái; bỏ ảnh lặp ở sidebar và thu hẹp sidebar. [Work log](/work-logs/2026-11-18-04-phase-04-club-rail-avatar).
+
+## 2026-11-18 — Chỉnh luồng và giao diện sinh viên
+
+Đăng nhập về trang chủ. Không gian sinh hoạt mở thẳng kênh CLB, chat chiếm toàn vùng; sidebar phân kênh/công việc/CLB. Tài khoản cá nhân bỏ mục CLB trùng và các thẻ khó hiểu; avatar dùng một menu. Build và 59 frontend tests đạt. [Work log](/work-logs/2026-11-18-03-phase-04-student-ux-navigation).
+
+## 2026-11-18 — Đối chiếu schema CLB đúng
+
+Sửa lối họp định kỳ để dùng công cụ họp đã hỗ trợ recurrence, thay cho nháp cục bộ. Ghi rõ kênh hiện là giao diện xem trước dù DB đã có các bảng channel; API workspace chưa kết nối. [Work log](/work-logs/2026-11-18-02-phase-04-schema-alignment).
+
+## 2026-11-18 — Không gian sinh hoạt sinh viên
+
+Thêm lối vào từ header để mở ngay shell CLB ba vùng kiểu Discord, tự chọn CLB đã tham gia. Kênh chỉ có UI; thao tác bài viết, duyệt và họp nối với các route hiện có. Nháp lịch họp định kỳ lưu cục bộ. [Work log](/work-logs/2026-11-18-01-phase-04-student-club-space-frontend).
 ## 2026-11-16 — Compact follow menu
 
 Anchored the unfollow menu immediately below its trigger and reduced its width, spacing and padding. [Work log](/work-logs/2026-11-16-26-compact-follow-menu).

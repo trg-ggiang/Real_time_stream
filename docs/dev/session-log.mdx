@@ -440,3 +440,51 @@ Workspace CLB có context/role riêng, draft/submit/review posts/activities, qu�
 ## 2026-11-16 — Admin default login destination fix
 
 Auth/profile từ trang gốc nay chờ refresh role rồi admin → /admin, student → /me; giữ deep link/meeting. Đã xác nhận read-only admin@gmail.com có role admin và profile đầy đủ. Typecheck/frontend build, 77 frontend tests và browser stale-role→admin landing đạt. Không ghi DB/commit/push. [Work log](/work-logs/2026-11-16-06-phase-04-admin-login-routing).
+
+## 2026-11-18 — Student club space frontend
+
+Thêm `/workspace` từ header và trang cá nhân; khung CLB hiện ngay, tự mở CLB đã tham gia, có kênh giao diện và công việc theo role dưới kênh. Nháp họp định kỳ chỉ lưu cục bộ; chưa có chat/channel backend. Frontend build và 2 test luồng mới đạt; toàn bộ frontend test lần cuối còn 4 lỗi chưa điều tra. Phase 04 In Progress. [Work log](/work-logs/2026-11-18-01-phase-04-student-club-space-frontend).
+
+## 2026-11-18 — Đối chiếu schema CLB đúng
+
+Schema mới khớp repo, có bảng channel và `meetings.club_id`/`recurrence_rule`. Frontend bỏ nháp họp cục bộ, mở công cụ họp định kỳ hiện có; kênh được đánh dấu bản xem trước vì chưa có workspace API. Build và 2 test workspace đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-02-phase-04-schema-alignment).
+
+## 2026-11-18 — Chỉnh UX sinh viên
+
+Đăng nhập về trang chủ; không gian sinh hoạt mở kênh CLB toàn vùng; sidebar xếp kênh, công việc và quản lý CLB; `/me` là tài khoản cá nhân, `/me/clubs` chuyển sang workspace; menu avatar một điểm mở. Build và 59 frontend tests đạt. Browser trực quan chưa khả dụng; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-03-phase-04-student-ux-navigation).
+
+## 2026-11-18 — Avatar CLB ở dải trái
+
+Bỏ avatar lặp trong sidebar và làm rõ avatar CLB ở dải biểu tượng ngoài cùng bên trái; sidebar thu hẹp. Build và 2 test workspace đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-04-phase-04-club-rail-avatar).
+
+## 2026-11-18 — Sidebar gọn và kênh gọi nhanh
+
+Giảm cuộn sidebar, thêm danh sách kênh có vùng cuộn riêng, nhóm công việc có thể gập, hai lối gọi nhanh và form bản nháp kênh cho chủ nhiệm. Build và 60 frontend tests đạt; chưa có API kênh/phòng gọi theo CLB, Phase 04 In Progress. [Work log](/work-logs/2026-11-18-05-phase-04-compact-club-sidebar).
+
+## 2026-11-18 — Dải CLB và cột xem nhanh bên phải
+
+Dải CLB xanh nhạt có Trang chủ ở đầu, avatar tài khoản ở cuối; cột bên phải cho lối lịch họp, hoạt động sắp tới và liên kết CLB. Build và 60 frontend tests đạt; lịch họp theo CLB chưa có API, Phase 04 In Progress. [Work log](/work-logs/2026-11-18-06-phase-04-workspace-rail-quick-view).
+
+## 2026-11-18 — Trái thao tác, phải thông tin
+
+Sidebar trái ưu tiên kênh và công việc thường dùng; cột phải chỉ hiển thị thông tin CLB, lịch họp và hoạt động, không có thao tác. Build và 60 frontend tests đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-07-phase-04-sidebar-priority-readonly-panel).
+
+## 2026-11-18 — Mục Khác sang cột phải
+
+Chuyển nhóm Khác sang cuối cột phải, bỏ mục tiêu và liên hệ khỏi phần xem nhanh; trái chỉ còn kênh và công việc hay dùng. Build và 60 frontend tests đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-08-phase-04-move-secondary-links-right).
+
+## 2026-11-18 — Công việc CLB ở đáy sidebar
+
+Cố định nhóm Công việc CLB ở đáy thanh trái; phần còn lại cuộn chung các kênh văn bản/gọi nhanh. Build và 60 frontend tests đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-09-phase-04-pinned-work-sidebar).
+
+## 2026-11-19 - Final UI and admin merge
+
+Resolved merge conflicts while keeping the `final` layout and separate admin access. Frontend build and 86 tests passed; two backend HTTP tests returned 500. Phase 04 remains In Progress. [Work log](/work-logs/2026-11-19-01-phase-04-final-ui-admin-merge).
+
+## 2026-11-19 - haimoi1 UI with final workspace
+
+Kept the haimoi1 layout, routed My Clubs and the desktop/mobile header to the final workspace, and retained admin. Frontend build and 90 tests passed; Phase 04 In Progress. [Work log](/work-logs/2026-11-19-02-phase-04-haimoi1-ui-final-workspace).
+
+## 2026-11-19 - Student login opens home
+
+Default student login now opens `/`, retaining admin and explicit destinations. Targeted auth tests (39) and frontend build passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-03-phase-04-student-login-home).

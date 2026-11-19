@@ -1,0 +1,50 @@
+---
+title: Correct club schema alignment
+description: Đối chiếu schema CLB mới gửi và sửa lối họp định kỳ ở frontend.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-02
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — NestJS API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đối chiếu lại schema đúng người dùng vừa gửi với luồng Không gian sinh hoạt. Giữ phạm vi thay đổi frontend của yêu cầu trước, không sửa backend hoặc DB.
+
+## Công việc hoàn thành
+
+- Xác nhận schema đúng có `users.role` mặc định `student`, `club_channels`, `channel_members`, `channel_messages`, `channel_read_states`, `meetings.club_id` và `meetings.recurrence_rule`.
+- Xác nhận backend workspace chưa có API kênh, nên đánh dấu danh sách kênh frontend là bản xem trước, không giả lập dữ liệu/tin nhắn thật.
+- Bỏ form lịch họp chỉ lưu localStorage. Lối họp định kỳ nay mở công cụ họp đang có, vốn hỗ trợ tạo meeting với `recurrenceRule` và lên lịch session. Giao diện nói rõ cuộc họp chưa gắn CLB vì API tạo meeting chưa ghi `club_id`.
+- Sửa tài liệu thiết kế từng nói schema chưa có channel hoặc `meetings.club_id`.
+
+File code: `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `WorkspaceHub.tsx`, `pages/WorkspaceHome.tsx`, `workspace.css`, `frontend/src/features/guest/ClubActivitiesPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo chunk LiveKit hiện hữu |
+| `npm.cmd --workspace frontend exec vitest run src/features/guest/ClubActivitiesPage.test.tsx` | Passed | 2 test luồng workspace |
+| Toàn bộ frontend test | Skipped | Đã chạy ở phiên trước và còn 4/59 test lỗi; thay đổi này chỉ ở lối họp/kênh và test liên quan đã chạy |
+| API kênh / meeting gắn CLB | Skipped | Không thay backend, không ghi DB live |
+
+## Quyết định và giới hạn
+
+Schema có bảng không đồng nghĩa NestJS đã có endpoint hoặc chính sách quyền. Các tên kênh hiện là mẫu frontend, chưa được lấy từ `club_channels`. DB cho phép `meetings.club_id`, nhưng `POST /api/meetings` hiện không nhận/ghi trường đó. Quyền private channel và giá trị `kind` không thể kết luận từ danh sách cột.
+
+## Bước tiếp theo
+
+Khi người dùng giao backend, thiết kế API danh sách/tin nhắn kênh với kiểm tra membership/ban và bổ sung contract `club_id` cho meeting. Sau đó nối frontend với dữ liệu thật.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

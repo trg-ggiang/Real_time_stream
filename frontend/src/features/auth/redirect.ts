@@ -24,7 +24,7 @@ export function sanitizeReturnTo(value: string | null | undefined): string | nul
 }
 
 export function resolvePostLoginPath(returnTo: string | null | undefined, role?: string | null) {
-  const fallback = role === "admin" ? "/admin" : "/me";
+  const fallback = role === "admin" ? "/admin" : "/";
   const path = sanitizeReturnTo(returnTo);
   if (!path) return fallback;
 

@@ -16,9 +16,10 @@ const completedProfile = { full_name: 'Test User', student_code: 'SV001', school
 
 it.each([
   ['/me/clubs?mode=login&returnTo=%2Fadmin', 'user', 'admin', '/admin'],
-  ['/me/clubs?mode=login&returnTo=%2Fadmin', 'admin', 'user', '/me'],
+  ['/me/clubs?mode=login&returnTo=%2Fadmin', 'admin', 'user', '/'],
   ['/me/clubs?mode=login&returnTo=https://evil.com', 'admin', null, '/me/clubs'],
   ['/?mode=login&returnTo=%2F', 'admin', null, '/admin'],
+  ['/?mode=login&returnTo=%2F', 'user', 'user', '/'],
 ] as const)('resolves the destination for %s after the account check', async (url, loginRole, checkedRole, expected) => {
   window.history.replaceState(null, '', url);
   const user = { userId: 'u1', email: 'user@test.dev', displayName: 'Route User', role: loginRole };
