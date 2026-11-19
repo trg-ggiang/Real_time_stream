@@ -6,9 +6,12 @@ import { FloppyDisk } from "@phosphor-icons/react/dist/csr/FloppyDisk";
 import { Trash } from "@phosphor-icons/react/dist/csr/Trash";
 import { X } from "@phosphor-icons/react/dist/csr/X";
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
+import { useNavigate } from "react-router-dom";
+import { accountRequest } from "../../../shared/api/account-http";
 import { useClub } from "../workspace-context";
 import { usePersonalQuery } from "../../personal/use-personal-query";
-import type { Department, WorkspaceList } from "../services/workspace-api";
+import { workspaceRequest, type Department, type RecruitmentApplicationQueueItem, type RecruitmentApplicationReview, type RecruitmentApplicationStatus, type RecruitmentCampaign, type WorkspaceList } from "../services/workspace-api";
+import { useWorkspaceMutation } from "../use-workspace-mutation";
 import { useUnsavedChanges } from "../../../shared/lib/use-unsaved-changes";
 import { loadRecruitmentDraft, newRecruitmentQuestion, withRecruitmentDepartments, type RecruitmentDepartment, type RecruitmentDraft, type RecruitmentQuestion } from "../recruitment-model";
 import "../recruitment.css";
@@ -34,10 +37,146 @@ function DepartmentTabs({ departments, selected, onSelect, prefix }: {
 }
 
 export function RecruitmentPage() {
+  const { membership } = useClub();
+  if (membership.role === "head") return <HeadRecruitmentReview />;
+  return <ChairRecruitmentPage />;
+}
+
+const applicationStatusLabel: Record<RecruitmentApplicationStatus, string> = {
+  draft: "Bản nháp", submitted: "Chờ duyệt", interviewing: "Qua vòng đơn", accepted: "Đã được nhận", rejected: "Đã từ chối", withdrawn: "Đã rút đơn",
+};
+
+function HeadRecruitmentReview() {
+  const { clubId, token } = useClub();
+  const [refresh, setRefresh] = useState(0);
+  const [detailRefresh, setDetailRefresh] = useState(0);
+  const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState<"pending" | "all">("pending");
+  const [selectedId, setSelectedId] = useState("");
+  const [detail, setDetail] = useState<RecruitmentApplicationReview | null>(null);
+  const [detailError, setDetailError] = useState("");
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [score, setScore] = useState("");
+  const [internalNote, setInternalNote] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const mutation = useWorkspaceMutation();
+  const queue = usePersonalQuery<WorkspaceList<RecruitmentApplicationQueueItem> & { total: number; hasMore: boolean }>(
+    token, `workspace/${clubId}/recruitment?list=review&page=${page}&limit=24`, refresh,
+  );
+  const visible = (queue.data?.items ?? []).filter(item => filter === "all" || item.status === "submitted");
+
+  useEffect(() => {
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") setRefresh(value => value + 1);
+    };
+    const timer = window.setInterval(refreshWhenVisible, 15000);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!visible.length) { setSelectedId(""); return; }
+    if (!visible.some(item => item.application_id === selectedId)) setSelectedId(visible[0].application_id);
+  }, [queue.data, filter, selectedId]);
+
+  useEffect(() => {
+    if (!selectedId) { setDetail(null); return; }
+    const controller = new AbortController();
+    setDetail(null);
+    setDetailLoading(true); setDetailError("");
+    void accountRequest<{ item: RecruitmentApplicationReview }>(token,
+      `workspace/${clubId}/recruitment/applications/${selectedId}`, { signal: controller.signal })
+      .then(result => { if (!controller.signal.aborted) setDetail(result.item); })
+      .catch(cause => { if (!controller.signal.aborted) setDetailError(cause instanceof Error ? cause.message : "Chưa tải được hồ sơ."); })
+      .finally(() => { if (!controller.signal.aborted) setDetailLoading(false); });
+    return () => controller.abort();
+  }, [token, clubId, selectedId, detailRefresh]);
+
+  useEffect(() => {
+    setScore(detail?.score == null ? "" : String(detail.score));
+    setInternalNote(detail?.internal_note ?? "");
+    setFeedback(detail?.feedback ?? "");
+  }, [detail]);
+
+  async function submitReview(status: "submitted" | "interviewing" | "accepted" | "rejected") {
+    if (!detail) return;
+    const scoreValue = score.trim() ? Number(score) : null;
+    if (scoreValue !== null && (!Number.isInteger(scoreValue) || scoreValue < 0 || scoreValue > 100)) return;
+    const saved = await mutation.run(signal => workspaceRequest<{ application: unknown }>(token, clubId,
+      `recruitment/applications/${detail.application_id}/review`, {
+        method: "PATCH", signal,
+        body: JSON.stringify({ status, score: scoreValue, internal_note: internalNote, feedback }),
+      }));
+    if (saved) {
+      setRefresh(value => value + 1);
+      setDetailRefresh(value => value + 1);
+    }
+  }
+
+  return <main className="cw-recruitment cw-rec-review">
+    <header className="cw-heading cw-rec-heading"><div><span className="cw-eyebrow">Tuyển thành viên</span><h1>Hồ sơ ứng tuyển</h1><p>Xem câu trả lời và cập nhật kết quả vòng đơn của ban bạn phụ trách.</p></div></header>
+    <div className="cw-rec-review-layout">
+      <aside className="cw-panel cw-rec-panel cw-rec-review-list" aria-label="Danh sách hồ sơ">
+        <div className="cw-rec-review-list-heading"><h2>Danh sách hồ sơ</h2><span>{queue.data?.total ?? 0}</span>
+          <button type="button" onClick={() => setRefresh(value => value + 1)} disabled={queue.loading}>Tải lại</button>
+        </div>
+        <label className="cw-rec-review-filter">Trạng thái
+          <select value={filter} onChange={event => setFilter(event.target.value as "pending" | "all")}>
+            <option value="pending">Chờ duyệt</option><option value="all">Tất cả hồ sơ</option>
+          </select>
+        </label>
+        {queue.loading && <p className="cw-rec-empty" role="status">Đang tải hồ sơ…</p>}
+        {queue.error && <div className="cw-rec-error" role="alert">{queue.error}<button type="button" onClick={queue.retry}>Thử lại</button></div>}
+        {!queue.loading && !queue.error && !visible.length && <p className="cw-rec-empty">{filter === "pending" ? "Chưa có hồ sơ cần duyệt." : "Chưa có hồ sơ ứng tuyển."}</p>}
+        <div className="cw-rec-review-items">{visible.map(item => <button key={item.application_id} type="button"
+          className={selectedId === item.application_id ? "is-selected" : ""} onClick={() => setSelectedId(item.application_id)}>
+          <span className="cw-rec-review-item-copy"><strong>{item.full_name}</strong><small>{item.department_name} · {new Date(item.submitted_at).toLocaleDateString("vi-VN")}</small></span>
+          <span className={`cw-rec-review-status is-${item.status}`}>{applicationStatusLabel[item.status]}</span>
+        </button>)}</div>
+        {queue.data && (page > 1 || queue.data.hasMore) && <div className="cw-rec-review-pagination">
+          <button type="button" disabled={page <= 1} onClick={() => setPage(value => Math.max(1, value - 1))}>← Trước</button>
+          <span>Trang {page}</span>
+          <button type="button" disabled={!queue.data.hasMore} onClick={() => setPage(value => value + 1)}>Sau →</button>
+        </div>}
+      </aside>
+
+      <section className="cw-panel cw-rec-panel cw-rec-review-detail" aria-live="polite">
+        {detailLoading && <p role="status">Đang tải chi tiết hồ sơ…</p>}
+        {detailError && <p className="cw-rec-error" role="alert">{detailError}</p>}
+        {!detail && !detailLoading && !detailError && <div className="cw-rec-empty"><h2>Chọn hồ sơ ứng tuyển</h2><p>Thông tin ứng viên và câu trả lời sẽ hiển thị tại đây.</p></div>}
+        {detail && <>
+          <header className="cw-rec-review-applicant"><h2>{detail.full_name}</h2><p>{detail.department_name} · Đã nộp {new Date(detail.submitted_at).toLocaleString("vi-VN")}</p><span className={`cw-rec-review-status is-${detail.status}`}>{applicationStatusLabel[detail.status]}</span></header>
+          <section className="cw-rec-review-section"><h3>Thông tin khi nộp đơn</h3><dl><div><dt>Mã sinh viên</dt><dd>{detail.student_code}</dd></div><div><dt>Đợt tuyển</dt><dd>{detail.campaign_title}</dd></div>
+            {detail.portfolio_url && <div><dt>CV / Portfolio</dt><dd><a href={detail.portfolio_url} target="_blank" rel="noreferrer">Mở liên kết</a></dd></div>}</dl></section>
+          <section className="cw-rec-review-section"><h3>Câu trả lời</h3>{detail.questions.map(question => <article className="cw-rec-review-answer" key={question.question_id}><h4>{question.question_text}</h4><p>{detail.answers?.[question.question_id] || "Không có câu trả lời"}</p></article>)}</section>
+          <section className="cw-rec-review-section cw-rec-review-evaluation"><h3>Đánh giá vòng đơn</h3>
+            <label>Điểm (0–100) <span>không bắt buộc</span><input type="number" min={0} max={100} step={1} value={score} onChange={event => setScore(event.target.value)} placeholder="Nhập điểm" disabled={detail.status === "accepted" || detail.status === "rejected"} /></label>
+            <label>Ghi chú nội bộ <span>không bắt buộc</span><textarea rows={3} value={internalNote} onChange={event => setInternalNote(event.target.value)} placeholder="Nhập ghi chú…" disabled={detail.status === "accepted" || detail.status === "rejected"} /></label>
+            <label>Phản hồi gửi ứng viên <span>không bắt buộc</span><textarea rows={3} value={feedback} onChange={event => setFeedback(event.target.value)} placeholder="Nhập phản hồi…" disabled={detail.status === "accepted" || detail.status === "rejected"} /></label>
+            {score.trim() && (!Number.isInteger(Number(score)) || Number(score) < 0 || Number(score) > 100) && <p className="cw-rec-error" role="alert">Điểm cần là số nguyên từ 0 đến 100.</p>}
+            {mutation.error && <p className="cw-rec-error" role="alert">{mutation.error}</p>}
+            <footer className="cw-rec-review-actions">
+              {detail.status !== "accepted" && detail.status !== "rejected" ? <>
+                <button type="button" disabled={mutation.busy} onClick={() => void submitReview("submitted")}>Lưu đánh giá</button>
+                <button type="button" className="cw-rec-review-reject" disabled={mutation.busy} onClick={() => void submitReview("rejected")}>Từ chối đơn</button>
+                <button type="button" className="cw-primary" disabled={mutation.busy} onClick={() => void submitReview("interviewing")}>Cho qua vòng đơn</button>
+              </> : <span>Đã ghi nhận kết quả xét duyệt.</span>}
+            </footer>
+          </section>
+        </>}
+      </section>
+    </div>
+  </main>;
+}
+
+function ChairRecruitmentPage() {
   const { club, clubId, token, membership } = useClub();
   const departments = usePersonalQuery<WorkspaceList<Department>>(token, `workspace/${clubId}/departments`);
   return <div className="cw-recruitment">
-    <header className="cw-heading cw-rec-heading"><div><span className="cw-eyebrow">Tuyển thành viên</span><h1>Tạo đợt tuyển</h1><p>Mở cánh cửa đến {club.name}. Cùng tìm những người đồng hành mới.</p></div><span className="cw-rec-badge">Bản mẫu</span></header>
+    <header className="cw-heading cw-rec-heading"><div><span className="cw-eyebrow">Tuyển thành viên</span><h1>Tạo đợt tuyển</h1><p>Mở cánh cửa đến {club.name}. Cùng tìm những người đồng hành mới.</p></div></header>
     {!departments.data ? <section className="cw-panel cw-rec-panel" aria-label="Danh sách ban">
       {departments.loading ? <p role="status">Đang tải các ban của CLB…</p> : <><p className="cw-rec-error" role="alert">{departments.error}</p><button type="button" onClick={departments.retry}>Thử tải lại các ban</button></>}
     </section> : <RecruitmentForm key={`${clubId}:${membership.user_id}`} departments={departments.data.items} />}
@@ -45,7 +184,9 @@ export function RecruitmentPage() {
 }
 
 function RecruitmentForm({ departments }: { departments: Department[] }) {
-  const { club, clubId, membership } = useClub();
+  const { club, clubId, membership, token } = useClub();
+  const navigate = useNavigate();
+  const mutation = useWorkspaceMutation();
   const storageKey = `uc:recruitment:v2:${membership.user_id}:${clubId}`;
   const [draft, setDraft] = useState(() => withRecruitmentDepartments(loadRecruitmentDraft(storageKey), departments));
   const [baseline, setBaseline] = useState(() => JSON.stringify(draft));
@@ -56,6 +197,7 @@ function RecruitmentForm({ departments }: { departments: Department[] }) {
   const [imageError, setImageError] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const reader = useRef<FileReader | null>(null);
+  const uploadedCover = useRef<{ source: string; url: string } | null>(null);
   const selected = draft.departments.filter(d => d.enabled);
   const active = selected.find(d => d.id === activeId) || selected[0];
   useUnsavedChanges(JSON.stringify(draft) !== baseline);
@@ -96,6 +238,50 @@ function RecruitmentForm({ departments }: { departments: Department[] }) {
       setMessage("Đã lưu bản nháp trong tab trình duyệt này. Đợt tuyển chưa được đăng.");
     } catch { setError("Chưa lưu được bản nháp. Bộ nhớ trình duyệt có thể đã đầy; thử dùng ảnh nhỏ hơn."); }
   }
+  async function publish() {
+    setMessage(""); setError("");
+    if (membership.role !== "chairperson") { setError("Chỉ chủ nhiệm được đăng đợt tuyển."); return; }
+    if (draft.title.trim().length < 2 || draft.description.trim().length < 10) {
+      setError("Nhập tên đợt tuyển từ 2 ký tự và mô tả từ 10 ký tự."); return;
+    }
+    if (!draft.opensAt || !draft.closesAt || draft.closesAt <= draft.opensAt) {
+      setError("Chọn ngày mở đơn và ngày đóng đơn; ngày đóng phải sau ngày mở."); return;
+    }
+    if (!selected.length) { setError("Chọn ít nhất một ban đang tuyển."); return; }
+    const invalid = selected.find(d => !d.description.trim() || !d.requirements.trim() || !Number.isInteger(Number(d.quota)) || Number(d.quota) < 1 || Number(d.quota) > 1000 || d.questions.some(q => !q.text.trim()));
+    if (invalid) { setActiveId(invalid.id); setError(`Điền đủ công việc, yêu cầu, chỉ tiêu và nội dung câu hỏi của ${invalid.name}.`); return; }
+    const published = await mutation.run(async signal => {
+      // Preserve IDs and the exact form for a manual retry in this page session.
+      try { sessionStorage.setItem(storageKey, JSON.stringify(draft)); }
+      catch { sessionStorage.setItem(storageKey, JSON.stringify({ ...draft, cover: null })); }
+      let cover_url: string | undefined;
+      if (draft.cover) {
+        if (draft.cover.url.startsWith("https://")) cover_url = draft.cover.url;
+        else if (uploadedCover.current?.source === draft.cover.url) cover_url = uploadedCover.current.url;
+        else {
+          const [header, encoded] = draft.cover.url.split(",");
+          const bytes = Uint8Array.from(atob(encoded), character => character.charCodeAt(0));
+          const file = new Blob([bytes], { type: header.includes("image/png") ? "image/png" : "image/jpeg" });
+          const body = new FormData(); body.append("file", file, draft.cover.name);
+          const uploaded = await workspaceRequest<{ cover_url: string }>(token, clubId, "recruitment-cover", { method: "POST", body, signal });
+          uploadedCover.current = { source: draft.cover.url, url: uploaded.cover_url };
+          cover_url = uploaded.cover_url;
+        }
+        sessionStorage.setItem(storageKey, JSON.stringify({ ...draft, cover: { ...draft.cover, url: cover_url } }));
+      }
+      return workspaceRequest<{ item: RecruitmentCampaign }>(token, clubId, "recruitment", { method: "POST", signal, body: JSON.stringify({
+        campaign_id: draft.campaignId, title: draft.title.trim(), description: draft.description.trim(), cover_url,
+        application_opens_at: `${draft.opensAt}T00:00:00+07:00`, application_closes_at: `${draft.closesAt}T23:59:59.999+07:00`,
+        departments: selected.map(d => ({ recruitment_department_id: d.recruitmentId, department_id: d.id, description: d.description.trim(), requirements: d.requirements.trim(), target_quantity: Number(d.quota),
+          questions: d.questions.map(q => ({ question_id: q.id, question_text: q.text.trim(), help_text: q.hint.trim(), is_required: q.required, max_length: q.maxLength || 5000 })) })),
+      }) });
+    });
+    if (published) {
+      setBaseline(JSON.stringify(draft));
+      try { sessionStorage.removeItem(storageKey); } catch { /* Publication already succeeded. */ }
+      navigate(`/workspace/${clubId}/activities`, { state: { recruitmentPublished: published.item.campaign_id } });
+    }
+  }
   function openPreview() {
     if (!selected.length) { setError("Chọn ít nhất một ban để xem trước mẫu đơn."); return; }
     if (draft.opensAt && draft.closesAt && draft.closesAt <= draft.opensAt) {
@@ -105,14 +291,15 @@ function RecruitmentForm({ departments }: { departments: Department[] }) {
   }
 
   return <>
-    <form onSubmit={save} noValidate>
+    <form onSubmit={save} noValidate aria-busy={mutation.busy}>
+      <fieldset disabled={mutation.busy} className="cw-rec-fields">
       <div className="cw-rec-grid">
         <div className="cw-rec-general">
           <section className="cw-panel cw-rec-panel" aria-labelledby="recruitment-info">
             <h2 id="recruitment-info">Thông tin đợt tuyển</h2>
             <label>Tên đợt tuyển<Required /><input required value={draft.title} maxLength={160} onChange={e => update({ title: e.target.value })} /></label>
             <label>Mô tả<Required /><textarea required value={draft.description} maxLength={5000} rows={5} onChange={e => update({ description: e.target.value })} /></label>
-            <div className="cw-rec-cover-field"><span className="cw-rec-label">Ảnh bìa<Required /></span>
+            <div className="cw-rec-cover-field"><span className="cw-rec-label">Ảnh bìa</span>
               <input ref={fileInput} className="cw-rec-file-input" type="file" accept="image/png,image/jpeg" aria-label="Chọn ảnh bìa" onChange={chooseCover} />
               {draft.cover ? <div className="cw-rec-cover-preview"><img src={draft.cover.url} alt="Ảnh bìa đợt tuyển" /><div><span>{draft.cover.name}</span><button type="button" onClick={() => fileInput.current?.click()}>Đổi ảnh</button><button type="button" aria-label="Xóa ảnh bìa" onClick={() => { reader.current?.abort(); update({ cover: null }); setImageError(""); }}><X size={16} /></button></div></div>
                 : <button className="cw-rec-upload" type="button" onClick={() => fileInput.current?.click()}><span className="cw-rec-upload-icon"><UploadSimple size={24} aria-hidden="true" /></span><strong>Tải ảnh bìa lên</strong><span>PNG, JPG · tối đa 10 MB</span></button>}
@@ -120,7 +307,7 @@ function RecruitmentForm({ departments }: { departments: Department[] }) {
             </div>
             <div className="cw-rec-dates"><label>Mở đơn<Required /><input type="date" required value={draft.opensAt} onChange={e => update({ opensAt: e.target.value })} /></label><label>Đóng đơn<Required /><input type="date" required min={draft.opensAt || undefined} value={draft.closesAt} onChange={e => update({ closesAt: e.target.value })} /></label></div>
           </section>
-          <section className="cw-panel cw-rec-panel cw-rec-departments" aria-labelledby="recruitment-departments"><div className="cw-rec-section-heading"><h2 id="recruitment-departments">Ban đang tuyển</h2><span>{selected.length} ban</span></div><p className="cw-rec-help">Chọn ban để thiết lập mẫu đơn riêng.</p>
+          <section className="cw-panel cw-rec-panel cw-rec-departments" aria-labelledby="recruitment-departments"><div className="cw-rec-section-heading"><h2 id="recruitment-departments">Ban đang tuyển</h2><span>{selected.length} ban</span></div><p className="cw-rec-help">Chọn ban để thiết lập mẫu đơn riêng. Ban quản lý không mở tuyển thành viên.</p>
             {draft.departments.map(d => <label key={d.id} className="cw-rec-department"><input type="checkbox" checked={d.enabled} onChange={e => updateDepartment(d.id, { enabled: e.target.checked })} /><span>{d.name}</span></label>)}
             {!draft.departments.length && <p className="cw-rec-empty">CLB chưa có ban đang hoạt động. <a href={`/workspace/${clubId}/departments`} className="cw-link">Quản lý các ban →</a></p>}
           </section>
@@ -151,8 +338,10 @@ function RecruitmentForm({ departments }: { departments: Department[] }) {
         </section>
       </div>
       {error && <p className="cw-rec-error" role="alert">{error}</p>}
+      {mutation.error && <p className="cw-rec-error" role="alert">{mutation.error} Biểu mẫu đã được giữ lại; nếu kết nối gián đoạn, kiểm tra Của tôi trước khi thử lại.</p>}
       {message && <p className="cw-rec-success" role="status">{message}</p>}
-      <footer className="cw-rec-actions"><p>Bản mẫu giao diện · Bản nháp chỉ lưu trong tab này.</p><div><button type="button" onClick={openPreview}><Eye size={18} aria-hidden="true" />Xem trước mẫu đơn</button><button type="submit" className="cw-primary"><FloppyDisk size={18} aria-hidden="true" />Lưu nháp</button></div></footer>
+      <footer className="cw-rec-actions"><p>Lưu nháp trong tab này hoặc đăng lên Hoạt động CLB khi đã hoàn tất.</p><div><button type="button" onClick={openPreview}><Eye size={18} aria-hidden="true" />Xem trước mẫu đơn</button><button type="submit"><FloppyDisk size={18} aria-hidden="true" />Lưu nháp</button><button type="button" className="cw-primary" onClick={publish}>{mutation.busy ? "Đang đăng…" : "Đăng đợt tuyển"}</button></div></footer>
+      </fieldset>
     </form>
     {preview && <RecruitmentPreview draft={draft} clubName={club.name} onClose={() => setPreview(false)} />}
   </>;

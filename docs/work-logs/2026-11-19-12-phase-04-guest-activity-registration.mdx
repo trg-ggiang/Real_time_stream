@@ -1,0 +1,43 @@
+---
+title: Người mới đăng ký hoạt động công khai
+description: Mở đường từ Không gian sinh hoạt tới hoạt động cho người chưa tham gia CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-12
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Người mới chưa tham gia CLB vẫn có thể thao tác để xem và chọn hoạt động đăng ký.
+
+## Công việc hoàn thành
+
+- Mục Hoạt động trong sidebar Không gian sinh hoạt dẫn tới danh sách công khai `/activities`.
+- Thêm nút Khám phá hoạt động ở trạng thái chưa tham gia CLB và lối vào tương ứng ở panel thông tin.
+- Giữ đăng ký hoạt động qua chi tiết công khai hiện có; thao tác cần đăng nhập và hồ sơ sinh viên hoàn chỉnh, không yêu cầu đã là thành viên CLB.
+- Cập nhật README, thiết kế workspace, phase plan, master plan, changelog và session log.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm thử tự động | Skipped | Không chạy theo chỉ dẫn môi trường. |
+| Browser/DB live | Skipped | Chưa nghiệm thu thao tác trên trình duyệt hoặc dữ liệu thật. |
+
+## Quyết định và lý do
+
+Tái sử dụng `/activities` và `AccountAction` hiện có, tránh tạo một luồng đăng ký hoạt động thứ hai. Mục Viết bài/Tạo họp trong menu xem trước giữ nguyên vì người chưa có CLB chưa có quyền thực hiện các thao tác quản trị đó.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh bằng browser tài khoản mới hoặc đăng ký với Supabase thật.
+
+## Bước tiếp theo
+
+Đăng nhập tài khoản có hồ sơ hoàn chỉnh, vào Không gian sinh hoạt → Khám phá hoạt động, mở một hoạt động đang nhận đăng ký và xác nhận nút đăng ký hoạt động bình thường.

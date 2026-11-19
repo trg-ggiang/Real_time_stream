@@ -1,5 +1,15 @@
 # Real-time Stream — Meeting Module
 
+### Tuyển thành viên — 19/11/2026
+
+Trạng thái hiện tại: trưởng ban thấy hàng chờ hồ sơ của ban mình trong mục Tuyển thành viên dưới Thành viên; chủ nhiệm tạo và đăng campaign.
+
+Chủ nhiệm có thể mở tuyển cho nhiều ban; trưởng ban nhận đơn trong hàng chờ riêng theo ban mình phụ trách, đọc câu trả lời và lưu đánh giá trong `application_reviews`, từ chối hoặc cho qua vòng đơn. Ứng viên tạo draft rỗng với `profile_snapshot = NULL`, ghi đáp án vào `application_answers`, rồi để trigger DB xác thực và dựng snapshot khi chuyển sang `submitted`. Không chạy các migration recruitment 001/002 cũ: chúng mô tả cấu trúc khác với DB bạn gửi. Schema live chưa được truy vấn trực tiếp; xem [hướng dẫn workspace](docs/design/phase-04-club-workspace.md) và [work log](docs/work-logs/2026-11-19-17-phase-04-recruitment-trigger-snapshot.mdx).
+
+Người mới chưa tham gia CLB vẫn có thể mở **Hoạt động** trong Không gian sinh hoạt hoặc bấm **Khám phá hoạt động**, xem hoạt động công khai và đăng ký bằng tài khoản có hồ sơ sinh viên hoàn chỉnh. [Work log](docs/work-logs/2026-11-19-12-phase-04-guest-activity-registration.mdx).
+
+Đơn ứng tuyển gắn với `recruitment_department_id` đã chọn và xuất hiện trong hàng chờ của trưởng ban phụ trách ban đó. [Work log](docs/work-logs/2026-11-19-13-phase-04-recruitment-delivery-feedback.mdx).
+
 ## Đề xuất khung giao diện mới
 
 Phase thiết kế sản phẩm 1 (16/11/2026): [bản đồ màn hình, quyền và API](docs/design/phase-01-product-frame.md), [storyboard sáu màn hình](docs/design/phase-01-review/index.html). Mở storyboard bằng trình duyệt; đây là bản phác thảo độc lập, không phải frontend đã được thay thế và không ghi dữ liệu. Phần ứng dụng hiện tại vẫn chạy theo hướng dẫn bên dưới.

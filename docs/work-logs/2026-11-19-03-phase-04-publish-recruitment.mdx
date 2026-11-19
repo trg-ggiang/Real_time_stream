@@ -1,0 +1,64 @@
+---
+title: Đăng đợt tuyển lên Hoạt động CLB
+description: Lưu mẫu đơn tuyển vào các bảng hiện có và hiển thị trong workspace.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-03
+- Thời gian kết thúc: 2026-11-19 15:45 +07:00; không ghi nhận giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chủ nhiệm hoàn tất mẫu đơn tuyển thành viên, lưu vào DB và đăng ở `/workspace/:clubId/activities`. Đối chiếu schema tham khảo người dùng gửi; không thực thi đoạn CREATE TABLE đó.
+
+## Công việc hoàn thành
+
+- Thêm DTO lồng nhau và `WorkspaceRecruitment`, đăng ký service/controller trong workspace. API: POST/GET `/recruitment`, GET `/recruitment/:id`, POST multipart `/recruitment-cover`, dưới `/api/workspace/:clubId`.
+- Lưu `recruitment_campaigns` draft → `recruitment_departments` → `recruitment_questions`, kiểm tra nội dung đã lưu rồi mới chuyển campaign sang `open`. Actor từ JWT, kiểm tra chủ nhiệm/CLB/ban active; không nhận quyền từ body.
+- Giữ ID qua retry/reload, insert bỏ qua ID đã có rồi so sánh dữ liệu và phạm vi. Lỗi giữa chừng giữ draft riêng tư; thử lại cùng nội dung tiếp tục phần thiếu. Chặn gắn câu hỏi vào ban tuyển của campaign khác khi ID xung đột.
+- Upload PNG/JPG tối đa 10 MB, kiểm tra MIME/chữ ký tệp, backend tạo public bucket `recruitment-covers` khi cần. Object gồm club/user/SHA256, không ghi đè, DB giữ URL. Không tạo bucket hoặc upload live trong phiên.
+- Form có Đăng đợt tuyển, validation mọi ban, khóa đang gửi, giữ form khi lỗi và chuyển về Hoạt động khi thành công. Nháp vẫn lưu trong tab. Ảnh là tùy chọn; bản khôi phục khi đăng lưu URL sau upload để tránh quota sessionStorage do base64.
+- Hoạt động có mục Đợt tuyển thành viên trong Đã đăng/Của tôi, phân trang riêng và detail công việc/yêu cầu/chỉ tiêu/câu hỏi theo ban. Không sao chép campaign vào club_activities hoặc thêm người vào membership.
+- `account-http` hỗ trợ FormData boundary; JSON giữ hành vi hiện tại.
+- File backend: `backend/src/workspace/recruitment.dto.ts`, `workspace-recruitment.service.ts`, `workspace.controller.ts`, `workspace.module.ts`; test `backend/test/workspace-recruitment.test.cjs`.
+- File frontend: `frontend/src/features/club-workspace/WorkspaceApp.tsx`, `recruitment-model.ts`, `recruitment.css`, `services/workspace-api.ts`, `pages/RecruitmentPage.tsx`, `pages/RecruitmentActivities.tsx`, `pages/WorkspaceContent.tsx`, `pages/RecruitmentPage.test.tsx`; `frontend/src/shared/api/account-http.ts`.
+- Cập nhật README, tài liệu workspace, phase/master plan, session log, changelog và navigation.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Cả hai workspace |
+| `npm.cmd --workspace backend run build` | Passed | Ngoài sandbox sau lỗi EPERM tại dist |
+| `node --test backend/test/workspace-recruitment.test.cjs backend/test/workspace-departments.test.cjs backend/test/workspace-members.test.cjs backend/test/workspace-member-picker.test.cjs` | Passed | 16 tests, gồm 7 mới; fixtures, không ghi live |
+| `npm.cmd --workspace frontend test -- src/features/club-workspace/pages/RecruitmentPage.test.tsx src/features/club-workspace/WorkspaceApp.test.tsx --configLoader runner --pool threads` | Passed | 11 tests; upload → đăng → danh sách → detail, lỗi/retry/validation |
+| `npm.cmd --workspace frontend run build -- --configLoader runner --outDir ../output/recruitment-build` | Passed | Đổi tên artifact thành `output/build` thuộc ignore; cảnh báo chunk lớn |
+| Supabase metadata | Passed, read-only | OpenAPI xác nhận bảng tuyển; danh sách bucket còn trống lúc kiểm tra |
+| Whitespace / JSON / navigation | Passed có giới hạn | JSON hợp lệ, log mới tồn tại/đăng ký đúng; 11 trang thiếu đã có từ HEAD, không thêm trang thiếu mới. Không có Mintlify CLI |
+| Browser và DB/Storage live writes | Skipped | Không có công cụ browser; không tạo dữ liệu tuyển/bucket thử trên live |
+
+Frontend mặc định gặp EPERM tại `.vite-temp`; config loader runner/pool threads chạy được trong sandbox. Đã sửa truy vấn nhãn/trạng thái trong tests mới trước lần kiểm tra cuối. Không cài dependency, chạy migration, commit hoặc push.
+
+## Quyết định và lý do
+
+Dùng đúng bảng tuyển đã có; `open` là trạng thái đã đăng theo CHECK được cung cấp. Khoảng nhận đơn dùng hai timestamp riêng theo giờ Việt Nam, hết ngày đóng đã chọn. Phân trang tuyển riêng để giữ phân trang chính xác cho mỗi nguồn.
+
+## Blocker và việc chưa hoàn thành
+
+Code trong phạm vi đã hoàn thành; chưa nghiệm thu trigger/ghi DB với tài khoản thật. REST writes không phải transaction liên bảng; bản lưu dở không xuất hiện công khai. Retry cùng nội dung được hỗ trợ; thay đổi nội dung sau khi một phần đã lưu trả conflict, tránh ghi đè. Chưa có sửa campaign đã lưu, dọn ảnh thừa, ứng tuyển/duyệt hồ sơ hoặc realtime. Phase 04 tiếp tục In Progress.
+
+## Bước tiếp theo
+
+Khởi động lại backend, mở Tuyển thành viên bằng chủ nhiệm, hoàn tất và Đăng đợt tuyển. Kiểm tra DB open, ban/câu hỏi/ảnh và bài ở Đã đăng bằng chủ nhiệm/member trên môi trường test.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh

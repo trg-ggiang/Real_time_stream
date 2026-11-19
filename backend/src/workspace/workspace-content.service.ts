@@ -132,7 +132,7 @@ export class WorkspaceContent {
         summary,
         content: p.content.trim(),
         cover_url: p.cover_url || null,
-        visibility: p.visibility,
+        visibility: "public",
       };
     }
     const a = input as ActivityDraftDto;

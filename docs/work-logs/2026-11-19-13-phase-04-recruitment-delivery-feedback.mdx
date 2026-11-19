@@ -1,0 +1,44 @@
+---
+title: Xác nhận trưởng ban nhận đơn tuyển
+description: Làm rõ kết quả nộp đơn và phản hồi cấu hình khi thiếu bảng dữ liệu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-13
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đảm bảo đơn sau khi nộp được chuyển vào hàng chờ trưởng ban CLB và làm rõ kết quả trong giao diện.
+
+## Công việc hoàn thành
+
+- Giữ đơn gắn với `recruitment_department_id` mà ứng viên đã chọn; hàng chờ trưởng ban lọc các đơn của department được gán.
+- Thông báo thành công của form chỉ hiện sau khi API insert thành công và nêu rõ đơn đã vào hàng chờ trưởng ban của ban ứng tuyển.
+- Khi Supabase trả lỗi thiếu bảng/schema cache, backend ghi mã lỗi (không ghi dữ liệu ứng viên) và trả thông báo cần quản trị viên kiểm tra.
+- Cập nhật README, hướng dẫn workspace, phase/master plan, changelog và session log.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript. |
+| Automated tests | Skipped | Không chạy theo hướng dẫn môi trường. |
+| DB/browser | Skipped | Chưa áp dụng migration hoặc xác minh nhận đơn trên tài khoản thật. |
+
+## Quyết định và lý do
+
+Đơn được gửi tới hàng chờ trong ứng dụng, giới hạn bằng department của trưởng ban. Không có thông báo email/push trong hệ thống hiện tại.
+
+## Blocker và việc chưa hoàn thành
+
+Hai migration `20261119000100_create_recruitment_applications.sql` và `20261119000200_recruitment_application_review.sql` chưa áp dụng vào Supabase; lỗi trong ảnh cho thấy lần nộp đó chưa thành công. Chưa xác nhận schema live để kết luận migration chưa áp dụng là nguyên nhân chính xác.
+
+## Bước tiếp theo
+
+Kiểm tra log backend để xem mã lỗi Supabase; xác nhận hai migration đã áp dụng đúng thứ tự, rồi thử nộp đơn và mở hàng chờ bằng tài khoản trưởng ban cùng ban.

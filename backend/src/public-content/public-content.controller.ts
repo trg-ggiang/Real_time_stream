@@ -30,6 +30,8 @@ import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { User } from "../users/entities/user.entity";
 import { CreateClubDto } from "./create-club.dto";
 import { CompleteProfileGuard } from "../users/complete-profile.guard";
+import { PublicRecruitmentService } from "./public-recruitment.service";
+import { SubmitRecruitmentApplicationDto } from "./recruitment-application.dto";
 
 export class PublicPageQuery {
   @Type(() => Number)
@@ -50,6 +52,8 @@ export class DiscoveryQuery extends PublicPageQuery {
     "all" | "upcoming" | "past";
 }
 
+export class PublicRecruitmentQuery extends PublicPageQuery {}
+
 export class AdminClubsQuery extends PublicPageQuery {
   @IsOptional()
   @IsIn(["all", "pending", "approved", "rejected"])
@@ -64,6 +68,7 @@ export class PublicContentController {
   constructor(
     private readonly content: PublicContentService,
     private readonly admin: AdminService,
+    private readonly recruitment: PublicRecruitmentService,
   ) {}
   @Get("clubs") clubs(@Query() query: DiscoveryQuery) {
     return this.content.list("clubs", query.page, query.limit, query);
@@ -73,6 +78,28 @@ export class PublicContentController {
   }
   @Get("posts") posts(@Query() query: DiscoveryQuery) {
     return this.content.list("posts", query.page, query.limit, query);
+  }
+
+  @Get("recruitment") listRecruitment(@Query() query: PublicRecruitmentQuery) {
+    return this.recruitment.list(query.page, query.limit);
+  }
+
+  @Get("recruitment/:id")
+  @Header("Cache-Control", "public, max-age=60")
+  recruitmentDetail(@Param("id", ParseUUIDPipe) id: string) {
+    return this.recruitment.detail(id);
+  }
+
+  @Post("recruitment/:id/applications")
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Header("Cache-Control", "private, no-store")
+  @UseGuards(JwtAuthGuard, CompleteProfileGuard)
+  submitRecruitmentApplication(
+    @CurrentUser() user: User,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: SubmitRecruitmentApplicationDto,
+  ) {
+    return this.recruitment.apply(user.userId, id, dto);
   }
 
   @Post("clubs")

@@ -3,6 +3,70 @@ title: Phase 04 — API và React nền tảng
 description: Theo dõi Module 1 trong phạm vi đã được giao.
 ---
 
+## Trigger tự dựng snapshot ở transition submit (2026-11-19)
+
+Draft insert gửi rõ tất cả trường hệ thống là `NULL` theo điều kiện trigger; backend kiểm tra đủ hồ sơ (họ tên, mã sinh viên, trường/khoa, ngành, khóa) và đóng nhận đơn đúng tại `application_closes_at`. Typecheck đạt; DB live chưa thử lại. [Work log](/work-logs/2026-11-19-18-phase-04-recruitment-trigger-null-fields).
+
+## Làm mới hàng chờ hồ sơ ứng tuyển (2026-11-19)
+
+Hàng chờ trưởng ban tự kiểm tra đơn mới mỗi 15 giây, cập nhật khi quay lại tab và có nút tải lại thủ công. Đơn vẫn được lọc theo ban trưởng ban phụ trách; typecheck đạt. Chưa xác minh với đơn mới trên DB live. [Work log](/work-logs/2026-11-19-19-phase-04-recruitment-queue-refresh).
+
+## Trigger yêu cầu tạo own empty draft (2026-11-19)
+
+Backend insert application dưới dạng draft rỗng sở hữu bởi applicant trước, rồi ghi profile snapshot/answers và submit. Typecheck đạt; DB live chưa được thử lại. [Work log](/work-logs/2026-11-19-16-phase-04-recruitment-empty-draft-trigger).
+
+## Đồng bộ API đơn tuyển với schema đã gửi (2026-11-19)
+
+`recruitment_applications` dùng `applicant_id`/`profile_snapshot`; câu trả lời và đánh giá lưu ở `application_answers`/`application_reviews`. API đã được điều chỉnh theo schema. Migrations recruitment 001/002 cũ không khớp và không nên chạy. Typecheck đạt; DB live chưa xác minh. [Work log](/work-logs/2026-11-19-15-phase-04-match-recruitment-db-schema).
+
+## Chẩn đoán PGRST204 nộp đơn (2026-11-19)
+
+Log backend ghi message PostgREST để nêu cột chưa được schema cache nhận diện; phản hồi UI hướng quản trị viên kiểm tra migration và làm mới cache. Typecheck đạt; chưa thử Supabase thật. [Work log](/work-logs/2026-11-19-14-phase-04-recruitment-schema-diagnostic).
+
+## Đơn ứng tuyển vào hàng chờ trưởng ban (2026-11-19)
+
+Đơn lưu kèm ban được chọn; trưởng ban nhận đơn trong hàng chờ đúng department. Form xác nhận nơi nhận sau khi ghi thành công; lỗi thiếu bảng được chỉ rõ ở mức cấu hình, không lộ chi tiết DB. Typecheck đạt; chờ áp dụng hai migration và nghiệm thu DB/browser. [Work log](/work-logs/2026-11-19-13-phase-04-recruitment-delivery-feedback).
+
+## Khám phá hoạt động trước khi tham gia CLB (2026-11-19)
+
+Người mới vào Không gian sinh hoạt có liên kết tới hoạt động công khai ở sidebar, phần nội dung và panel thông tin. Trang hoạt động cho phép đăng ký theo điều kiện hồ sơ hiện có, không phụ thuộc membership CLB. [Work log](/work-logs/2026-11-19-12-phase-04-guest-activity-registration).
+
+## Trưởng ban xét duyệt đơn ứng tuyển (2026-11-19)
+
+Mục Tuyển thành viên mở hàng chờ hồ sơ của ban được gán. Trưởng ban xem hồ sơ/câu trả lời và lưu đánh giá, điểm, ghi chú nội bộ, phản hồi, hoặc từ chối/cho qua vòng đơn. API kiểm tra role và department. Typecheck đạt; cần áp dụng hai migrations recruitment trước khi nghiệm thu dữ liệu thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-11-phase-04-head-application-review).
+
+## Trang tuyển của trưởng ban tạm để trống — yêu cầu trước đó (2026-11-19)
+
+Lịch sử trạng thái trang trống trước khi có yêu cầu làm màn xét duyệt. [Work log](/work-logs/2026-11-19-10-phase-04-head-recruitment-blank).
+
+## Trưởng ban mở tuyển thành viên (2026-11-19)
+
+Thêm mục điều hướng dưới Thành viên cho role `head`; form và backend giới hạn campaign vào department của trưởng ban. Chủ nhiệm tiếp tục chọn nhiều ban. Chưa chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-09-phase-04-head-recruitment-entry).
+
+## Chọn ban trước khi ứng tuyển (2026-11-19)
+
+Trang chi tiết có bộ nút chọn ban; chỉ một biểu mẫu hiển thị theo ban đang chọn và chỉ gửi câu trả lời thuộc bộ câu hỏi đó. Chưa chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-08-phase-04-select-recruitment-department).
+
+## Ứng tuyển đợt tuyển thành viên (2026-11-19)
+
+Thêm trang công khai danh sách/chi tiết, form theo câu hỏi trong DB, tự điền họ tên/mã sinh viên và API lưu đơn. Migration thêm bảng có unique campaign/ban/người dùng và RLS; chưa áp dụng migration hoặc chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-07-phase-04-recruitment-applications).
+
+## Tải lại biểu mẫu tạo đợt tuyển (2026-11-19)
+
+Khi browser reload, biểu mẫu bỏ nháp lưu trong `sessionStorage` và tạo campaign/question/department IDs mới; retry trong cùng lần mở trang vẫn giữ mã để tránh ghi lặp. Không chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-06-phase-04-recruitment-reload-reset).
+
+## Bài viết CLB luôn công khai (2026-11-19)
+
+Đã bỏ lựa chọn nội bộ khỏi trình soạn bài và buộc API lưu bài mới/sửa bài với `visibility = public`. Bài được công khai trên trang người xem sau khi chủ nhiệm duyệt; bài nội bộ cũ không tự đổi. Chưa chạy kiểm tra tự động trong phiên này. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-05-phase-04-public-club-posts).
+
+## Chặn tuyển vào ban quản lý (2026-11-19)
+
+Form bỏ ban quản lý kể cả trong nháp đã lưu; API kiểm tra trước write. 8 backend và 9 frontend tests/typecheck đạt. Chưa thử lại đăng thật; Phase 04 In Progress. [Work log](/work-logs/2026-11-19-04-phase-04-recruitment-management).
+
+## Đăng đợt tuyển lên Hoạt động CLB (2026-11-19)
+
+Đã nối form với bảng campaign/ban/câu hỏi hiện có; chủ nhiệm đăng draft → open, upload ảnh Supabase Storage và đọc lại tại Hoạt động/detail. Typecheck, hai build, 16 backend và 11 frontend tests liên quan đạt. Không ghi DB/Storage live hoặc chạy migration; Phase 04 In Progress, chờ nghiệm thu tài khoản thật. [Work log](/work-logs/2026-11-19-03-phase-04-publish-recruitment).
+
 ## Bảng thành viên dành cho member (2026-11-19)
 
 Trang Thành viên của member/head dùng bảng năm cột theo hình tham chiếu, avatar tròn, ngày dd/mm/yyyy và nhãn trạng thái; chủ nhiệm giữ công cụ quản lý. Frontend build và 13 kiểm thử liên quan đạt; chưa nghiệm thu browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-02-phase-04-member-directory-table).

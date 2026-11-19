@@ -1,0 +1,63 @@
+.dc-recruitment-page { padding-top: 32px; padding-bottom: 80px; }
+.dc-recruitment-feed { padding: 28px; margin: 28px 0; border: 1px solid var(--dc-line); border-radius: 14px; background: #f7f9fc; }
+.dc-recruitment-feed > header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.dc-recruitment-feed > header h2 { font-size: 23px; }
+.dc-recruitment-feed > header p { color: var(--dc-muted); font-size: 13px; }
+.dc-recruitment-feed-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.dc-recruitment-feed-grid > article { overflow: hidden; border: 1px solid var(--dc-line); border-radius: 10px; background: white; }
+.dc-recruitment-feed-cover { display: block; height: 150px; background: #eaf0f8; }
+.dc-recruitment-feed-cover img { width: 100%; height: 100%; object-fit: cover; }
+.dc-recruitment-feed-grid > article > div { display: grid; gap: 7px; padding: 15px; }
+.dc-recruitment-feed-grid h3 { font-size: 16px; }
+.dc-recruitment-feed-grid article p:not(.dc-meta) { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; color: var(--dc-muted); font-size: 13px; }
+.dc-recruitment-page .dc-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 25px; color: var(--dc-muted); font-size: 13px; }
+.dc-recruitment-heading { max-width: 820px; margin-bottom: 22px; }
+.dc-recruitment-club { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 12px; color: var(--dc-blue); font-size: 13px; font-weight: 600; }
+.dc-recruitment-club img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.dc-recruitment-heading h1 { margin-bottom: 10px !important; font-size: clamp(30px, 5vw, 46px); }
+.dc-recruitment-heading > p { color: var(--dc-muted); white-space: pre-wrap; }
+.dc-recruitment-dates { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 22px; color: var(--dc-ink); }
+.dc-recruitment-dates span { display: grid; gap: 2px; }
+.dc-recruitment-dates small { color: var(--dc-muted); }
+.dc-recruitment-cover { width: 100%; max-height: 390px; object-fit: cover; border-radius: 16px; }
+.dc-recruitment-departments { display: grid; gap: 18px; margin-top: 32px; }
+.dc-recruitment-departments > h2 { font-size: 25px; }
+.dc-recruitment-department { padding: clamp(20px, 4vw, 34px); border: 1px solid var(--dc-line); border-radius: 14px; background: white; box-shadow: 0 12px 35px #152c5008; }
+.dc-recruitment-department > header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+.dc-recruitment-department > header h3 { font-size: 20px; }
+.dc-recruitment-department > header span { color: var(--dc-muted); font-size: 13px; }
+.dc-recruitment-department > h4 { margin: 18px 0 5px; font-size: 15px; }
+.dc-recruitment-department .dc-rich-text { color: var(--dc-muted); }
+.dc-recruitment-question-list { display: grid; gap: 12px; padding-left: 22px; }
+.dc-recruitment-question-list p { margin-top: 3px; color: var(--dc-muted); font-size: 13px; }
+.dc-recruitment-apply-trigger { margin-top: 24px; }
+.dc-recruitment-closed { margin-top: 20px; color: var(--dc-muted); }
+.dc-recruitment-selector { display: grid; gap: 18px; padding: clamp(20px, 4vw, 30px); margin-top: 24px; border: 1px solid var(--dc-line); border-radius: 12px; background: white; }
+.dc-recruitment-selector h2 { font-size: 21px; }
+.dc-recruitment-selector > div:first-child p { margin-top: 5px; color: var(--dc-muted); font-size: 13px; }
+.dc-recruitment-select-options { display: flex; flex-wrap: wrap; gap: 10px; }
+.dc-app .dc-recruitment-select-options button { display: grid; justify-items: start; gap: 3px; min-width: 155px; padding: 11px 15px; border: 1px solid #c9d7eb; border-radius: 8px; color: var(--dc-ink); background: #f7f9fc; text-align: left; cursor: pointer; }
+.dc-app .dc-recruitment-select-options button.selected, .dc-app .dc-recruitment-select-options button[aria-pressed='true'] { border-color: var(--dc-blue); color: var(--dc-blue); background: #eaf1fb; box-shadow: 0 0 0 1px var(--dc-blue); }
+.dc-recruitment-select-options button span { font-weight: 600; }
+.dc-recruitment-select-options button small { color: var(--dc-muted); font-size: 11px; }
+.dc-recruitment-select-options button:focus-visible { outline: 3px solid #a9c5ef; outline-offset: 2px; }
+.dc-recruitment-application { max-width: 760px; padding: clamp(18px, 4vw, 30px); margin: 24px auto 0; border: 1px solid #c9d7eb; border-radius: 12px; background: #f7f9fc; }
+.dc-recruitment-application > h3 { margin-bottom: 18px; font-size: 20px; }
+.dc-recruitment-application fieldset { display: grid; gap: 18px; padding: 0; border: 0; }
+.dc-recruitment-profile, .dc-recruitment-answers { display: grid; gap: 12px; }
+.dc-recruitment-profile h4, .dc-recruitment-answers h4 { padding: 8px 12px; border-radius: 7px; background: #eaf1fb; font-size: 14px; }
+.dc-recruitment-application label { display: grid; gap: 6px; color: var(--dc-ink); font-size: 13px; font-weight: 500; }
+.dc-recruitment-application label > span { color: #b64242; }
+.dc-recruitment-application label small { color: var(--dc-muted); font-weight: 400; }
+.dc-recruitment-application input, .dc-recruitment-application textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--dc-line); border-radius: 7px; color: var(--dc-ink); background: white; font: inherit; font-size: 14px; }
+.dc-recruitment-application input[readonly] { background: #f0f3f8; }
+.dc-recruitment-application :is(input, textarea):focus-visible { outline: 3px solid #a9c5ef; outline-offset: 2px; }
+.dc-recruitment-application textarea { min-height: 90px; resize: vertical; }
+.dc-recruitment-submit { width: 100%; margin-top: 20px; }
+.dc-recruitment-form-error, .dc-recruitment-form-success { padding: 10px 12px; margin-top: 14px !important; border-radius: 7px; font-size: 13px; }
+.dc-recruitment-form-error { color: #963737; background: #fff0f0; }
+.dc-recruitment-form-success { color: #246747; background: #eaf5ef; }
+.dc-recruitment-profile-required { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.dc-recruitment-profile-required p { flex: 1 1 240px; }
+@media (max-width: 760px) { .dc-recruitment-feed-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .dc-recruitment-page { padding-top: 22px; }.dc-recruitment-dates { gap: 16px; }.dc-recruitment-application { margin-top: 18px; }.dc-recruitment-feed { padding: 19px; }.dc-recruitment-feed-grid { grid-template-columns: minmax(0, 1fr); } }

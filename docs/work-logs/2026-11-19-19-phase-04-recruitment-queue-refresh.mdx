@@ -1,0 +1,51 @@
+---
+title: Tự cập nhật hàng chờ ứng tuyển
+description: Làm mới danh sách hồ sơ trưởng ban khi có đơn mới.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-19
+- Thời gian kết thúc: 2026-11-19, Asia/Saigon (giờ bắt đầu không có dữ liệu)
+- Agent: Codex
+- Phase: 04 — Club workspace và ứng tuyển
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đảm bảo hồ sơ ứng tuyển đã nộp được cập nhật trong hàng chờ của trưởng ban, kể cả khi trang đang mở trước lúc có đơn mới.
+
+## Công việc hoàn thành
+
+- Giữ truy vấn hàng chờ giới hạn theo ban trưởng ban phụ trách; truy vấn hiện có chỉ trả đơn không còn ở trạng thái `draft`.
+- Tự làm mới danh sách mỗi 15 giây và khi quay lại tab.
+- Thêm nút tải lại thủ công.
+- Tách việc làm mới danh sách khỏi chi tiết hồ sơ để nhịp polling không xóa nội dung đánh giá đang nhập.
+- Thay đổi giao diện: `frontend/src/features/club-workspace/pages/RecruitmentPage.tsx`, `frontend/src/features/club-workspace/recruitment.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript |
+| Kiểm tra DB/browser live | Skipped | Chưa có lần nộp mới để nghiệm thu đầu cuối |
+
+## Quyết định và lý do
+
+Polling giữ trang đơn giản và tự cập nhật trong lúc trưởng ban đang xem; nút tải lại giúp chủ động kiểm tra ngay. Không thay đổi bảng hoặc quyền truy cập.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác nhận hồ sơ thật xuất hiện do chưa có truy vấn/ghi DB live trong phiên này.
+
+## Bước tiếp theo
+
+Khởi động lại backend/frontend nếu đang chạy bản cũ, nộp thử một đơn thành công rồi kiểm tra hồ sơ xuất hiện ở đúng ban trong trang Tuyển thành viên.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong `docs.json`
+- [x] Ghi rõ xác minh DB live còn pending

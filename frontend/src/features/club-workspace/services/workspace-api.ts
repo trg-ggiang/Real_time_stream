@@ -69,6 +69,48 @@ export interface WorkspaceList<T> {
   total?: number;
   hasMore?: boolean;
 }
+export interface RecruitmentCampaign {
+  campaign_id: string;
+  club_id: string;
+  title: string;
+  description: string;
+  cover_url: string | null;
+  application_opens_at: string;
+  application_closes_at: string;
+  status: "draft" | "open" | "closed" | "completed" | "cancelled";
+  created_by: string;
+  updated_at: string;
+  departments?: {
+    recruitment_department_id: string;
+    department_id: string;
+    description: string;
+    requirements: string | null;
+    target_quantity: number | null;
+    club_departments: { name: string };
+    recruitment_questions: { question_id: string; question_text: string; help_text: string | null; is_required: boolean; max_length: number; sort_order: number }[];
+  }[];
+}
+export type RecruitmentApplicationStatus = "draft" | "submitted" | "interviewing" | "accepted" | "rejected" | "withdrawn";
+export interface RecruitmentApplicationQueueItem {
+  application_id: string;
+  campaign_id: string;
+  recruitment_department_id: string;
+  full_name: string;
+  student_code: string;
+  status: RecruitmentApplicationStatus;
+  submitted_at: string;
+  score: number | null;
+  internal_note: string | null;
+  feedback: string | null;
+  department_name: string;
+  campaign_title: string;
+}
+export interface RecruitmentApplicationReview extends RecruitmentApplicationQueueItem {
+  answers: Record<string, string>;
+  portfolio_url: string | null;
+  questions: { question_id: string; question_text: string }[];
+}
+export const recruitmentStatus = (status: RecruitmentCampaign["status"]) => ({ draft: "Bản nháp", open: "Đã đăng", closed: "Đã đóng đơn", completed: "Đã hoàn thành", cancelled: "Đã hủy" })[status];
 export const contentId = (item: ContentItem) =>
   item.post_id || item.activity_id!;
 export const contentStatus = (status: string) =>

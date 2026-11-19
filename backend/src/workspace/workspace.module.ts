@@ -5,9 +5,10 @@ import { WorkspaceController } from "./workspace.controller";
 import { WorkspaceAccess } from "./workspace-access.service";
 import { WorkspacePeople } from "./workspace-people.service";
 import { WorkspaceContent } from "./workspace-content.service";
+import { WorkspaceRecruitment } from "./workspace-recruitment.service";
 @Module({
   imports: [AuthModule, UsersModule],
   controllers: [WorkspaceController],
-  providers: [WorkspaceAccess, WorkspacePeople, WorkspaceContent],
+  providers: [WorkspaceAccess, WorkspacePeople, WorkspaceContent, WorkspaceRecruitment],
 })
 export class WorkspaceModule {}

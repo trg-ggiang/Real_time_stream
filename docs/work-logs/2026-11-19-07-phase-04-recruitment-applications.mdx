@@ -1,0 +1,44 @@
+---
+title: Đơn ứng tuyển tuyển thành viên
+description: Form ứng tuyển công khai dùng hồ sơ và câu hỏi đã lưu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-07
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sau khi mở chi tiết đợt tuyển, người dùng có thể xem form được thiết kế theo giao diện hiện tại, dùng câu hỏi đã lưu theo ban và nộp đơn.
+
+## Công việc hoàn thành
+
+- Thêm API công khai đọc campaign đang/đã mở và danh sách đợt tuyển đang mở.
+- Nối danh sách workspace sang trang chi tiết công khai; trang Hoạt động có thêm các campaign tuyển thành viên.
+- Thêm form theo ban, lấy câu hỏi từ `recruitment_questions`, tự điền họ tên/mã sinh viên từ hồ sơ.
+- Thêm endpoint nộp đơn; backend kiểm tra campaign/date, ban, câu hỏi bắt buộc/độ dài và lưu snapshot hồ sơ, câu trả lời, URL CV.
+- Thêm migration `recruitment_applications` với RLS, quyền chỉ backend, unique campaign/ban/người dùng và index đọc.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra tự động | Skipped | Không chạy theo chỉ dẫn phiên. |
+| Browser/DB live | Skipped | Chưa áp dụng migration; không ghi dữ liệu live. |
+
+## Quyết định và lý do
+
+Mỗi người dùng có tối đa một đơn cho mỗi ban trong một campaign. Câu trả lời lưu dạng JSON object theo question ID; tên và mã sinh viên được chụp tại thời điểm nộp để giữ thông tin hồ sơ lúc ứng tuyển. Backend service role là đường ghi duy nhất; RLS bật và anon/authenticated không có quyền trực tiếp.
+
+## Blocker và việc chưa hoàn thành
+
+Cần áp dụng migration trước khi endpoint nộp đơn dùng được. Chưa nghiệm thu trên browser hoặc Supabase live.
+
+## Bước tiếp theo
+
+Áp dụng migration trong môi trường Supabase test, sau đó đăng campaign, đăng nhập bằng hồ sơ sinh viên, nộp đơn và xác nhận dòng application cùng JSON answers.

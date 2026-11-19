@@ -32,7 +32,11 @@
 .cw-nav-separator { height: 1px; background: #dce4ee; margin: 18px 10px 2px; }
 .cw-sidebar-bottom { margin-top: auto; }
 .cw-rail-home { font-size: 29px !important; }
-.cw-entry-sidebar nav span { color: #73839a; font-size: 14px; padding: 9px 12px; }
+.cw-entry-sidebar nav span, .cw-entry-sidebar nav > a { color: #73839a; font-size: 14px; padding: 9px 12px; }
+.cw-entry-sidebar nav > a { display: block; text-decoration: none; }
+.cw-entry-sidebar nav > a:hover, .cw-entry-sidebar nav > a:focus-visible { color: #285fba; text-decoration: underline; }
+.cw-entry-app .cw-quick-section > a { display: inline-block; margin-top: 8px; color: #285fba; font-size: 12px; text-decoration: none; }
+.cw-entry-app .cw-quick-section > a:hover, .cw-entry-app .cw-quick-section > a:focus-visible { text-decoration: underline; }
 .cw-entry-state { max-width: 630px; padding: 55px 0; }
 .cw-entry-state h1 { margin-bottom: 17px; }
 .cw-entry-state .cw-actions { align-items: center; }

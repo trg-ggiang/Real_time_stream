@@ -1,0 +1,54 @@
+---
+title: Chặn tuyển vào ban quản lý
+description: Loại ban quản lý khỏi form tuyển và kiểm tra tại API.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-04
+- Thời gian kết thúc: 2026-11-19 15:49 +07:00; không ghi nhận giờ bắt đầu
+- Agent: Codex
+- Phase: 04
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa lỗi đăng đợt tuyển báo dữ liệu không thỏa nghiệp vụ theo ảnh người dùng.
+
+## Công việc hoàn thành
+
+- Đọc live xác nhận campaign đang draft, chưa có recruitment_departments; Ban quản trị được chọn có is_management=true. Chưa thu được thông báo trigger gốc nên chưa khẳng định đây là nguyên nhân duy nhất.
+- `recruitment-model.ts` chỉ đưa ban active, không phải quản lý vào form, kể cả khi bản nháp cũ đã bật ban quản lý. `RecruitmentPage.tsx` giải thích điều kiện cạnh danh sách ban.
+- `workspace-recruitment.service.ts` kiểm tra is_management trước mọi write, trả lỗi cụ thể cho yêu cầu tuyển ban quản lý.
+- Bổ sung regression trong `workspace-recruitment.test.cjs` và `RecruitmentPage.test.tsx`.
+
+## Kiểm tra
+
+| Lệnh / kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Backend build với `--outDir ../output/build/backend` | Passed | Không ghi đè artifact cũ |
+| `node --test backend/test/workspace-recruitment.test.cjs` | Passed | 8 tests |
+| Frontend RecruitmentPage tests, configLoader runner/pool threads | Passed | 9 tests, gồm nháp cũ chọn ban quản lý |
+| `npm.cmd run typecheck` | Passed | Cả hai workspace |
+| Supabase | Read-only | Chỉ đọc ID/trạng thái và thuộc tính ban, không sửa dữ liệu |
+| Browser/đăng DB thật | Skipped | Cần thử lại form thực tế, chưa xác minh thông báo trigger gốc |
+
+## Quyết định và lý do
+
+Loại lựa chọn không phù hợp ngay khi khôi phục nháp và kiểm tra lại tại backend, tránh chỉ chặn bằng giao diện. Không xóa campaign draft đang có hoặc nội dung mẫu của các ban còn lại.
+
+## Blocker và việc chưa hoàn thành
+
+Hoàn thành thay đổi và kiểm thử. Chưa chứng minh lần đăng thực tế thành công; Phase 04 In Progress.
+
+## Bước tiếp theo
+
+Tải lại form: Ban quản trị không còn trong danh sách; kiểm tra nội dung các ban còn lại rồi đăng lại. Nếu vẫn lỗi, cần xác định thông báo ràng buộc DB cụ thể.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan
+- [x] Cập nhật session log/changelog/tài liệu workspace
+- [x] Đăng ký navigation và kiểm tra JSON
+- [x] Ghi giới hạn xác minh

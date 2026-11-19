@@ -1,0 +1,52 @@
+---
+title: Khớp payload draft với trigger tuyển dụng
+description: Gửi draft với các trường hệ thống NULL và kiểm tra hồ sơ theo guard_application.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-18
+- Thời gian kết thúc: 2026-11-19, Asia/Saigon (giờ bắt đầu không có dữ liệu)
+- Agent: Codex
+- Phase: 04 — Club workspace và ứng tuyển
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đối chiếu SQL `guard_application()` người dùng cung cấp với payload gửi đơn ứng tuyển và sửa những điều kiện chưa khớp.
+
+## Công việc hoàn thành
+
+- Payload tạo draft gửi rõ `profile_snapshot`, `submitted_at`, `decided_by`, `decided_at`, `admitted_membership_id`, `withdrawn_at`, `result_message` đều là `NULL`, theo điều kiện INSERT của trigger.
+- Backend kiểm tra đủ năm trường hồ sơ bắt buộc: họ tên, mã sinh viên, trường/khoa, ngành và khóa.
+- Đồng bộ thời điểm hết hạn nhận đơn với trigger: từ `application_closes_at` trở đi thì không nhận đơn.
+- File ứng dụng thay đổi: `backend/src/public-content/public-recruitment.service.ts`.
+- Cập nhật phase page, master plan, session log, changelog và đăng ký work log.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript |
+| Kiểm tra Supabase live | Skipped | Không có kết nối/ghi DB thực hiện trong phiên này |
+| Kiểm tra JSON docs và navigation | Passed | JSON parse được; work log có file và đã đăng ký |
+
+## Quyết định và lý do
+
+Các cột hệ thống được gửi tường minh là `NULL` để không phụ thuộc vào default của database. Trigger tự tạo snapshot và `submitted_at` khi chuyển draft sang submitted.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa gửi thử với tài khoản thật để xác nhận trigger chạy qua toàn bộ bước và đơn xuất hiện trong hàng chờ trưởng ban.
+
+## Bước tiếp theo
+
+Khởi động lại backend để nạp code mới, gửi thử đơn với hồ sơ đủ năm trường, rồi kiểm tra hàng chờ hồ sơ của trưởng ban. Nếu còn lỗi, dùng stage và mã PostgreSQL mới trong log để khoanh vùng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong `docs.json`
+- [x] Ghi kết quả xác minh DB live còn pending vì chưa gửi thử với DB thật

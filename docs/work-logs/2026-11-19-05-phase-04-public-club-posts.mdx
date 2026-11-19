@@ -1,0 +1,42 @@
+---
+title: Bài viết CLB công khai
+description: Bỏ chế độ nội bộ khỏi luồng tạo bài viết CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-05
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đảm bảo bài viết CLB công khai cho mọi người, không cho chọn chế độ nội bộ.
+
+## Công việc hoàn thành
+
+- Bỏ lựa chọn phạm vi bài viết khỏi form và ghi rõ bài công khai sau khi chủ nhiệm duyệt.
+- Frontend luôn gửi `visibility: public`.
+- DTO chỉ chấp nhận `public`; backend lưu cứng `public` kể cả khi nhận yêu cầu lưu/sửa.
+- Bài nội bộ cũ không bị thay đổi tự động.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra tự động | Skipped | Không chạy theo chỉ dẫn phiên; chưa xác minh view Supabase live. |
+
+## Quyết định và lý do
+
+Giữ nguyên phạm vi của các bài nội bộ đã tồn tại để tránh thay đổi dữ liệu cũ ngoài yêu cầu. Bài mới và bài được sửa sẽ dùng phạm vi công khai.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh bài sau khi duyệt xuất hiện trong public view Supabase trên dữ liệu live.
+
+## Bước tiếp theo
+
+Thử tạo, duyệt và mở bài từ trang công khai trong môi trường Supabase test.

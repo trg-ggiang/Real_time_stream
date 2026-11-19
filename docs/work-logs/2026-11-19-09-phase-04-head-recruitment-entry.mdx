@@ -1,0 +1,42 @@
+---
+title: Lối vào tuyển thành viên cho trưởng ban
+description: Cho phép trưởng ban chỉ mở tuyển cho department mình phụ trách.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-09
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm mục Tuyển thành viên cho từng trưởng ban ngay dưới Thành viên trong workspace.
+
+## Công việc hoàn thành
+
+- Hiện mục điều hướng và route tuyển cho role `head`.
+- Lọc form về department gắn trên membership; khóa lựa chọn đó để trưởng ban không tuyển thay ban khác.
+- Backend cho phép chairperson/head, xác thực role tại upload/publish và buộc campaign của head chỉ có department được gán.
+- Chủ nhiệm giữ nguyên quyền đăng campaign nhiều ban.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra tự động | Skipped | Không chạy theo chỉ dẫn phiên. |
+
+## Quyết định và lý do
+
+Trưởng ban tạo campaign riêng cho ban được gán; không sửa quyền đọc public campaign hay quyền xét duyệt của chủ nhiệm.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa thử bằng tài khoản trưởng ban thật; migration đơn ứng tuyển trước đó vẫn cần được áp dụng để nộp đơn.
+
+## Bước tiếp theo
+
+Đăng nhập tài khoản role `head`, xác nhận menu, thử đăng một campaign cho ban được gán và xác nhận API từ chối department khác.

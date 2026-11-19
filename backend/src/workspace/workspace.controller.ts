@@ -10,7 +10,12 @@ import {
   Post,
   Query,
   UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { WorkspaceRecruitment } from "./workspace-recruitment.service";
+import { PublishRecruitmentDto, RecruitmentApplicationReviewDto } from "./recruitment.dto";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CompleteProfileGuard } from "../users/complete-profile.guard";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
@@ -43,7 +48,29 @@ export class WorkspaceController {
     private readonly access: WorkspaceAccess,
     private readonly people: WorkspacePeople,
     private readonly content: WorkspaceContent,
+    private readonly recruitment: WorkspaceRecruitment,
   ) {}
+  @Get("recruitment") @Header("Cache-Control", "private, no-store") recruitmentList(
+    @CurrentUser() u: User, @Param("clubId", ParseUUIDPipe) c: string, @Query() q: ContentQuery,
+  ) { return this.recruitment.list(u.userId, c, q.list, q.page, q.limit); }
+  @Get("recruitment/:id") @Header("Cache-Control", "private, no-store") recruitmentDetail(
+    @CurrentUser() u: User, @Param("clubId", ParseUUIDPipe) c: string, @Param("id", ParseUUIDPipe) id: string,
+  ) { return this.recruitment.detail(u.userId, c, id); }
+  @Get("recruitment/applications/:id") @Header("Cache-Control", "private, no-store") applicationReviewDetail(
+    @CurrentUser() u: User, @Param("clubId", ParseUUIDPipe) c: string, @Param("id", ParseUUIDPipe) id: string,
+  ) { return this.recruitment.applicationReviewDetail(u.userId, c, id); }
+  @Patch("recruitment/applications/:id/review") reviewRecruitmentApplication(
+    @CurrentUser() u: User, @Param("clubId", ParseUUIDPipe) c: string, @Param("id", ParseUUIDPipe) id: string,
+    @Body() b: RecruitmentApplicationReviewDto,
+  ) { return this.recruitment.reviewApplication(u.userId, c, id, b); }
+  @Post("recruitment") publishRecruitment(
+    @CurrentUser() u: User, @Param("clubId", ParseUUIDPipe) c: string, @Body() b: PublishRecruitmentDto,
+  ) { return this.recruitment.publish(u.userId, c, b); }
+  @Post("recruitment-cover")
+  @UseInterceptors(FileInterceptor("file", { limits: { fileSize: 10 * 1024 * 1024, files: 1 } }))
+  recruitmentCover(@CurrentUser() u: User, @Param("clubId", ParseUUIDPipe) c: string,
+    @UploadedFile() file?: { buffer: Buffer; mimetype: string; size: number },
+  ) { return this.recruitment.cover(u.userId, c, file); }
   @Get() @Header("Cache-Control", "private, no-store") context(
     @CurrentUser() u: User,
     @Param("clubId", ParseUUIDPipe) c: string,

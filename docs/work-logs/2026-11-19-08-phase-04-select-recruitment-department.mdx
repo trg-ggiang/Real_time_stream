@@ -1,0 +1,42 @@
+---
+title: Chọn ban ứng tuyển
+description: Hiển thị biểu mẫu theo ban được chọn trong đợt tuyển nhiều ban.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-08
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Cho phép ứng viên chọn một ban trong campaign nhiều ban và chỉ điền form/câu hỏi đúng ban đó.
+
+## Công việc hoàn thành
+
+- Thay các nút đăng ký rời trong từng thẻ bằng bộ chọn ban riêng.
+- Hiển thị một form duy nhất với tiêu đề ban và câu hỏi lấy theo `recruitment_department_id` đã chọn.
+- Khi đổi ban, xóa các câu trả lời đang nhập để tránh ghép câu trả lời sai ban.
+- Giữ lựa chọn qua login redirect bằng query `department`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra tự động | Skipped | Không chạy theo chỉ dẫn phiên. |
+
+## Quyết định và lý do
+
+Mỗi submission vẫn gắn với một ban duy nhất; backend kiểm tra department thuộc campaign và chỉ nhận question IDs của ban đó.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa áp dụng migration ứng tuyển hoặc xác minh luồng trên browser/DB live.
+
+## Bước tiếp theo
+
+Thử campaign có ít nhất hai ban với bộ câu hỏi khác nhau; chọn từng ban và xác nhận form cùng đơn lưu đúng department/question IDs.

@@ -4,6 +4,7 @@ import { MagnifyingGlass } from "@phosphor-icons/react/dist/csr/MagnifyingGlass"
 import { useCollection } from "../hooks/use-public-query";
 import { ContentCards, QueryState } from "../components/PublicContent";
 import type { Collection } from "../services/discovery-api";
+import { PublicRecruitmentCollection } from "./PublicRecruitmentPage";
 const titles = {
   clubs: [
     "Tìm một nơi thuộc về.",
@@ -96,6 +97,7 @@ export function CollectionPage({ kind }: { kind: Collection }) {
           </label>
         )}
       </div>
+      {kind === "activities" && <PublicRecruitmentCollection />}
       <p className="dc-result-count" role="status">
         {result.loading
           ? "Đang tìm nội dung…"

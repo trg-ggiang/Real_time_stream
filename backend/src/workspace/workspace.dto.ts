@@ -74,7 +74,7 @@ export class PostDraftDto {
   @IsUrl({ protocols: ["http", "https"], require_protocol: true })
   @MaxLength(2048)
   cover_url?: string | null;
-  @IsIn(["public", "internal"]) visibility: "public" | "internal" = "public";
+  @IsIn(["public"]) visibility: "public" = "public";
   @IsOptional() @IsISO8601() expected_updated_at?: string;
 }
 export class ActivityDraftDto {

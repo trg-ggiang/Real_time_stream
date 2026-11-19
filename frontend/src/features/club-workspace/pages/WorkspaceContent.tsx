@@ -23,6 +23,7 @@ import {
 } from "../../discovery/components/PublicContent";
 import { publicDate } from "../../../shared/lib/content-format";
 import { useUnsavedChanges } from "../../../shared/lib/use-unsaved-changes";
+import { RecruitmentActivities } from "./RecruitmentActivities";
 export function ContentList({ kind }: { kind: ContentKind }) {
   const { token, clubId, membership } = useClub();
   const [params, setParams] = useSearchParams();
@@ -70,6 +71,7 @@ export function ContentList({ kind }: { kind: ContentKind }) {
           </Link>
         ))}
       </nav>
+      {kind === "activities" && <RecruitmentActivities key={`${clubId}:${list}`} list={list} />}
       {result.data?.items.length ? (
         <div className="cw-content-list">
           {result.data.items.map((item) => (
@@ -95,7 +97,7 @@ export function ContentList({ kind }: { kind: ContentKind }) {
           ))}
         </div>
       ) : (
-        <PersonalState {...result} empty="Chưa có nội dung trong mục này." />
+        <PersonalState {...result} empty={kind === "activities" ? "Chưa có hoạt động khác trong mục này." : "Chưa có nội dung trong mục này."} />
       )}
       <nav className="cw-pagination" aria-label="Phân trang nội dung">
         <button
@@ -410,7 +412,7 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
     if (kind === "posts")
       Object.assign(payload, {
         content: values.content?.trim(),
-        visibility: values.visibility,
+        visibility: "public",
       });
     else {
       Object.assign(payload, {
@@ -496,9 +498,11 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
                 : "Tạo một hoạt động mới"}
           </h1>
           <p>
-            {kind === "activities" && membership.role === "chairperson"
-              ? "Bạn có thể lưu nháp hoặc đăng ngay với quyền chủ nhiệm."
-              : "Lưu nháp để viết tiếp; gửi duyệt khi nội dung đã sẵn sàng."}
+            {kind === "posts"
+              ? "Lưu nháp để viết tiếp; bài viết sẽ công khai cho mọi người sau khi chủ nhiệm duyệt."
+              : kind === "activities" && membership.role === "chairperson"
+                ? "Bạn có thể lưu nháp hoặc đăng ngay với quyền chủ nhiệm."
+                : "Lưu nháp để viết tiếp; gửi duyệt khi nội dung đã sẵn sàng."}
           </p>
         </div>
       </div>
@@ -516,19 +520,7 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
             { required: true, min: 10, multiline: true },
           )}
           {field("cover_url", "URL ảnh bìa", { type: "url", max: 2048 })}
-          {kind === "posts" ? (
-            <label>
-              Phạm vi bài viết
-              <select
-                value={values.visibility}
-                onChange={(e) => change("visibility", e.target.value)}
-                disabled={mutation.busy}
-              >
-                <option value="public">Công khai</option>
-                <option value="internal">Nội bộ CLB</option>
-              </select>
-            </label>
-          ) : (
+          {kind !== "posts" && (
             <>
               {field("starts_at", "Bắt đầu (giờ Việt Nam)", {
                 type: "datetime-local",

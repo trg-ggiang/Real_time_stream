@@ -23,6 +23,7 @@ import { GearSix } from "@phosphor-icons/react/dist/csr/GearSix";
 import { DiscoveryHome } from "./pages/DiscoveryHome";
 import { CollectionPage } from "./pages/CollectionPage";
 import { PublicDetailPage } from "./pages/PublicDetailPage";
+import { PublicRecruitmentPage } from "./pages/PublicRecruitmentPage";
 import { useDiscoveryMotion } from "./hooks/use-discovery-motion";
 import { PersonalApp } from "../personal/PersonalApp";
 import { AdminApp } from "../admin/AdminApp";
@@ -274,6 +275,7 @@ export function DiscoveryApp({
               }
             />
           ))}
+          <Route path="/recruitment/:id" element={<PublicRecruitmentPage accessToken={accessToken} />} />
           <Route
             path="*"
             element={

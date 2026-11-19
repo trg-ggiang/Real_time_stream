@@ -1,3 +1,71 @@
+## 2026-11-19 — Hàng chờ tuyển dụng cập nhật đơn mới
+
+- Hàng chờ trưởng ban tự làm mới định kỳ và có nút tải lại; giữ phạm vi theo ban phụ trách. Typecheck đạt. [Work log](/work-logs/2026-11-19-19-phase-04-recruitment-queue-refresh).
+
+## 2026-11-19 — Trigger ứng tuyển yêu cầu các trường hệ thống rỗng
+
+- Payload tạo draft gửi rõ các trường hệ thống là `NULL`, kiểm tra đủ hồ sơ sinh viên theo trigger và từ chối đơn đúng mốc đóng; typecheck đạt. [Work log](/work-logs/2026-11-19-18-phase-04-recruitment-trigger-null-fields).
+
+## 2026-11-19 — Snapshot do trigger tạo khi submit
+
+Draft mới giữ `profile_snapshot = NULL`; bỏ update snapshot thủ công vì trigger tự xác thực và dựng snapshot khi trạng thái chuyển sang `submitted`. Typecheck đạt; chưa xác minh ghi DB thật. [Work log](/work-logs/2026-11-19-17-phase-04-recruitment-trigger-snapshot).
+
+## 2026-11-19 — Tạo draft rỗng theo trigger ứng tuyển
+
+Nộp đơn bắt đầu bằng row `draft` rỗng thuộc applicant; backend sau đó ghi profile snapshot, đáp án rồi mới chuyển sang submitted theo trigger báo qua `P0001`. Typecheck đạt; chưa xác minh với DB live. [Work log](/work-logs/2026-11-19-16-phase-04-recruitment-empty-draft-trigger).
+
+## 2026-11-19 — Đồng bộ đơn ứng tuyển theo schema CLB
+
+API gửi đơn và hàng chờ xét duyệt dùng `applicant_id`, `profile_snapshot`, `application_answers`, `application_reviews` và status thật trong schema đã cung cấp. Không dùng migration recruitment 001/002 cũ. Typecheck đạt; Supabase live chưa được truy vấn. [Work log](/work-logs/2026-11-19-15-phase-04-match-recruitment-db-schema).
+
+## 2026-11-19 — Chẩn đoán PGRST204 khi nộp đơn
+
+Backend log thêm message lỗi PostgREST để xác định cột chưa có trong schema cache, đồng thời trả hướng dẫn làm mới cấu trúc nhận đơn. Typecheck đạt; cần migration/cột phù hợp và `NOTIFY pgrst, 'reload schema'` trên DB trước khi thử lại. [Work log](/work-logs/2026-11-19-14-phase-04-recruitment-schema-diagnostic).
+
+## 2026-11-19 — Xác nhận nơi nhận đơn tuyển
+
+Sau khi lưu thành công, form nêu rõ đơn đã vào hàng chờ trưởng ban của ban ứng tuyển; backend ghi mã lỗi Supabase an toàn và báo cấu hình nếu thiếu bảng. Typecheck đạt; hai migration cần được áp dụng để nhận đơn. [Work log](/work-logs/2026-11-19-13-phase-04-recruitment-delivery-feedback).
+
+## 2026-11-19 — Người mới đăng ký hoạt động công khai
+
+Trong Không gian sinh hoạt chưa có CLB, mục Hoạt động và nút Khám phá hoạt động mở danh sách công khai; thêm đường dẫn từ panel thông tin. Luồng đăng ký có sẵn tiếp tục yêu cầu đăng nhập/hồ sơ hoàn chỉnh, không yêu cầu membership. [Work log](/work-logs/2026-11-19-12-phase-04-guest-activity-registration).
+
+## 2026-11-19 — Trưởng ban xét duyệt hồ sơ tuyển
+
+Thay trang trống bằng hàng chờ và chi tiết đơn theo ban được gán; bổ sung API lưu điểm, ghi chú nội bộ, phản hồi, từ chối và cho qua vòng đơn. Typecheck backend/frontend đạt. Cần áp dụng migration xét duyệt trước khi dùng DB thật; chưa kiểm tra browser hoặc DB live. [Work log](/work-logs/2026-11-19-11-phase-04-head-application-review).
+
+## 2026-11-19 — Trang tuyển của trưởng ban tạm để trống
+
+Giữ mục điều hướng cho trưởng ban nhưng ẩn nội dung trang và giới hạn đăng tuyển ở chủ nhiệm.
+
+## 2026-11-19 — Quyền tuyển thành viên cho trưởng ban
+
+Thêm lối vào dưới Thành viên và giới hạn backend trưởng ban vào department được gán; chủ nhiệm vẫn mở campaign đa ban.
+
+## 2026-11-19 — Chọn ban ứng tuyển
+
+Thêm bộ nút chọn ban; form đơn duy nhất đổi theo câu hỏi của ban được chọn.
+
+## 2026-11-19 — Nộp đơn tuyển thành viên
+
+Thêm danh sách/chi tiết tuyển công khai, form câu hỏi theo ban và API nộp đơn có chụp hồ sơ sinh viên; cần áp dụng migration `20261119000100_create_recruitment_applications.sql`. Chưa chạy kiểm tra hoặc ghi DB live.
+
+## 2026-11-19 — Biểu mẫu tuyển mới sau reload
+
+Reload trang tạo đợt tuyển bắt đầu form mới và campaign ID mới; retry trong cùng phiên giữ ID để tránh tạo bản ghi trùng.
+
+## 2026-11-19 — Bài viết CLB công khai
+
+Bỏ lựa chọn nội bộ ở form bài viết; backend cưỡng chế `visibility = public` cả khi lưu nháp/sửa. Sau khi chủ nhiệm duyệt, bài được đưa ra công khai. Bài nội bộ cũ không bị cập nhật. Không chạy kiểm tra tự động theo phạm vi phiên; chưa xác minh view Supabase live. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-05-phase-04-public-club-posts).
+
+## 2026-11-19 — Điều kiện ban tuyển
+
+Loại ban quản lý khỏi form và chặn tại API trước khi lưu. 17 tests liên quan đạt; chưa nghiệm thu đăng thật. [Work log](/work-logs/2026-11-19-04-phase-04-recruitment-management).
+
+## 2026-11-19 — Đăng đợt tuyển
+
+- Chủ nhiệm có thể đăng mẫu tuyển vào DB campaign/ban/câu hỏi, upload ảnh qua backend và xem bài/detail trong Hoạt động CLB. Giữ ID khi retry, ẩn bản lưu dở. Typecheck/build, 16 backend và 11 frontend tests liên quan đạt; chưa ghi DB/Storage live. [Work log](/work-logs/2026-11-19-03-phase-04-publish-recruitment).
+
 ## 2026-11-19 — Bảng thành viên cho member
 
 - Đổi thẻ thành viên lớn sang bảng năm cột theo mẫu, avatar tròn, ngày dd/mm/yyyy và nhãn trạng thái xanh; công cụ quản lý chỉ dành cho chủ nhiệm. Frontend build và 13 kiểm thử liên quan đạt. [Work log](/work-logs/2026-11-19-02-phase-04-member-directory-table).

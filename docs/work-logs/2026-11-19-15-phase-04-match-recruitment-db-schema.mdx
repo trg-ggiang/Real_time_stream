@@ -1,0 +1,46 @@
+---
+title: Khớp API tuyển dụng với schema hiện có
+description: Sửa lỗi PGRST204 bằng cách dùng đúng các bảng/cột ứng tuyển trong DB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-15
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đối chiếu schema Supabase người dùng cung cấp với lỗi PGRST204 khi nộp đơn và chỉnh ứng tuyển/xét duyệt cho đúng schema.
+
+## Công việc hoàn thành
+
+- Đổi insert application sang `applicant_id`, `profile_snapshot`, `updated_by` và chu trình `draft` → ghi đáp án → `submitted`.
+- Ghi câu trả lời vào `application_answers`; queue và detail đọc bảng đó rồi ghép thành map để UI hiển thị câu hỏi.
+- Đọc đánh giá từ `application_reviews`; lưu score, recommendation, internal note tại đó, còn feedback/result vào `recruitment_applications.result_message`.
+- Ánh xạ `Lưu đánh giá` → `submitted`, `Cho qua vòng đơn` → `interviewing`, phù hợp status check trong schema.
+- Không áp dụng migration hoặc ghi vào DB. Hai migration recruitment 001/002 cũ không khớp schema được gửi và không nên chạy.
+- Cập nhật README, hướng dẫn workspace, phase/master plan, changelog và session log.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript. |
+| Automated tests | Skipped | Không chạy theo hướng dẫn môi trường. |
+| Supabase live | Skipped | Chỉ đối chiếu schema snapshot do người dùng cung cấp; chưa xác minh schema trên server. |
+
+## Quyết định và lý do
+
+Giữ nguyên schema của CLB. `PGRST204` phát sinh vì code trước đó gửi các cột không tồn tại trong `recruitment_applications`; không phải vấn đề có thể sửa bằng reload cache khi payload vẫn sai.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa thử nộp đơn/duyệt bằng Supabase live. Chưa xác nhận lần submit lỗi trước có tạo bản ghi nào hay không.
+
+## Bước tiếp theo
+
+Khởi động lại backend, gửi đơn thử và xác nhận hồ sơ xuất hiện dưới đúng trưởng ban, sau đó lưu review vào `application_reviews`.

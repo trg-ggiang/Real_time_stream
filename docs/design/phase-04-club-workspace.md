@@ -1,5 +1,53 @@
 # Phase 4 — Không gian sinh hoạt và quản lý CLB
 
+## Người mới khám phá và đăng ký hoạt động (2026-11-19)
+
+Từ trang Không gian sinh hoạt khi chưa tham gia CLB, người dùng có liên kết Hoạt động ở sidebar, nút Khám phá hoạt động ở nội dung chính và liên kết ở panel phải. Các điểm vào đều mở danh sách hoạt động công khai `/activities`; trang chi tiết hiện hành cho phép tài khoản đăng ký nếu hồ sơ sinh viên hoàn chỉnh và hoạt động còn mở. Việc đăng ký hoạt động không yêu cầu membership CLB. [Work log](../work-logs/2026-11-19-12-phase-04-guest-activity-registration.mdx).
+
+## Chuyển đơn tuyển tới trưởng ban — 2026-11-19
+
+Khi ứng viên nộp đơn, backend tạo draft với `profile_snapshot = NULL`; câu trả lời được ghi vào `application_answers`. Khi chuyển sang `submitted`, trigger tự xác thực hồ sơ và dựng `profile_snapshot`. Hồ sơ sau đó xuất hiện trong hàng chờ trưởng ban phụ trách `recruitment_department_id`. Đánh giá dùng `application_reviews` và kết quả gửi ứng viên dùng `result_message`. [Work log](../work-logs/2026-11-19-17-phase-04-recruitment-trigger-snapshot.mdx).
+
+Trigger DB trả `P0001: Create application as own empty draft` nếu bản ghi mới không phải draft rỗng. `profile_snapshot` phải để `NULL` lúc insert; trigger sẽ tự dựng snapshot khi submit. Backend không còn tự cập nhật snapshot trước bước này. Đã typecheck; trigger trên DB thật chưa được thử lại. [Work log](../work-logs/2026-11-19-17-phase-04-recruitment-trigger-snapshot.mdx).
+
+Lỗi `PGRST204` lần này do API cũ gửi `user_id`, `full_name`, `student_code`, `answers`, `portfolio_url` vào `recruitment_applications`, trong khi schema bạn gửi dùng `applicant_id`, `profile_snapshot` và bảng câu trả lời riêng. Không cần đổi DB hoặc reload cache để chữa sai lệch cột này; backend đã được chỉnh để theo đúng schema. Chưa xác minh với Supabase live. [Work log](../work-logs/2026-11-19-15-phase-04-match-recruitment-db-schema.mdx).
+
+## Trưởng ban — trạng thái hiện tại
+
+Role head có lối vào **Tuyển thành viên** ngay dưới **Thành viên**. Trang hiển thị hàng chờ và chi tiết đơn thuộc ban được gán; trưởng ban có thể lưu đánh giá, từ chối hoặc cho qua vòng đơn. Chủ nhiệm vẫn là người tạo campaign.
+
+## Trưởng ban tuyển thành viên
+
+Role `head` có lối vào **Tuyển thành viên** ngay dưới **Thành viên**. Danh sách và chi tiết chỉ trả hồ sơ thuộc department được gán; API xác thực role/department trước khi đọc hoặc ghi quyết định. Màn hình theo khung danh sách bên trái và chi tiết/đánh giá bên phải, dùng màu, viền và typography của workspace. Chủ nhiệm giữ quyền tạo campaign nhiều ban.
+
+## Chọn ban ứng tuyển
+
+Trang chi tiết tuyển hiển thị một bộ chọn gồm các ban đang mở. Chọn một ban mới mở form duy nhất với các câu hỏi của đúng ban đó; khi đổi lựa chọn, câu trả lời form trước không được gửi kèm.
+
+## Ứng tuyển đợt tuyển
+
+Trang Hoạt động công khai liệt kê các campaign `open`, trang chi tiết chỉ đọc campaign đã công khai, và bộ chọn ban chỉ hiển thị một biểu mẫu ứng tuyển tại một thời điểm. Người dùng đăng nhập và có hồ sơ đầy đủ; câu trả lời đọc từ `recruitment_questions`, hồ sơ lấy từ `student_profiles`; đơn ghi vào `recruitment_applications`, câu trả lời vào `application_answers`. Hàng chờ chỉ trả ứng viên có department thuộc trưởng ban hiện tại. Đánh giá lưu riêng trong `application_reviews`. Không áp dụng hai migration 001/002 cũ vì chúng mô tả cấu trúc khác với schema đã cung cấp. Chưa truy vấn DB live.
+
+## Tải lại biểu mẫu tuyển
+
+Tải lại browser trên trang tạo đợt tuyển xóa bản khôi phục từ `sessionStorage` và sinh campaign/form IDs mới. Lưu nháp, chuyển trong SPA và retry lỗi trong cùng trang vẫn giữ dữ liệu/ID hiện tại.
+
+## Bài viết công khai
+
+Bài viết mới và bài được sửa luôn lưu với `visibility = public`; form không có lựa chọn nội bộ. Bài xuất hiện cho mọi người xem sau khi chủ nhiệm duyệt. Bài nội bộ đã có từ trước không tự động đổi phạm vi.
+
+## Đăng đợt tuyển — 2026-11-19
+
+Cập nhật: chỉ ban active không có `is_management` mới xuất hiện trong form; nháp cũ được lọc lại. API cũng chặn ban quản lý trước mọi write. [Sửa điều kiện ban tuyển](../work-logs/2026-11-19-04-phase-04-recruitment-management.mdx).
+
+Chủ nhiệm vào Tuyển thành viên, điền thông tin và mẫu câu hỏi cho từng ban rồi bấm **Đăng đợt tuyển**. API lưu các bảng `recruitment_campaigns`, `recruitment_departments`, `recruitment_questions` hiện có, sau đó mở campaign (`draft` → `open`). Thành công chuyển về **Hoạt động CLB → Đã đăng**, có mục Đợt tuyển thành viên và detail đọc mẫu đã lưu. Tab Của tôi bao gồm các bản lưu dở của chính người gọi; tuyển và hoạt động thường có phân trang riêng.
+
+Các API dưới `/api/workspace/:clubId`: GET/POST `/recruitment`, GET `/recruitment/:id`, POST multipart `/recruitment-cover`. JWT/profile và membership được kiểm tra; chỉ chủ nhiệm được ghi, ban phải active và thuộc CLB. Người dùng khác không được đọc draft. ID giữ qua retry; chỉ mở sau khi đối chiếu đủ dữ liệu. REST writes không phải transaction liên bảng; bản lưu dở không nằm trong feed đã đăng. Retry cùng nội dung tiếp tục được, thay đổi nội dung một bản đã lưu trả conflict để tránh ghi đè.
+
+Ảnh PNG/JPG tùy chọn, tối đa 10 MB, được kiểm tra MIME/chữ ký. Backend dùng Supabase Storage, tạo public bucket `recruitment-covers` ở lần upload đầu khi chưa tồn tại; DB chỉ giữ HTTPS URL. Backend cần secret key có quyền Storage. Nháp vẫn lưu theo tab; ngày mở là đầu ngày, ngày đóng là hết ngày Việt Nam. Đã có API ứng tuyển và hàng chờ xét duyệt; cần áp dụng hai migration recruitment trước khi ghi DB thật. Chưa có chỉnh sửa campaign đã lưu hoặc dọn ảnh thừa.
+
+Typecheck/build và 27 tests liên quan đạt (16 backend, 11 frontend); chỉ đọc metadata Supabase, không tạo dữ liệu/bucket live. Khởi động lại backend trước khi thử form thực tế. Phase 04 In Progress. [Work log](../work-logs/2026-11-19-03-phase-04-publish-recruitment.mdx). Các mô tả tuyển dụng chưa có API bên dưới là lịch sử trước cập nhật này.
+
 ## Bản chính Real_time_stream1 — 2026-11-19
 
 Cập nhật màn hình Thành viên: member/head xem bảng năm cột Họ và tên, Ban, Vai trò, Ngày tham gia, Trạng thái theo mẫu; avatar tròn với chữ viết tắt khi thiếu ảnh, ngày dd/mm/yyyy và badge xanh cho membership active. Chủ nhiệm có thêm cột Thao tác. Bảng cuộn ngang khi thiếu chiều rộng. Không đổi API hoặc phân trang. [Work log](../work-logs/2026-11-19-02-phase-04-member-directory-table.mdx).

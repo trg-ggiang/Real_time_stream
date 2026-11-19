@@ -3,6 +3,40 @@ title: Master Plan
 description: Tiến trình phase và thứ tự triển khai theo context.
 ---
 
+2026-11-19: Mục Tuyển thành viên của trưởng ban thành hàng chờ xét duyệt, giới hạn theo ban được gán; bổ sung xem câu trả lời, lưu đánh giá và quyết định. Typecheck đạt; chờ áp dụng migrations và nghiệm thu DB/browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-11-phase-04-head-application-review).
+
+2026-11-19: Chỉnh API ứng tuyển/xét duyệt theo schema người dùng cung cấp: hồ sơ snapshot, bảng application_answers, review records riêng. Không áp dụng hai migration cũ do khác schema. Typecheck đạt; chưa thử DB live. [Work log](/work-logs/2026-11-19-15-phase-04-match-recruitment-db-schema).
+
+2026-11-19: Sửa trình tự ghi theo trigger P0001: tạo own empty draft rồi mới lưu snapshot, đáp án và submit. Typecheck đạt; chưa thử trên DB live. [Work log](/work-logs/2026-11-19-16-phase-04-recruitment-empty-draft-trigger).
+
+2026-11-19: Để `profile_snapshot` NULL trên draft mới và bỏ cập nhật thủ công; trigger tự dựng snapshot khi chuyển sang submitted. Typecheck đạt; chờ thử lại DB live. [Work log](/work-logs/2026-11-19-17-phase-04-recruitment-trigger-snapshot).
+
+2026-11-19: Đối chiếu đầy đủ trigger: insert draft gửi rõ các cột hệ thống là NULL; backend kiểm tra đủ hồ sơ sinh viên và mốc đóng đơn giống DB. Typecheck đạt; DB live chưa thử lại. [Work log](/work-logs/2026-11-19-18-phase-04-recruitment-trigger-null-fields).
+
+2026-11-19: Hàng chờ trưởng ban tự làm mới mỗi 15 giây, khi tab được mở lại và có nút tải lại; chỉ hiển thị đơn theo ban phụ trách. Typecheck đạt; chưa xác minh DB live. [Work log](/work-logs/2026-11-19-19-phase-04-recruitment-queue-refresh).
+
+2026-11-19: Biểu mẫu báo đơn đã vào hàng chờ trưởng ban thuộc ban ứng tuyển; lỗi thiếu bảng được ghi mã an toàn và báo cấu hình. Typecheck đạt; chờ áp dụng migrations và thử DB/browser. [Work log](/work-logs/2026-11-19-13-phase-04-recruitment-delivery-feedback).
+
+2026-11-19: Thêm chi tiết PGRST204 vào log backend để xác định cột PostgREST không thấy; hướng xử lý gồm kiểm tra migration và reload schema cache. Typecheck đạt; chưa kiểm tra DB live. [Work log](/work-logs/2026-11-19-14-phase-04-recruitment-schema-diagnostic).
+
+2026-11-19: Người chưa tham gia CLB có thể đi từ Không gian sinh hoạt sang danh sách hoạt động công khai và đăng ký theo luồng sẵn có. Không cần membership; cần tài khoản và hồ sơ hoàn chỉnh. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-12-phase-04-guest-activity-registration).
+
+2026-11-19: Theo yêu cầu lúc đó, giữ mục Tuyển thành viên cho trưởng ban nhưng để trang trống; quyền tạo đợt tuyển vẫn chỉ dành cho chủ nhiệm. Đã được thay thế bởi luồng xét duyệt mới bên trên. [Work log](/work-logs/2026-11-19-10-phase-04-head-recruitment-blank).
+
+2026-11-19: Thêm mục Tuyển thành viên cho trưởng ban dưới Thành viên; UI/API giới hạn tuyển ở ban họ phụ trách, còn chủ nhiệm được mở nhiều ban. Chưa chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-09-phase-04-head-recruitment-entry).
+
+2026-11-19: Thay nút đăng ký rời từng thẻ bằng bộ chọn ban; form duy nhất đổi theo ban đang chọn để câu trả lời khớp bộ câu hỏi. Chưa chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-08-phase-04-select-recruitment-department).
+
+2026-11-19: Bổ sung ứng tuyển đợt tuyển công khai: danh sách/chi tiết, form động đọc câu hỏi đã lưu, tự điền hồ sơ và lưu đơn. Cần áp dụng migration; chưa chạy kiểm tra tự động hoặc ghi DB live. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-07-phase-04-recruitment-applications).
+
+2026-11-19: Tải lại trang tạo đợt tuyển sẽ bắt đầu campaign mới thay vì khôi phục mã/nội dung trước; retry trong cùng trang vẫn dùng lại mã an toàn. Chưa chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-06-phase-04-recruitment-reload-reset).
+
+2026-11-19: Bài viết CLB không còn lựa chọn nội bộ; giao diện và API luôn lưu bài công khai, hiển thị cho mọi người sau khi chủ nhiệm duyệt. Bài nội bộ cũ không tự đổi. Chưa chạy kiểm tra tự động. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-05-phase-04-public-club-posts).
+
+2026-11-19: Loại ban quản lý khỏi form tuyển, kiểm tra API trước write. 8 backend và 9 frontend tests/typecheck đạt; chưa thử đăng DB thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-04-phase-04-recruitment-management).
+
+2026-11-19: Đăng mẫu đơn tuyển vào bảng campaign/ban/câu hỏi và hiển thị trên Hoạt động CLB, có upload ảnh và detail. Typecheck/build, 16 backend và 11 frontend tests liên quan đạt; chưa ghi DB/Storage thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-03-phase-04-publish-recruitment).
+
 2026-11-19: Đổi màn hình Thành viên của member/head sang bảng năm cột theo hình tham chiếu; giữ quyền quản lý của chủ nhiệm. Frontend build và 13 kiểm thử liên quan đạt; chưa nghiệm thu browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-02-phase-04-member-directory-table).
 
 2026-11-19: Dùng `C:/Real_time_stream1` làm bản chính, thay module không gian sinh hoạt từ `E:/Real_time_stream`, giữ phần còn lại của bản đích. Build, 106 frontend tests và 9 backend workspace tests đạt; chưa nghiệm thu browser/DB live. Phase 04 In Progress. [Work log](/work-logs/2026-11-19-01-phase-04-import-club-workspace).

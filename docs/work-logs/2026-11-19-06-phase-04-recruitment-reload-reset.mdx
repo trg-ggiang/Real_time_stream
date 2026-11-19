@@ -1,0 +1,42 @@
+---
+title: Biểu mẫu tuyển mới sau reload
+description: Tạo campaign và bộ mã câu hỏi mới sau mỗi lần tải lại trang.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-06
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Mỗi lần tải lại trang tạo đợt tuyển phải bắt đầu bản mới, không tiếp tục ghi đè campaign cũ.
+
+## Công việc hoàn thành
+
+- Phát hiện browser navigation có kiểu `reload`, xóa các draft tuyển được giữ trong tab và tạo draft mới.
+- Tạo campaign, ban tuyển và câu hỏi bằng IDs mới sau reload.
+- Retry lỗi trong cùng lần mở trang vẫn giữ dữ liệu/IDs để không tạo nhiều campaign do gửi lại.
+- Cập nhật chú thích code phản ánh chính sách retry trong page session.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Kiểm tra tự động | Skipped | Không chạy theo chỉ dẫn phiên; chưa thử reload trên browser thật. |
+
+## Quyết định và lý do
+
+Giữ khả năng lưu nháp và điều hướng trong cùng tab; chỉ browser reload làm mới bản hiện tại. Điều này giữ retry của request lỗi an toàn mà không hồi sinh campaign cũ.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh thực tế trên browser hoặc DB live.
+
+## Bước tiếp theo
+
+Mở form, nhập dữ liệu, reload trang và xác nhận form trống/IDs mới; thử gửi lại sau lỗi để xác nhận ID được giữ trong cùng page session.

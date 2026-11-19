@@ -1,0 +1,43 @@
+---
+title: Chẩn đoán schema đơn ứng tuyển
+description: Ghi message lỗi PGRST204 để xác định cột PostgREST chưa nhận diện.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-14
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chẩn đoán log `PGRST204` phát sinh khi ứng viên nộp đơn tuyển.
+
+## Công việc hoàn thành
+
+- Backend log code và message PostgREST khi insert thất bại để nêu cột chưa có trong schema cache; không log tên, mã sinh viên hoặc câu trả lời.
+- Trả thông báo riêng cho PGRST204 yêu cầu quản trị viên kiểm tra cột/migration và reload schema cache.
+- Cập nhật tài liệu workspace, phase/master plan, changelog và session log.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript. |
+| Automated tests | Skipped | Không chạy theo hướng dẫn môi trường. |
+| Supabase schema | Skipped | Không truy cập/chỉnh sửa DB live. |
+
+## Quyết định và lý do
+
+PGRST204 là lỗi PostgREST không nhận ra cột được truy vấn; cần tên cột đầy đủ từ message để phân biệt migration thiếu cột với schema cache cũ. Sau khi schema đúng, có thể gửi `NOTIFY pgrst, 'reload schema';` trong SQL Editor.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa có message đầy đủ trong log hiện do người dùng gửi; chưa xác nhận migration 001 đã được áp dụng hoặc kiểm tra DB live.
+
+## Bước tiếp theo
+
+Khởi động lại backend, thử gửi lại và đối chiếu tên cột trong log với migration `20261119000100_create_recruitment_applications.sql`; nếu các cột đều có, làm mới schema cache bằng lệnh trên rồi thử lại.

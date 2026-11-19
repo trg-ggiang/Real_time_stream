@@ -31,6 +31,7 @@ import { DepartmentsPage, MembersPage } from "./pages/WorkspacePeople";
 import { WorkspaceChannel, type DraftChannel } from "./pages/WorkspaceChannel";
 import { WorkspaceOverview } from "./pages/WorkspaceOverview";
 import { RecruitmentPage } from "./pages/RecruitmentPage";
+import { RecruitmentDetail } from "./pages/RecruitmentActivities";
 import {
   ClubInformation,
   MeetingsEntry,
@@ -124,6 +125,7 @@ function WorkspaceScope({
     );
   const ctx = state.data,
     chair = ctx.membership.role === "chairperson",
+    head = ctx.membership.role === "head",
     base = `/workspace/${clubId}`;
   const inChannel = location.pathname.startsWith(`${base}/channels/`);
   const textChannels = [
@@ -155,7 +157,7 @@ function WorkspaceScope({
           <div className="cw-club-identity">
             <div>
               <strong>{ctx.club.name}</strong>
-              <small>{chair ? "Chủ nhiệm" : "Thành viên"}</small>
+              <small>{chair ? "Chủ nhiệm" : head ? "Trưởng ban" : "Thành viên"}</small>
             </div>
           </div>
           <button
@@ -188,7 +190,7 @@ function WorkspaceScope({
             {draftChannels.filter(item => item.kind === "voice").map(item => <NavLink key={item.id} className="cw-voice-link" to={`${base}/channels/${item.id}`} title="Bản nháp trên trình duyệt"><span aria-hidden="true">◖</span> {item.name}</NavLink>)}</div>
             <NavLink to={`${base}/departments`} className="cw-departments-link"><Stack size={18} aria-hidden="true" /><span>Các ban</span></NavLink>
             <NavLink to={`${base}/members`} className="cw-members-link"><UsersThree size={18} aria-hidden="true" /><span>Thành viên</span></NavLink>
-            {chair && <NavLink to={`${base}/recruitment`} className="cw-recruitment-link"><UserPlus size={18} aria-hidden="true" /><span>Tuyển thành viên</span></NavLink>}
+            {(chair || head) && <NavLink to={`${base}/recruitment`} className="cw-recruitment-link"><UserPlus size={18} aria-hidden="true" /><span>Tuyển thành viên</span></NavLink>}
             </div>
             <details className="cw-nav-details cw-work-pinned" open={workOpen} onToggle={event => setWorkOpen(event.currentTarget.open)}><summary>Công việc CLB</summary><div>
               <NavLink to={`${base}/posts/new`}>Viết bài</NavLink>
@@ -237,7 +239,8 @@ function WorkspaceScope({
               />
               <Route path={`${base}/meetings`} element={<MeetingsEntry />} />
               <Route path={`${base}/recurring-meetings`} element={<RecurringMeetings />} />
-              <Route path={`${base}/recruitment`} element={chair ? <RecruitmentPage /> : <Denied />} />
+              <Route path={`${base}/recruitment`} element={chair || head ? <RecruitmentPage /> : <Denied />} />
+              <Route path={`${base}/recruitment/:id`} element={<RecruitmentDetail />} />
               <Route
                 path={`${base}/information`}
                 element={<ClubInformation />}

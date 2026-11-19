@@ -1,0 +1,44 @@
+---
+title: Để trigger dựng snapshot khi nộp đơn
+description: Dùng NULL trong draft mới để trigger dựng profile snapshot tại bước submit.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-17
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Xử lý trigger `guard_application` sau khi P0001 tiếp tục dù backend tạo draft mới.
+
+## Công việc hoàn thành
+
+- Đối chiếu trigger dump: trigger dựng `profile_snapshot` khi trạng thái chuyển sang `submitted`.
+- Để `profile_snapshot = NULL` ở insert draft và bỏ update snapshot thủ công trước khi ghi câu trả lời/submit.
+- Bật log theo từng giai đoạn insert draft, save answers và submit để biết trigger nào còn từ chối.
+- Typecheck backend/frontend đạt.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript. |
+| Automated tests | Skipped | Không chạy theo hướng dẫn môi trường. |
+| Supabase live | Skipped | Chưa thử trigger sau khi cập nhật. |
+
+## Quyết định và lý do
+
+Trigger kiểm soát vòng đời hồ sơ và tự dựng snapshot khi submit; backend không tự ghi snapshot trước transition.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác nhận lần gửi thành công trên DB thật; các ảnh function vẫn cắt một số dòng điều kiện.
+
+## Bước tiếp theo
+
+Khởi động lại backend, gửi đơn. Nếu P0001 tiếp tục, dùng stage trong log mới để xác định trigger từ chối ở thao tác nào.

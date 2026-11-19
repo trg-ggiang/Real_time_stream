@@ -1,0 +1,43 @@
+---
+title: Tạo draft rỗng theo trigger tuyển dụng
+description: Tuân thủ trigger DB yêu cầu hồ sơ ứng tuyển bắt đầu là draft rỗng của applicant.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-16
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa lỗi `P0001: Create application as own empty draft` khi nộp đơn.
+
+## Công việc hoàn thành
+
+- Tạo row với `applicant_id`, `status = draft`, `profile_snapshot = {}` và `updated_by` là applicant.
+- Cập nhật snapshot vào draft, ghi câu trả lời vào `application_answers`, rồi chuyển status sang `submitted`.
+- Cập nhật README, thiết kế workspace, changelog, phase/master plan và session log.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript. |
+| Automated tests | Skipped | Không chạy theo hướng dẫn môi trường. |
+| Supabase live | Skipped | Chưa thử trigger lại trên DB thật. |
+
+## Quyết định và lý do
+
+Thông báo trigger cho biết chỉ chấp nhận một draft rỗng thuộc applicant ở bước tạo; dữ liệu profile và câu trả lời được cập nhật sau.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác nhận điều kiện đầy đủ của trigger ngoài thông báo lỗi; chưa kiểm tra ghi draft, answers hoặc submit trên DB live.
+
+## Bước tiếp theo
+
+Khởi động lại backend và thử gửi một đơn. Nếu vẫn có P0001, đối chiếu message trigger với các trường `applicant_id`, `status`, `profile_snapshot`, `updated_by` trong insert draft mới.

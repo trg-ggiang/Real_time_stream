@@ -1,0 +1,45 @@
+---
+title: Trưởng ban xét duyệt đơn tuyển
+description: Hàng chờ hồ sơ theo ban, chi tiết câu trả lời và quyết định vòng đơn.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-19-11
+- Thời gian: 2026-11-19, Asia/Saigon
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thay trang trống Tuyển thành viên của trưởng ban bằng màn xét duyệt theo hình tham chiếu, dùng style workspace hiện có. Đơn ứng tuyển cần tới hàng chờ của đúng trưởng ban phụ trách.
+
+## Công việc hoàn thành
+
+- Mục Tuyển thành viên của trưởng ban hiển thị hàng chờ và chi tiết hồ sơ, câu trả lời, điểm, ghi chú nội bộ và phản hồi.
+- Thêm thao tác lưu đánh giá, từ chối đơn và cho qua vòng đơn.
+- Backend giới hạn đọc/ghi theo role `head`, CLB và department được gán; campaign do chủ nhiệm tạo vẫn có thể tuyển nhiều ban.
+- Thêm migration cho metadata đánh giá, reviewer và quyền update service role.
+- Cập nhật README, tài liệu workspace, phase plan, master plan, changelog và session log.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend TypeScript. |
+| Automated tests | Skipped | Không chạy theo chỉ dẫn phiên. |
+| Browser/DB live | Skipped | Chưa áp dụng migrations và chưa có nghiệm thu môi trường thật. |
+
+## Quyết định và lý do
+
+Đơn gửi vào bảng `recruitment_applications`; hàng chờ được xác định bằng department thuộc campaign của CLB và department_id trong membership trưởng ban. Ghi chú nội bộ và phản hồi được lưu tách trường để UI phân biệt mục đích.
+
+## Blocker và việc chưa hoàn thành
+
+Migration nhận đơn `20261119000100_create_recruitment_applications.sql` và migration đánh giá `20261119000200_recruitment_application_review.sql` chưa được áp dụng vào Supabase. Vì vậy chưa xác minh ghi/đọc đơn thực tế hoặc hiển thị browser.
+
+## Bước tiếp theo
+
+Áp dụng hai migration theo thứ tự trên môi trường Supabase được chọn, sau đó thử nộp đơn bằng tài khoản sinh viên và duyệt bằng tài khoản trưởng ban tương ứng.
