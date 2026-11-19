@@ -8,3 +8,24 @@ Phase 04 — In Progress. Đã thêm Enter để gửi qua biểu mẫu hiện c
 Năm test Workspace đạt, bao gồm Enter gửi lần đầu, Shift+Enter và ghép chữ không gửi, và nút Gửi thử lại thành công. Kiểm tra TypeScript frontend đạt.
 
 Tiếp theo, rà hành vi nhập liệu trên trình duyệt cùng đợt nghiệm thu giao diện chat.
+
+## Rà soát Không gian sinh hoạt trên bản final
+
+Đối chiếu phiên bản `36ff795`. Phase 04 vẫn **In Progress**. Lượt này chỉ kiểm tra và ghi nhận kết quả.
+
+### Kết quả kiểm tra
+
+- Trình duyệt ở 1440 px và 390 px với API mô phỏng. Đã thử menu mobile, thu gọn cột thông tin, lưu theme, Enter để gửi, Shift+Enter để xuống dòng, nhận tin ở tài khoản khác và từ chối truy cập trực tiếp kênh private.
+- Đã thử tạo họp ngay bằng vai trò thành viên, mở đúng buổi từ workspace và thử lại bước lưu lịch sau khi API mô phỏng báo lỗi.
+- Supabase chỉ đọc cho CLB AE 18. Cả ba vai trò được thử đều mở được kênh Chung và các kênh ban mở trong CLB. Trong các tài khoản đã kiểm tra, chỉ chủ nhiệm được mở Ban quản trị.
+- `npm test` đạt 44 test backend và 94 test frontend. Chưa nghiệm thu ghi dữ liệu trên Supabase hoặc cuộc gọi LiveKit giữa hai thiết bị.
+
+### Các điểm cần xử lý
+
+1. Khi có 55 tin mới giữa hai lần polling, giao diện lấy 50 tin gần nhất và thiếu 5 tin trong ca thử. Cần tải bù theo mốc tin đã nhận.
+2. Form sửa ban của chủ nhiệm luôn gửi `is_private`, trong khi migration chỉ cấp quyền cập nhật trực tiếp tên, mô tả và trạng thái. Đổi riêng tư đi qua RPC của head. Cần đối chiếu quyền DB trước khi sửa luồng. Workspace còn thiếu thao tác head thêm và gỡ người khỏi kênh private.
+3. Tạo cuộc họp và tạo phiên là hai bước. Khi bước tạo phiên lỗi, thông tin thử lại hiện chỉ giữ trong component. Cần chốt quyền truy cập bằng mã cho họp nội bộ CLB, vì luồng vào phòng hiện dựa theo luật admission của cuộc họp.
+4. Trang Ban còn mô tả cũ về chat theo ban. Sidebar và thanh trên hiển thị vai trò head khác nhau. Theme tối còn ô và nút sáng ở màn hình họp, dòng mã họp có tương phản thấp, còn nút theme trên mobile nằm dưới vùng chat.
+5. Sidebar có hai nhóm dẫn tới màn hình họp. Tạo họp ngay vẫn giữ người dùng ở danh sách. Với buổi `cancelled` trong mô phỏng, nhãn trạng thái trống và nút mở vẫn hiện.
+
+Module ứng tuyển chưa nằm trong lượt rà soát.
