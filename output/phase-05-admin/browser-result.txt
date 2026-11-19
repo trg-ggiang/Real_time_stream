@@ -1,0 +1,7 @@
+{
+  "checks": 35,
+  "failures": [],
+  "visualFailures": [],
+  "fixtureWrites": 3,
+  "liveWrites": 0
+}

@@ -5,7 +5,7 @@ import { GuestLanding } from '../guest/GuestLanding';
 import { mergeChannelMessages } from './pages/WorkspaceChat';
 import type { ChannelMessage } from './services/workspace-api';
 
-afterEach(() => { cleanup(); sessionStorage.clear(); history.replaceState(null, '', '/'); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.removeItem('unicircle.workspace-theme'); history.replaceState(null, '', '/'); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 function fixture() {
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
   let failedSend = false;
@@ -57,7 +57,10 @@ it('keeps failed message text and reuses its retry key, then renders the saved m
   const field = await screen.findByRole('textbox', { name: 'Nhắn tin trong Chung' });
   await waitFor(() => expect((field as HTMLTextAreaElement).disabled).toBe(false));
   fireEvent.change(field, { target: { value: 'Xin chào CLB' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
+  fireEvent.keyDown(field, { key: 'Enter', shiftKey: true });
+  fireEvent.keyDown(field, { key: 'Enter', isComposing: true });
+  expect(postBodies).toHaveLength(0);
+  fireEvent.keyDown(field, { key: 'Enter' });
   await screen.findByRole('alert');
   expect((field as HTMLTextAreaElement).value).toBe('Xin chào CLB');
   fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
@@ -103,4 +106,25 @@ it('binds scheduled meetings to the club and retries a failed schedule without r
   await screen.findByText(/Đã tạo lịch họp CODE/);
   expect(rooms).toBe(1);
   expect(schedules).toBe(2);
+});
+
+it('switches and restores the workspace theme while the information panel is collapsed', async () => {
+  fixture();
+  history.replaceState(null, '', '/workspace/alpha/channels/general');
+  const view = <GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />;
+  const first = render(view);
+  await screen.findByRole('heading', { name: 'Chung' });
+  fireEvent.click(screen.getByRole('button', { name: 'Thu gọn thông tin CLB' }));
+
+  const toggle = screen.getByRole('button', { name: 'Chế độ tối' });
+  fireEvent.click(toggle);
+  expect(toggle.getAttribute('aria-pressed')).toBe('true');
+  expect(toggle.closest('.cw-app')?.getAttribute('data-theme')).toBe('dark');
+
+  first.unmount();
+  render(view);
+  const restored = await screen.findByRole('button', { name: 'Chế độ tối' });
+  expect(restored.getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(restored);
+  expect(restored.closest('.cw-app')?.getAttribute('data-theme')).toBe('light');
 });

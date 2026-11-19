@@ -1,0 +1,4 @@
+
+> @real-time-stream/backend@0.0.0 build
+> tsc -p tsconfig.json
+

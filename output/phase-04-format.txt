@@ -1,0 +1,15 @@
+backend/src/workspace/workspace-access.service.ts 65ms (unchanged)
+backend/src/workspace/workspace-content.service.ts 64ms
+backend/src/workspace/workspace-people.service.ts 38ms (unchanged)
+backend/src/workspace/workspace.controller.ts 20ms (unchanged)
+backend/src/workspace/workspace.dto.ts 14ms (unchanged)
+backend/src/workspace/workspace.module.ts 3ms (unchanged)
+frontend/src/features/club-workspace/pages/WorkspaceContent.tsx 76ms (unchanged)
+frontend/src/features/club-workspace/pages/WorkspaceHome.tsx 29ms
+frontend/src/features/club-workspace/pages/WorkspacePeople.tsx 42ms (unchanged)
+frontend/src/features/club-workspace/services/workspace-api.ts 9ms (unchanged)
+frontend/src/features/club-workspace/use-workspace-mutation.ts 6ms (unchanged)
+frontend/src/features/club-workspace/workspace-context.tsx 3ms (unchanged)
+frontend/src/features/club-workspace/workspace.css 103ms (unchanged)
+frontend/src/features/club-workspace/WorkspaceApp.tsx 23ms (unchanged)
+frontend/src/features/guest/ClubActivitiesPage.test.tsx 8ms

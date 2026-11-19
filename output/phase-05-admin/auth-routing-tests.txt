@@ -1,0 +1,13 @@
+
+> @real-time-stream/frontend@0.0.0 test
+> vitest run --run src/features/auth/AuthApp.test.tsx
+
+
+ RUN  v5.0.5 D:/Project/Livekit project/Real_time_stream/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  13:39:14
+   Duration  3.60s (environment 59%, tests 23%, import 12%, transform 6%)
+

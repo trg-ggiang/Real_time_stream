@@ -1,0 +1,322 @@
+[
+  {
+    "width": 1440,
+    "path": "/",
+    "title": "Tìm cộng đồng.Mở lối đam mê.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/clubs",
+    "title": "Tìm một nơi thuộc về.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/activities",
+    "title": "Ra ngoài. Gặp nhau.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/posts",
+    "title": "Chuyện từ cộng đồng.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/clubs/4cadddcb-bacf-5515-a332-74b677aed50e",
+    "title": "HUROS — Robotics và Thiết bị thông minh",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/activities/46c4dd18-afab-5d94-af25-40a6e6413680",
+    "title": "HUST Business Analytics & AI Challenge 2026",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/posts/eeaba9ba-6935-559f-a26c-938abad42aaf",
+    "title": "HBAC và hành trình học phân tích dữ liệu",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/clubs?q=no-such-club-271828",
+    "title": "Tìm một nơi thuộc về.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/activities?period=upcoming",
+    "title": "Ra ngoài. Gặp nhau.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "path": "/clubs/00000000-0000-4000-8000-000000000000",
+    "headings": 0,
+    "overflow": false,
+    "broken": [],
+    "error": "Nội dung chưa khả dụngNội dung không tồn tại hoặc chưa được công khai. Về khám phá",
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "interaction": "search URL",
+    "passed": true
+  },
+  {
+    "width": 768,
+    "path": "/",
+    "title": "Tìm cộng đồng.Mở lối đam mê.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/clubs",
+    "title": "Tìm một nơi thuộc về.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/activities",
+    "title": "Ra ngoài. Gặp nhau.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/posts",
+    "title": "Chuyện từ cộng đồng.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/clubs/4cadddcb-bacf-5515-a332-74b677aed50e",
+    "title": "HUROS — Robotics và Thiết bị thông minh",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/activities/46c4dd18-afab-5d94-af25-40a6e6413680",
+    "title": "HUST Business Analytics & AI Challenge 2026",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/posts/eeaba9ba-6935-559f-a26c-938abad42aaf",
+    "title": "HBAC và hành trình học phân tích dữ liệu",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/clubs?q=no-such-club-271828",
+    "title": "Tìm một nơi thuộc về.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/activities?period=upcoming",
+    "title": "Ra ngoài. Gặp nhau.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "path": "/clubs/00000000-0000-4000-8000-000000000000",
+    "headings": 0,
+    "overflow": false,
+    "broken": [],
+    "error": "Nội dung chưa khả dụngNội dung không tồn tại hoặc chưa được công khai. Về khám phá",
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "interaction": "search URL",
+    "passed": true
+  },
+  {
+    "width": 390,
+    "path": "/",
+    "title": "Tìm cộng đồng.Mở lối đam mê.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/clubs",
+    "title": "Tìm một nơi thuộc về.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/activities",
+    "title": "Ra ngoài. Gặp nhau.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/posts",
+    "title": "Chuyện từ cộng đồng.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/clubs/4cadddcb-bacf-5515-a332-74b677aed50e",
+    "title": "HUROS — Robotics và Thiết bị thông minh",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/activities/46c4dd18-afab-5d94-af25-40a6e6413680",
+    "title": "HUST Business Analytics & AI Challenge 2026",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/posts/eeaba9ba-6935-559f-a26c-938abad42aaf",
+    "title": "HBAC và hành trình học phân tích dữ liệu",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/clubs?q=no-such-club-271828",
+    "title": "Tìm một nơi thuộc về.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/activities?period=upcoming",
+    "title": "Ra ngoài. Gặp nhau.",
+    "headings": 1,
+    "overflow": false,
+    "broken": [],
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "path": "/clubs/00000000-0000-4000-8000-000000000000",
+    "headings": 0,
+    "overflow": false,
+    "broken": [],
+    "error": "Nội dung chưa khả dụngNội dung không tồn tại hoặc chưa được công khai. Về khám phá",
+    "loading": false,
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "interaction": "mobile menu + Escape",
+    "passed": true
+  },
+  {
+    "width": 390,
+    "interaction": "search URL",
+    "passed": true
+  }
+]

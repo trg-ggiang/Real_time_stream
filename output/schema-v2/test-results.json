@@ -1,0 +1,338 @@
+[
+  {
+    "name": "one general + one channel per department provisioned",
+    "passed": true
+  },
+  {
+    "name": "department member reads private channel",
+    "passed": true
+  },
+  {
+    "name": "chair has no private bypass",
+    "passed": true
+  },
+  {
+    "name": "platform admin has no private bypass",
+    "passed": true
+  },
+  {
+    "name": "ordinary member cannot add chair",
+    "passed": true
+  },
+  {
+    "name": "chair cannot add self",
+    "passed": true
+  },
+  {
+    "name": "head explicitly adds chair",
+    "passed": true
+  },
+  {
+    "name": "added chair cannot delegate or add another member",
+    "passed": true
+  },
+  {
+    "name": "authorized channel history",
+    "passed": true
+  },
+  {
+    "name": "head cannot edit another sender body",
+    "passed": true
+  },
+  {
+    "name": "soft deleted body redacted in history RPC",
+    "passed": true
+  },
+  {
+    "name": "read marker accepted for correct channel",
+    "passed": true
+  },
+  {
+    "name": "cross channel read marker rejected",
+    "passed": true
+  },
+  {
+    "name": "revoked explicit access denied",
+    "passed": true
+  },
+  {
+    "name": "revoked history forbidden",
+    "passed": true
+  },
+  {
+    "name": "regrant preserves prior history row",
+    "passed": true
+  },
+  {
+    "name": "departed member loses implicit channel access",
+    "passed": true
+  },
+  {
+    "name": "chair cannot rename department channel",
+    "passed": true
+  },
+  {
+    "name": "head manages own channel metadata",
+    "passed": true
+  },
+  {
+    "name": "ordinary member cannot open campaign",
+    "passed": true
+  },
+  {
+    "name": "question frozen after campaign opens",
+    "passed": true
+  },
+  {
+    "name": "one department per student per campaign",
+    "passed": true
+  },
+  {
+    "name": "foreign department question rejected",
+    "passed": true
+  },
+  {
+    "name": "one application per campaign even same department",
+    "passed": true
+  },
+  {
+    "name": "cannot submit without required answer",
+    "passed": true
+  },
+  {
+    "name": "answer length enforced",
+    "passed": true
+  },
+  {
+    "name": "other user cannot answer candidate draft",
+    "passed": true
+  },
+  {
+    "name": "submit snapshots profile and timestamp",
+    "passed": true
+  },
+  {
+    "name": "answers immutable after submission",
+    "passed": true
+  },
+  {
+    "name": "head of another department cannot decide",
+    "passed": true
+  },
+  {
+    "name": "chair cannot decide recruitment",
+    "passed": true
+  },
+  {
+    "name": "applicant cannot decide result",
+    "passed": true
+  },
+  {
+    "name": "stale application token rejected",
+    "passed": true
+  },
+  {
+    "name": "assigned interviewer can review but has no final decision power",
+    "passed": true
+  },
+  {
+    "name": "unassigned user cannot review",
+    "passed": true
+  },
+  {
+    "name": "appointment and session must match",
+    "passed": true
+  },
+  {
+    "name": "atomic reschedule updates both session and appointment",
+    "passed": true
+  },
+  {
+    "name": "scheduled sessions cannot receive chat messages",
+    "passed": true
+  },
+  {
+    "name": "ending session deletes only its ephemeral chat",
+    "passed": true
+  },
+  {
+    "name": "ended session rejects late message insert",
+    "passed": true
+  },
+  {
+    "name": "existing meeting end remains compatible",
+    "passed": true
+  },
+  {
+    "name": "acceptance creates active membership atomically in selected department",
+    "passed": true
+  },
+  {
+    "name": "accepted application is terminal",
+    "passed": true
+  },
+  {
+    "name": "duplicate active membership rolls back acceptance",
+    "passed": true
+  },
+  {
+    "name": "failed acceptance leaves application interviewing",
+    "passed": true
+  },
+  {
+    "name": "direct rewrite of public club identity blocked",
+    "passed": true
+  },
+  {
+    "name": "pending revision leaves original public name",
+    "passed": true
+  },
+  {
+    "name": "chair cannot approve own revision",
+    "passed": true
+  },
+  {
+    "name": "admin revision approval updates public club atomically",
+    "passed": true
+  },
+  {
+    "name": "revision allowlist blocks role changes",
+    "passed": true
+  },
+  {
+    "name": "wrong worker claim cannot finish job",
+    "passed": true
+  },
+  {
+    "name": "completed lease cannot be replayed",
+    "passed": true
+  },
+  {
+    "name": "notification dedupe per recipient",
+    "passed": true
+  },
+  {
+    "name": "other user cannot mark notification read",
+    "passed": true
+  },
+  {
+    "name": "recipient marks own notification read",
+    "passed": true
+  },
+  {
+    "name": "new tables have RLS and no browser privileges",
+    "passed": true
+  },
+  {
+    "name": "browser cannot execute privileged RPCs",
+    "passed": true
+  },
+  {
+    "name": "service cannot rewrite audit history",
+    "passed": true
+  },
+  {
+    "name": "service cannot directly create channel access without head actor",
+    "passed": true
+  },
+  {
+    "name": "existing rows and candidate history retained",
+    "passed": true
+  },
+  {
+    "name": "publication schedules two future reminder jobs",
+    "passed": true
+  },
+  {
+    "name": "unpublishing invalidates pending reminders",
+    "passed": true
+  },
+  {
+    "name": "republish same start time restores future reminders",
+    "passed": true
+  },
+  {
+    "name": "stale revision approval rolls back",
+    "passed": true
+  },
+  {
+    "name": "failed revision stays pending",
+    "passed": true
+  },
+  {
+    "name": "removed head cannot manage channel anymore",
+    "passed": true
+  },
+  {
+    "name": "actual service_role can write through authorized guards",
+    "passed": true
+  },
+  {
+    "name": "service cannot mutate private worker state directly",
+    "passed": true
+  },
+  {
+    "name": "all new foreign keys have nonpartial leading indexes",
+    "passed": true
+  },
+  {
+    "name": "legacy direct email admission is disabled",
+    "passed": true
+  },
+  {
+    "name": "direct role escalation disabled",
+    "passed": true
+  },
+  {
+    "name": "existing creator chair provisioning still works under service_role",
+    "passed": true
+  },
+  {
+    "name": "multiple same-transaction activity changes keep only current reminders",
+    "passed": true
+  },
+  {
+    "name": "rejoining club does not inherit old channel grant",
+    "passed": true
+  },
+  {
+    "name": "expired old lease cannot acknowledge reclaimed job",
+    "passed": true
+  },
+  {
+    "name": "service worker claim and expired-lease recovery work",
+    "passed": true
+  },
+  {
+    "name": "invalid batch rolls back notification delivery",
+    "passed": true
+  },
+  {
+    "name": "failed notification batch leaves no partial notification and lease remains",
+    "passed": true
+  },
+  {
+    "name": "worker delivery and acknowledgment commit together",
+    "passed": true
+  },
+  {
+    "name": "chair cannot change privacy through head RPC",
+    "passed": true
+  },
+  {
+    "name": "service cannot bypass privacy through direct department update",
+    "passed": true
+  },
+  {
+    "name": "head manages own channel privacy through audited RPC",
+    "passed": true
+  },
+  {
+    "name": "repeat import fails safely without removing data",
+    "passed": true
+  },
+  {
+    "name": "read-only postflight executes and sees all 16 tables",
+    "passed": true
+  }
+]

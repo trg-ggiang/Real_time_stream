@@ -1,0 +1,526 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "route": "",
+      "h1": "Không gian SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/posts",
+      "h1": "Bài viết CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/posts/new",
+      "h1": "Viết câu chuyện CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/activities/new",
+      "h1": "Tạo một hoạt động mới",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/members",
+      "h1": "Những người cùng CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/departments",
+      "h1": "Các ban trong CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/information",
+      "h1": "Thông tin CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/review",
+      "h1": "Những nội dung chờ duyệt",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/meetings",
+      "h1": "Gặp nhau, cùng trao đổi",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "route": "/posts/20000000-0000-4000-8000-000000000001",
+      "h1": "Một ý tưởng, nhiều người cùng làm",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "interaction": "create and submit post",
+      "passed": true
+    },
+    {
+      "interaction": "chair approves draft version",
+      "passed": true
+    },
+    {
+      "interaction": "switch to member club",
+      "passed": true
+    },
+    {
+      "interaction": "member review direct route denied",
+      "passed": true
+    },
+    {
+      "width": 768,
+      "route": "",
+      "h1": "Không gian SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/posts",
+      "h1": "Bài viết CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/posts/new",
+      "h1": "Viết câu chuyện CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/activities/new",
+      "h1": "Tạo một hoạt động mới",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/members",
+      "h1": "Những người cùng CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/departments",
+      "h1": "Các ban trong CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/information",
+      "h1": "Thông tin CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/review",
+      "h1": "Những nội dung chờ duyệt",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/meetings",
+      "h1": "Gặp nhau, cùng trao đổi",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "route": "/posts/20000000-0000-4000-8000-000000000001",
+      "h1": "Một ý tưởng, nhiều người cùng làm",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "",
+      "h1": "Không gian SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/posts",
+      "h1": "Bài viết CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/posts/new",
+      "h1": "Viết câu chuyện CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/activities/new",
+      "h1": "Tạo một hoạt động mới",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/members",
+      "h1": "Những người cùng CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/departments",
+      "h1": "Các ban trong CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/information",
+      "h1": "Thông tin CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/review",
+      "h1": "Những nội dung chờ duyệt",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/meetings",
+      "h1": "Gặp nhau, cùng trao đổi",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "route": "/posts/20000000-0000-4000-8000-000000000001",
+      "h1": "Một ý tưởng, nhiều người cùng làm",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "interaction": "mobile navigation opens",
+      "passed": true
+    },
+    {
+      "width": 320,
+      "route": "",
+      "h1": "Không gian SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/posts",
+      "h1": "Bài viết CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/posts/new",
+      "h1": "Viết câu chuyện CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/activities/new",
+      "h1": "Tạo một hoạt động mới",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/members",
+      "h1": "Những người cùng CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/departments",
+      "h1": "Các ban trong CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/information",
+      "h1": "Thông tin CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/review",
+      "h1": "Những nội dung chờ duyệt",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/meetings",
+      "h1": "Gặp nhau, cùng trao đổi",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "route": "/posts/20000000-0000-4000-8000-000000000001",
+      "h1": "Một ý tưởng, nhiều người cùng làm",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    }
+  ],
+  "visual": [
+    {
+      "width": 1440,
+      "route": "",
+      "findings": [
+        {
+          "level": "WARN",
+          "id": "ragged-row",
+          "width": 1440,
+          "message": "1 pair(s) of cards in one row end at different heights (by 186px).",
+          "fix": "Cards that share a row share a bottom edge: balance them by their content (the same number of rows, a block of similar height beside it), or stack them. In testing, ragged rows were marked down every time."
+        },
+        {
+          "level": "WARN",
+          "id": "panel-void",
+          "width": 1440,
+          "message": "1 card(s) hold a blank band inside: 140px in \"Câu chuyện trong cộng đồng\".",
+          "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/posts/new",
+      "findings": []
+    },
+    {
+      "width": 1440,
+      "route": "/members",
+      "findings": [
+        {
+          "level": "WARN",
+          "id": "contrast",
+          "width": 1440,
+          "message": "Low-contrast text: \"uniCircle\" 4.1:1 needs 4.5:1",
+          "fix": "Darken or lighten the text colour."
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "route": "",
+      "findings": []
+    },
+    {
+      "width": 768,
+      "route": "/posts/new",
+      "findings": []
+    },
+    {
+      "width": 768,
+      "route": "/members",
+      "findings": [
+        {
+          "level": "WARN",
+          "id": "contrast",
+          "width": 768,
+          "message": "Low-contrast text: \"uniCircle\" 4.1:1 needs 4.5:1",
+          "fix": "Darken or lighten the text colour."
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "route": "",
+      "findings": []
+    },
+    {
+      "width": 390,
+      "route": "/posts/new",
+      "findings": []
+    },
+    {
+      "width": 390,
+      "route": "/members",
+      "findings": [
+        {
+          "level": "WARN",
+          "id": "contrast",
+          "width": 390,
+          "message": "Low-contrast text: \"uniCircle\" 4.1:1 needs 4.5:1",
+          "fix": "Darken or lighten the text colour."
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "route": "",
+      "findings": []
+    },
+    {
+      "width": 320,
+      "route": "/posts/new",
+      "findings": []
+    },
+    {
+      "width": 320,
+      "route": "/members",
+      "findings": [
+        {
+          "level": "WARN",
+          "id": "contrast",
+          "width": 320,
+          "message": "Low-contrast text: \"uniCircle\" 4.1:1 needs 4.5:1",
+          "fix": "Darken or lighten the text colour."
+        }
+      ]
+    }
+  ],
+  "writes": [
+    {
+      "path": "workspace/10000000-0000-4000-8000-000000000001/posts",
+      "method": "POST",
+      "body": {
+        "title": "Bản thảo chia sẻ của thành viên",
+        "summary": "Những ý tưởng mới để cùng nhau phát triển.",
+        "cover_url": null,
+        "post_id": "35c334d6-6dae-4e1d-8870-ddf355b81171",
+        "content": "Nội dung mô phỏng kiểm tra luồng soạn thảo, lưu nháp và gửi chủ nhiệm duyệt.",
+        "visibility": "public"
+      },
+      "simulated": true
+    },
+    {
+      "path": "workspace/10000000-0000-4000-8000-000000000001/content/posts/35c334d6-6dae-4e1d-8870-ddf355b81171/submit",
+      "method": "POST",
+      "body": {
+        "expected_updated_at": "2026-11-16T09:00:00Z"
+      },
+      "simulated": true
+    },
+    {
+      "path": "workspace/10000000-0000-4000-8000-000000000001/content/posts/35c334d6-6dae-4e1d-8870-ddf355b81171/review",
+      "method": "PATCH",
+      "body": {
+        "decision": "published",
+        "expected_updated_at": "2026-11-16T10:00:00Z"
+      },
+      "simulated": true
+    }
+  ],
+  "liveWrites": 0
+}

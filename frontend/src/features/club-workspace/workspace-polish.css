@@ -225,3 +225,59 @@
 .cw-app .cw-rail-clubs .cw-rail-club{position:relative}
 .cw-app .cw-rail-clubs .cw-rail-club.is-current::before{display:block;content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:3px;height:26px;border-radius:3px;background:#245dc1}
 @media(max-width:640px){.cw-app .cw-rail-clubs{width:auto}.cw-app .cw-rail-clubs .cw-rail-club.is-current::before{height:22px}}
+
+/* Navy light palette for the club workspace. */
+.cw-app {
+  --cw-navy: #14284a;
+  --cw-secondary-ink: #495d78;
+  --cw-blue: #2356a8;
+  --cw-blue-hover: #194484;
+  --cw-sidebar-surface: #f1f5fb;
+  --cw-info-surface: #f7f9fd;
+  --cw-active-surface: #dce9fc;
+  --cw-pane-line: #c9d7e8;
+}
+.cw-app .cw-club-rail {
+  background: var(--cw-navy);
+  border-right-color: var(--cw-navy);
+}
+.cw-app .cw-rail-clubs .cw-rail-club.is-current::before { background: #9ac3ff; }
+.cw-app .cw-sidebar {
+  background: var(--cw-sidebar-surface);
+  border-right-color: var(--cw-pane-line);
+}
+.cw-app .cw-sidebar nav :is(a, p) { color: var(--cw-secondary-ink); }
+.cw-app .cw-sidebar nav a:hover { background: #e6edf8; }
+.cw-app .cw-sidebar nav a.active {
+  background: var(--cw-active-surface);
+  color: var(--cw-navy);
+  box-shadow: none;
+  font-weight: 700;
+}
+.cw-app .cw-work-pinned { background: #e8eff9; }
+.cw-app .cw-quick-panel {
+  background: var(--cw-info-surface);
+  border-color: var(--cw-pane-line);
+}
+.cw-app .cw-quick-panel :is(time, p, summary, .cw-panel-date-year) { color: var(--cw-secondary-ink); }
+.cw-app .cw-quick-heading h2, .cw-app .cw-club-identity strong { color: var(--cw-navy); }
+.cw-app main :is(.cw-channel-header, .cw-live-history) { background: #fff; color: var(--cw-navy); }
+.cw-app main .cw-channel-header { border-bottom-color: var(--cw-pane-line); }
+.cw-app main .cw-channel-header :is(p, .cw-channel-club) { color: var(--cw-secondary-ink); }
+.cw-app main .cw-message p { color: var(--cw-navy); }
+.cw-app main .cw-message-meta strong { color: var(--cw-navy); font-weight: 700; }
+.cw-app main .cw-message.is-mine .cw-message-meta strong { color: var(--cw-blue); }
+.cw-app main .cw-message-meta time { color: var(--cw-secondary-ink); font-weight: 500; }
+.cw-app main .cw-live-composer { border-color: var(--cw-pane-line); }
+.cw-app main .cw-live-composer textarea {
+  border-color: #768ca7;
+  color: var(--cw-navy);
+}
+.cw-app main .cw-live-composer textarea::placeholder { color: var(--cw-secondary-ink); }
+.cw-app main .cw-live-composer .cw-primary { background: var(--cw-blue); border-color: var(--cw-blue); }
+.cw-app main .cw-live-composer .cw-primary:hover:not(:disabled) { background: var(--cw-blue-hover); border-color: var(--cw-blue-hover); }
+.cw-app :is(a, button, summary, textarea, .cw-message):focus-visible {
+  outline: 2px solid var(--cw-blue);
+  outline-offset: 2px;
+}
+.cw-app .cw-club-rail :is(a, summary):focus-visible { outline-color: #9ac3ff; }

@@ -1,0 +1,2186 @@
+{
+ "url": "http://127.0.0.1:5173",
+ "at": "2026-11-16T04:38:48.884Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    1,
+    0.97,
+    1,
+    1,
+    0.99
+   ],
+   "motion": {
+    "elements": 28,
+    "css": 28,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 3773,
+     "screens": 4.2,
+     "words": 565,
+     "img": 13,
+     "video": 0,
+     "canvas": 0,
+     "svg": 18,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 8,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "campus-bright-1000.jpg",
+      "hbac-cover.webp",
+      "huros-logo.webp",
+      "huros-logo.webp",
+      "huros-logo.webp",
+      "sinno-cover.webp",
+      "hbac-cover.webp",
+      "hbac-cover.webp"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Tìm cộng đồng. Mở lối đam mê.",
+     "words": 7,
+     "chars": 29,
+     "lines": 2,
+     "size": 68,
+     "vw": 4.7,
+     "font": "Be Vietnam Pro",
+     "weight": 600,
+     "tracking": -0.045,
+     "leading": 1.23,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.41,
+     "top": 184,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Tìm cộng đồng. Mở lối đam mê.",
+     "words": 7,
+     "lines": 2,
+     "size": 68,
+     "font": "Be Vietnam Pro"
+    },
+    "headings": [
+     {
+      "text": "uni circle .",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 29,
+      "vw": 2,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.062,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.08,
+      "top": 34,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Tìm cộng đồng. Mở lối đam mê.",
+      "words": 7,
+      "chars": 29,
+      "lines": 2,
+      "size": 68,
+      "vw": 4.7,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 1.23,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.41,
+      "top": 184,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Dấu chân cộng đồng",
+      "words": 4,
+      "chars": 18,
+      "lines": 1,
+      "size": 38,
+      "vw": 2.6,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 873,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.01,
+      "top": 1276,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "22",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.03,
+      "top": 1276,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "22",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.03,
+      "top": 1276,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "Cùng tần số, cùng đam mê.",
+      "words": 6,
+      "chars": 25,
+      "lines": 1,
+      "size": 38,
+      "vw": 2.6,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.33,
+      "top": 1637,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Chuyện kể từ các CLB",
+      "words": 5,
+      "chars": 20,
+      "lines": 1,
+      "size": 38,
+      "vw": 2.6,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.27,
+      "top": 2407,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "HBAC và hành trình học phân tích dữ liệu",
+      "words": 9,
+      "chars": 40,
+      "lines": 1,
+      "size": 28,
+      "vw": 1.9,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.025,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.46,
+      "top": 2975,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Câu chuyện tiếp theo có thể bắt đầu từ bạn.",
+      "words": 10,
+      "chars": 43,
+      "lines": 2,
+      "size": 46,
+      "vw": 3.2,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.45,
+      "top": 3247,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "uni circle .",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 29,
+      "vw": 2,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.062,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.08,
+      "top": 3525,
+      "tag": "a",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 11,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Be Vietnam Pro",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      13,
+      14,
+      16,
+      17,
+      18,
+      20,
+      28,
+      29,
+      32,
+      38,
+      46,
+      68
+     ],
+     "sizeCount": 12,
+     "notLoaded": [],
+     "body": {
+      "font": "Be Vietnam Pro",
+      "size": 16,
+      "leading": 1.8,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 8.5
+     },
+     "measureChars": 88,
+     "max": {
+      "size": 68,
+      "vw": 4.7,
+      "font": "Be Vietnam Pro",
+      "text": "Tìm cộng đồng."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#101827",
+     "bodyBgHsl": {
+      "h": 219,
+      "s": 0.42,
+      "l": 0.11
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#ffffff",
+       "top": 0,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#f1f5fa",
+       "top": 1547,
+       "hsl": {
+        "h": 213,
+        "s": 0.47,
+        "l": 0.96
+       }
+      },
+      {
+       "color": "#eaf0f7",
+       "top": 3460,
+       "hsl": {
+        "h": 212,
+        "s": 0.45,
+        "l": 0.94
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#53647b",
+       "share": 0.37
+      },
+      {
+       "color": "#152c50",
+       "share": 0.31
+      },
+      {
+       "color": "#344960",
+       "share": 0.26
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.04
+      },
+      {
+       "color": "#285fba",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#285fba",
+      "hsl": {
+       "h": 217,
+       "s": 0.65,
+       "l": 0.44
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 2,
+     "radius": 4,
+     "height": 50,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Đến nội dung",
+      "Tham gia"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 8,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.27
+     }
+    ],
+    "nav": {
+     "links": 6,
+     "fixed": false,
+     "height": 100,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "be vietnam pro"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 3773,
+    "margins": {
+     "left": 80,
+     "right": 80
+    },
+    "sections": [
+     {
+      "sel": "section.dc-hero.dc-container",
+      "tag": "section",
+      "top": 100,
+      "height": 605,
+      "words": 43,
+      "media": 1,
+      "middle": 55,
+      "heading": {
+       "text": "Tìm cộng đồng.",
+       "size": 68,
+       "tag": "h1"
+      },
+      "left": 78,
+      "right": 59,
+      "textLeft": 78,
+      "textRight": 443,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-section",
+      "tag": "section",
+      "top": 783,
+      "height": 764,
+      "words": 135,
+      "media": 3,
+      "middle": 28,
+      "heading": {
+       "text": "Dấu chân cộng đồng",
+       "size": 38,
+       "tag": "h2"
+      },
+      "left": 80,
+      "right": 80,
+      "textLeft": 80,
+      "textRight": 108,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-clubs-section",
+      "tag": "section",
+      "top": 1547,
+      "height": 770,
+      "words": 108,
+      "media": 3,
+      "middle": 32,
+      "heading": {
+       "text": "Cùng tần số, cùng đam mê.",
+       "size": 38,
+       "tag": "h2"
+      },
+      "left": 80,
+      "right": 80,
+      "textLeft": 80,
+      "textRight": 102,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-section",
+      "tag": "section",
+      "top": 2317,
+      "height": 870,
+      "words": 144,
+      "media": 1,
+      "middle": 42,
+      "heading": {
+       "text": "Chuyện kể từ các CLB",
+       "size": 38,
+       "tag": "h2"
+      },
+      "left": 80,
+      "right": 81,
+      "textLeft": 80,
+      "textRight": 81,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-closing",
+      "tag": "section",
+      "top": 3187,
+      "height": 273,
+      "words": 30,
+      "media": 0,
+      "middle": 268,
+      "heading": {
+       "text": "Câu chuyện tiếp theo",
+       "size": 46,
+       "tag": "h2"
+      },
+      "left": 80,
+      "right": 264,
+      "textLeft": 80,
+      "textRight": 264,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.dc-footer",
+      "tag": "footer",
+      "top": 3460,
+      "height": 314,
+      "words": 60,
+      "media": 0,
+      "middle": 306,
+      "heading": {
+       "text": "uni",
+       "size": 29,
+       "tag": "a"
+      },
+      "left": 80,
+      "right": 80,
+      "textLeft": 80,
+      "textRight": 80,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Tìm cộng đồng. Mở lối đam mê.",
+      "size": 68,
+      "top": 184,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 78,
+      "n": 11
+     },
+     {
+      "x": 946,
+      "n": 5
+     },
+     {
+      "x": 142,
+      "n": 2
+     },
+     {
+      "x": 579,
+      "n": 2
+     },
+     {
+      "x": 1017,
+      "n": 2
+     },
+     {
+      "x": 517,
+      "n": 1
+     },
+     {
+      "x": 815,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 24,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.13,
+    "voidBox": {
+     "x": 480,
+     "y": 660,
+     "w": 720,
+     "h": 240
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    1,
+    0.95,
+    1,
+    0.88,
+    0.99
+   ],
+   "motion": {
+    "elements": 28,
+    "css": 28,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 4460,
+     "screens": 4.4,
+     "words": 565,
+     "img": 13,
+     "video": 0,
+     "canvas": 0,
+     "svg": 18,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 8,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "campus-bright-1000.jpg",
+      "hbac-cover.webp",
+      "huros-logo.webp",
+      "huros-logo.webp",
+      "huros-logo.webp",
+      "sinno-cover.webp",
+      "hbac-cover.webp",
+      "hbac-cover.webp"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Tìm cộng đồng. Mở lối đam mê.",
+     "words": 7,
+     "chars": 29,
+     "lines": 2,
+     "size": 39,
+     "vw": 5.1,
+     "font": "Be Vietnam Pro",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.25,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.44,
+     "top": 142,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Tìm cộng đồng. Mở lối đam mê.",
+     "words": 7,
+     "lines": 2,
+     "size": 39,
+     "font": "Be Vietnam Pro"
+    },
+    "headings": [
+     {
+      "text": "uni circle .",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 26,
+      "vw": 3.4,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.069,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.13,
+      "top": 28,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Tìm cộng đồng. Mở lối đam mê.",
+      "words": 7,
+      "chars": 29,
+      "lines": 2,
+      "size": 39,
+      "vw": 5.1,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.44,
+      "top": 142,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Dấu chân cộng đồng",
+      "words": 4,
+      "chars": 18,
+      "lines": 1,
+      "size": 27,
+      "vw": 3.5,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.57,
+      "top": 705,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 32,
+      "vw": 4.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.02,
+      "top": 1052,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "22",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 32,
+      "vw": 4.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.05,
+      "top": 1052,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "22",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 32,
+      "vw": 4.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.05,
+      "top": 1445,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "Cùng tần số, cùng đam mê.",
+      "words": 6,
+      "chars": 25,
+      "lines": 1,
+      "size": 27,
+      "vw": 3.5,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.51,
+      "top": 1760,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Chuyện kể từ các CLB",
+      "words": 5,
+      "chars": 20,
+      "lines": 1,
+      "size": 27,
+      "vw": 3.5,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.47,
+      "top": 2914,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Câu chuyện tiếp theo có thể bắt đầu từ bạn.",
+      "words": 10,
+      "chars": 43,
+      "lines": 2,
+      "size": 33,
+      "vw": 4.3,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.48,
+      "top": 3810,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "uni circle .",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 26,
+      "vw": 3.4,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.069,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.13,
+      "top": 4057,
+      "tag": "a",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 10,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 3,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Be Vietnam Pro",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      18,
+      20,
+      23,
+      26,
+      27,
+      32,
+      33,
+      39
+     ],
+     "sizeCount": 12,
+     "notLoaded": [],
+     "body": {
+      "font": "Be Vietnam Pro",
+      "size": 16,
+      "leading": 1.8,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 8.5
+     },
+     "measureChars": 88,
+     "max": {
+      "size": 39,
+      "vw": 5.1,
+      "font": "Be Vietnam Pro",
+      "text": "Tìm cộng đồng."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#101827",
+     "bodyBgHsl": {
+      "h": 219,
+      "s": 0.42,
+      "l": 0.11
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#ffffff",
+       "top": 0,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#f1f5fa",
+       "top": 1690,
+       "hsl": {
+        "h": 213,
+        "s": 0.47,
+        "l": 0.96
+       }
+      },
+      {
+       "color": "#eaf0f7",
+       "top": 3992,
+       "hsl": {
+        "h": 212,
+        "s": 0.45,
+        "l": 0.94
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#53647b",
+       "share": 0.37
+      },
+      {
+       "color": "#152c50",
+       "share": 0.31
+      },
+      {
+       "color": "#344960",
+       "share": 0.26
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.04
+      },
+      {
+       "color": "#285fba",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#285fba",
+      "hsl": {
+       "h": 217,
+       "s": 0.65,
+       "l": 0.44
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 2,
+     "radius": 4,
+     "height": 50,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Đến nội dung",
+      "Tham gia"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 8,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.17
+     },
+     {
+      "type": "img",
+      "ratio": 0.09
+     },
+     {
+      "type": "img",
+      "ratio": 0.09
+     }
+    ],
+    "nav": {
+     "links": 6,
+     "fixed": false,
+     "height": 84,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "be vietnam pro"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 4460,
+    "margins": {
+     "left": 32,
+     "right": 32
+    },
+    "sections": [
+     {
+      "sel": "section.dc-hero.dc-container",
+      "tag": "section",
+      "top": 84,
+      "height": 478,
+      "words": 43,
+      "media": 1,
+      "middle": 32,
+      "heading": {
+       "text": "Tìm cộng đồng.",
+       "size": 39,
+       "tag": "h1"
+      },
+      "left": 31,
+      "right": 32,
+      "textLeft": 31,
+      "textRight": 128,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-section",
+      "tag": "section",
+      "top": 635,
+      "height": 1056,
+      "words": 135,
+      "media": 3,
+      "middle": 0,
+      "heading": {
+       "text": "22",
+       "size": 32,
+       "tag": "strong"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 51,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-clubs-section",
+      "tag": "section",
+      "top": 1690,
+      "height": 1154,
+      "words": 108,
+      "media": 3,
+      "middle": 0,
+      "heading": {
+       "text": "Cùng tần số, cùng đam mê.",
+       "size": 27,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 42,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-section",
+      "tag": "section",
+      "top": 2844,
+      "height": 927,
+      "words": 144,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Chuyện kể từ các CLB",
+       "size": 27,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 41,
+      "textLeft": 32,
+      "textRight": 41,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-closing",
+      "tag": "section",
+      "top": 3770,
+      "height": 221,
+      "words": 30,
+      "media": 0,
+      "middle": 66,
+      "heading": {
+       "text": "Câu chuyện tiếp theo",
+       "size": 33,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 48,
+      "textLeft": 32,
+      "textRight": 48,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.dc-footer",
+      "tag": "footer",
+      "top": 3992,
+      "height": 469,
+      "words": 60,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "uni",
+       "size": 26,
+       "tag": "a"
+      },
+      "left": 32,
+      "right": 192,
+      "textLeft": 32,
+      "textRight": 196,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Tìm cộng đồng. Mở lối đam mê.",
+      "size": 39,
+      "top": 142,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 31,
+      "n": 10
+     },
+     {
+      "x": 80,
+      "n": 4
+     },
+     {
+      "x": 178,
+      "n": 4
+     },
+     {
+      "x": 395,
+      "n": 3
+     },
+     {
+      "x": 443,
+      "n": 2
+     },
+     {
+      "x": 432,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 24,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 8,
+   "filled": [
+    1,
+    0.93,
+    0.95,
+    1,
+    1,
+    0.97,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 28,
+    "css": 28,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 6138,
+     "screens": 7.3,
+     "words": 520,
+     "img": 13,
+     "video": 0,
+     "canvas": 0,
+     "svg": 18,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 8,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "campus-bright-1000.jpg",
+      "hbac-cover.webp",
+      "huros-logo.webp",
+      "huros-logo.webp",
+      "huros-logo.webp",
+      "sinno-cover.webp",
+      "hbac-cover.webp",
+      "hbac-cover.webp"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Tìm cộng đồng. Mở lối đam mê.",
+     "words": 7,
+     "chars": 29,
+     "lines": 2,
+     "size": 44,
+     "vw": 11.3,
+     "font": "Be Vietnam Pro",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.25,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.9,
+     "top": 98,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Tìm cộng đồng. Mở lối đam mê.",
+     "words": 7,
+     "lines": 2,
+     "size": 44,
+     "font": "Be Vietnam Pro"
+    },
+    "headings": [
+     {
+      "text": "uni circle .",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.069,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.26,
+      "top": 25,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Tìm cộng đồng. Mở lối đam mê.",
+      "words": 7,
+      "chars": 29,
+      "lines": 2,
+      "size": 44,
+      "vw": 11.3,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 98,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Dấu chân cộng đồng",
+      "words": 4,
+      "chars": 18,
+      "lines": 1,
+      "size": 29,
+      "vw": 7.4,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 981,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.03,
+      "top": 1375,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "22",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.1,
+      "top": 1770,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "22",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Be Vietnam Pro",
+      "weight": 500,
+      "tracking": -0.031,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.1,
+      "top": 2165,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "Cùng tần số, cùng đam mê.",
+      "words": 6,
+      "chars": 25,
+      "lines": 2,
+      "size": 29,
+      "vw": 7.4,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 2496,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Chuyện kể từ các CLB",
+      "words": 5,
+      "chars": 20,
+      "lines": 1,
+      "size": 29,
+      "vw": 7.4,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 4166,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Câu chuyện tiếp theo có thể bắt đầu từ bạn.",
+      "words": 10,
+      "chars": 43,
+      "lines": 2,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 5212,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "uni circle .",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": -0.069,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.26,
+      "top": 5533,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "Khám phá",
+      "words": 2,
+      "chars": 8,
+      "lines": 1,
+      "size": 29,
+      "vw": 7.4,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.41,
+      "top": 5659,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Dành cho CLB",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 29,
+      "vw": 7.4,
+      "font": "Be Vietnam Pro",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 5843,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 12,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 3,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Be Vietnam Pro",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      18,
+      21,
+      26,
+      29,
+      32,
+      44
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "Be Vietnam Pro",
+      "size": 16,
+      "leading": 1.8,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 8.5
+     },
+     "measureChars": 54,
+     "max": {
+      "size": 44,
+      "vw": 11.3,
+      "font": "Be Vietnam Pro",
+      "text": "Tìm cộng đồng."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#101827",
+     "bodyBgHsl": {
+      "h": 219,
+      "s": 0.42,
+      "l": 0.11
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#ffffff",
+       "top": 0,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#f1f5fa",
+       "top": 468,
+       "hsl": {
+        "h": 213,
+        "s": 0.47,
+        "l": 0.96
+       }
+      },
+      {
+       "color": "#eaf0f7",
+       "top": 5493,
+       "hsl": {
+        "h": 212,
+        "s": 0.45,
+        "l": 0.94
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#53647b",
+       "share": 0.4
+      },
+      {
+       "color": "#152c50",
+       "share": 0.33
+      },
+      {
+       "color": "#344960",
+       "share": 0.22
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.04
+      },
+      {
+       "color": "#285fba",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#ffffff",
+      "hsl": {
+       "h": 0,
+       "s": 0,
+       "l": 1
+      },
+      "fg": "#152c50"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 0,
+     "height": 50,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Đến nội dung"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 8,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.33
+     }
+    ],
+    "nav": {
+     "links": 2,
+     "fixed": false,
+     "height": 78,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "be vietnam pro"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 6138,
+    "margins": {
+     "left": 20,
+     "right": 20
+    },
+    "sections": [
+     {
+      "sel": "section.dc-hero.dc-container",
+      "tag": "section",
+      "top": 78,
+      "height": 742,
+      "words": 43,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Tìm cộng đồng.",
+       "size": 44,
+       "tag": "h1"
+      },
+      "left": 19,
+      "right": 20,
+      "textLeft": 19,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.dc-section-heading.dc-revealed",
+      "tag": "div",
+      "top": 981,
+      "height": 145,
+      "words": 21,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Dấu chân cộng đồng",
+       "size": 29,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 34,
+      "textLeft": 20,
+      "textRight": 34,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.dc-events-grid",
+      "tag": "div",
+      "top": 1154,
+      "height": 1150,
+      "words": 92,
+      "media": 3,
+      "middle": 0,
+      "heading": {
+       "text": "HUST Business Analytics & AI Challenge 2026",
+       "size": 21,
+       "tag": "h3"
+      },
+      "left": 20,
+      "right": 20,
+      "textLeft": 20,
+      "textRight": 21,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-clubs-section",
+      "tag": "section",
+      "top": 2432,
+      "height": 1670,
+      "words": 108,
+      "media": 3,
+      "middle": 0,
+      "heading": {
+       "text": "Cùng tần số, cùng đam mê.",
+       "size": 29,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 20,
+      "textLeft": 20,
+      "textRight": 24,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-section",
+      "tag": "section",
+      "top": 4102,
+      "height": 1064,
+      "words": 109,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Chuyện kể từ các CLB",
+       "size": 29,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 20,
+      "textLeft": 20,
+      "textRight": 22,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.dc-container.dc-closing",
+      "tag": "section",
+      "top": 5167,
+      "height": 327,
+      "words": 30,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Câu chuyện tiếp theo",
+       "size": 32,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 31,
+      "textLeft": 20,
+      "textRight": 31,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.dc-footer",
+      "tag": "footer",
+      "top": 5493,
+      "height": 645,
+      "words": 60,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Khám phá",
+       "size": 29,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 28,
+      "textLeft": 20,
+      "textRight": 28,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Tìm cộng đồng. Mở lối đam mê.",
+      "size": 44,
+      "top": 98,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 19,
+      "n": 14
+     },
+     {
+      "x": 72,
+      "n": 3
+     },
+     {
+      "x": 83,
+      "n": 3
+     },
+     {
+      "x": 138,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 22,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "size-count",
+   "width": 1440,
+   "message": "12 different font sizes (13, 14, 16, 17, 18, 20, 28, 29, 32, 38, 46, 68).",
+   "fix": "A page needs about five: display, heading, lead, body, small.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\Project\\Livekit project\\Real_time_stream\\output\\phase-02-polish\\final\\desktop-fold.jpg",
+   "pages": [
+    "D:\\Project\\Livekit project\\Real_time_stream\\output\\phase-02-polish\\final\\desktop-page-01.jpg",
+    "D:\\Project\\Livekit project\\Real_time_stream\\output\\phase-02-polish\\final\\desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "D:\\Project\\Livekit project\\Real_time_stream\\output\\phase-02-polish\\final\\tablet-fold.jpg",
+   "pages": [
+    "D:\\Project\\Livekit project\\Real_time_stream\\output\\phase-02-polish\\final\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\Project\\Livekit project\\Real_time_stream\\output\\phase-02-polish\\final\\mobile-fold.jpg",
+   "pages": [
+    "D:\\Project\\Livekit project\\Real_time_stream\\output\\phase-02-polish\\final\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

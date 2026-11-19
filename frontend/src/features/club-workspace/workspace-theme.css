@@ -1,0 +1,110 @@
+.cw-app {
+  --cw-chat-ground: #f2f6fc;
+  --cw-received-bg: #fff;
+  --cw-received-ink: #14284a;
+  --cw-received-line: #cedaeb;
+  --cw-sent-bg: #2356a8;
+  --cw-sent-ink: #fff;
+}
+
+.cw-app .cw-quick-actions { display: flex; gap: 6px; }
+.cw-app--info-collapsed .cw-quick-actions { flex-direction: column; }
+.cw-app .cw-quick-header .cw-theme-toggle span { color: inherit; font-size: 18px; }
+@media (max-width: 930px) {
+  .cw-app--info-collapsed .cw-quick-actions { flex-direction: row; }
+}
+
+.cw-app main .cw-live-history { background: var(--cw-chat-ground); }
+.cw-app main .cw-message p {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  padding: 7px 12px;
+  border: 1px solid var(--cw-received-line);
+  border-radius: 4px 14px 14px 14px;
+  background: var(--cw-received-bg);
+  color: var(--cw-received-ink);
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.cw-app main .cw-message.is-mine p {
+  margin-inline-start: auto;
+  border-color: transparent;
+  border-radius: 14px 4px 14px 14px;
+  background: var(--cw-sent-bg);
+  color: var(--cw-sent-ink);
+}
+.cw-app main .cw-message.is-continuation p { border-radius: 14px; }
+
+.cw-app[data-theme="dark"] {
+  color-scheme: dark;
+  --cw-night-ground: #17191e;
+  --cw-night-surface: #21242b;
+  --cw-night-hover: #2d3440;
+  --cw-night-accent: #a9cbff;
+  --cw-navy: #edf3fc;
+  --cw-secondary-ink: #b6c3d6;
+  --cw-blue: #2356a8;
+  --cw-sidebar-surface: #21242b;
+  --cw-info-surface: #1d2026;
+  --cw-active-surface: #344664;
+  --cw-pane-line: #414959;
+  --cw-chat-ground: #17191e;
+  --cw-received-bg: #282e38;
+  --cw-received-ink: #edf3fc;
+  --cw-received-line: #414959;
+  --cw-sent-bg: #2859aa;
+  background: var(--cw-night-ground);
+  color: var(--cw-navy);
+}
+
+.cw-app[data-theme="dark"] main {
+  --cw-ink: var(--cw-navy);
+  --cw-muted: var(--cw-secondary-ink);
+  --cw-line: var(--cw-pane-line);
+  --cw-accent: var(--cw-night-accent);
+  background: var(--cw-night-ground);
+  color: var(--cw-navy);
+}
+.cw-app[data-theme="dark"] :is(.cw-topbar, .cw-channel, .cw-work-pinned, .cw-club-rail, .cw-rail-account-menu, .cw-create-dialog) {
+  background: var(--cw-night-surface);
+  border-color: var(--cw-pane-line);
+  color: var(--cw-navy);
+}
+.cw-app[data-theme="dark"] main :is(.cw-channel-header, .cw-live-composer, .cw-panel, .cw-editor, .cw-member, .cw-content-list article, .cw-overview-hero, .cw-overview-stats, .cw-overview-feed, .cw-overview-quick, .cw-meeting-list > article, .cw-meetings .workspace-form, .cw-empty, .ps-empty) {
+  background: var(--cw-night-surface);
+  border-color: var(--cw-pane-line);
+  color: var(--cw-navy);
+}
+.cw-app[data-theme="dark"] :is(.cw-overview, .cw-channel-header) :is(h1,h2,h3),
+.cw-app[data-theme="dark"] main :is(.cw-heading h1, .cw-panel > h2, .cw-overview-stats strong, .cw-message.is-mine .cw-message-meta strong),
+.cw-app[data-theme="dark"] :is(.cw-topbar > span:first-child, .cw-quick-about h2, .cw-quick-header span) { color: var(--cw-navy); }
+
+.cw-app[data-theme="dark"] main :is(.cw-muted, .cw-heading p, .cw-panel > p, .cw-member p, .cw-content-list article p, .cw-eyebrow, .cw-overview small, .cw-overview p, .cw-long-text, label),
+.cw-app[data-theme="dark"] :is(.cw-club-identity small, .cw-work-pinned summary, .cw-quick-section li) { color: var(--cw-secondary-ink); }
+.cw-app[data-theme="dark"] :is(.cw-quick-panel a, .cw-link, .cw-panel-date-day, .cw-overview a, .cw-content-list article > a) { color: var(--cw-night-accent); }
+.cw-app[data-theme="dark"] :is(.cw-info-toggle, .cw-mobile-toggle) {
+  background: var(--cw-night-hover);
+  border-color: var(--cw-pane-line);
+  color: var(--cw-night-accent);
+}
+.cw-app[data-theme="dark"] :is(.cw-quick-other nav a.active, .cw-sidebar nav a.active, .cw-sidebar nav a:hover, .cw-info-toggle:hover) {
+  background: var(--cw-active-surface);
+  color: var(--cw-navy);
+}
+.cw-app[data-theme="dark"] main .cw-message:hover,
+.cw-app[data-theme="dark"] main .cw-message:focus-within { background: var(--cw-night-surface); }
+.cw-app[data-theme="dark"] main :is(input, textarea, select) {
+  background: var(--cw-night-ground);
+  color: var(--cw-navy);
+  border-color: #78879d;
+}
+.cw-app[data-theme="dark"] main :is(input, textarea)::placeholder { color: var(--cw-secondary-ink); }
+.cw-app[data-theme="dark"] main :is(.cw-tabs, .cw-meetings .workspace-mode) { background: var(--cw-night-hover); }
+.cw-app[data-theme="dark"] main :is(.cw-tabs a, .cw-meetings .workspace-mode button) { color: var(--cw-navy); }
+.cw-app[data-theme="dark"] main :is(.cw-tabs a[aria-current="page"], .cw-meetings .workspace-mode button[aria-pressed="true"]) {
+  background: var(--cw-active-surface);
+  color: var(--cw-navy);
+}
+.cw-app[data-theme="dark"] main .cw-overview .cw-primary { color: #fff; }
+.cw-app[data-theme="dark"] :is(a, button, summary, textarea, .cw-message):focus-visible { outline-color: var(--cw-night-accent); }

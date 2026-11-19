@@ -1,0 +1,617 @@
+
+> real-time-stream@0.0.0 test
+> npm --workspaces run test
+
+
+> @real-time-stream/backend@0.0.0 test
+> npm run build && node --test test/*.test.cjs
+
+
+> @real-time-stream/backend@0.0.0 build
+> tsc -p tsconfig.json
+
+src/workspace/workspace-content.service.ts(78,39): error TS2352: Conversion of type 'GenericStringError' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type '{ error: true; } & String'.
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path D:\Project\Livekit project\Real_time_stream\backend
+npm error workspace @real-time-stream/backend@0.0.0
+npm error location D:\Project\Livekit project\Real_time_stream\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c tsc -p tsconfig.json
+npm error Lifecycle script `test` failed with error:
+npm error code 2
+npm error path D:\Project\Livekit project\Real_time_stream\backend
+npm error workspace @real-time-stream/backend@0.0.0
+npm error location D:\Project\Livekit project\Real_time_stream\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c npm run build && node --test test/*.test.cjs
+
+
+> @real-time-stream/frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.5 D:/Project/Livekit project/Real_time_stream/frontend
+
+ ❯ src/features/personal/personal.test.tsx (5 tests | 1 failed) 756ms
+   × shows distinct chair/member roles in personal clubs without granting follow membership 122ms
+ ❯ src/features/guest/ClubActivitiesPage.test.tsx (1 test | 1 failed) 564ms
+   × opens the correct club from the signed-in navigation and only shows review for that club’s chairperson 561ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/guest/ClubActivitiesPage.test.tsx > opens the correct club from the signed-in navigation and only shows review for that club’s chairperson
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Tạo hoạt động"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "Đến nội dung":
+  <a
+    class="ps-skip"
+    href="#personal-content"
+  />
+
+  Name "unicircle.":
+  <a
+    class="ps-brand"
+    data-discover="true"
+    href="/"
+  />
+
+  Name "Tổng quan":
+  <a
+    class=""
+    data-discover="true"
+    href="/me"
+  />
+
+  Name "CLB tham gia":
+  <a
+    aria-current="page"
+    class="active"
+    data-discover="true"
+    href="/me/clubs"
+  />
+
+  Name "Đang quan tâm":
+  <a
+    class=""
+    data-discover="true"
+    href="/me/follows"
+  />
+
+  Name "Hoạt động đã đăng ký":
+  <a
+    class=""
+    data-discover="true"
+    href="/me/registrations"
+  />
+
+  Name "Đề nghị CLB":
+  <a
+    class=""
+    data-discover="true"
+    href="/me/club-requests"
+  />
+
+  Name "Hồ sơ cá nhân":
+  <a
+    class=""
+    data-discover="true"
+    href="/me/profile"
+  />
+
+  Name "← Khám phá công khai":
+  <a
+    data-discover="true"
+    href="/"
+  />
+
+  Name "Khám phá Bách khoa ↗":
+  <a
+    data-discover="true"
+    href="/"
+  />
+
+  Name "CLB Alpha":
+  <a
+    data-discover="true"
+    href="/clubs/alpha"
+  />
+
+  Name "Mở không gian →":
+  <a
+    class="ps-text-link"
+    data-discover="true"
+    href="/workspace/alpha"
+  />
+
+  Name "CLB Beta":
+  <a
+    data-discover="true"
+    href="/clubs/beta"
+  />
+
+  Name "Mở không gian →":
+  <a
+    class="ps-text-link"
+    data-discover="true"
+    href="/workspace/beta"
+  />
+
+  --------------------------------------------------
+  complementary:
+
+  Name "":
+  <aside
+    class="ps-sidebar"
+  />
+
+  --------------------------------------------------
+  strong:
+
+  Name "":
+  <strong />
+
+  --------------------------------------------------
+  button:
+
+  Name "Điều hướng cá nhân +":
+  <button
+    aria-controls="personal-navigation"
+    aria-expanded="false"
+    class="ps-mobile-toggle"
+  />
+
+  Name "Mở phòng họp":
+  <button
+    data-leave-account="true"
+  />
+
+  Name "Đăng xuất":
+  <button
+    data-leave-account="true"
+  />
+
+  Name "← Trang trước":
+  <button
+    disabled=""
+  />
+
+  Name "Trang sau →":
+  <button
+    disabled=""
+  />
+
+  --------------------------------------------------
+  navigation:
+
+  Name "Điều hướng cá nhân":
+  <nav
+    aria-label="Điều hướng cá nhân"
+    class=""
+    id="personal-navigation"
+  />
+
+  Name "Phân trang cá nhân":
+  <nav
+    aria-label="Phân trang cá nhân"
+    class="ps-pagination"
+  />
+
+  --------------------------------------------------
+  banner:
+
+  Name "":
+  <header
+    class="ps-topbar"
+  />
+
+  --------------------------------------------------
+  main:
+
+  Name "":
+  <main
+    id="personal-content"
+    tabindex="-1"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "CLB tham gia":
+  <h1 />
+
+  Name "CLB Alpha":
+  <h2 />
+
+  Name "CLB Beta":
+  <h2 />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p />
+
+  Name "":
+  <p
+    class="ps-count"
+  />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p
+    class="ps-small"
+  />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p
+    class="ps-small"
+  />
+
+  --------------------------------------------------
+  article:
+
+  Name "":
+  <article
+    class="ps-object"
+  />
+
+  Name "":
+  <article
+    class="ps-object"
+  />
+
+  --------------------------------------------------
+  img:
+
+  Name "Chưa có hình ảnh":
+  <div
+    aria-label="Chưa có hình ảnh"
+    class="dc-image-fallback ps-object-image"
+    role="img"
+  />
+
+  Name "Chưa có hình ảnh":
+  <div
+    aria-label="Chưa có hình ảnh"
+    class="dc-image-fallback ps-object-image"
+    role="img"
+  />
+
+  --------------------------------------------------
+  contentinfo:
+
+  Name "":
+  <footer
+    class="ps-footer"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="ps-app"
+    >
+      <a
+        class="ps-skip"
+        href="#personal-content"
+      >
+        Đến nội dung
+      </a>
+      <aside
+        class="ps-sidebar"
+      >
+        <a
+          class="ps-brand"
+          data-discover="true"
+          href="/"
+        >
+          uni
+          <span>
+            circle
+          </span>
+          .
+        </a>
+        <div
+          class="ps-identity"
+        >
+          <span
+            aria-hidden="true"
+            class="ps-avatar"
+          >
+            A
+          </span>
+          <div>
+            <strong>
+              An
+            </strong>
+            <small>
+              Không gian cá nhân
+            </small>
+          </div>
+        </div>
+        <button
+          aria-controls="personal-navigation"
+          aria-expanded="false"
+          class="ps-mobile-toggle"
+        >
+          Điều hướng cá nhân 
+          +
+        </button>
+        <nav
+          aria-label="Điều hướng cá nhân"
+          class=""
+          id="personal-navigation"
+        >
+          <a
+            class=""
+            data-discover="true"
+            href="/me"
+          >
+            Tổng quan
+          </a>
+          <a
+            aria-current="page"
+            class="active"
+            data-discover="true"
+            href="/me/clubs"
+          >
+            CLB tham gia
+          </a>
+          <a
+            class=""
+            data-discover="true"
+            href="/me/follows"
+          >
+            Đang quan tâm
+          </a>
+          <a
+            class=""
+            data-discover="true"
+            href="/me/registrations"
+          >
+            Hoạt động đã đăng ký
+          </a>
+          <a
+            class=""
+            data-discover="true"
+            href="/me/club-requests"
+          >
+            Đề nghị CLB
+          </a>
+          <a
+            class=""
+            data-discover="true"
+            href="/me/profile"
+          >
+            Hồ sơ cá nhân
+          </a>
+        </nav>
+        <div
+          class="ps-sidebar-bottom"
+        >
+          <a
+            data-discover="true"
+            href="/"
+          >
+            ← Khám phá công khai
+          </a>
+          <button
+            data-leave-account="true"
+          >
+            Mở phòng họp
+          </button>
+          <button
+            data-leave-account="true"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </aside>
+      <div
+        class="ps-workspace"
+      >
+        <header
+          class="ps-topbar"
+        >
+          <a
+            data-discover="true"
+            href="/"
+          >
+            Khám phá Bách khoa ↗
+          </a>
+          <span>
+            Tài khoản sinh viên
+          </span>
+        </header>
+        <main
+          id="personal-content"
+          tabindex="-1"
+        >
+          <div
+            class="ps-heading"
+          >
+            <div>
+              <h1>
+                CLB tham gia
+              </h1>
+              <p>
+                Vai trò được xác định riêng trong từng CLB.
+              </p>
+            </div>
+          </div>
+          <p
+            class="ps-count"
+          >
+            undefined mục · Trang 1
+          </p>
+          <div
+            class="ps-object-list"
+          >
+            <article
+              class="ps-object"
+            >
+              <div
+                aria-label="Chưa có hình ảnh"
+                class="dc-image-fallback ps-object-image"
+                role="img"
+              >
+                <span>
+                  uniCircle
+                </span>
+              </div>
+              <div>
+                <h2>
+                  <a
+                    data-discover="true"
+                    href="/clubs/alpha"
+                  >
+                    CLB Alpha
+                  </a>
+                </h2>
+                <p>
+                  Thành viên
+                </p>
+                <p
+                  class="ps-small"
+                />
+              </div>
+              <a
+                class="ps-text-link"
+                data-discover="true"
+                href="/workspace/alpha"
+              >
+                Mở không gian →
+              </a>
+            </article>
+            <article
+              class="ps-object"
+            >
+              <div
+                aria-label="Chưa có hình ảnh"
+                class="dc-image-fallback ps-object-image"
+                role="img"
+              >
+                <span>
+                  uniCircle
+                </span>
+              </div>
+              <div>
+                <h2>
+                  <a
+                    data-discover="true"
+                    href="/clubs/beta"
+                  >
+                    CLB Beta
+                  </a>
+                </h2>
+                <p>
+                  Chủ nhiệm · Có quyền quản lý CLB này
+                </p>
+                <p
+                  class="ps-small"
+                />
+              </div>
+              <a
+                class="ps-text-link"
+                data-discover="true"
+                href="/workspace/beta"
+              >
+                Mở không gian →
+              </a>
+            </article>
+          </div>
+          <nav
+            aria-label="Phân trang cá nhân"
+            class="ps-pagination"
+          >
+            <button
+              disabled=""
+            >
+              ← Trang trước
+            </button>
+            <span>
+              Trang 
+              1
+            </span>
+            <button
+              disabled=""
+            >
+              Trang sau →
+            </button>
+          </nav>
+        </main>
+        <footer
+          class="ps-footer"
+        >
+          uniCircle · Cộng đồng bắt đầu từ những kết nối.
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError ../node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/features/guest/ClubActivitiesPage.test.tsx:56:17
+     54|   open(spaces[0]);
+     55|   expect(await screen.findByRole("heading", { name: "CLB Alpha" })).to…
+     56|   expect(screen.getByRole("button", { name: "Tạo hoạt động" })).toBeTr…
+       |                 ^
+     57|   expect(screen.queryByRole("button", { name: "Xét duyệt" })).toBeNull…
+     58|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/personal/personal.test.tsx > shows distinct chair/member roles in personal clubs without granting follow membership
+AssertionError: expected [ '/workspace/c1', '/workspace/c2' ] to deeply equal [ '/#my-clubs/c1', '/#my-clubs/c2' ]
+
+- Expected
++ Received
+
+  [
+-   "/#my-clubs/c1",
+-   "/#my-clubs/c2",
++   "/workspace/c1",
++   "/workspace/c2",
+  ]
+
+ ❯ src/features/personal/personal.test.tsx:103:5
+    101|       .getAllByRole("link", { name: "Mở không gian →" })
+    102|       .map((a) => a.getAttribute("href")),
+    103|   ).toEqual(["/#my-clubs/c1", "/#my-clubs/c2"]);
+       |     ^
+    104| });
+    105| it("waits for server state, follows once, and keeps failures reloadabl…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 15 passed (17)
+      Tests  2 failed | 65 passed (67)
+   Start at  12:37:44
+   Duration  6.62s (environment 76%, import 13%, tests 8%, transform 3%)
+
+    Isolate  17 workers spawned · ~3.63s startup each (spawn + environment, per file)
+             at least ~484ms faster with isolate: false — reuses workers across files instead of one per file
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path D:\Project\Livekit project\Real_time_stream\frontend
+npm error workspace @real-time-stream/frontend@0.0.0
+npm error location D:\Project\Livekit project\Real_time_stream\frontend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vitest run

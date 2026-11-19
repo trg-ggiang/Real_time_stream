@@ -1,0 +1,274 @@
+[
+  {
+    "width": 320,
+    "reducedMotion": false,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 20,
+        "inkLeft": 21,
+        "height": 45.1875,
+        "width": 280,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "36.16px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 18.921875,
+        "inkLeft": 20.921875,
+        "height": 45.1875,
+        "width": 280,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "36.16px"
+      }
+    ],
+    "photo": "none",
+    "scroll": {
+      "revealed": 2,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 320,
+    "reducedMotion": true,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 20,
+        "inkLeft": 21,
+        "height": 45.1875,
+        "width": 280,
+        "animation": "none",
+        "opacity": "1",
+        "font": "36.16px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 18.921875,
+        "inkLeft": 20.921875,
+        "height": 45.1875,
+        "width": 280,
+        "animation": "none",
+        "opacity": "1",
+        "font": "36.16px"
+      }
+    ],
+    "photo": "none",
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "reducedMotion": false,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 20,
+        "inkLeft": 21,
+        "height": 55,
+        "width": 350,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "44px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 18.6875,
+        "inkLeft": 20.6875,
+        "height": 55,
+        "width": 350,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "44px"
+      }
+    ],
+    "photo": "none",
+    "scroll": {
+      "revealed": 3,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "reducedMotion": true,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 20,
+        "inkLeft": 21,
+        "height": 55,
+        "width": 350,
+        "animation": "none",
+        "opacity": "1",
+        "font": "44px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 18.6875,
+        "inkLeft": 20.6875,
+        "height": 55,
+        "width": 350,
+        "animation": "none",
+        "opacity": "1",
+        "font": "44px"
+      }
+    ],
+    "photo": "none",
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "reducedMotion": false,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 32,
+        "inkLeft": 33,
+        "height": 48.75,
+        "width": 339.5,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "39px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 30.84375,
+        "inkLeft": 32.84375,
+        "height": 48.75,
+        "width": 339.5,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "39px"
+      }
+    ],
+    "photo": "none",
+    "scroll": {
+      "revealed": 4,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "reducedMotion": true,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 32,
+        "inkLeft": 33,
+        "height": 48.75,
+        "width": 339.5,
+        "animation": "none",
+        "opacity": "1",
+        "font": "39px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 30.84375,
+        "inkLeft": 32.84375,
+        "height": 48.75,
+        "width": 339.5,
+        "animation": "none",
+        "opacity": "1",
+        "font": "39px"
+      }
+    ],
+    "photo": "none",
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "reducedMotion": false,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 80,
+        "inkLeft": 82,
+        "height": 83.625,
+        "width": 587.5,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "68px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 77.96875,
+        "inkLeft": 81.96875,
+        "height": 83.625,
+        "width": 587.5,
+        "animation": "dc-title-arrive",
+        "opacity": "1",
+        "font": "68px"
+      }
+    ],
+    "photo": "matrix(1.065, 0, 0, 1.065, 0, 2)",
+    "scroll": {
+      "revealed": 4,
+      "drift": "14.0px",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "reducedMotion": true,
+    "overflow": false,
+    "lines": [
+      {
+        "text": "Tìm cộng đồng.",
+        "left": 80,
+        "inkLeft": 82,
+        "height": 83.625,
+        "width": 587.5,
+        "animation": "none",
+        "opacity": "1",
+        "font": "68px"
+      },
+      {
+        "text": "Mở lối đam mê.",
+        "left": 77.96875,
+        "inkLeft": 81.96875,
+        "height": 83.625,
+        "width": 587.5,
+        "animation": "none",
+        "opacity": "1",
+        "font": "68px"
+      }
+    ],
+    "photo": "none",
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  }
+]

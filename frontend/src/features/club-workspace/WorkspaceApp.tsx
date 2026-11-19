@@ -34,6 +34,7 @@ import {
 } from "./pages/WorkspaceHome";
 import "./workspace.css";
 import './workspace-polish.css';
+import './workspace-theme.css';
 import { channelLabel } from './channel-label';
 export function WorkspaceApp(props: DiscoveryViewer) {
   const match = useMatch("/workspace/:clubId/*");
@@ -66,6 +67,15 @@ function WorkspaceScope({
   const [open, setOpen] = useState(false);
   const [workOpen, setWorkOpen] = useState(true);
   const [infoCollapsed, setInfoCollapsed] = useState(false);
+  const [darkTheme, setDarkTheme] = useState(() => {
+    try { return localStorage.getItem("unicircle.workspace-theme") === "dark"; }
+    catch { return false; }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem("unicircle.workspace-theme", darkTheme ? "dark" : "light"); }
+    catch { /* The theme still works when browser storage is unavailable. */ }
+  }, [darkTheme]);
   const main = useRef<HTMLElement>(null);
   useEffect(() => {
     setOpen(false);
@@ -85,7 +95,7 @@ function WorkspaceScope({
   }, [state.data?.club.name]);
   if (!state.data)
     return (
-      <div className="cw-app cw-loading-page">
+      <div className="cw-app cw-loading-page" data-theme={darkTheme ? "dark" : "light"}>
         <Link className="cw-brand" to="/workspace">
           uni<span>circle</span>.
         </Link>
@@ -110,7 +120,7 @@ function WorkspaceScope({
         onMeeting,
       }}
     >
-      <div className={`cw-app ${inChannel ? "cw-app--channel" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
+      <div data-theme={darkTheme ? "dark" : "light"} className={`cw-app ${inChannel ? "cw-app--channel" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
         <a className="cw-skip" href="#workspace-content">
           Đến nội dung
         </a>
@@ -207,7 +217,7 @@ function WorkspaceScope({
           </main>
           <footer className="cw-footer">uniCircle · {ctx.club.name}</footer>
         </div>
-        <WorkspaceQuickPanel club={ctx.club} token={accessToken} chair={chair} collapsed={infoCollapsed} onToggle={() => setInfoCollapsed(value => !value)} />
+        <WorkspaceQuickPanel club={ctx.club} token={accessToken} chair={chair} collapsed={infoCollapsed} darkTheme={darkTheme} onThemeToggle={() => setDarkTheme(value => !value)} onToggle={() => setInfoCollapsed(value => !value)} />
 
       </div>
     </ClubContext.Provider>

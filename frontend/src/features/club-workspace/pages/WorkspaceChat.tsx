@@ -110,7 +110,11 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
       })}
     </div>
     <form className="cw-channel-composer cw-live-composer" onSubmit={event => void send(event)}>
-      <textarea aria-label={`Nhắn tin trong ${channelLabel(channel)}`} placeholder={`Nhắn tin trong ${channelLabel(channel)}`} value={text} onChange={event => setText(event.target.value)} maxLength={2000} disabled={mutation.busy || denied || loading} rows={2} />
+      <textarea aria-label={`Nhắn tin trong ${channelLabel(channel)}`} placeholder={`Nhắn tin trong ${channelLabel(channel)}`} value={text} onChange={event => setText(event.target.value)} onKeyDown={event => {
+        if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return;
+        event.preventDefault();
+        if (!event.repeat) event.currentTarget.form?.requestSubmit();
+      }} maxLength={2000} disabled={mutation.busy || denied || loading} rows={2} />
       <button className="cw-primary" disabled={!text.trim() || mutation.busy || denied || loading}>{mutation.busy ? 'Đang gửi…' : 'Gửi'}</button>
       {mutation.error && <p role="alert">{mutation.error} Nội dung được giữ lại để bạn kiểm tra và gửi lại.</p>}
     </form>

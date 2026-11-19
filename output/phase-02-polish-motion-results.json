@@ -1,0 +1,130 @@
+[
+  {
+    "width": 320,
+    "reduced": false,
+    "overflow": false,
+    "inkDelta": -0.078125,
+    "animation": [
+      "dc-title-arrive",
+      "dc-title-arrive"
+    ],
+    "scroll": {
+      "revealed": 2,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 320,
+    "reduced": true,
+    "overflow": false,
+    "inkDelta": -0.078125,
+    "animation": [
+      "none",
+      "none"
+    ],
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "reduced": false,
+    "overflow": false,
+    "inkDelta": -0.3125,
+    "animation": [
+      "dc-title-arrive",
+      "dc-title-arrive"
+    ],
+    "scroll": {
+      "revealed": 3,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 390,
+    "reduced": true,
+    "overflow": false,
+    "inkDelta": -0.3125,
+    "animation": [
+      "none",
+      "none"
+    ],
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "reduced": false,
+    "overflow": false,
+    "inkDelta": -0.15625,
+    "animation": [
+      "dc-title-arrive",
+      "dc-title-arrive"
+    ],
+    "scroll": {
+      "revealed": 4,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 768,
+    "reduced": true,
+    "overflow": false,
+    "inkDelta": -0.15625,
+    "animation": [
+      "none",
+      "none"
+    ],
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "reduced": false,
+    "overflow": false,
+    "inkDelta": -0.03125,
+    "animation": [
+      "dc-title-arrive",
+      "dc-title-arrive"
+    ],
+    "scroll": {
+      "revealed": 4,
+      "drift": "14.0px",
+      "visible": true
+    },
+    "exceptions": []
+  },
+  {
+    "width": 1440,
+    "reduced": true,
+    "overflow": false,
+    "inkDelta": -0.03125,
+    "animation": [
+      "none",
+      "none"
+    ],
+    "scroll": {
+      "revealed": 0,
+      "drift": "",
+      "visible": true
+    },
+    "exceptions": []
+  }
+]

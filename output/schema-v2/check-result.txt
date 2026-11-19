@@ -1,0 +1,31 @@
+MIGRATION_APPLIED_IN_TEMP_POSTGRES
+PASS one general + one channel per department provisioned
+PASS department member reads private channel
+PASS chair has no private bypass
+PASS platform admin has no private bypass
+PASS head explicitly adds chair
+PASS authorized channel history
+PASS soft deleted body redacted in history RPC
+PASS revoked explicit access denied
+PASS regrant preserves prior history row
+PASS departed member loses implicit channel access
+PASS submit snapshots profile and timestamp
+PASS ending session deletes only its ephemeral chat
+PASS acceptance creates active membership atomically in selected department
+PASS failed acceptance leaves application interviewing
+PASS pending revision leaves original public name
+PASS admin revision approval updates public club atomically
+PASS new tables have RLS and no browser privileges
+PASS browser cannot execute privileged RPCs
+PASS existing rows and candidate history retained
+PASS publication schedules two future reminder jobs
+PASS unpublishing invalidates pending reminders
+PASS republish same start time restores future reminders
+PASS failed revision stays pending
+PASS all new foreign keys have nonpartial leading indexes
+PASS multiple same-transaction activity changes keep only current reminders
+PASS rejoining club does not inherit old channel grant
+PASS failed notification batch leaves no partial notification and lease remains
+PASS worker delivery and acknowledgment commit together
+PASS head manages own channel privacy through audited RPC
+{"passed":84,"failures":0}

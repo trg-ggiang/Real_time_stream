@@ -1,0 +1,345 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "path": "/admin",
+      "h1": "Đề nghị và cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/admin/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/admin/clubs",
+      "h1": "Danh sách CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "h1": "SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000015",
+      "h1": "CLB Khoa học dữ liệu",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/admin/club-requests?status=pending&q=kh%C3%B4ngc%C3%B3",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "interaction": "server pagination",
+      "passed": true
+    },
+    {
+      "interaction": "approve -> read-only result",
+      "passed": true
+    },
+    {
+      "interaction": "approved -> public detail",
+      "passed": true
+    },
+    {
+      "interaction": "reject -> stored reason",
+      "passed": true
+    },
+    {
+      "interaction": "owner sees reason and new request action",
+      "passed": true
+    },
+    {
+      "width": 768,
+      "path": "/admin",
+      "h1": "Đề nghị và cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/admin/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/admin/clubs",
+      "h1": "Danh sách CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "h1": "SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000015",
+      "h1": "CLB Khoa học dữ liệu",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/admin/club-requests?status=pending&q=kh%C3%B4ngc%C3%B3",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/admin",
+      "h1": "Đề nghị và cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/admin/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/admin/clubs",
+      "h1": "Danh sách CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "h1": "SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000015",
+      "h1": "CLB Khoa học dữ liệu",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/admin/club-requests?status=pending&q=kh%C3%B4ngc%C3%B3",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "interaction": "mobile menu",
+      "passed": true
+    },
+    {
+      "width": 320,
+      "path": "/admin",
+      "h1": "Đề nghị và cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/admin/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/admin/clubs",
+      "h1": "Danh sách CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "h1": "SINNO — Cộng đồng sáng tạo",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000015",
+      "h1": "CLB Khoa học dữ liệu",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/admin/club-requests?status=pending&q=kh%C3%B4ngc%C3%B3",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": 0,
+      "exceptions": []
+    },
+    {
+      "scenario": "student",
+      "passed": true
+    },
+    {
+      "scenario": "guest",
+      "passed": true
+    },
+    {
+      "scenario": "conflict",
+      "passed": true
+    },
+    {
+      "scenario": "error",
+      "passed": true
+    },
+    {
+      "scenario": "missing",
+      "passed": true
+    }
+  ],
+  "visual": [
+    {
+      "width": 1440,
+      "path": "/admin",
+      "findings": []
+    },
+    {
+      "width": 1440,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "findings": [
+        {
+          "level": "WARN",
+          "id": "ragged-row",
+          "width": 1440,
+          "message": "1 pair(s) of cards in one row end at different heights (by 128px).",
+          "fix": "Cards that share a row share a bottom edge: balance them by their content (the same number of rows, a block of similar height beside it), or stack them. In testing, ragged rows were marked down every time."
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "path": "/admin",
+      "findings": []
+    },
+    {
+      "width": 768,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "findings": []
+    },
+    {
+      "width": 390,
+      "path": "/admin",
+      "findings": []
+    },
+    {
+      "width": 390,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "findings": []
+    },
+    {
+      "width": 320,
+      "path": "/admin",
+      "findings": []
+    },
+    {
+      "width": 320,
+      "path": "/admin/club-requests/10000000-0000-4000-8000-000000000001",
+      "findings": []
+    }
+  ],
+  "writes": [
+    {
+      "path": "admin/clubs/10000000-0000-4000-8000-000000000001/decision",
+      "method": "PATCH",
+      "body": {
+        "decision": "approve",
+        "expected_updated_at": "2026-11-16T08:00:00+07:00"
+      },
+      "simulated": true
+    },
+    {
+      "path": "admin/clubs/10000000-0000-4000-8000-000000000002/decision",
+      "method": "PATCH",
+      "body": {
+        "decision": "reject",
+        "expected_updated_at": "2026-11-16T08:00:00+07:00",
+        "reason": "Cần bổ sung kế hoạch hoạt động rõ ràng."
+      },
+      "simulated": true
+    },
+    {
+      "path": "admin/clubs/10000000-0000-4000-8000-000000000001/decision",
+      "method": "PATCH",
+      "body": {
+        "decision": "approve",
+        "expected_updated_at": "2026-11-16T08:00:00+07:00"
+      },
+      "simulated": true
+    }
+  ],
+  "liveWrites": 0
+}

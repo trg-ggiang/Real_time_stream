@@ -1,0 +1,164 @@
+[
+  {
+    "width": 1440,
+    "screen": "discover",
+    "hash": "#discover",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 1440,
+    "screen": "club",
+    "hash": "#club",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 1440,
+    "screen": "personal",
+    "hash": "#personal",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 1440,
+    "screen": "workspace",
+    "hash": "#workspace",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 1440,
+    "screen": "admin",
+    "hash": "#admin",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 1440,
+    "screen": "onboarding",
+    "hash": "#onboarding",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 768,
+    "screen": "discover",
+    "hash": "#discover",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 768,
+    "screen": "club",
+    "hash": "#club",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 768,
+    "screen": "personal",
+    "hash": "#personal",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 768,
+    "screen": "workspace",
+    "hash": "#workspace",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 768,
+    "screen": "admin",
+    "hash": "#admin",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 768,
+    "screen": "onboarding",
+    "hash": "#onboarding",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 390,
+    "screen": "discover",
+    "hash": "#discover",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 390,
+    "screen": "club",
+    "hash": "#club",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 390,
+    "screen": "personal",
+    "hash": "#personal",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 390,
+    "screen": "workspace",
+    "hash": "#workspace",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 390,
+    "screen": "admin",
+    "hash": "#admin",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  },
+  {
+    "width": 390,
+    "screen": "onboarding",
+    "hash": "#onboarding",
+    "overflow": false,
+    "brokenImages": [],
+    "h1": 1,
+    "pressed": 1
+  }
+]

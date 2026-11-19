@@ -1,0 +1,384 @@
+[
+  {
+    "section": "01_table_count",
+    "result": {
+      "actual": 16,
+      "expected": 16,
+      "all_rls_enabled": true
+    }
+  },
+  {
+    "section": "02_table_access",
+    "result": [
+      {
+        "rls": true,
+        "table": "application_answers",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "application_reviews",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "audit_logs",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": false,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "channel_members",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "channel_messages",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "channel_read_states",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": false,
+        "service_select": true,
+        "service_update": false,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "club_change_requests",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "club_channels",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": false,
+        "service_select": true,
+        "service_update": false,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "interview_appointments",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "interview_panel_members",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": false,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "notification_jobs",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": false,
+        "service_select": true,
+        "service_update": false,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "notifications",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": false,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "recruitment_applications",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "recruitment_campaigns",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "recruitment_departments",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      },
+      {
+        "rls": true,
+        "table": "recruitment_questions",
+        "exists": true,
+        "anon_select": false,
+        "service_delete": false,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_select": false
+      }
+    ]
+  },
+  {
+    "section": "03_rpc_count",
+    "result": {
+      "actual": 14,
+      "expected": 14,
+      "all_security_definer": true
+    }
+  },
+  {
+    "section": "04_rpc_access",
+    "result": [
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_can_read_channel(uuid,uuid)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_channel_history(uuid,uuid,timestamp with time zone,uuid,integer)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_claim_notification_jobs(integer,integer)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_clear_draft_answers(uuid,uuid)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_decide_club_change(uuid,uuid,timestamp with time zone,text,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_deliver_notification_job(uuid,uuid,jsonb,boolean)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_finish_notification_job(uuid,uuid,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_mark_channel_read(uuid,uuid,uuid)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_mark_notification_read(uuid,uuid)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_remove_interviewer(uuid,uuid,uuid)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_set_department_head(uuid,uuid,boolean,timestamp with time zone)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_set_department_privacy(uuid,uuid,boolean,timestamp with time zone)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_transition_application(uuid,uuid,timestamp with time zone,text,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      },
+      {
+        "config": [
+          "search_path=\"\""
+        ],
+        "signature": "clubspace_update_channel(uuid,uuid,text,text)",
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": false
+      }
+    ]
+  },
+  {
+    "section": "05_membership_admission",
+    "result": {
+      "service_direct_insert_should_be_false": false,
+      "service_move_department_should_be_true": true,
+      "service_direct_role_update_should_be_false": false
+    }
+  },
+  {
+    "section": "06_membership_role_check",
+    "result": [
+      "CHECK ((role = ANY (ARRAY['chairperson'::text, 'head'::text, 'member'::text])))"
+    ]
+  },
+  {
+    "section": "07_public_views",
+    "result": {
+      "campaign_view_exists": true,
+      "department_view_exists": true
+    }
+  },
+  {
+    "section": "08_missing_general_channels",
+    "result": {
+      "count_should_be_zero": 0
+    }
+  },
+  {
+    "section": "09_missing_department_channels",
+    "result": {
+      "count_should_be_zero": 0
+    }
+  },
+  {
+    "section": "10_private_channel_policy",
+    "result": {
+      "history_and_access_rpcs_exist": true,
+      "extra_grant_table_has_no_delegation_flag": true
+    }
+  },
+  {
+    "section": "10b_privacy_write_policy",
+    "result": {
+      "service_direct_privacy_update_should_be_false": false,
+      "service_department_metadata_update_should_be_true": true
+    }
+  },
+  {
+    "section": "11_meeting_link_and_chat",
+    "result": {
+      "club_id_exists": true,
+      "future_end_purge_trigger": true
+    }
+  }
+]

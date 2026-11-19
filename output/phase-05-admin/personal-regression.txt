@@ -1,0 +1,33 @@
+{
+  "checks": 41,
+  "failures": [],
+  "fixtureWrites": [
+    {
+      "path": "me/follows/10000000-0000-4000-8000-000000000001",
+      "method": "PUT",
+      "simulated": true
+    },
+    {
+      "path": "me/registrations/20000000-0000-4000-8000-000000000001",
+      "method": "DELETE",
+      "simulated": true
+    },
+    {
+      "path": "me/registrations/20000000-0000-4000-8000-000000000001",
+      "method": "PUT",
+      "simulated": true
+    },
+    {
+      "path": "users/me/profile",
+      "method": "PATCH",
+      "simulated": true
+    },
+    {
+      "path": "public/clubs",
+      "method": "POST",
+      "simulated": true
+    }
+  ],
+  "liveWrites": 0,
+  "visualFailures": []
+}

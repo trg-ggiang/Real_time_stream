@@ -1,0 +1,9 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test/public-content.test.cjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/CHANGELOG.mdx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/dev/session-log.mdx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/plans/master-plan.mdx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/plans/phase-03-database-auth.mdx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/features/auth/AuthApp.test.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/features/guest/ClubActivitiesPage.test.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/features/guest/GuestLanding.test.tsx', LF will be replaced by CRLF the next time Git touches it

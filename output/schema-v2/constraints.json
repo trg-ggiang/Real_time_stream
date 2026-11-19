@@ -1,0 +1,697 @@
+[
+  {
+    "table_name": "application_answers",
+    "conname": "application_answers_answer_text_check",
+    "definition": "CHECK ((char_length(answer_text) <= 10000))"
+  },
+  {
+    "table_name": "application_answers",
+    "conname": "application_answers_application_id_fkey",
+    "definition": "FOREIGN KEY (application_id) REFERENCES recruitment_applications(application_id)"
+  },
+  {
+    "table_name": "application_answers",
+    "conname": "application_answers_application_id_question_id_key",
+    "definition": "UNIQUE (application_id, question_id)"
+  },
+  {
+    "table_name": "application_answers",
+    "conname": "application_answers_pkey",
+    "definition": "PRIMARY KEY (answer_id)"
+  },
+  {
+    "table_name": "application_answers",
+    "conname": "application_answers_question_id_fkey",
+    "definition": "FOREIGN KEY (question_id) REFERENCES recruitment_questions(question_id)"
+  },
+  {
+    "table_name": "application_answers",
+    "conname": "application_answers_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_application_id_fkey",
+    "definition": "FOREIGN KEY (application_id) REFERENCES recruitment_applications(application_id)"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_application_id_reviewer_id_stage_key",
+    "definition": "UNIQUE (application_id, reviewer_id, stage)"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_internal_note_check",
+    "definition": "CHECK (((internal_note ~ '[^[:space:]]'::text) AND (char_length(internal_note) <= 10000)))"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_pkey",
+    "definition": "PRIMARY KEY (review_id)"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_recommendation_check",
+    "definition": "CHECK ((recommendation = ANY (ARRAY['pass'::text, 'fail'::text, 'undecided'::text])))"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_reviewer_id_fkey",
+    "definition": "FOREIGN KEY (reviewer_id) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_score_check",
+    "definition": "CHECK (((score >= (0)::numeric) AND (score <= (100)::numeric)))"
+  },
+  {
+    "table_name": "application_reviews",
+    "conname": "application_reviews_stage_check",
+    "definition": "CHECK ((stage = ANY (ARRAY['application'::text, 'interview'::text])))"
+  },
+  {
+    "table_name": "audit_logs",
+    "conname": "audit_logs_action_check",
+    "definition": "CHECK (((char_length(action) >= 1) AND (char_length(action) <= 100)))"
+  },
+  {
+    "table_name": "audit_logs",
+    "conname": "audit_logs_actor_id_fkey",
+    "definition": "FOREIGN KEY (actor_id) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "audit_logs",
+    "conname": "audit_logs_change_data_check",
+    "definition": "CHECK (((jsonb_typeof(change_data) = 'object'::text) AND (pg_column_size(change_data) <= 32768)))"
+  },
+  {
+    "table_name": "audit_logs",
+    "conname": "audit_logs_club_id_fkey",
+    "definition": "FOREIGN KEY (club_id) REFERENCES clubs(club_id)"
+  },
+  {
+    "table_name": "audit_logs",
+    "conname": "audit_logs_entity_type_check",
+    "definition": "CHECK (((char_length(entity_type) >= 1) AND (char_length(entity_type) <= 100)))"
+  },
+  {
+    "table_name": "audit_logs",
+    "conname": "audit_logs_pkey",
+    "definition": "PRIMARY KEY (audit_id)"
+  },
+  {
+    "table_name": "channel_members",
+    "conname": "channel_members_added_by_fkey",
+    "definition": "FOREIGN KEY (added_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "channel_members",
+    "conname": "channel_members_channel_id_fkey",
+    "definition": "FOREIGN KEY (channel_id) REFERENCES club_channels(channel_id)"
+  },
+  {
+    "table_name": "channel_members",
+    "conname": "channel_members_check",
+    "definition": "CHECK (((removed_at IS NULL) = (removed_by IS NULL)))"
+  },
+  {
+    "table_name": "channel_members",
+    "conname": "channel_members_check1",
+    "definition": "CHECK (((removed_at IS NULL) OR (removed_at >= joined_at)))"
+  },
+  {
+    "table_name": "channel_members",
+    "conname": "channel_members_membership_id_fkey",
+    "definition": "FOREIGN KEY (membership_id) REFERENCES club_memberships(membership_id)"
+  },
+  {
+    "table_name": "channel_members",
+    "conname": "channel_members_pkey",
+    "definition": "PRIMARY KEY (channel_member_id)"
+  },
+  {
+    "table_name": "channel_members",
+    "conname": "channel_members_removed_by_fkey",
+    "definition": "FOREIGN KEY (removed_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_channel_id_fkey",
+    "definition": "FOREIGN KEY (channel_id) REFERENCES club_channels(channel_id)"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_channel_id_sender_membership_id_client_mes_key",
+    "definition": "UNIQUE (channel_id, sender_membership_id, client_message_id)"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_check",
+    "definition": "CHECK (((deleted_at IS NULL) = (deleted_by IS NULL)))"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_content_check",
+    "definition": "CHECK (((content ~ '[^[:space:]]'::text) AND (char_length(content) <= 5000)))"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_deleted_by_fkey",
+    "definition": "FOREIGN KEY (deleted_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_message_id_channel_id_key",
+    "definition": "UNIQUE (message_id, channel_id)"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_pkey",
+    "definition": "PRIMARY KEY (message_id)"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_sender_membership_id_fkey",
+    "definition": "FOREIGN KEY (sender_membership_id) REFERENCES club_memberships(membership_id)"
+  },
+  {
+    "table_name": "channel_messages",
+    "conname": "channel_messages_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "channel_read_states",
+    "conname": "channel_read_states_channel_id_fkey",
+    "definition": "FOREIGN KEY (channel_id) REFERENCES club_channels(channel_id)"
+  },
+  {
+    "table_name": "channel_read_states",
+    "conname": "channel_read_states_last_read_message_id_channel_id_fkey",
+    "definition": "FOREIGN KEY (last_read_message_id, channel_id) REFERENCES channel_messages(message_id, channel_id)"
+  },
+  {
+    "table_name": "channel_read_states",
+    "conname": "channel_read_states_membership_id_fkey",
+    "definition": "FOREIGN KEY (membership_id) REFERENCES club_memberships(membership_id)"
+  },
+  {
+    "table_name": "channel_read_states",
+    "conname": "channel_read_states_pkey",
+    "definition": "PRIMARY KEY (channel_id, membership_id)"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_check",
+    "definition": "CHECK ((((status = ANY (ARRAY['approved'::text, 'rejected'::text])) AND (reviewed_by IS NOT NULL) AND (reviewed_at IS NOT NULL)) OR ((status <> ALL (ARRAY['approved'::text, 'rejected'::text])) AND (reviewed_by IS NULL) AND (reviewed_at IS NULL))))"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_club_id_fkey",
+    "definition": "FOREIGN KEY (club_id) REFERENCES clubs(club_id)"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_pkey",
+    "definition": "PRIMARY KEY (change_request_id)"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_proposed_data_check",
+    "definition": "CHECK (((jsonb_typeof(proposed_data) = 'object'::text) AND (proposed_data <> '{}'::jsonb) AND (pg_column_size(proposed_data) <= 262144)))"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_requested_by_fkey",
+    "definition": "FOREIGN KEY (requested_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_review_note_check",
+    "definition": "CHECK ((char_length(review_note) <= 5000))"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_reviewed_by_fkey",
+    "definition": "FOREIGN KEY (reviewed_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_status_check",
+    "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'cancelled'::text])))"
+  },
+  {
+    "table_name": "club_change_requests",
+    "conname": "club_change_requests_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "club_channels",
+    "conname": "club_channels_check",
+    "definition": "CHECK (((kind = 'department'::text) = (department_id IS NOT NULL)))"
+  },
+  {
+    "table_name": "club_channels",
+    "conname": "club_channels_club_id_fkey",
+    "definition": "FOREIGN KEY (club_id) REFERENCES clubs(club_id)"
+  },
+  {
+    "table_name": "club_channels",
+    "conname": "club_channels_department_id_fkey",
+    "definition": "FOREIGN KEY (department_id) REFERENCES club_departments(department_id)"
+  },
+  {
+    "table_name": "club_channels",
+    "conname": "club_channels_description_check",
+    "definition": "CHECK ((char_length(description) <= 5000))"
+  },
+  {
+    "table_name": "club_channels",
+    "conname": "club_channels_kind_check",
+    "definition": "CHECK ((kind = ANY (ARRAY['general'::text, 'department'::text])))"
+  },
+  {
+    "table_name": "club_channels",
+    "conname": "club_channels_name_check",
+    "definition": "CHECK (((name ~ '[^[:space:]]'::text) AND (char_length(name) <= 160)))"
+  },
+  {
+    "table_name": "club_channels",
+    "conname": "club_channels_pkey",
+    "definition": "PRIMARY KEY (channel_id)"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_application_id_fkey",
+    "definition": "FOREIGN KEY (application_id) REFERENCES recruitment_applications(application_id)"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_cancellation_reason_check",
+    "definition": "CHECK ((char_length(cancellation_reason) <= 2000))"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_candidate_note_check",
+    "definition": "CHECK ((char_length(candidate_note) <= 5000))"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_check",
+    "definition": "CHECK ((scheduled_end_at > scheduled_start_at))"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_check1",
+    "definition": "CHECK (((status = 'cancelled'::text) = (cancelled_at IS NOT NULL)))"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_created_by_fkey",
+    "definition": "FOREIGN KEY (created_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_pkey",
+    "definition": "PRIMARY KEY (appointment_id)"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_session_id_fkey",
+    "definition": "FOREIGN KEY (session_id) REFERENCES meeting_sessions(session_id)"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_session_id_key",
+    "definition": "UNIQUE (session_id)"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_status_check",
+    "definition": "CHECK ((status = ANY (ARRAY['scheduled'::text, 'completed'::text, 'cancelled'::text, 'no_show'::text])))"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "interview_appointments_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "interview_appointments",
+    "conname": "v2_interview_consistency",
+    "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED"
+  },
+  {
+    "table_name": "interview_panel_members",
+    "conname": "interview_panel_members_appointment_id_fkey",
+    "definition": "FOREIGN KEY (appointment_id) REFERENCES interview_appointments(appointment_id)"
+  },
+  {
+    "table_name": "interview_panel_members",
+    "conname": "interview_panel_members_assigned_by_fkey",
+    "definition": "FOREIGN KEY (assigned_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "interview_panel_members",
+    "conname": "interview_panel_members_membership_id_fkey",
+    "definition": "FOREIGN KEY (membership_id) REFERENCES club_memberships(membership_id)"
+  },
+  {
+    "table_name": "interview_panel_members",
+    "conname": "interview_panel_members_pkey",
+    "definition": "PRIMARY KEY (appointment_id, membership_id)"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_attempt_count_check",
+    "definition": "CHECK ((attempt_count >= 0))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_check",
+    "definition": "CHECK ((((status = 'processing'::text) AND (claim_token IS NOT NULL) AND (locked_until IS NOT NULL)) OR ((status <> 'processing'::text) AND (claim_token IS NULL) AND (locked_until IS NULL))))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_check1",
+    "definition": "CHECK (((status <> 'completed'::text) OR (processed_at IS NOT NULL)))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_deduplication_key_check",
+    "definition": "CHECK (((char_length(deduplication_key) >= 1) AND (char_length(deduplication_key) <= 500)))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_deduplication_key_key",
+    "definition": "UNIQUE (deduplication_key)"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_entity_type_check",
+    "definition": "CHECK ((entity_type = ANY (ARRAY['club'::text, 'campaign'::text, 'post'::text, 'activity'::text, 'registration'::text, 'application'::text, 'interview'::text, 'club_change'::text, 'channel_member'::text])))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_event_type_check",
+    "definition": "CHECK ((event_type ~ '^[a-z][a-z0-9_.]{1,99}$'::text))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_last_error_check",
+    "definition": "CHECK ((char_length(last_error) <= 2000))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_payload_check",
+    "definition": "CHECK (((jsonb_typeof(payload) = 'object'::text) AND (pg_column_size(payload) <= 32768)))"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_pkey",
+    "definition": "PRIMARY KEY (job_id)"
+  },
+  {
+    "table_name": "notification_jobs",
+    "conname": "notification_jobs_status_check",
+    "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'processing'::text, 'completed'::text, 'cancelled'::text, 'failed'::text])))"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_actor_id_fkey",
+    "definition": "FOREIGN KEY (actor_id) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_body_check",
+    "definition": "CHECK ((char_length(body) <= 5000))"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_check",
+    "definition": "CHECK (((read_at IS NULL) OR (read_at >= created_at)))"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_data_check",
+    "definition": "CHECK (((jsonb_typeof(data) = 'object'::text) AND (pg_column_size(data) <= 16384)))"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_deduplication_key_check",
+    "definition": "CHECK (((char_length(deduplication_key) >= 1) AND (char_length(deduplication_key) <= 500)))"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_pkey",
+    "definition": "PRIMARY KEY (notification_id)"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_recipient_id_deduplication_key_key",
+    "definition": "UNIQUE (recipient_id, deduplication_key)"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_recipient_id_fkey",
+    "definition": "FOREIGN KEY (recipient_id) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_title_check",
+    "definition": "CHECK (((title ~ '[^[:space:]]'::text) AND (char_length(title) <= 200)))"
+  },
+  {
+    "table_name": "notifications",
+    "conname": "notifications_type_check",
+    "definition": "CHECK ((type ~ '^[a-z][a-z0-9_.]{1,99}$'::text))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_admitted_membership_id_fkey",
+    "definition": "FOREIGN KEY (admitted_membership_id) REFERENCES club_memberships(membership_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_admitted_membership_id_key",
+    "definition": "UNIQUE (admitted_membership_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_applicant_id_fkey",
+    "definition": "FOREIGN KEY (applicant_id) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_campaign_id_applicant_id_key",
+    "definition": "UNIQUE (campaign_id, applicant_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_campaign_id_fkey",
+    "definition": "FOREIGN KEY (campaign_id) REFERENCES recruitment_campaigns(campaign_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_check",
+    "definition": "CHECK (((status = ANY (ARRAY['draft'::text, 'withdrawn'::text])) OR (submitted_at IS NOT NULL)))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_check1",
+    "definition": "CHECK ((((status = ANY (ARRAY['accepted'::text, 'rejected'::text])) AND (decided_by IS NOT NULL) AND (decided_at IS NOT NULL)) OR ((status <> ALL (ARRAY['accepted'::text, 'rejected'::text])) AND (decided_by IS NULL) AND (decided_at IS NULL))))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_check2",
+    "definition": "CHECK (((submitted_at IS NULL) = (profile_snapshot IS NULL)))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_check3",
+    "definition": "CHECK ((((status = ANY (ARRAY['accepted'::text, 'rejected'::text])) AND (result_message IS NOT NULL) AND (result_message ~ '[^[:space:]]'::text)) OR ((status <> ALL (ARRAY['accepted'::text, 'rejected'::text])) AND (result_message IS NULL))))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_check4",
+    "definition": "CHECK (((status = 'accepted'::text) = (admitted_membership_id IS NOT NULL)))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_check5",
+    "definition": "CHECK (((status = 'withdrawn'::text) = (withdrawn_at IS NOT NULL)))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_decided_by_fkey",
+    "definition": "FOREIGN KEY (decided_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_pkey",
+    "definition": "PRIMARY KEY (application_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_profile_snapshot_check",
+    "definition": "CHECK (((profile_snapshot IS NULL) OR ((jsonb_typeof(profile_snapshot) = 'object'::text) AND (pg_column_size(profile_snapshot) <= 16384))))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_recruitment_department_id_campaig_fkey",
+    "definition": "FOREIGN KEY (recruitment_department_id, campaign_id) REFERENCES recruitment_departments(recruitment_department_id, campaign_id)"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_result_message_check",
+    "definition": "CHECK ((char_length(result_message) <= 5000))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_status_check",
+    "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'submitted'::text, 'interviewing'::text, 'accepted'::text, 'rejected'::text, 'withdrawn'::text])))"
+  },
+  {
+    "table_name": "recruitment_applications",
+    "conname": "recruitment_applications_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_check",
+    "definition": "CHECK ((application_closes_at > application_opens_at))"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_club_id_fkey",
+    "definition": "FOREIGN KEY (club_id) REFERENCES clubs(club_id) ON DELETE RESTRICT"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_cover_url_check",
+    "definition": "CHECK (((cover_url IS NULL) OR ((cover_url ~ '^https?://'::text) AND (char_length(cover_url) <= 2048))))"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_created_by_fkey",
+    "definition": "FOREIGN KEY (created_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_description_check",
+    "definition": "CHECK (((description ~ '[^[:space:]]'::text) AND (char_length(description) <= 50000)))"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_pkey",
+    "definition": "PRIMARY KEY (campaign_id)"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_status_check",
+    "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'open'::text, 'closed'::text, 'completed'::text, 'cancelled'::text])))"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_title_check",
+    "definition": "CHECK (((title ~ '[^[:space:]]'::text) AND (char_length(title) <= 200)))"
+  },
+  {
+    "table_name": "recruitment_campaigns",
+    "conname": "recruitment_campaigns_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_campaign_id_department_id_key",
+    "definition": "UNIQUE (campaign_id, department_id)"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_campaign_id_fkey",
+    "definition": "FOREIGN KEY (campaign_id) REFERENCES recruitment_campaigns(campaign_id)"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_created_by_fkey",
+    "definition": "FOREIGN KEY (created_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_department_id_fkey",
+    "definition": "FOREIGN KEY (department_id) REFERENCES club_departments(department_id)"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_description_check",
+    "definition": "CHECK (((description ~ '[^[:space:]]'::text) AND (char_length(description) <= 20000)))"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_pkey",
+    "definition": "PRIMARY KEY (recruitment_department_id)"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_recruitment_department_id_campaign__key",
+    "definition": "UNIQUE (recruitment_department_id, campaign_id)"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_requirements_check",
+    "definition": "CHECK ((char_length(requirements) <= 20000))"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_target_quantity_check",
+    "definition": "CHECK ((target_quantity > 0))"
+  },
+  {
+    "table_name": "recruitment_departments",
+    "conname": "recruitment_departments_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_created_by_fkey",
+    "definition": "FOREIGN KEY (created_by) REFERENCES users(user_id)"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_help_text_check",
+    "definition": "CHECK ((char_length(help_text) <= 2000))"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_max_length_check",
+    "definition": "CHECK (((max_length >= 1) AND (max_length <= 10000)))"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_pkey",
+    "definition": "PRIMARY KEY (question_id)"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_question_text_check",
+    "definition": "CHECK (((question_text ~ '[^[:space:]]'::text) AND (char_length(question_text) <= 2000)))"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_recruitment_department_id_fkey",
+    "definition": "FOREIGN KEY (recruitment_department_id) REFERENCES recruitment_departments(recruitment_department_id)"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_recruitment_department_id_sort_order_key",
+    "definition": "UNIQUE (recruitment_department_id, sort_order)"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_sort_order_check",
+    "definition": "CHECK ((sort_order > 0))"
+  },
+  {
+    "table_name": "recruitment_questions",
+    "conname": "recruitment_questions_updated_by_fkey",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES users(user_id)"
+  }
+]

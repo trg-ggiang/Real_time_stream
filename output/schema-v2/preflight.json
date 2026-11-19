@@ -1,0 +1,156 @@
+[
+  {
+    "section": "01_existing_tables",
+    "result": [
+      {
+        "table": "activity_registrations",
+        "exists": true
+      },
+      {
+        "table": "club_activities",
+        "exists": true
+      },
+      {
+        "table": "club_departments",
+        "exists": true
+      },
+      {
+        "table": "club_follows",
+        "exists": true
+      },
+      {
+        "table": "club_memberships",
+        "exists": true
+      },
+      {
+        "table": "club_posts",
+        "exists": true
+      },
+      {
+        "table": "clubs",
+        "exists": true
+      },
+      {
+        "table": "meeting_messages",
+        "exists": true
+      },
+      {
+        "table": "meeting_sessions",
+        "exists": true
+      },
+      {
+        "table": "meetings",
+        "exists": true
+      },
+      {
+        "table": "student_profiles",
+        "exists": true
+      },
+      {
+        "table": "users",
+        "exists": true
+      }
+    ]
+  },
+  {
+    "section": "02_existing_membership_role_check",
+    "result": [
+      {
+        "name": "club_memberships_dates_check",
+        "definition": "CHECK ((((status = 'active'::text) AND (left_at IS NULL)) OR ((status = ANY (ARRAY['left'::text, 'removed'::text])) AND (left_at IS NOT NULL) AND (left_at >= joined_at))))"
+      },
+      {
+        "name": "club_memberships_role_check",
+        "definition": "CHECK ((role = ANY (ARRAY['chairperson'::text, 'member'::text])))"
+      },
+      {
+        "name": "club_memberships_status_check",
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'left'::text, 'removed'::text])))"
+      }
+    ]
+  },
+  {
+    "section": "03_core_triggers",
+    "result": [
+      {
+        "name": "club_departments_guard",
+        "table": "club_departments",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER club_departments_guard BEFORE INSERT OR UPDATE ON public.club_departments FOR EACH ROW EXECUTE FUNCTION clubspace_private.guard_department()"
+      },
+      {
+        "name": "club_memberships_guard",
+        "table": "club_memberships",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER club_memberships_guard BEFORE INSERT OR UPDATE ON public.club_memberships FOR EACH ROW EXECUTE FUNCTION clubspace_private.guard_membership()"
+      },
+      {
+        "name": "clubs_provision",
+        "table": "clubs",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER clubs_provision AFTER INSERT ON public.clubs FOR EACH ROW EXECUTE FUNCTION clubspace_private.provision_club()"
+      },
+      {
+        "name": "clubs_structure_check",
+        "table": "clubs",
+        "enabled": "O",
+        "definition": "CREATE CONSTRAINT TRIGGER clubs_structure_check AFTER INSERT OR UPDATE ON public.clubs DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION clubspace_private.check_club_structure()"
+      },
+      {
+        "name": "club_departments_structure_check",
+        "table": "club_departments",
+        "enabled": "O",
+        "definition": "CREATE CONSTRAINT TRIGGER club_departments_structure_check AFTER INSERT OR DELETE OR UPDATE ON public.club_departments DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION clubspace_private.check_club_structure()"
+      },
+      {
+        "name": "club_memberships_structure_check",
+        "table": "club_memberships",
+        "enabled": "O",
+        "definition": "CREATE CONSTRAINT TRIGGER club_memberships_structure_check AFTER INSERT OR DELETE OR UPDATE ON public.club_memberships DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION clubspace_private.check_club_structure()"
+      },
+      {
+        "name": "touch_updated_at",
+        "table": "clubs",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER touch_updated_at BEFORE UPDATE ON public.clubs FOR EACH ROW EXECUTE FUNCTION clubspace_private.touch_updated_at()"
+      },
+      {
+        "name": "touch_updated_at",
+        "table": "club_departments",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER touch_updated_at BEFORE UPDATE ON public.club_departments FOR EACH ROW EXECUTE FUNCTION clubspace_private.touch_updated_at()"
+      },
+      {
+        "name": "touch_updated_at",
+        "table": "club_memberships",
+        "enabled": "O",
+        "definition": "CREATE TRIGGER touch_updated_at BEFORE UPDATE ON public.club_memberships FOR EACH ROW EXECUTE FUNCTION clubspace_private.touch_updated_at()"
+      }
+    ]
+  },
+  {
+    "section": "04_extension_not_installed",
+    "result": {
+      "campaign_table_exists": false,
+      "private_schema_exists": false,
+      "meetings_club_id_exists": false
+    }
+  },
+  {
+    "section": "05_runtime_roles",
+    "result": [
+      {
+        "role": "anon",
+        "bypasses_rls": false
+      },
+      {
+        "role": "authenticated",
+        "bypasses_rls": false
+      },
+      {
+        "role": "service_role",
+        "bypasses_rls": true
+      }
+    ]
+  }
+]
