@@ -102,6 +102,16 @@ Bản SQL mở rộng CLB, tuyển dụng, kênh và thông báo được theo d
 
 Lượt rà gần nhất đạt **44 test backend và 94 test frontend**. Đã thử UI với API mô phỏng và kiểm tra chỉ đọc quyền kênh trên Supabase. Nghiệm thu ghi thật và LiveKit hai thiết bị vẫn còn. Xem [bàn giao workspace](docs/design/phase-04-club-workspace.md) để chọn việc cho phiên tiếp theo. [Tổng kết PoC](PHASE_05_SUMMARY.md) lưu lịch sử triển khai media ban đầu.
 
+## Loại câu lạc bộ — cập nhật 20/11/2026
+
+Trang `/clubs` lọc theo loại CLB lưu trong `club_categories` và `club_category_links`.
+Form `/me/club-requests/new` cho chọn một hoặc nhiều loại khi gửi đề nghị; admin và người gửi
+thấy lại các loại trong chi tiết hồ sơ. API kiểm tra ID loại trước khi tạo CLB và lưu liên kết
+cho đề nghị mới. Không cần migration mới.
+Chạy `npm run seed:club-types` để xem trước sáu loại và mười liên kết CLB;
+chỉ dùng `npm run seed:club-types -- --apply` trên Supabase development khi muốn thêm dữ liệu.
+Script chỉ thêm bản ghi còn thiếu. Năm CLB thử nghiệm hoặc mô tả chưa rõ được xếp tạm vào `Khác`.
+
 ## Trưởng ban — cập nhật 20/11/2026
 
 Chủ nhiệm vào Khác → Thành viên, dùng Chuyển trưởng ban/Gỡ trưởng ban để đổi

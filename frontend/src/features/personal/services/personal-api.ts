@@ -39,6 +39,7 @@ export interface RegisteredActivity extends Registration {
   } | null;
 }
 export interface ClubRequest extends ClubSummary {
+  category_names?: string[];
   description: string;
   mission?: string | null;
   status: string;

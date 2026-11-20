@@ -8,6 +8,17 @@ export interface PublicPage {
   total: number;
   hasMore: boolean;
 }
+export interface ClubCategory {
+  category_id: string;
+  name: string;
+}
+export async function getClubCategories(signal: AbortSignal) {
+  const data = await publicGet<{ items: ClubCategory[] }>("club-categories", signal);
+  if (!Array.isArray(data.items) || data.items.some((item) =>
+    !item || typeof item.category_id !== "string" || typeof item.name !== "string"
+  )) throw new Error("Danh mục loại CLB chưa hợp lệ.");
+  return data.items;
+}
 export const itemId = (kind: Collection, item: PublicItem) =>
   kind === "clubs"
     ? item.club_id

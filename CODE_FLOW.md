@@ -136,12 +136,13 @@ Sau profile, đích mặc định của sinh viên là `/`, của admin là `/ad
 
 | Frontend | API | Nguồn Supabase |
 | --- | --- | --- |
-| Câu lạc bộ | `GET /api/public/clubs?page=&limit=` | `public_clubs` |
+| Câu lạc bộ | `GET /api/public/clubs?page=&limit=&q=&category=` | `public_clubs`; `club_category_links` khi lọc loại |
+| Loại CLB | `GET /api/public/club-categories` | `club_categories` |
 | Hoạt động | `GET /api/public/activities?page=&limit=` | `public_club_activities` |
 | Bài viết | `GET /api/public/posts?page=&limit=` | `public_club_posts` |
 
-`PublicContentController` giới hạn pagination và rate limit. Service chỉ đọc
-các public view được allowlist, chọn cột công khai, sắp xếp theo thời gian
+`PublicContentController` giới hạn pagination và rate limit. Service đọc
+các public view được allowlist; bộ lọc CLB đọc thêm danh mục/liên kết loại nhưng chỉ trả CLB từ `public_clubs`. Service chọn cột công khai, sắp xếp theo thời gian
 publish và trả `{items, page, limit, total, hasMore}`. Không có fallback sang
 bảng riêng tư hay dữ liệu mẫu khi API lỗi. Frontend hỗ trợ retry, tải trang
 tiếp, tìm CLB, chi tiết nội dung và chỉ cho phép URL ảnh/link HTTP(S).

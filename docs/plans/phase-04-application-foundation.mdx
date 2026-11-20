@@ -12,6 +12,26 @@ description: Theo dõi Module 1 trong phạm vi đã được giao.
 
 ## Lịch sử triển khai
 
+### Club types on creation (2026-11-21)
+
+Hai form tạo CLB cho chọn một hoặc nhiều loại, API lưu liên kết sau khi xác thực ID, người gửi/admin thấy loại trong chi tiết. Backend build/72 test, frontend build/116 test đạt; chưa tạo đề nghị thật hoặc rà browser. Phase 04 vẫn **In Progress**. [Work log](/work-logs/2026-11-21-01-phase-04-club-types-on-create).
+
+### All published clubs classified (2026-11-20)
+
+Năm CLB thử nghiệm hoặc mô tả chưa rõ được xếp tạm vào `Khác`; API development xác nhận 10/10 CLB công khai nằm trong bộ lọc, không trùng ID: Học thuật & công nghệ 3, Thể thao 2, Khác 5. Form tạo CLB chưa lưu loại; Phase 04 vẫn **In Progress**. [Work log](/work-logs/2026-11-20-14-phase-04-classify-all-clubs).
+
+### Club types (2026-11-20)
+
+Bộ lọc `/clubs` nay ghi “Loại CLB”. Đã thêm sáu loại do người dùng chọn và gắn năm CLB có nội dung rõ ràng trên Supabase development; API xác nhận Học thuật & công nghệ có 3 CLB, Thể thao có 2. Backend build/68 test, frontend build/7 test liên quan đạt; chưa rà browser thật. Phase 04 vẫn **In Progress**. [Work log](/work-logs/2026-11-20-13-phase-04-club-types).
+
+### Club interest filter (2026-11-20)
+
+Trang `/clubs` lọc theo sở thích từ `club_categories`/`club_category_links`, kết hợp tìm tên và phân trang trên kết quả từ `public_clubs`. Backend build/68 test và frontend build/114 test đạt; chưa xác minh Supabase/browser thật. Phase 04 vẫn **In Progress**. [Work log](/work-logs/2026-11-20-12-phase-04-club-interest-filter).
+
+### Public header consistency (2026-11-20)
+
+Header trang chủ và các trang `/clubs`, `/activities`, `/posts` dùng cùng giao diện và trạng thái tài khoản, đồng thời bám mép trên khi cuộn. Frontend build và 27 test liên quan đạt; chưa rà trực quan trên browser thật. Phase 04 vẫn **In Progress**. [Work log](/work-logs/2026-11-20-11-phase-04-public-header).
+
 ### Club information scrolling (2026-11-20)
 
 Trang Khác → Thông tin CLB có vùng cuộn nội dung riêng trên desktop/tablet và cuộn theo trang trên mobile. Frontend build và 13 workspace tests đạt; chưa kiểm tra cuộn trên browser thật. Phase 04 vẫn **In Progress**. [Work log](/work-logs/2026-11-20-10-phase-04-club-information-scroll).

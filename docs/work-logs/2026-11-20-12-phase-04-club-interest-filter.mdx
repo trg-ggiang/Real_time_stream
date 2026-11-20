@@ -1,0 +1,54 @@
+---
+title: Phase 04 — Lọc câu lạc bộ theo sở thích
+description: Dùng danh mục và liên kết CLB từ schema để lọc danh sách công khai.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-12
+- Thời gian: 20/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm tiêu chí lọc câu lạc bộ theo sở thích dựa trên schema database người dùng cung cấp.
+
+## Công việc hoàn thành
+
+- `backend/src/public-content/public-content.controller.ts`, `public-content.service.ts`: thêm `GET /api/public/club-categories`, tham số `category` UUID cho danh sách CLB, lấy ID từ `club_category_links` và chỉ trả CLB từ view `public_clubs`. Lọc trước phân trang; đọc theo lô khi một danh mục có nhiều liên kết.
+- `frontend/src/features/discovery/services/discovery-api.ts`, `hooks/use-public-query.ts`, `components/ClubCategoryFilter.tsx`, `pages/CollectionPage.tsx`, `discovery.css`: tải danh mục sở thích từ API, chọn sở thích trên `/clubs`, giữ lựa chọn trong URL, kết hợp tìm tên và xóa bộ lọc.
+- Thêm test backend cho danh mục, CLB công khai, danh mục rỗng và phân trang nhiều lô; thêm test frontend cho thao tác chọn/xóa và URL.
+- Cập nhật `CODE_FLOW.md` và tài liệu thiết kế trải nghiệm công khai.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace backend run test` | Passed | Build và 68 test backend |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; còn cảnh báo chunk lớn |
+| `npm.cmd --workspace frontend run test` | Passed | 114 test frontend; jsdom in cảnh báo `scrollTo` chưa triển khai |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser / trực quan | Skipped | Frontend localhost không chạy |
+| Dịch vụ thật / end-to-end | Skipped | Backend localhost không chạy; chưa xác minh danh mục và liên kết trên Supabase thật |
+
+## Quyết định và lý do
+
+Schema có `club_categories` và `club_category_links`, còn `public_clubs` không có cột danh mục. API đọc liên kết để xác định ID, sau đó lấy kết quả từ view công khai; không cần migration hoặc ghi dữ liệu. Bộ lọc thực hiện trước phân trang để `total` và `hasMore` chính xác.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker code. Chưa xác nhận bảng danh mục/liên kết có dữ liệu thật hoặc kiểm tra thao tác trên browser thật. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Chạy backend/frontend với Supabase development, mở `/clubs`, chọn từng sở thích, kết hợp tìm tên và kiểm tra phân trang cùng danh mục rỗng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu luồng
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh

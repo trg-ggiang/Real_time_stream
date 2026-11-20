@@ -17,6 +17,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Max,
   MaxLength,
   Min,
@@ -46,6 +47,7 @@ export class PublicPageQuery {
 
 export class DiscoveryQuery extends PublicPageQuery {
   @IsOptional() @IsString() @MaxLength(100) q?: string;
+  @IsOptional() @IsUUID() category?: string;
   @IsOptional() @IsIn(["all", "upcoming", "past"]) period?:
     "all" | "upcoming" | "past";
 }
@@ -67,6 +69,9 @@ export class PublicContentController {
   ) {}
   @Get("clubs") clubs(@Query() query: DiscoveryQuery) {
     return this.content.list("clubs", query.page, query.limit, query);
+  }
+  @Get("club-categories") clubCategories() {
+    return this.content.clubCategories();
   }
   @Get("activities") activities(@Query() query: DiscoveryQuery) {
     return this.content.list("activities", query.page, query.limit, query);

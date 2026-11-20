@@ -12,6 +12,7 @@ export interface AdminClubSummary {
   published_at?: string | null;
 }
 export interface AdminClub extends AdminClubSummary {
+  category_names?: string[];
   description: string;
   mission: string | null;
   contact_email: string | null;

@@ -591,3 +591,23 @@ với đơn đã xử lý. Typecheck đạt. Phase 04 In Progress. [Work log](/w
 
 Giữ nút chi tiết ở hàng dưới bên phải sau duyệt/từ chối, chỉ có trạng thái bên
 trái. Typecheck đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-20-06-phase-04-application-detail-position).
+
+## 20/11/2026 — Header công khai thống nhất
+
+Header trên `/`, `/clubs`, `/activities`, `/posts` cùng giao diện và trạng thái tài khoản, bám mép trên khi cuộn. Frontend build và 27 test liên quan đạt; chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-11-phase-04-public-header).
+
+## 20/11/2026 — Lọc CLB theo sở thích
+
+Trang `/clubs` lấy danh mục từ database và lọc qua liên kết CLB trước phân trang, chỉ trả bản ghi từ `public_clubs`. Backend build/68 test, frontend build/114 test đạt; chưa rà Supabase/browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-12-phase-04-club-interest-filter).
+
+## 20/11/2026 — Loại CLB và dữ liệu phân loại
+
+Đổi nhãn bộ lọc thành Loại CLB; tạo sáu loại đã chọn và gắn năm CLB rõ nội dung trên Supabase development. API xác nhận loại Học thuật & công nghệ có 3 CLB, Thể thao có 2. Backend build/68 test, frontend build/7 test liên quan đạt; chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-13-phase-04-club-types).
+
+## 20/11/2026 — Phân loại đủ 10 CLB
+
+Gắn năm CLB thiếu mô tả rõ vào `Khác`. API development xác nhận bộ lọc bao phủ 10/10 CLB: Học thuật & công nghệ 3, Thể thao 2, Khác 5, không trùng ID. Form tạo CLB chưa lưu loại; Phase 04 In Progress. [Work log](/work-logs/2026-11-20-14-phase-04-classify-all-clubs).
+
+## 21/11/2026 — Chọn nhiều loại khi tạo CLB
+
+Form đề nghị chính và dialog cũ cho chọn nhiều loại; backend kiểm tra ID và lưu liên kết, trang chi tiết người gửi/admin hiển thị lại. Backend build/72 test, frontend build/116 test đạt; chưa thử ghi DB thật hoặc rà browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-01-phase-04-club-types-on-create).

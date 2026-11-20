@@ -98,11 +98,19 @@ export class AdminService {
           .in("user_id", ids)
       : { data: [], error: null };
     this.check(people.error);
+    const links = await this.db.from("club_category_links")
+      .select("category_id").eq("club_id", id);
+    this.check(links.error);
+    const categories = links.data?.length
+      ? await this.db.from("club_categories").select("category_id,name")
+          .in("category_id", links.data.map((link) => link.category_id)).order("name")
+      : { data: [], error: null };
+    this.check(categories.error);
     const creator =
       people.data?.find((x) => x.user_id === item.created_by) || null;
     const reviewer = people.data?.find((x) => x.user_id === item.reviewed_by);
     return {
-      item,
+      item: { ...item, category_names: (categories.data ?? []).map((category) => category.name) },
       creator,
       reviewer: reviewer
         ? { user_id: reviewer.user_id, display_name: reviewer.display_name }

@@ -10,7 +10,8 @@ Ngày 16/11/2026. Mã nguồn triển khai trên nhánh final cục bộ; chưa 
 - Dữ liệu đọc thật từ view public Supabase qua NestJS. Không có fallback sang mock khi API lỗi.
 - Home là bản biên tập gọn: tối đa 3 CLB trong trang dữ liệu đầu (ưu tiên có ảnh); danh sách đầy đủ không ẩn bản ghi thiếu ảnh. Không gắn nhãn nổi bật do admin chọn hoặc khẳng định đây là xếp hạng.
 - Hoạt động sắp tới dùng starts_at và lifecycle scheduled, sắp xếp ngày bắt đầu tăng dần. Nếu không có thì giới thiệu hoạt động đã đăng, ghi rõ chưa có lịch tới. Không đổi ngày quá khứ thành tương lai.
-- Search chạy phía server theo tên CLB hoặc tiêu đề, trước phân trang. Bộ lọc thời gian all/upcoming/past lưu trên URL. Không giả lập đã có category/organization filter.
+- Search chạy phía server theo tên CLB hoặc tiêu đề, trước phân trang. Bộ lọc thời gian all/upcoming/past và bộ lọc loại CLB lưu trên URL. Loại lấy từ `club_categories`, liên kết từ `club_category_links`; kết quả CLB luôn lấy từ `public_clubs` và lọc trước phân trang. Chưa có bộ lọc organization.
+- Form đề nghị thành lập CLB cho chọn nhiều loại; backend kiểm tra ID loại, lưu liên kết theo đề nghị và trang chi tiết người gửi/admin hiển thị lại. Luồng tạo dùng bảng liên kết hiện có, không đổi schema.
 - Public GET timeout 8 giây/lần, tối đa 3 lần khi lỗi mạng/500/502/503/504, backoff 600/1600ms; hủy khi rời trang. 400/401/403/404/429 không tự thử lại. Chỉ áp dụng GET, không lặp mutation.
 - Loading, lỗi, empty, không tìm thấy, ảnh lỗi/thiếu đều có UI; URL ngoài chỉ cho HTTP(S), nội dung text không render HTML.
 - Menu tài khoản chứa lối vào CLB của tôi, meeting và admin; navigation public chỉ có khám phá nội dung. Shell cá nhân/admin/CLB hoàn chỉnh thuộc Phase 3–5.
