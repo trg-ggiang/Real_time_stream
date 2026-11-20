@@ -1,3 +1,4 @@
+import { confirmAction } from '../../../shared/lib/confirm-action';
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useClub } from "../workspace-context";
@@ -169,13 +170,13 @@ function MemberRow({
   async function action(kind: "move" | "remove" | "transfer" | "head" | "unhead") {
     if (
       kind !== "move" &&
-      !window.confirm(
+      !(await confirmAction(
         kind === "remove"
-          ? `Gỡ ${member.users.display_name} khỏi CLB?`
+          ? `Xóa ${member.users.display_name} khỏi CLB?`
           : kind === "head" ? `Chọn ${member.users.display_name} làm trưởng ${member.club_departments.name}?`
           : kind === "unhead" ? `Gỡ quyền trưởng ban của ${member.users.display_name}? Thành viên vẫn ở ban hiện tại.`
           : `Chuyển quyền chủ nhiệm cho ${member.users.display_name}? Bạn sẽ trở thành thành viên.`,
-      )
+      ))
     )
       return;
     const path =
@@ -236,7 +237,7 @@ function MemberRow({
               disabled={mutation.busy || member.role === "head" || department === member.department_id}
               onClick={() => action("move")}
             >
-              Lưu ban
+              Lưu thay đổi
             </button>
             <button disabled={mutation.busy || member.role !== "member"} onClick={() => action("transfer")}>
               Chuyển chủ nhiệm
@@ -248,7 +249,7 @@ function MemberRow({
               disabled={mutation.busy || member.role === "head"}
               onClick={() => action("remove")}
             >
-              Gỡ thành viên
+              Xóa thành viên
             </button>
           </div>
         )}
@@ -276,8 +277,7 @@ export function DepartmentsPage() {
         <div>
           <h1>Các ban trong CLB</h1>
           <p>
-            Ban riêng tư là cấu hình cho kênh trao đổi tương lai; hiện chưa có
-            tính năng chat theo ban.
+            Công khai: thành viên CLB có thể xem kênh. Riêng tư: chỉ người được cấp quyền mới có thể truy cập.
           </p>
         </div>
         {membership.role === "chairperson" && (
@@ -313,7 +313,7 @@ export function DepartmentsPage() {
                   ? "Ban quản trị"
                   : d.is_private
                     ? "Riêng tư"
-                    : "Chung trong CLB"}
+                    : "Công khai"}
               </span>
               <h2>{d.name}</h2>
               <p>{d.description || "Chưa có mô tả."}</p>
@@ -412,15 +412,7 @@ function DepartmentForm({
             disabled={mutation.busy}
           />
         </label>
-        <label className="cw-checkbox">
-          <input
-            type="checkbox"
-            checked={privateBan}
-            onChange={(e) => setPrivate(e.target.checked)}
-            disabled={mutation.busy}
-          />
-          Ban riêng tư
-        </label>
+        <fieldset className="cw-department-visibility"><legend>Quyền truy cập kênh</legend><label><input type="radio" name="department-visibility" checked={!privateBan} onChange={() => setPrivate(false)} disabled={mutation.busy} />Công khai</label><label><input type="radio" name="department-visibility" checked={privateBan} onChange={() => setPrivate(true)} disabled={mutation.busy} />Riêng tư</label><p className="cw-muted">Công khai trong CLB, không hiển thị cho khách bên ngoài.</p></fieldset>
       </div>
       <p className="cw-muted">
         Chuyển hết thành viên đang hoạt động trước khi ngừng một ban. Ban quản
@@ -436,7 +428,7 @@ function DepartmentForm({
           Đóng
         </button>
         <button className="cw-primary" disabled={mutation.busy}>
-          Lưu ban
+          {department ? 'Lưu thay đổi' : 'Tạo ban'}
         </button>
       </div>
     </form>

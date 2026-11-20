@@ -1,0 +1,46 @@
+---
+title: Phase 04 - App audit and unified content detail card
+description: Read-only app review, confirmed fixes and status-colored post/activity detail cards.
+---
+
+## Scope
+
+2026-11-20 (Asia/Saigon). User requested an app review, then specified a unified detail card for posts and activities. Phase 04 remains In Progress. No live application records, schema or storage objects were written; no commit/push.
+
+## Completed fixes
+
+- Post/activity detail content and publication state now share one card. Published has a green border, pending review yellow, rejected/changes requested red; drafts retain a neutral border. Text badges remain, so status is not conveyed by color alone. Review notes/actions and the public link stay inside the same card.
+- Dates use Vietnam timezone and numeric day/month/year. A same-day activity shows one date; a same-year range uses `25/11–02/12/2026`; cross-year ranges show both years. Activity start/end hours and registration deadline hours are preserved below their dates.
+- Corrected reverted member/department copy to the user's earlier decisions: “Xóa thành viên”, “Lưu thay đổi”, “Công khai / Riêng tư”. Removed inaccurate copy claiming department chat was not implemented.
+- A confirmation popup cancels when browser history changes, preventing a stale page action from being accepted later. Unsaved-change protection no longer intercepts new-tab or download links.
+- Socket acknowledgement timeout now has a Vietnamese, actionable message; the draft/retry key remain intact.
+- Image preview dimensions are reserved and upload progress is announced via a polite status region.
+- Recruitment query hook no longer exposes its internal `key` through spread props. This removes the React warning observed in the browser and preserves the existing query identity checks.
+- `GET /api/auth/me` now has its own 120/minute allowance. Rapid authenticated page restoration previously hit the shared default of 10/minute and produced 429s during review. Login/register protections remain unchanged; regression test verifies repeated current-user reads and that login throttling still works.
+
+## Browser scope and evidence
+
+Used already-running frontend/backend. API writes were blocked except read-only login. Reviewed public home, clubs, activities and posts at 1440px and 390px: no horizontal document overflow or uncaught page exceptions in those sampled routes.
+
+Authenticated read review covered club overview, members, departments, posts, activities, information, meetings, recruitment, personal profile and new club request. Both post/activity detail cards were reviewed at 1440px and 390px. No horizontal overflow or uncaught page exceptions in the sampled routes.
+
+Published card was checked against real read data. Pending/rejected card styling used mocked GET responses only, never changed DB status. Observed one card per detail, with computed green/yellow/red borders. Screenshots are in `output/playwright/audit-detail-*.png`.
+
+## Verification
+
+- Backend suite: 71 passed after the auth limit fix.
+- Frontend full suite: 126 passed across 24 files; targeted recruitment tests passed again after fixing the query hook.
+- Frontend typecheck and production build passed; existing large JS chunk warnings remain.
+- Date tests include same-day, same-year, different-year, invalid dates and UTC-to-Vietnam date rollover. Popup tests include browser Back and non-leaving links. Socket client tests cover acknowledgement timeout and offline/access-denial behavior.
+
+## Remaining findings
+
+1. **Meeting management visibility:** `frontend/src/features/meeting/services/meetings-api.ts` still treats unknown membership as manageable, while the session overview does not include the viewer's meeting role. Backend mutation guards enforce actual permissions, but an ordinary member can see management actions that later fail. Recommend an explicit actor-scoped role in the overview and hiding management when it is unknown. No meeting-role API redesign was applied in this audit.
+2. **Initial download size:** production main JS is approximately 613 kB and the lazy meeting-media chunk 710 kB before gzip. Consider additional route-level splitting after measuring target devices; the build succeeds and no bundler/framework change was made here.
+3. **Image lifecycle:** immediate uploads can leave unreferenced objects when a form is abandoned or an image is replaced. Reference-aware cleanup remains a separate storage task; existing files were not deleted.
+
+## Limits
+
+This was a sampled code/browser review, not exhaustive acceptance of every role and mutation. Did not test admin-only pages with an admin login, real approval/removal/publication writes, production image storage upload, or a multi-user camera/microphone call over a public tunnel. Socket delivery and image-storage failures are covered using isolated test fixtures; broader live acceptance still needs the corresponding user accounts and environment.
+
+Review criteria included the [Vercel Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines/blob/main/command.md), applied to the current application rather than changing its established layout.

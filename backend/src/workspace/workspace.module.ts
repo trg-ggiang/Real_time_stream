@@ -7,9 +7,12 @@ import { WorkspacePeople } from "./workspace-people.service";
 import { WorkspaceContent } from "./workspace-content.service";
 import { WorkspaceChannels } from './workspace-channels.service';
 import { WorkspaceChannelsController } from './workspace-channels.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { WorkspaceChannelEvents } from './workspace-channel-events';
+import { WorkspaceChannelGateway } from './workspace-channel.gateway';
 @Module({
-  imports: [AuthModule, UsersModule],
+  imports: [AuthModule, UsersModule, JwtModule.register({})],
   controllers: [WorkspaceController, WorkspaceChannelsController],
-  providers: [WorkspaceAccess, WorkspacePeople, WorkspaceContent, WorkspaceChannels],
+  providers: [WorkspaceAccess, WorkspacePeople, WorkspaceContent, WorkspaceChannels, WorkspaceChannelEvents, WorkspaceChannelGateway],
 })
 export class WorkspaceModule {}

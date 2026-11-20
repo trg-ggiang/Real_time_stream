@@ -141,15 +141,8 @@ it('logs in with the API contract and clears the in-memory session on logout', a
   expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ email: 'a@test.dev', password: 'password123' });
   expect(screen.queryByTestId('token')).toBeNull();
   fireEvent.click(screen.getByText('Mở cuộc họp'));
-  expect(screen.getByTestId('token').textContent).toBe('app-jwt');
-  expect(window.location.search).toContain('view=meeting');
-  fireEvent.click(screen.getByRole('button', { name: 'Trang chủ' }));
-  expect(screen.getByText('Trang chủ Tester')).toBeTruthy();
-  expect(window.location.search).not.toContain('view=meeting');
-  fireEvent.click(screen.getByText('Mở cuộc họp'));
-  window.history.back();
-  await waitFor(() => expect(window.location.search).not.toContain('view=meeting'));
-  expect(await screen.findByText('Trang chủ Tester')).toBeTruthy();
+  expect(location.pathname).toBe('/workspace');
+  expect(screen.queryByTestId('token')).toBeNull();
   fireEvent.click(screen.getByText('Đăng xuất'));
   expect(screen.queryByText('Tester')).toBeNull();
   expect(screen.getByLabelText('Mật khẩu')).toBeTruthy();

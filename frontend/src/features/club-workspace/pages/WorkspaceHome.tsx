@@ -11,6 +11,7 @@ import {
   LinkedText,
 } from "../../discovery/components/PublicContent";
 import { useUnsavedChanges } from "../../../shared/lib/use-unsaved-changes";
+import { ImageUpload } from '../../../shared/components/ImageUpload';
 export { MeetingsEntry, RecurringMeetings } from "./WorkspaceMeetingsEntries";
 export function ClubInformation() {
   const { club, clubId, token, membership, reload } = useClub();
@@ -21,11 +22,13 @@ export function ClubInformation() {
     cover_url: club.cover_url || "",
   });
   const [dirty, setDirty] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const mutation = useWorkspaceMutation();
   useUnsavedChanges(dirty);
   async function save(e: FormEvent) {
     e.preventDefault();
+    if (uploading) return;
     const r = await mutation.run((signal) =>
       workspaceRequest<WorkspaceContext>(token, clubId, "contact", {
         method: "PATCH",
@@ -79,8 +82,6 @@ export function ClubInformation() {
             [
               ["contact_email", "Email", "email", 320],
               ["contact_phone", "Điện thoại", "tel", 32],
-              ["logo_url", "URL logo", "url", 2048],
-              ["cover_url", "URL ảnh bìa", "url", 2048],
             ] as const
           ).map(([key, label, type, limit]) => (
             <label key={key}>
@@ -98,12 +99,12 @@ export function ClubInformation() {
               />
             </label>
           ))}
+          {(['logo_url', 'cover_url'] as const).map(key => <ImageUpload key={key} token={token} label={key === 'logo_url' ? 'Logo CLB' : 'Ảnh bìa CLB'} value={values[key]} disabled={membership.role !== 'chairperson' || mutation.busy || uploading} onBusyChange={setUploading} onChange={url => { setValues(v => ({ ...v, [key]: url })); setDirty(true); setMessage(''); }} />)}
           <p className="cw-muted">
-            Ảnh dùng URL công khai, chưa có upload file. Chỉ chủ nhiệm được lưu
-            các thay đổi này.
+            Chọn ảnh từ thiết bị; hệ thống tự lưu đường dẫn ảnh. Chỉ chủ nhiệm được lưu các thay đổi này.
           </p>
           {membership.role === "chairperson" && (
-            <button className="cw-primary" disabled={!dirty || mutation.busy}>
+            <button className="cw-primary" disabled={!dirty || mutation.busy || uploading}>
               Lưu thông tin
             </button>
           )}

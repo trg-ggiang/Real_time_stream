@@ -1,6 +1,7 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, Optional, ServiceUnavailableException } from '@nestjs/common';
 import { WorkspaceAccess } from './workspace-access.service';
 import { attachmentBucket, prepareChannelAttachments, type ChannelUpload } from './channel-attachments';
+import { WorkspaceChannelEvents } from './workspace-channel-events';
 
 const fields = 'channel_id,club_id,department_id,kind,name,description';
 const messageFields = 'message_id,channel_id,sender_membership_id,client_message_id,content,created_at,edited_at,deleted_at,club_memberships!sender_membership_id(users(display_name,avatar_url)),attachments:channel_message_attachments(attachment_id,original_name,mime_type,size_bytes,position)';
@@ -8,7 +9,7 @@ const attachmentLinkSeconds = 120;
 
 @Injectable()
 export class WorkspaceChannels {
-  constructor(private readonly access: WorkspaceAccess) {}
+  constructor(private readonly access: WorkspaceAccess, @Optional() private readonly events?: WorkspaceChannelEvents) {}
   private get db() { return this.access.supabase.client; }
 
   private async readable(userId: string, channelId: string) {
@@ -28,12 +29,21 @@ export class WorkspaceChannels {
   }
 
   private async authorize(userId: string, clubId: string, channelId: string) {
-    const context = await this.access.require(userId, clubId);
-    const result = await this.db.from('club_channels').select(fields).eq('club_id', clubId).eq('channel_id', channelId).maybeSingle();
+    const [context, result] = await Promise.all([
+      this.access.require(userId, clubId),
+      this.db.from('club_channels').select(fields).eq('club_id', clubId).eq('channel_id', channelId).maybeSingle(),
+    ]);
     this.access.check(result.error);
     if (!result.data) throw new NotFoundException('Không tìm thấy kênh trong CLB này.');
     if (!await this.readable(userId, channelId)) throw new ForbiddenException('Bạn không có quyền đọc kênh này.');
     return context;
+  }
+
+  requireChannel(userId: string, clubId: string, channelId: string) { return this.authorize(userId, clubId, channelId); }
+
+  private saved(clubId: string, channelId: string, message: Record<string, any>) {
+    this.events?.publish({ clubId, channelId, message });
+    return { item: message };
   }
 
   private publicMessage(row: Record<string, any>, membershipId: string) {
@@ -77,10 +87,10 @@ export class WorkspaceChannels {
         .eq('sender_membership_id', context.membership.membership_id).eq('client_message_id', body.client_message_id).maybeSingle();
       this.access.check(existing.error);
       if (!existing.data || existing.data.content !== content || existing.data.deleted_at) throw new ConflictException('Tin nhắn đã thay đổi. Kiểm tra lịch sử trước khi gửi lại.');
-      return { item: this.publicMessage(existing.data, context.membership.membership_id) };
+      return this.saved(clubId, channelId, this.publicMessage(existing.data, context.membership.membership_id));
     }
     this.access.check(result.error);
-    return { item: this.publicMessage(result.data!, context.membership.membership_id) };
+    return this.saved(clubId, channelId, this.publicMessage(result.data!, context.membership.membership_id));
   }
 
   async sendWithAttachments(userId: string, clubId: string, channelId: string,
@@ -112,7 +122,7 @@ export class WorkspaceChannels {
     const message = await this.db.from('channel_messages').select(messageFields)
       .eq('message_id', result.data).eq('channel_id', channelId).single();
     this.access.check(message.error);
-    return { item: this.publicMessage(message.data!, membershipId) };
+    return this.saved(clubId, channelId, this.publicMessage(message.data!, membershipId));
   }
 
   async attachmentUrl(userId: string, clubId: string, channelId: string, attachmentId: string, preview: boolean) {

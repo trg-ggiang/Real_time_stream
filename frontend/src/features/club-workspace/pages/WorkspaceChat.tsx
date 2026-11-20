@@ -1,6 +1,8 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import type { Socket } from 'socket.io-client';
 import { Smiley } from '@phosphor-icons/react/dist/csr/Smiley';
 import { Paperclip } from '@phosphor-icons/react/dist/csr/Paperclip';
+import { PaperPlaneRight } from '@phosphor-icons/react/dist/csr/PaperPlaneRight';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { AccountApiError } from '../../../shared/api/account-http';
 import { useUnsavedChanges } from '../../../shared/lib/use-unsaved-changes';
@@ -13,6 +15,7 @@ import { channelLabel } from '../channel-label';
 import { ContentImage } from '../../discovery/components/PublicContent';
 import { ChannelMessageAttachment, DraftChannelAttachment, channelFileAccept, channelFileError, pastedChannelImages } from './ChannelAttachments';
 import { ChannelMessageText } from './ChannelMessageText';
+import { channelRequest, createChannelSocket } from '../services/channel-socket';
 
 export function WorkspaceChannel({ channels }: { channels: ReturnType<typeof usePersonalQuery<WorkspaceList<ClubChannel>>> }) {
   const { channel } = useParams();
@@ -40,12 +43,16 @@ const emojis = [
 function ChannelChat({ channel }: { channel: ClubChannel }) {
   const { token, clubId, club } = useClub();
   const [items, setItems] = useState<ChannelMessage[]>([]);
+  const itemsRef = useRef<ChannelMessage[]>([]);
+  const socketRef = useRef<Socket | null>(null);
+  const [connected, setConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [denied, setDenied] = useState(false);
   const [text, setText] = useState('');
   const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
   const [fileError, setFileError] = useState('');
+  const [sending, setSending] = useState<{ id: string; content: string; fileCount: number } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const emojiPickerId = useId();
@@ -58,43 +65,80 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
   const history = useRef<HTMLDivElement>(null);
   const retryKey = useRef<{ text: string; id: string; files: typeof files } | null>(null);
   const mutation = useWorkspaceMutation();
-  const composerDisabled = mutation.busy || denied || loading;
+  const composerDisabled = mutation.busy || denied || loading || !connected;
   const path = `channels/${channel.channel_id}/messages`;
   const [refresh, setRefresh] = useState(0);
+  const accept = useCallback((incoming: ChannelMessage[]) => {
+    itemsRef.current = mergeChannelMessages(itemsRef.current, incoming);
+    setItems(itemsRef.current);
+  }, []);
+
+  useEffect(() => {
+    const field = composer.current;
+    if (!field) return;
+    field.style.height = 'auto';
+    field.style.height = `${Math.min(field.scrollHeight, 144)}px`;
+  }, [text]);
 
   useEffect(() => {
     const controller = new AbortController();
-    let timer: number;
-    let initial = true;
-    async function poll() {
-      if (document.hidden) { timer = window.setTimeout(poll, 3000); return; }
+    const socket = createChannelSocket(token, clubId, channel.channel_id);
+    socketRef.current = socket;
+    let generation = 0;
+    const valid = (run: number) => !controller.signal.aborted && socket.connected && run === generation;
+    function revoke(message: string) {
+      setError(message); setDenied(true); setConnected(false); setLoading(false);
+      itemsRef.current = []; setItems([]); socket.disconnect();
+    }
+    async function synchronize() {
+      const run = ++generation;
+      setConnected(true); setDenied(false); setLoading(true);
+      const known = new Set(itemsRef.current.map(item => item.message_id));
       const follow = !history.current || history.current.scrollHeight - history.current.scrollTop - history.current.clientHeight < 100;
       try {
         const result = await workspaceRequest<ChannelHistory>(token, clubId, path, { signal: controller.signal });
-        if (controller.signal.aborted) return;
-        setItems(previous => mergeChannelMessages(previous, result.items));
-        if (initial) { setCursor(result.cursor); setHasMore(result.hasMore); }
-        setError(''); setDenied(false); setLoading(false);
-        if (initial || follow) requestAnimationFrame(() => { if (!controller.signal.aborted && history.current) history.current.scrollTop = history.current.scrollHeight; });
-        initial = false;
+        if (!valid(run)) return;
+        accept(result.items);
+        if (!known.size) { setCursor(result.cursor); setHasMore(result.hasMore); }
+        // Walk backwards to the prior history, including gaps longer than one page.
+        let page = result;
+        while (known.size && page.hasMore && page.cursor && !page.items.some(item => known.has(item.message_id))) {
+          page = await workspaceRequest<ChannelHistory>(token, clubId, `${path}?${new URLSearchParams(page.cursor)}`, { signal: controller.signal });
+          if (!valid(run)) return;
+          accept(page.items);
+        }
+        setError(''); setLoading(false);
+        if (!known.size || follow) requestAnimationFrame(() => { if (valid(run) && history.current) history.current.scrollTop = history.current.scrollHeight; });
       } catch (cause) {
-        if (controller.signal.aborted) return;
+        if (!valid(run)) return;
         setLoading(false);
         setError(cause instanceof Error ? cause.message : 'Chưa tải được tin nhắn.');
-        if (cause instanceof AccountApiError && [401, 403, 404].includes(cause.status)) { setItems([]); setDenied(true); }
+        if (cause instanceof AccountApiError && [401, 403, 404].includes(cause.status)) revoke(cause.message);
       }
-      if (!controller.signal.aborted) timer = window.setTimeout(poll, 3000);
     }
-    void poll();
-    return () => { controller.abort(); window.clearTimeout(timer); };
-  }, [token, clubId, path, refresh]);
+    socket.on('connect', () => { void synchronize(); });
+    socket.on('channel:message', (item: ChannelMessage) => {
+      if (controller.signal.aborted || item.channel_id !== channel.channel_id) return;
+      const follow = !history.current || history.current.scrollHeight - history.current.scrollTop - history.current.clientHeight < 100;
+      accept([item]);
+      if (follow) requestAnimationFrame(() => { if (history.current) history.current.scrollTop = history.current.scrollHeight; });
+    });
+    socket.on('disconnect', () => { generation++; setConnected(false); setLoading(false); });
+    socket.on('connect_error', (cause: Error & { data?: { code?: number } }) => {
+      setConnected(false); setLoading(false); setError(cause.message || 'Chưa kết nối được chat.');
+      if ([401, 403, 404].includes(cause.data?.code || 0)) revoke(cause.message);
+    });
+    socket.on('channel:revoked', (event: { message: string }) => revoke(event.message));
+    socket.connect();
+    return () => { generation++; controller.abort(); socket.removeAllListeners(); socket.disconnect(); socketRef.current = null; };
+  }, [token, clubId, path, channel.channel_id, refresh, accept]);
 
   async function older() {
     if (!cursor || olderBusy) return;
     setOlderBusy(true);
     try {
       const result = await workspaceRequest<ChannelHistory>(token, clubId, `${path}?${new URLSearchParams(cursor)}`);
-      setItems(previous => mergeChannelMessages(previous, result.items)); setCursor(result.cursor); setHasMore(result.hasMore);
+      accept(result.items); setCursor(result.cursor); setHasMore(result.hasMore);
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chưa tải được tin nhắn cũ.'); }
     finally { setOlderBusy(false); }
   }
@@ -123,6 +167,8 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
       retryKey.current = { text: content, id: crypto.randomUUID(), files };
     }
     const id = retryKey.current.id;
+    setSending({ id, content, fileCount: files.length });
+    requestAnimationFrame(() => { if (history.current) history.current.scrollTop = history.current.scrollHeight; });
     const result = await mutation.run(signal => {
       if (files.length) {
         const form = new FormData();
@@ -133,12 +179,12 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
           method: 'POST', signal, body: form, timeoutMs: 90000,
         });
       }
-      return workspaceRequest<{ item: ChannelMessage }>(token, clubId, path, {
-        method: 'POST', signal, body: JSON.stringify({ content, client_message_id: id }),
-      });
+      if (!socketRef.current) throw new Error('Chat chưa kết nối.');
+      return channelRequest<{ item: ChannelMessage }>(socketRef.current, 'channel:send', { content, client_message_id: id });
     });
+    setSending(null);
     if (result) {
-      setItems(previous => mergeChannelMessages(previous, [result.item])); setText(''); setFiles([]); retryKey.current = null;
+      accept([result.item]); setText(''); setFiles([]); retryKey.current = null;
       requestAnimationFrame(() => { if (history.current) history.current.scrollTop = history.current.scrollHeight; });
     }
   }
@@ -151,6 +197,7 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
   }
   return <section className="cw-channel" aria-label={`Kênh ${channelLabel(channel)}`}>
     <header className="cw-channel-header"><div><h1>{channelLabel(channel)}</h1><p>{channel.description || 'Trao đổi cùng các thành viên được phép truy cập kênh.'}</p></div><span className="cw-channel-club">{club.name}</span></header>
+    {!connected && !loading && !denied && <p role="status" className="cw-muted">Chat đang mất kết nối. Nội dung đang soạn được giữ lại.</p>}
     <div className="cw-channel-history cw-live-history" ref={history} aria-label="Lịch sử tin nhắn">
       {hasMore && <button className="cw-link" disabled={olderBusy} onClick={() => void older()}>{olderBusy ? 'Đang tải…' : 'Tin nhắn cũ hơn'}</button>}
       {loading && <p role="status">Đang tải tin nhắn…</p>}
@@ -168,6 +215,14 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
         </ul>}</div>
       </article>;
       })}
+      {sending && !denied && !items.some(item => item.client_message_id === sending.id) && <article className="cw-message is-mine cw-message-sending" aria-label="Tin nhắn đang gửi">
+        <span className="cw-message-avatar-space" aria-hidden="true" />
+        <div className="cw-message-body">
+          {sending.content && <p><ChannelMessageText content={sending.content} /></p>}
+          {!!sending.fileCount && <p>{sending.fileCount} tệp đính kèm</p>}
+          <small role="status">Đang gửi…</small>
+        </div>
+      </article>}
     </div>
     <form className="cw-channel-composer cw-live-composer" onSubmit={event => void send(event)}>
       {!!files.length && <ul className="cw-draft-attachments" aria-label="Tệp đính kèm đang soạn">
@@ -211,8 +266,8 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
         if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return;
         event.preventDefault();
         if (!event.repeat) event.currentTarget.form?.requestSubmit();
-      }} maxLength={messageLengthLimit} disabled={composerDisabled} rows={2} />
-      <button className="cw-primary" disabled={(!text.trim() && !files.length) || composerDisabled}>{mutation.busy ? 'Đang gửi…' : 'Gửi'}</button>
+      }} maxLength={messageLengthLimit} disabled={composerDisabled} rows={1} />
+      <button className="cw-primary cw-composer-send" aria-label={mutation.busy ? 'Đang gửi…' : 'Gửi'} title="Gửi tin nhắn" aria-busy={mutation.busy} disabled={(!text.trim() && !files.length) || composerDisabled}><PaperPlaneRight size={24} weight="fill" aria-hidden="true" /></button>
       {fileError && <p role="alert">{fileError}</p>}
       {mutation.error && <p role="alert">{mutation.error} Nội dung được giữ lại để bạn kiểm tra và gửi lại.</p>}
     </form>

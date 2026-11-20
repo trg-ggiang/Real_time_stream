@@ -13,6 +13,7 @@ import { PersonalModule } from "./personal/personal.module";
 import { WorkspaceModule } from "./workspace/workspace.module";
 import { AdminModule } from "./admin/admin.module";
 import { RecruitmentModule } from "./recruitment/recruitment.module";
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RecruitmentModule } from "./recruitment/recruitment.module";
     WorkspaceModule,
     AdminModule,
     RecruitmentModule,
+    MediaModule,
   ],
   controllers: [HealthController],
 })

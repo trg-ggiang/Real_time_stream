@@ -1,5 +1,9 @@
 # Phase 4 — Không gian sinh hoạt và quản lý CLB
 
+> Image and confirmation update: existing image URL inputs now use file selection/upload; confirmations use the shared asynchronous popup. [Implementation and verification](../work-logs/2026-11-20-12-phase-04-popups-image-upload.mdx).
+
+> Realtime update 2026-11-20: club messages use Socket.IO `/workspace-chat`; history uses HTTP only on connection/reconnection/pagination. Meeting messages use `/chat`. Older polling/meeting-overview descriptions below are historical; see [current transport and room decisions](../work-logs/2026-11-20-11-phase-04-realtime-chat-room-cleanup.mdx). Meetings still open as a separate full-page view; only the duplicate overview was removed.
+
 **Bàn giao 20/11/2026** · Phase 04 kỹ thuật vẫn **In Progress**. Tài liệu này mô tả workspace sau tích hợp kênh, chat và họp gắn CLB. Xem [log tích hợp](../work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx) và [log rà soát](../work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx).
 
 Điều hướng cập nhật 20/11: hai lối họp chỉ nằm trong nhóm Gọi và gặp mặt; chuyển kênh dùng danh sách kênh đã tải trong CLB; dải CLB giữ thứ tự membership từ API. Xem [work log điều hướng](../work-logs/2026-11-20-07-phase-04-workspace-navigation-stability.mdx).

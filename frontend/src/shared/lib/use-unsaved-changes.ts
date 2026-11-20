@@ -1,15 +1,8 @@
 import { useEffect } from "react";
+import { confirmAction } from './confirm-action';
 export function useUnsavedChanges(dirty: boolean) {
   useEffect(() => {
-    const beforeNavigate = (event: Event) => {
-      if (
-        dirty &&
-        !window.confirm(
-          "Bạn có thay đổi chưa lưu. Rời trang và bỏ các thay đổi này?",
-        )
-      )
-        event.preventDefault();
-    };
+    let active = true, bypass = false, asking = false;
     const unload = (event: BeforeUnloadEvent) => {
       if (dirty) {
         event.preventDefault();
@@ -17,29 +10,32 @@ export function useUnsavedChanges(dirty: boolean) {
       }
     };
     const click = (event: MouseEvent) => {
-      if (!dirty || event.defaultPrevented || event.button !== 0) return;
+      if (bypass) { bypass = false; return; }
+      if (!dirty || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       const link = (event.target as Element)?.closest(
         "a[href]",
       ) as HTMLAnchorElement | null;
+      if (link?.target === '_blank' || link?.hasAttribute('download')) return;
       const leavingAccount = (event.target as Element)?.closest(
         "[data-leave-account]",
       );
-      if (
-        ((link && link.href !== window.location.href) || leavingAccount) &&
-        !window.confirm(
-          "Bạn có thay đổi chưa lưu. Rời trang và bỏ các thay đổi này?",
-        )
-      ) {
+      const destination = link && link.href !== window.location.href ? link : leavingAccount;
+      if (destination instanceof HTMLElement) {
         event.preventDefault();
         event.stopPropagation();
+        if (asking) return;
+        asking = true;
+        void confirmAction('Bạn có thay đổi chưa lưu. Rời trang và bỏ các thay đổi này?').then(accepted => {
+          asking = false;
+          if (active && accepted && destination.isConnected) { bypass = true; destination.click(); }
+        });
       }
     };
     window.addEventListener("beforeunload", unload);
-    window.addEventListener("uc:before-navigate", beforeNavigate);
     document.addEventListener("click", click, true);
     return () => {
       window.removeEventListener("beforeunload", unload);
-      window.removeEventListener("uc:before-navigate", beforeNavigate);
+      active = false;
       document.removeEventListener("click", click, true);
     };
   }, [dirty]);
