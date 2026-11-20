@@ -79,6 +79,12 @@ export function AuthApp() {
 
   function openMeeting() {
     const url = new URL(window.location.href);
+    if (!url.searchParams.get('meeting')) {
+      window.history.pushState(null, '', '/workspace');
+      setEnterMeeting(false);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      return;
+    }
     url.searchParams.set("view", "meeting");
     window.history.pushState(null, "", url);
     setEnterMeeting(true);
@@ -363,7 +369,7 @@ export function AuthApp() {
     );
   if (session && landingToken !== session.access_token)
     return <p role="status">Đang kiểm tra tài khoản…</p>;
-  if (session && enterMeeting)
+  if (session && enterMeeting && new URLSearchParams(window.location.search).get('meeting'))
     return (
       <MeetingPage
         accessToken={session.access_token}

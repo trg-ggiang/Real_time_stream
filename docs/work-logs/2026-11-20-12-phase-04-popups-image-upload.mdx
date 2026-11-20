@@ -1,0 +1,40 @@
+---
+title: Phase 04 - Confirmation popups and image uploads
+description: Replace browser confirmations and manually entered image URLs with shared UI components.
+---
+
+## Scope
+
+2026-11-20, Asia/Saigon. Phase 04 remains In Progress. User requested confirmation popups and selecting/uploading image files instead of entering URLs. No commit or push.
+
+## Confirmation popups
+
+- `shared/lib/confirm-action.ts` exposes an asynchronous confirmation using a native modal dialog with application styling. It displays plain text, supports cancel/Escape, restores focus, respects the initiating theme and rejects additional simultaneous requests.
+- Member removal/role transfer, content review, club request approval/rejection, recruitment publishing/closing and registration cancellation use this popup instead of `window.confirm`.
+- `use-unsaved-changes` blocks in-app link/account navigation, asks through the same popup and replays the original action only after acceptance. Cancel preserves the page/draft. Closing/reloading a browser tab continues to use the browser-controlled `beforeunload` warning; browsers do not allow replacing it with an application popup.
+- Technical logs were not converted into user notifications. The initial scan found browser confirmations rather than user-confirmation `console.log` calls.
+
+## Image uploads
+
+- New reusable `shared/components/ImageUpload.tsx`: select JPG/PNG/WebP up to 5 MB, upload immediately, show the returned URL as an image preview and optionally clear the selected image. Errors preserve the old image. Parent forms block submission until the upload finishes.
+- Applied to logo/cover in new club requests, logo/cover in workspace club information, and covers in post/activity editors. Existing recruitment covers and private chat attachments keep their established upload paths. No new avatar-editing function was added; the profile form did not have an avatar URL input.
+- Users no longer enter image URLs in these forms. The upload response supplies the URL internally; the existing form mutation saves that value into the existing image field. Existing saved images remain usable.
+- `POST /api/media/images`: JWT, complete-profile and rate-limit guards; one multipart `file`, maximum 5 MB, MIME signature/type checks, server-generated actor-prefixed UUID paths, no overwrite. The endpoint returns `{ url }` only after storage confirms the upload.
+- Storage bucket `app-images` is public for these image fields, restricted by size and image MIME types when provisioned. The first explicit authenticated upload creates this new bucket if it is missing; no existing bucket is altered. Uses the server-held Supabase secret, never exposes it to clients. Uses the supported Storage API rather than writing storage metadata tables directly.
+- No live image or bucket was created during implementation/validation. User-selected uploads create objects when used. Removing an image from a form clears its reference; it does not delete potentially shared stored files. Unreferenced-object cleanup is not implemented.
+
+Supabase configuration reference: [Create a bucket](https://supabase.com/docs/reference/javascript/file-buckets-createbucket).
+
+## Verification
+
+- 71 backend tests and 121 frontend tests passed. Added tests cover file-path ownership, bucket provisioning, size/type rejection, failed upload, multipart URL assignment, old-image retention, popup accept/cancel/Escape and unsaved-navigation behavior.
+- Production build and frontend/backend typecheck passed; existing large bundle warnings remain.
+- Live API checked without storage writes: anonymous empty upload returned 401; authenticated empty upload returned 400.
+- Browser review at desktop 1365px and mobile 390px: image preview and cancel-preserves-page behavior worked, no horizontal document overflow. Image endpoint was mocked and other mutations blocked during this visual review; no real club/post data was changed.
+- Screenshots: `output/playwright/image-picker-preview.png`, `custom-confirmation.png`, `custom-confirmation-mobile.png`.
+
+## Maintainer notes
+
+Await `confirmAction` before invoking mutations; it no longer returns a synchronous boolean. Do not mock `window.confirm` in tests for these actions: interact with the application's alert dialog. Native popup markup is outside the React root, so tests must close it when leaving a pending confirmation.
+
+Image uploads save the object before the parent form saves its reference. Do not remove the returned URL fields from DTOs or tables: only the user-facing URL inputs were replaced. The new media module must be loaded in a running backend; restart an older production backend manually if the endpoint is missing. Existing permission checks on the parent club/content mutations remain unchanged.

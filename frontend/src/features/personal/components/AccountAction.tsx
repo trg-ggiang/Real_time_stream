@@ -1,3 +1,4 @@
+import { confirmAction } from '../../../shared/lib/confirm-action';
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -77,7 +78,7 @@ export function AccountAction({
     if (
       kind === "registration" &&
       remove &&
-      !window.confirm("Hủy đăng ký hoạt động này?")
+      !(await confirmAction("Hủy đăng ký hoạt động này?"))
     )
       return;
     setBusy(true);

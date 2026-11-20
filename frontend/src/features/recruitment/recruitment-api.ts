@@ -17,7 +17,8 @@ export const profileLabels={full_name:'Họ tên',student_code:'MSSV',email:'Ema
 export function useRecruitment<T>(path:string,token?:string){
  const key=`${token||'public'}:${path}`,[attempt,setAttempt]=useState(0),[state,setState]=useState<{key:string;data?:T;error?:string}>({key});
  useEffect(()=>{const abort=new AbortController();setState({key});const req=token?accountRequest<T>(token,path,{signal:abort.signal}):publicGet<T>(path,abort.signal);void req.then(data=>{if(!abort.signal.aborted)setState({key,data});}).catch(e=>{if(!abort.signal.aborted)setState({key,error:e.message});});return()=>abort.abort();},[key,attempt]);
- return {...(state.key===key?state:{key}),retry:()=>setAttempt(n=>n+1)};
+ const current=state.key===key?state:{key};
+ return {data:current.data,error:current.error,retry:()=>setAttempt(n=>n+1)};
 }
 export function useWrite(){const lock=useRef(false),[busy,setBusy]=useState(false),[error,setError]=useState('');async function run<T>(action:()=>Promise<T>){if(lock.current)return;lock.current=true;setBusy(true);setError('');try{return await action();}catch(e){setError(e instanceof Error?e.message:'Chưa thực hiện được thao tác.');}finally{lock.current=false;setBusy(false);}}return {run,busy,error,setError};}
 export const write=<T,>(token:string,path:string,body:unknown,method='POST')=>accountRequest<T>(token,path,{method,body:JSON.stringify(body)});

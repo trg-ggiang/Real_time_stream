@@ -125,3 +125,12 @@
 @media (max-width: 600px) { .meeting-app .meeting-controls .meeting-device-arrow { width: 22px; min-width: 22px; height: 44px; min-height: 44px; } }
 @media (max-width: 600px) { .meeting-app .meeting-avatar-small { display: none; } .meeting-app .meeting-account { gap: 8px; } }
 @media (max-width: 400px) { .meeting-app .meeting-topbar { padding-inline: 16px; gap: 8px; } .meeting-app .meeting-brand { font-size: 12px; gap: 6px; } .meeting-app .meeting-theme-switch button { width: 30px; min-width: 30px; height: 32px; } }
+/* Full-page room keeps the workspace's blue/navy language, without its old overview. */
+.meeting-room-page[data-theme='light']{--meeting-bg:#f2f6fc;--meeting-surface:#fff;--meeting-line:#cedaeb;--meeting-text:#14284a;--meeting-muted:#53677f;--meeting-accent:#245dc1;--theme-button:#245dc1;--theme-button-hover:#1b4b9e;--theme-control:#e8effb;--theme-control-hover:#d8e5fa;--theme-input-line:#8196b0}
+.meeting-room-page[data-theme='dark']{--meeting-bg:#17191e;--meeting-surface:#21242b;--meeting-line:#526078;--meeting-text:#edf3fc;--meeting-muted:#b4c3d8;--meeting-accent:#a9cbff;--theme-button:#245dc1;--theme-button-hover:#1b4b9e;--theme-control:#2d3440}
+.meeting-room-page[data-theme] .meeting-main{width:100%;max-width:1480px;padding:24px 30px}
+.meeting-room-page[data-theme] .workspace-session{border-radius:12px;border:1px solid var(--meeting-line);padding:20px}
+.meeting-room-page[data-theme] .workspace-session-actions>button:first-child{background:var(--theme-button);border-color:var(--theme-button);color:#fff}
+.meeting-room-page[data-theme] .workspace-detail-heading{margin-bottom:24px}
+.meeting-room-page[data-theme] .workspace-feedback:empty{display:none}
+@media(max-width:640px){.meeting-room-page[data-theme] .meeting-main{padding:18px 14px}.meeting-room-page[data-theme] .workspace-session{padding:16px}}

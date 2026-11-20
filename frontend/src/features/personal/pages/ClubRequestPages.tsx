@@ -12,6 +12,7 @@ import { ClubCategoryPicker } from "../../discovery/components/ClubCategoryPicke
 import { type ClubRequest } from "../services/personal-api";
 import { PersonalState } from "../components/PersonalState";
 import { requestStatus } from "./PersonalLists";
+import { ImageUpload } from '../../../shared/components/ImageUpload';
 
 const requestFields = [
   { key: "name", label: "Tên CLB", limit: 120, min: 2, required: true },
@@ -33,8 +34,6 @@ const requestFields = [
   { key: "mission", label: "Sứ mệnh", limit: 2000, min: 10, multiline: true },
   { key: "contact_email", label: "Email liên hệ", limit: 254, type: "email" },
   { key: "contact_phone", label: "Điện thoại liên hệ", limit: 32, type: "tel" },
-  { key: "logo_url", label: "URL logo", limit: 2048, type: "url" },
-  { key: "cover_url", label: "URL ảnh bìa", limit: 2048, type: "url" },
 ];
 export function NewClubRequest({ token }: { token: string }) {
   const navigate = useNavigate();
@@ -42,6 +41,7 @@ export function NewClubRequest({ token }: { token: string }) {
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [sent, setSent] = useState(false);
   const [uncertain, setUncertain] = useState(false);
   const mutation = useRef<AbortController | null>(null);
@@ -49,7 +49,7 @@ export function NewClubRequest({ token }: { token: string }) {
   useUnsavedChanges(!sent && (categoryIds.length > 0 || Object.values(values).some((v) => Boolean(v))));
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (busy || uncertain || mutation.current) return;
+    if (busy || uploading || uncertain || mutation.current) return;
     setError("");
     const body = Object.fromEntries(
       Object.entries(values)
@@ -164,10 +164,9 @@ export function NewClubRequest({ token }: { token: string }) {
         </div>
         <ClubCategoryPicker selected={categoryIds} onChange={setCategoryIds} disabled={busy || uncertain} />
         <p className="ps-small">
-          Ảnh hiện được lưu bằng URL công khai; chưa hỗ trợ tải file. Không nhập
-          đơn vị trực thuộc hay fanpage riêng khi API chưa lưu được các trường
-          đó.
+          Chọn logo và ảnh bìa từ thiết bị. Hệ thống tải ảnh lên và tự lưu đường dẫn.
         </p>
+        {(['logo_url', 'cover_url'] as const).map(key => <ImageUpload key={key} token={token} label={key === 'logo_url' ? 'Logo CLB' : 'Ảnh bìa CLB'} value={values[key]} disabled={busy || uncertain || uploading} onBusyChange={setUploading} onChange={url => setValues(v => ({ ...v, [key]: url }))} />)}
         {(values.logo_url || values.cover_url) && (
           <div className="ps-preview">
             <ContentImage
@@ -196,7 +195,7 @@ export function NewClubRequest({ token }: { token: string }) {
           <button
             className="ps-primary"
             type="submit"
-            disabled={busy || uncertain}
+            disabled={busy || uploading || uncertain}
           >
             {busy ? "Đang gửi…" : "Gửi đề nghị xét duyệt"}
           </button>

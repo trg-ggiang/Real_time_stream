@@ -1,3 +1,4 @@
+import { confirmAction } from '../../shared/lib/confirm-action';
 import { useEffect, useMemo, useState } from 'react';
 import { publicDate, safePublicUrl } from './public-content';
 import './club-management.css';
@@ -54,7 +55,8 @@ export function ClubManagementPage({ token }: { token: string }) {
   }), [items, filter, search]);
 
   async function reject(item: ClubRequest) {
-    if (!window.confirm(`Từ chối yêu cầu thành lập “${item.name}”?`)) return;
+    if (!(await confirmAction(`Từ chối yêu cầu thành lập “${item.name}”?`))
+    ) return;
     setActionId(item.club_id); setError('');
     try {
       const response = await fetch(`${base}/api/public/admin/clubs/${encodeURIComponent(item.club_id)}/reject`, {
@@ -68,7 +70,8 @@ export function ClubManagementPage({ token }: { token: string }) {
   }
 
   async function approve(item: ClubRequest) {
-    if (!window.confirm(`Đồng ý thành lập “${item.name}” và thêm người gửi làm chủ nhiệm CLB?`)) return;
+    if (!(await confirmAction(`Đồng ý thành lập “${item.name}” và thêm người gửi làm chủ nhiệm CLB?`))
+    ) return;
     setActionId(item.club_id); setError('');
     try {
       const response = await fetch(`${base}/api/public/admin/clubs/${encodeURIComponent(item.club_id)}/approve`, {

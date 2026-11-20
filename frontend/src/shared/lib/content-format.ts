@@ -29,3 +29,20 @@ export function publicDateOnly(value?: string | null) {
     year: "numeric",
   }).format(date);
 }
+
+export function publicDateRange(start?: string | null, end?: string | null) {
+  const valid = (value?: string | null) => value && Number.isFinite(Date.parse(value)) ? new Date(value) : null;
+  const first = valid(start), last = valid(end);
+  if (!first || !last) return publicDateOnly(first ? start : end);
+  const formatter = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric' });
+  const parts = (date: Date) => Object.fromEntries(formatter.formatToParts(date).map(part => [part.type, part.value]));
+  const a = parts(first), b = parts(last);
+  if (formatter.format(first) === formatter.format(last)) return formatter.format(first);
+  if (a.year === b.year) return `${a.day}/${a.month}–${b.day}/${b.month}/${b.year}`;
+  return `${formatter.format(first)}–${formatter.format(last)}`;
+}
+
+export function publicTime(value?: string | null) {
+  if (!value || !Number.isFinite(Date.parse(value))) return '';
+  return new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value));
+}

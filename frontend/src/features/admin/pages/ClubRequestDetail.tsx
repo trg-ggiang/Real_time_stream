@@ -1,3 +1,4 @@
+import { confirmAction } from '../../../shared/lib/confirm-action';
 import { Link } from "react-router-dom";
 import { usePersonalQuery } from "../../personal/use-personal-query";
 import { PersonalState } from "../../personal/components/PersonalState";
@@ -46,11 +47,11 @@ function RequestDetail({
   async function decide(decision: "approve" | "reject") {
     if (
       !item ||
-      !window.confirm(
+      !(await confirmAction(
         decision === "approve"
           ? `Duyệt và công khai ${item.name}?`
           : `Từ chối đề nghị ${item.name}?`,
-      )
+      ))
     )
       return;
     const r = await mutation.run((signal) =>

@@ -314,3 +314,41 @@
 @media (max-width: 640px) {
   .cw-app main .cw-live-composer { gap: 6px; padding: 8px; }
 }
+/* Messenger-style composer: only the text field has an input surface. */
+.cw-app main form.cw-live-composer{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:8px;margin:12px 20px 18px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.cw-app main form.cw-live-composer textarea{flex:1 1 0;min-width:0;min-height:44px;max-height:144px;margin:0;padding:10px 16px;border:1px solid var(--cw-pane-line);border-radius:22px;background:var(--cw-chat-ground);color:var(--cw-navy);font-size:14px;line-height:22px;resize:none;overflow-y:auto;box-sizing:border-box;box-shadow:none}
+.cw-app main form.cw-live-composer textarea:focus{border-color:var(--cw-blue);outline:2px solid var(--cw-blue);outline-offset:2px;box-shadow:none}
+.cw-app main form.cw-live-composer .cw-emoji-toggle,.cw-app main form.cw-live-composer .cw-composer-send{display:grid;place-items:center;flex:0 0 40px;width:40px;height:44px;min-width:40px;min-height:44px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:var(--cw-blue);box-shadow:none;align-self:flex-end}
+.cw-app main form.cw-live-composer .cw-emoji-control{flex:none}
+.cw-app main form.cw-live-composer .cw-emoji-toggle:hover:not(:disabled),.cw-app main form.cw-live-composer .cw-composer-send:hover:not(:disabled){background:var(--cw-active-surface);color:var(--cw-blue)}
+.cw-app main form.cw-live-composer .cw-composer-send:disabled{opacity:.4}
+.cw-app main form.cw-live-composer .cw-draft-attachments,.cw-app main form.cw-live-composer>p{flex-basis:100%;width:100%}
+.cw-app[data-theme="dark"] main form.cw-live-composer{background:transparent;border:0;box-shadow:none}
+.cw-app[data-theme="dark"] main form.cw-live-composer textarea{background:var(--cw-night-surface);border-color:#526078}
+@media(max-width:640px){.cw-app main form.cw-live-composer{margin:10px 10px 14px;gap:4px}.cw-app main form.cw-live-composer .cw-emoji-toggle,.cw-app main form.cw-live-composer .cw-composer-send{flex-basis:34px;width:34px;min-width:34px}.cw-app main form.cw-live-composer textarea{padding-inline:12px;font-size:13px}}
+/* Content and publication state form one card for posts and activities. */
+.cw-app main .cw-detail-card{--cw-detail-border:#a6b6cb;display:block;padding:28px;border:2px solid var(--cw-detail-border);border-radius:16px;background:var(--cw-received-bg);box-shadow:none}
+.cw-app main .cw-detail-card[data-status=published]{--cw-detail-border:#288766}
+.cw-app main .cw-detail-card[data-status=pending_review]{--cw-detail-border:#ce961b}
+.cw-app main .cw-detail-card:is([data-status=rejected],[data-status=changes_requested]){--cw-detail-border:#c54a58}
+.cw-app main .cw-detail-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--cw-pane-line)}
+.cw-app main .cw-detail-card-top h2{margin:0;font-size:17px}
+.cw-app main .cw-detail-card-body dl{display:grid;grid-template-columns:140px minmax(0,1fr);gap:14px 22px;margin:28px 0 0}
+.cw-app main .cw-detail-card-body dt{color:var(--cw-secondary-ink);font-size:13px}
+.cw-app main .cw-detail-card-body dd{margin:0;min-width:0;font-size:14px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.cw-app main .cw-detail-clock{display:block;font-size:12px;color:var(--cw-secondary-ink);margin-top:3px}
+.cw-app main .cw-detail-card-footer{margin-top:26px;padding-top:22px;border-top:1px solid var(--cw-pane-line);font-size:13px}
+.cw-app main .cw-detail-card-footer h3{font-size:14px;margin:0 0 8px}
+.cw-app main .cw-detail-card-footer .cw-link{display:inline-block;margin-top:12px;font-weight:600}
+.cw-app main .cw-detail-card-footer .cw-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.cw-app[data-theme=dark] main .cw-detail-card[data-status=published]{--cw-detail-border:#57bc92}
+.cw-app[data-theme=dark] main .cw-detail-card[data-status=pending_review]{--cw-detail-border:#e3b64f}
+.cw-app[data-theme=dark] main .cw-detail-card:is([data-status=rejected],[data-status=changes_requested]){--cw-detail-border:#ed8590}
+@media(max-width:640px){.cw-app main .cw-detail-card{padding:20px}.cw-app main .cw-detail-card-body dl{grid-template-columns:1fr;gap:4px}.cw-app main .cw-detail-card-body dd{margin-bottom:14px}.cw-app main .cw-detail-card-top{align-items:flex-start;margin-bottom:20px}}
+.cw-app main .cw-detail-card-footer:empty{display:none}
+.cw-app main .cw-detail-card .cw-status:is(.rejected,.changes_requested){background:#fce7ea;color:#923440}
+.cw-app main .cw-department-visibility{min-width:0;margin:0;padding:14px 16px;border:1px solid var(--cw-pane-line);border-radius:9px}
+.cw-app main .cw-department-visibility legend{padding:0 5px;font-size:12px;font-weight:600}
+.cw-app main .cw-department-visibility label{display:inline-flex;align-items:center;gap:8px;margin:3px 20px 8px 0;cursor:pointer}
+.cw-app main .cw-department-visibility input{width:18px;height:18px;min-width:18px;min-height:18px;padding:0;margin:0;accent-color:var(--cw-blue);box-shadow:none}
+.cw-app main .cw-department-visibility p{font-size:11px}

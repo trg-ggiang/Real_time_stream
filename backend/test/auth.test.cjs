@@ -52,6 +52,10 @@ test('HTTP auth validates, hashes passwords, signs JWT and never returns passwor
   assert.equal(me.status, 200);
   assert.equal((await me.json()).passwordHash, undefined);
   assert.equal((await fetch(`${base}/api/auth/me`)).status, 401);
+  // Restoring an authenticated page must not consume the strict login-attempt allowance.
+  for (let i = 0; i < 12; i++) {
+    assert.equal((await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${session.access_token}` } })).status, 200);
+  }
   const room = await fetch(`${base}/api/livekit/token`, { method: 'POST', headers: { Authorization: `Bearer ${session.access_token}` } });
   assert.equal(room.status, 200);
   assert.ok((await room.json()).participantIdentity.startsWith('test-user:'));

@@ -1,11 +1,35 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { GuestLanding } from '../guest/GuestLanding';
 import { mergeChannelMessages } from './pages/WorkspaceChat';
 import type { ChannelMessage } from './services/workspace-api';
 
-afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.removeItem('unicircle.workspace-theme'); history.replaceState(null, '', '/'); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+const { channelSockets } = vi.hoisted(() => ({ channelSockets: [] as any[] }));
+vi.mock('./services/channel-socket', async importOriginal => {
+  const original = await importOriginal<typeof import('./services/channel-socket')>();
+  return { ...original, createChannelSocket: (_token: string, clubId: string, channelId: string) => {
+    const handlers = new Map<string, Set<(...args: any[]) => void>>();
+    const socket = {
+      connected: false,
+      on(event: string, callback: (...args: any[]) => void) { if (!handlers.has(event)) handlers.set(event, new Set()); handlers.get(event)!.add(callback); return this; },
+      receive(event: string, ...args: any[]) { handlers.get(event)?.forEach(callback => callback(...args)); },
+      connect() { this.connected = true; queueMicrotask(() => this.receive('connect')); return this; },
+      disconnect() { this.connected = false; this.receive('disconnect'); return this; },
+      removeAllListeners() { handlers.clear(); },
+      timeout() { return this; },
+      async emitWithAck(event: string, body: unknown) {
+        if (event !== 'channel:send') throw new Error('Unexpected socket event');
+        const response = await fetch(`/api/workspace/${clubId}/channels/${channelId}/messages`, { method: 'POST', body: JSON.stringify(body) });
+        return { ok: response.ok, data: await response.json() };
+      },
+    };
+    channelSockets.push(socket);
+    return socket;
+  } };
+});
+
+afterEach(() => { cleanup(); vi.useRealTimers(); channelSockets.length = 0; sessionStorage.clear(); localStorage.removeItem('unicircle.workspace-theme'); history.replaceState(null, '', '/'); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 function fixture(meetings: unknown[] = [], historyItems: unknown[] = []) {
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
   let failedSend = false;
@@ -216,6 +240,86 @@ it('merges message updates and tombstones without duplicates', () => {
   const old = { message_id: 'a', content: 'old', created_at: '2026-11-19T00:00:00Z' } as ChannelMessage;
   const incoming = { ...old, content: '', deleted_at: '2026-11-19T00:01:00Z' };
   expect(mergeChannelMessages([old], [incoming])).toEqual([incoming]);
+});
+
+it('shows a pending message immediately and replaces it once the server confirms it', async () => {
+  const { fetcher } = fixture();
+  const read = fetcher.getMockImplementation()!;
+  let finish!: (value: any) => void;
+  fetcher.mockImplementation((url, options) => {
+    if (options?.method === 'POST' && url.endsWith('/messages')) {
+      return new Promise(resolve => { finish = resolve; });
+    }
+    return read(url, options);
+  });
+  history.replaceState(null, '', '/workspace/beta/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  const field = await screen.findByRole('textbox', { name: 'Nhắn tin trong Chung' });
+  await waitFor(() => expect((field as HTMLTextAreaElement).disabled).toBe(false));
+  fireEvent.change(field, { target: { value: 'Tin nhắn chờ xác nhận' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
+  expect(screen.getByRole('article', { name: 'Tin nhắn đang gửi' })).toBeTruthy();
+  expect(within(screen.getByRole('article', { name: 'Tin nhắn đang gửi' })).getByText('Tin nhắn chờ xác nhận')).toBeTruthy();
+  await act(async () => finish({ ok: true, json: async () => ({ item: {
+    message_id: 'confirmed', sender_membership_id: 'm', sender: 'An', mine: true,
+    content: 'Tin nhắn chờ xác nhận', created_at: '2026-11-20T01:00:00Z',
+  } }) }));
+  await waitFor(() => expect(screen.queryByRole('article', { name: 'Tin nhắn đang gửi' })).toBeNull());
+  expect(screen.getAllByText('Tin nhắn chờ xác nhận')).toHaveLength(1);
+  expect((field as HTMLTextAreaElement).value).toBe('');
+});
+
+it('receives pushed messages without polling and retains the draft while disconnected', async () => {
+  const { fetcher } = fixture();
+  history.replaceState(null, '', '/workspace/beta/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  const field = await screen.findByRole('textbox', { name: 'Nhắn tin trong Chung' });
+  await waitFor(() => expect((field as HTMLTextAreaElement).disabled).toBe(false));
+  const reads = () => fetcher.mock.calls.filter(([url, options]) => url.endsWith('/messages') && options?.method !== 'POST').length;
+  const before = reads();
+  vi.useFakeTimers();
+  await act(async () => { await vi.advanceTimersByTimeAsync(9000); });
+  expect(reads()).toBe(before);
+  vi.useRealTimers();
+  await act(async () => channelSockets.at(-1).receive('channel:message', {
+    message_id: 'pushed', channel_id: 'real-general', sender_membership_id: 'other', sender: 'Bình',
+    content: 'Nhận ngay qua socket', created_at: '2026-11-20T01:00:00Z', mine: false,
+  }));
+  expect(screen.getByText('Nhận ngay qua socket')).toBeTruthy();
+  fireEvent.change(field, { target: { value: 'Bản nháp đang viết' } });
+  await act(async () => channelSockets.at(-1).disconnect());
+  expect((field as HTMLTextAreaElement).value).toBe('Bản nháp đang viết');
+  expect((field as HTMLTextAreaElement).disabled).toBe(true);
+});
+
+it('walks missed history pages after reconnect and clears messages when channel access is revoked', async () => {
+  const old = { message_id: 'old', channel_id: 'real-general', sender_membership_id: 'other', sender: 'Bình', content: 'Tin cũ', created_at: '2026-11-20T01:00:00Z' };
+  const { fetcher } = fixture([], [old]);
+  const read = fetcher.getMockImplementation()!;
+  let reconnecting = false;
+  const cursor = { before: '2026-11-20T01:02:00Z', before_id: 'cursor' };
+  fetcher.mockImplementation(async (url, options) => {
+    if (reconnecting && url.endsWith('/messages')) return { ok: true, json: async () => ({
+      items: [{ ...old, message_id: 'newest', content: 'Tin mới nhất', created_at: '2026-11-20T01:03:00Z' }], hasMore: true, cursor,
+    }) };
+    if (url.includes('/messages?')) return { ok: true, json: async () => ({
+      items: [old, { ...old, message_id: 'missed', content: 'Tin ở trang bị bỏ lỡ', created_at: '2026-11-20T01:01:00Z' }], hasMore: false, cursor: null,
+    }) };
+    return read(url, options);
+  });
+  history.replaceState(null, '', '/workspace/beta/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  await screen.findByText('Tin cũ');
+  const socket = channelSockets.at(-1);
+  await act(async () => socket.disconnect());
+  reconnecting = true;
+  await act(async () => socket.connect());
+  await screen.findByText('Tin ở trang bị bỏ lỡ');
+  expect(screen.getByText('Tin mới nhất')).toBeTruthy();
+  expect(fetcher.mock.calls.some(([url]) => url.includes('before_id=cursor'))).toBe(true);
+  await act(async () => socket.receive('channel:revoked', { message: 'Không còn quyền truy cập' }));
+  expect(screen.queryByText('Tin cũ')).toBeNull();
+  expect(screen.queryByText('Tin mới nhất')).toBeNull();
 });
 
 it('binds scheduled meetings to the club and retries a failed schedule without recreating the room', async () => {

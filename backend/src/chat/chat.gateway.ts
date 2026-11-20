@@ -59,9 +59,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       const message = await this.chat.send(identity, value);
       // Revalidate each recipient before delivery, including removal/session state.
       const recipients = [...this.server.sockets.values()].filter(peer => peer.data.identity?.sessionId === identity.sessionId);
-      await Promise.all(recipients.map(async peer => {
+      void Promise.all(recipients.map(async peer => {
         if (await this.recheck(peer)) peer.emit('chat:message', message);
-      }));
+      })).catch(() => { /* A delivery failure must not reject an already persisted message. */ });
       return { ok: true, data: message };
     } catch (cause) { return failure(cause); }
   }

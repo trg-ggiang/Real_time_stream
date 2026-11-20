@@ -19,7 +19,7 @@ beforeEach(()=>{calls=[];vi.spyOn(window,'scrollTo').mockImplementation(()=>{});
 it('saves before publishing and uses the exact new campaign timestamp',async()=>{
  mock((url,o)=>o?.method==='PATCH'?{item:{...detail.item,updated_at:'precise-saved-version'}}:o?.method==='POST'?{item:{...detail.item,status:'open'}}:url.endsWith('/departments')?{items:[{department_id:'dept',name:'Ban Kỹ thuật',status:'active'}]}:detail);
  render(<MemoryRouter initialEntries={['/workspace/club/recruitments/campaign/edit']}><ClubContext.Provider value={session}><Routes><Route path='/workspace/:clubId/recruitments/:campaignId/edit' element={<RecruitmentEditor/>}/></Routes></ClubContext.Provider></MemoryRouter>);
- fireEvent.click(await screen.findByRole('button',{name:'Đăng đợt tuyển'}));
+ fireEvent.click(await screen.findByRole('button',{name:'Đăng đợt tuyển'}));fireEvent.click(await screen.findByRole('button',{name:'X\u00e1c nh\u1eadn'}));
  await waitFor(()=>expect(calls.some(c=>c.url.endsWith('/publish'))).toBe(true));const writes=calls.filter(c=>c.options?.method==='PATCH'||c.options?.method==='POST');expect(writes.map(c=>c.options?.method)).toEqual(['PATCH','POST']);
  expect(JSON.parse(String(writes[0].options?.body)).departments[0].questions[0].sort_order).toBeUndefined();expect(JSON.parse(String(writes[1].options?.body)).expected_updated_at).toBe('precise-saved-version');
 });

@@ -2,11 +2,10 @@ import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from '@phosphor-icons/react/dist/csr/ArrowLeft';
 import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
-import { LinkSimple } from '@phosphor-icons/react/dist/csr/LinkSimple';
-import { CreateMeetingForm, ScheduleSessionForm, type CreateValues } from './components/MeetingForms';
+import { ScheduleSessionForm } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
 import { useSessionFlow } from './hooks/use-session-flow';
-import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, parseMeetingCode, parseMeetingInvite, roleLabels, type Member, type Membership, type MeetingOverview, type MeetingSession } from './services/meetings-api';
+import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, parseMeetingCode, roleLabels, type Member, type MeetingOverview } from './services/meetings-api';
 import './meeting.css';
 import './workspace.css';
 import { UnauthorizedError } from './services/token-api';
@@ -28,14 +27,9 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
   const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState('');
   const [sessionPage, setSessionPage] = useState(0);
   const [people, setPeople] = useState<Record<string, Member[]>>({});
-  const contexts = useRef(new Map<string, { membership: Membership; recurrenceRule: string | null }>());
-  const enrich = useCallback((data: MeetingOverview): MeetingOverview => {
-    const context = contexts.current.get(data.meeting.meetingCode);
-    return context ? { ...data, membership: context.membership, meeting: { ...data.meeting, recurrenceRule: context.recurrenceRule } } : data;
-  }, []);
   const onMembersChanged = useCallback((meetingId: string, members: Member[]) => setPeople(previous => ({ ...previous, [meetingId]: members })), []);
   const [showSchedule, setShowSchedule] = useState(false), [now, setNow] = useState(Date.now);
-  const lock = useRef(false), revision = useRef(0), actionController = useRef<AbortController | null>(null);
+  const lock = useRef(false), revision = useRef(0);
   const name = displayName.trim() || 'Bạn';
   const initials = Array.from(name)[0]?.toLocaleUpperCase('vi') || 'B';
   const requestedSessionId = flow.active?.sessionId || selectedId;
@@ -65,9 +59,9 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     const sequence = ++revision.current;
     try {
       const data = await meetingRequest<MeetingOverview>(accessToken, `/${encodeURIComponent(parseMeetingCode(code))}/sessions`);
-      if (sequence === revision.current) { setOverview(enrich(data)); setError(''); }
+      if (sequence === revision.current) { setOverview(data); setError(''); }
     } catch (cause) { if (sequence === revision.current) { setError(cause instanceof Error ? cause.message : 'Không tải được cuộc họp.'); report(cause); } }
-  }, [code, accessToken, report, enrich]);
+  }, [code, accessToken, report]);
 
   useEffect(() => {
     const controller = new AbortController(); const sequence = ++revision.current;
@@ -77,12 +71,12 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     try {
       const parsed = parseMeetingCode(code);
       void meetingRequest<MeetingOverview>(accessToken, `/${parsed}/sessions`, { signal: controller.signal })
-        .then(data => { if (!controller.signal.aborted && sequence === revision.current) setOverview(enrich(data)); })
+        .then(data => { if (!controller.signal.aborted && sequence === revision.current) setOverview(data); })
         .catch(cause => { if (!controller.signal.aborted) { setError(cause instanceof Error ? cause.message : 'Không tải được cuộc họp.'); report(cause); } })
         .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     } catch (cause) { setLoading(false); setError(cause instanceof Error ? cause.message : 'Mã không hợp lệ.'); }
     return () => controller.abort();
-  }, [code, accessToken, report, enrich]);
+  }, [code, accessToken, report]);
 
   useEffect(() => {
     if (!code || !overview) return;
@@ -95,7 +89,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
   useEffect(() => {
     const navigateBack = () => { void flow.leave(); setCode(codeFromUrl()); setSelectedId(sessionFromUrl()); setNotice(''); };
     window.addEventListener('popstate', navigateBack);
-    return () => { actionController.current?.abort(); window.removeEventListener('popstate', navigateBack); };
+    return () => { window.removeEventListener('popstate', navigateBack); };
   }, [flow.leave]);
   const hasScheduledSessions = !!overview?.sessions.some(session => session.status === 'scheduled');
   useEffect(() => {
@@ -105,36 +99,6 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     return () => clearInterval(timer);
   }, [!!flow.active, hasScheduledSessions, flow.waiting?.retryAt]);
 
-  function openMeeting(nextCode: string, sessionId = '') {
-    const url = new URL(window.location.href);
-    if (nextCode) url.searchParams.set('meeting', nextCode); else url.searchParams.delete('meeting');
-    if (sessionId) url.searchParams.set('session', sessionId); else url.searchParams.delete('session');
-    window.history.pushState(null, '', url); setCode(nextCode); setSelectedId(sessionId); setNotice('');
-  }
-  async function create(values: CreateValues, quick: boolean) {
-    if (lock.current) return;
-    lock.current = true; setBusy(true); setError('');
-    const controller = new AbortController(); actionController.current = controller;
-    try {
-      const result = await meetingRequest<{ meeting_id: string; meeting_code: string; created_by: string; session?: MeetingSession }>(accessToken, quick ? '/quick' : '', {
-        method: 'POST', body: { title: values.title, waitingRoomEnabled: values.waitingRoomEnabled, ...(!quick ? { recurrenceRule: values.recurrenceRule } : {}) }, signal: controller.signal,
-      });
-      if (controller.signal.aborted) return;
-      contexts.current.set(result.meeting_code, { membership: { userId: result.created_by, role: 'host', invitedAt: null }, recurrenceRule: values.recurrenceRule });
-      openMeeting(result.meeting_code, result.session?.session_id);
-      if (!quick && values.scheduledStartAt && values.scheduledEndAt) {
-        try {
-          await meetingRequest(accessToken, `/${result.meeting_id}/sessions`, { method: 'POST', body: { scheduledStartAt: values.scheduledStartAt, scheduledEndAt: values.scheduledEndAt }, signal: controller.signal });
-        } catch (cause) {
-          setShowSchedule(true); setNotice('Cuộc họp đã được tạo. Lịch hẹn chưa lưu thành công; hãy dùng Lên lịch để thử lại.'); throw cause;
-        }
-      }
-      const data = await meetingRequest<MeetingOverview>(accessToken, `/${result.meeting_code}/sessions`, { signal: controller.signal });
-      if (!controller.signal.aborted) setOverview(enrich(data));
-      if (quick && result.session) await flow.join(result.meeting_code, result.meeting_id, result.session.session_id);
-    } catch (cause) { if (!controller.signal.aborted) report(cause); }
-    finally { lock.current = false; if (!controller.signal.aborted) setBusy(false); }
-  }
   async function schedule(values: { scheduledStartAt: string; scheduledEndAt: string }) {
     if (!overview || lock.current) return;
     lock.current = true; setBusy(true);
@@ -153,7 +117,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     if (flow.active && overview?.sessions.find(session => session.session_id === flow.active?.sessionId)?.status === 'ended') flow.sessionEnded();
   }, [flow.active, overview, flow.sessionEnded]);
 
-  return <div className={`meeting-app${flow.active ? ' meeting-app--incall' : ''}`} data-theme={theme}>
+  return <div className={`meeting-app meeting-room-page${flow.active ? ' meeting-app--incall' : ''}`} data-theme={theme}>
     <a className="meeting-skip" href="#meeting-main">Đến nội dung chính</a>
     <header className="meeting-topbar"><div className="meeting-brand"><UniCircleLogo /></div>
       {onBack && <button className="meeting-home-link" type="button" onClick={() => { void flow.leave(); onBack(); }}><ArrowLeft size={17} aria-hidden="true" />Trang chủ</button>}
@@ -167,7 +131,6 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
         <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} accessToken={accessToken} onLeave={() => void flow.leave()} onEnded={flow.ended}
           management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} /></Suspense>
       </> : code ? <>
-        <button className="workspace-back" type="button" disabled={busy || flow.busy} onClick={async () => { await flow.leave(); openMeeting(''); }}><ArrowLeft size={18} aria-hidden="true" />Tổng quan</button>
         {loading ? <p role="status" className="meeting-loading">Đang tải cuộc họp…</p> : overview ? <>
           <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><button className="workspace-icon meeting-share-button" type="button" title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn" disabled={!!requestedSessionId && !selected} onClick={() => void copyLink(selected?.session_id)}><ShareNetwork size={22} aria-hidden="true" /></button></div>
           {requestedSessionId && !selected ? <p role="status">Buổi họp trong đường dẫn không còn khả dụng. Hãy kiểm tra link hoặc chọn một buổi bên dưới.</p> : null}
@@ -197,22 +160,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
           {canManageSessions(overview.membership) ? <details className="lobby-management"><summary>Quản lý cuộc họp</summary><MeetingManagement key={`${code}:${selected?.session_id || ''}`} accessToken={accessToken} overview={overview} sessionId={selected?.session_id} knownMembers={people[overview.meeting.meetingId] || []} onMembersChanged={onMembersChanged} onChanged={refresh} onError={reportAdmin} onSessionEnded={onSessionEnded} /></details> : null}
           </div>
         </> : <button type="button" onClick={() => void refresh()}>Thử tải lại</button>}
-      </> : <>
-        <div className="workspace-welcome"><span>Xin chào, {name}</span><h1>Bạn muốn gặp ai hôm nay?</h1></div>
-        <div className="workspace-dashboard lobby-dashboard">
-          <section className="workspace-join lobby-join" aria-labelledby="join-title">
-            <span className="lobby-join-symbol" aria-hidden="true"><LinkSimple size={30} /></span>
-            <div className="workspace-section-title"><h2 id="join-title">Tham gia cuộc họp</h2></div>
-            <form className="workspace-form" onSubmit={event => { event.preventDefault(); try { setError(''); const invite = parseMeetingInvite(String(new FormData(event.currentTarget).get('code'))); openMeeting(invite.code, invite.sessionId); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Mã không hợp lệ.'); } }}>
-              <label htmlFor="meeting-code">Mã hoặc đường dẫn mời</label>
-              <div className="lobby-code-field"><LinkSimple size={21} aria-hidden="true" /><input id="meeting-code" name="code" required autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="Mã ..." aria-invalid={!!error} aria-describedby={error ? 'join-code-error' : undefined} /></div>
-              {error ? <p id="join-code-error" className="notice error" role="alert">{error}</p> : null}
-              <button type="submit" disabled={busy}>Mở cuộc họp</button>
-            </form>
-          </section>
-          <CreateMeetingForm busy={busy} onCreate={create} />
-        </div>
-      </>}
+      </> : null}
     </main>
   </div>;
 }

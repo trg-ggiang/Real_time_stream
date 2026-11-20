@@ -1,3 +1,5 @@
+import { confirmAction } from '../../../shared/lib/confirm-action';
+import { ImageUpload } from '../../../shared/components/ImageUpload';
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   Link,
@@ -21,7 +23,7 @@ import {
   ContentImage,
   LinkedText,
 } from "../../discovery/components/PublicContent";
-import { publicDate } from "../../../shared/lib/content-format";
+import { publicDate, publicDateOnly, publicDateRange, publicTime } from "../../../shared/lib/content-format";
 import { useUnsavedChanges } from "../../../shared/lib/use-unsaved-changes";
 export function ContentList({ kind }: { kind: ContentKind }) {
   const { token, clubId, membership } = useClub();
@@ -130,11 +132,11 @@ export function ContentDetail({ kind }: { kind: ContentKind }) {
   async function review(decision: string) {
     if (
       !item ||
-      !window.confirm(
+      !(await confirmAction(
         decision === "published"
           ? "Duyệt và đăng nội dung này?"
           : "Gửi yêu cầu chỉnh sửa cho tác giả?",
-      )
+      ))
     )
       return;
     const r = await mutation.run((signal) =>
@@ -173,9 +175,6 @@ export function ContentDetail({ kind }: { kind: ContentKind }) {
       </Link>
       <div className="cw-heading">
         <div>
-          <span className={`cw-status ${item.publication_status}`}>
-            {contentStatus(item.publication_status)}
-          </span>
           <h1>{item.title}</h1>
           <p>{item.summary}</p>
         </div>
@@ -197,22 +196,21 @@ export function ContentDetail({ kind }: { kind: ContentKind }) {
           alt="Ảnh nội dung CLB"
         />
       )}
-      <div className="cw-detail-grid">
-        <article className="cw-panel cw-reading">
+      <article className="cw-panel cw-reading cw-detail-card" data-status={item.publication_status}>
+        <header className="cw-detail-card-top"><h2>{kind === 'activities' ? 'Thông tin hoạt động' : 'Nội dung bài viết'}</h2><span className={`cw-status ${item.publication_status}`}>{contentStatus(item.publication_status)}</span></header>
+        <div className="cw-detail-card-body">
           <div className="cw-long-text">
             <LinkedText text={item.content || item.description} />
           </div>
           {kind === "activities" && (
             <dl>
-              <dt>Bắt đầu</dt>
-              <dd>{publicDate(item.starts_at)}</dd>
-              <dt>Kết thúc</dt>
-              <dd>{publicDate(item.ends_at)}</dd>
+              <dt>Thời gian</dt>
+              <dd><time dateTime={item.starts_at}>{publicDateRange(item.starts_at, item.ends_at)}</time><small className="cw-detail-clock">{[publicTime(item.starts_at), publicTime(item.ends_at)].filter(Boolean).join('–')}</small></dd>
               <dt>Địa điểm</dt>
               <dd>{item.location_name || "Trực tuyến"}</dd>
               <dt>Hạn đăng ký</dt>
               <dd>
-                {publicDate(item.registration_closes_at || item.starts_at)}
+                <time dateTime={item.registration_closes_at || item.starts_at}>{publicDateOnly(item.registration_closes_at || item.starts_at)}</time><small className="cw-detail-clock">{publicTime(item.registration_closes_at || item.starts_at)}</small>
               </dd>
               {item.join_url && (
                 <>
@@ -224,10 +222,9 @@ export function ContentDetail({ kind }: { kind: ContentKind }) {
               )}
             </dl>
           )}
-        </article>
-        <aside className="cw-panel">
-          <h2>Trạng thái nội dung</h2>
-          <p>{contentStatus(item.publication_status)}</p>
+          {kind === 'posts' && <dl><dt>{item.published_at ? 'Ngày đăng' : 'Cập nhật'}</dt><dd><time dateTime={item.published_at || item.updated_at}>{publicDateOnly(item.published_at || item.updated_at)}</time></dd></dl>}
+        </div>
+        <footer className="cw-detail-card-footer">
           {item.review_note && (
             <>
               <h3>Phản hồi của chủ nhiệm</h3>
@@ -281,8 +278,8 @@ export function ContentDetail({ kind }: { kind: ContentKind }) {
                 Xem trang công khai ↗
               </Link>
             )}
-        </aside>
-      </div>
+        </footer>
+      </article>
     </>
   );
 }
@@ -298,6 +295,8 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
   const { token, clubId, membership } = useClub();
   const navigate = useNavigate();
   const mutation = useWorkspaceMutation();
+  const [uploading, setUploading] = useState(false);
+  const busy = mutation.busy || uploading;
   const initialId = useRef(id || crypto.randomUUID());
   const [values, setValues] = useState<Record<string, string>>({
     format: "onsite",
@@ -371,7 +370,7 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
             required={options.required}
             minLength={options.min}
             maxLength={options.max || 50000}
-            disabled={mutation.busy}
+            disabled={busy}
             onChange={(e) => change(key, e.target.value)}
           />
         ) : (
@@ -383,7 +382,7 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
             minLength={options.min}
             maxLength={options.max}
             min={options.type === "number" ? 1 : undefined}
-            disabled={mutation.busy}
+            disabled={busy}
             onChange={(e) => change(key, e.target.value)}
           />
         )}
@@ -397,6 +396,7 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
   }
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy) return;
     const action =
       (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value") ||
       "draft";
@@ -505,7 +505,7 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
       <form
         className="cw-panel cw-editor"
         onSubmit={save}
-        aria-busy={mutation.busy}
+        aria-busy={busy}
       >
         <div className="cw-form-grid">
           {field("title", "Tiêu đề", { required: true, min: 2, max: 200 })}
@@ -515,14 +515,14 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
             "Nội dung chi tiết",
             { required: true, min: 10, multiline: true },
           )}
-          {field("cover_url", "URL ảnh bìa", { type: "url", max: 2048 })}
+          <ImageUpload token={token} label="Ảnh bìa" value={values.cover_url} disabled={busy} onBusyChange={setUploading} onChange={url => change('cover_url', url)} />
           {kind === "posts" ? (
             <label>
               Phạm vi bài viết
               <select
                 value={values.visibility}
                 onChange={(e) => change("visibility", e.target.value)}
-                disabled={mutation.busy}
+                disabled={busy}
               >
                 <option value="public">Công khai</option>
                 <option value="internal">Nội bộ CLB</option>
@@ -543,7 +543,7 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
                 <select
                   value={values.format}
                   onChange={(e) => change("format", e.target.value)}
-                  disabled={mutation.busy}
+                  disabled={busy}
                 >
                   <option value="onsite">Trực tiếp</option>
                   <option value="online">Trực tuyến</option>
@@ -582,16 +582,16 @@ export function ContentEditor({ kind }: { kind: ContentKind }) {
           </p>
         )}
         <div className="cw-actions">
-          <button type="submit" value="draft" disabled={mutation.busy}>
+          <button type="submit" value="draft" disabled={busy}>
             Lưu bản nháp
           </button>
           <button
             type="submit"
             value="submit"
             className="cw-primary"
-            disabled={mutation.busy}
+            disabled={busy}
           >
-            {mutation.busy
+            {busy
               ? "Đang lưu…"
               : kind === "activities" && membership.role === "chairperson"
                 ? "Đăng hoạt động"

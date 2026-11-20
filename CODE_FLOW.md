@@ -1,5 +1,7 @@
 # Real-time Stream — luồng hoạt động của hệ thống
 
+> Realtime update 2026-11-20: club messages use Socket.IO `/workspace-chat`; history uses HTTP only on connection/reconnection/pagination. Meeting messages use `/chat`. Older polling/meeting-overview descriptions below are historical; see [current transport and room decisions](docs/work-logs/2026-11-20-11-phase-04-realtime-chat-room-cleanup.mdx). Meetings still open as a separate full-page view; only the duplicate overview was removed.
+
 Tài liệu này mô tả luồng đang có trong source: ứng dụng React/Vite, API NestJS,
 Supabase và LiveKit Cloud. Đây là hướng dẫn đọc code, không phải thiết kế cho các
 workflow chưa triển khai.
