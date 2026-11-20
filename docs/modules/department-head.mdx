@@ -1,0 +1,60 @@
+---
+title: Giao và gỡ trưởng ban
+description: Quyền trưởng ban trong CLB và thông báo chỉ tại landing page.
+---
+
+## Cài đặt
+
+Chạy toàn bộ `supabase/migrations/202611200001_department_head_notifications.sql`
+trên Supabase development bằng SQL Editor rồi restart backend. Migration yêu cầu
+schema clubspace v2 đã có `clubspace_set_department_head`, các helper phân quyền,
+`club_memberships`, `club_departments` và `notifications`. Không cần các migration
+tuyển dụng ở phiên/nhánh khác. Không tạo bảng mới hoặc đổi luồng chuyển chủ nhiệm.
+Phiên phát triển chỉ kiểm thử DB tạm, chưa áp dụng SQL lên Supabase thật.
+
+## Luồng sử dụng
+
+1. Chủ nhiệm mở CLB tham gia → Khác → Thành viên.
+2. Với thành viên trong ban thường đang hoạt động, bấm Chuyển trưởng ban và xác
+   nhận. Người này giữ nguyên ban và chuyển từ member thành head.
+3. Với head, bấm Gỡ trưởng ban để chuyển lại thành member, vẫn giữ nguyên ban.
+   Gỡ quyền trước khi chuyển ban hoặc gỡ khỏi CLB.
+4. Profile → Tổng quan → Cộng đồng của bạn hiển thị Trưởng ban theo membership.
+5. Người được bổ nhiệm nhận thông báo trong chuông trên landing `/` (poll 15 giây
+   hoặc khi tab nhận focus). Mở chuông đánh dấu thông báo đến thời điểm snapshot
+   đã xem; số bên ngoài biến mất sau khi lưu thành công. Thông báo mới sau mốc
+   đó vẫn chưa đọc. Lịch sử thông báo giữ lại, tối đa 50 mục gần nhất được hiển thị.
+6. Gỡ trưởng ban không phát thông báo bổ nhiệm. Đóng/mở lại và đăng nhập lại không
+   khôi phục số của thông báo đã đọc. Chuông này không được gắn vào trang khác.
+
+## API và phân quyền
+
+| Endpoint | Chức năng |
+| --- | --- |
+| PATCH `/api/workspace/:clubId/members/:id/head` | Body `is_head`, `expected_updated_at`; actor từ JWT; chỉ chủ nhiệm đúng CLB |
+| GET `/api/me/head-notifications` | Inbox và số chưa đọc của chính người dùng, loại department.head_assigned |
+| PUT `/api/me/head-notifications/read` | Body `through` từ snapshot GET; recipient lấy từ JWT |
+
+Role head là quyền theo membership/ban, không phải role toàn hệ thống. Chuyển chủ
+nhiệm tiếp tục dùng POST transfer-chair và RPC clubspace_transfer_chair cũ. Chức
+năng head không gọi hàm này và chặn thay đổi role của chủ nhiệm.
+
+RPC head dùng optimistic version và khóa hàng; ghi role/audit/notification trong
+cùng transaction. Các RPC chỉ được service_role gọi. Số lượng head của mỗi ban
+giữ theo quy tắc DB hiện có; không tự gỡ một head khác khi bổ nhiệm thêm người.
+
+## Kiểm tra
+
+Typecheck/build đạt, 99 frontend và 49 backend tests đạt. PostgreSQL 17 single-user
+regression kiểm tra SQL, quyền, bảo vệ chủ nhiệm, stale version, promote/revoke/
+reappoint, read cutoff/ownership và rollback khi notification insert lỗi.
+Fixtures là schema tối thiểu với helper/guard trích từ export ngày 19/11, không
+phải toàn bộ Supabase. Chưa nghiệm thu UI/live writes/concurrency bằng DB thật.
+
+## Test thủ công
+
+Dùng một chủ nhiệm và một thành viên ban thường ở hai trình duyệt. Bổ nhiệm →
+kiểm tra role card/chuông landing → mở chuông và refresh để xác nhận số đã mất →
+gỡ quyền → kiểm tra card trở về Thành viên → bổ nhiệm lại để nhận thông báo mới.
+Kiểm tra member/head không tự cấp quyền, chủ nhiệm CLB khác bị chặn và tài khoản
+khác không được xem hoặc đánh dấu thông báo của người nhận.

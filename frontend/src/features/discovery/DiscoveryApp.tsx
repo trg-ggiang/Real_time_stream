@@ -13,7 +13,7 @@ import { List } from "@phosphor-icons/react/dist/csr/List";
 import { X } from "@phosphor-icons/react/dist/csr/X";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
-import { Bell } from "@phosphor-icons/react/dist/csr/Bell";
+import { HeadNotifications } from "./components/HeadNotifications";
 import { UserRectangle } from "@phosphor-icons/react/dist/csr/UserRectangle";
 import { Users } from "@phosphor-icons/react/dist/csr/Users";
 import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
@@ -28,6 +28,7 @@ import { PersonalApp } from "../personal/PersonalApp";
 import { AdminApp } from "../admin/AdminApp";
 import { WorkspaceApp } from "../club-workspace/WorkspaceApp";
 import { WorkspaceHub } from "../club-workspace/WorkspaceHub";
+import { RecruitmentApply,RecruitmentPublicDetail,RecruitmentPublicList } from '../recruitment/PublicRecruitment';
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -190,15 +191,7 @@ export function DiscoveryApp({
           </nav>
           <div className="dc-account">
             {viewer && isHome && (
-              <details className="dc-notifications" ref={notifications}>
-                <summary aria-label="Thông báo">
-                  <Bell size={22} aria-hidden="true" />
-                </summary>
-                <div className="dc-account-menu dc-notification-panel">
-                  <h2>Thông báo</h2>
-                  <p>Tính năng nhận thông báo chưa được kết nối.</p>
-                </div>
-              </details>
+              <HeadNotifications key={accessToken || "guest"} token={accessToken} panelRef={notifications} />
             )}
             {viewer ? (
               <details ref={accountMenu}>
@@ -254,6 +247,9 @@ export function DiscoveryApp({
       <main id="public-content" ref={main} tabIndex={-1}>
         <Routes>
           <Route path="/" element={<DiscoveryHome />} />
+          <Route path="/recruitments" element={<RecruitmentPublicList />} />
+          <Route path="/recruitments/:campaignId" element={<RecruitmentPublicDetail token={accessToken} />} />
+          <Route path="/recruitments/:campaignId/apply" element={<RecruitmentApply token={accessToken} />} />
           {(["clubs", "activities", "posts"] as const).map((kind) => (
             <Route
               key={kind}

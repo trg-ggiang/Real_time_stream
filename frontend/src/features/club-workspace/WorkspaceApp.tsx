@@ -33,6 +33,7 @@ import {
   ReviewHome,
 } from "./pages/WorkspaceHome";
 import "./workspace.css";
+import { WorkspaceRecruitment,RecruitmentEditor,RecruitmentQueue,RecruitmentApplicationDetail } from '../recruitment/WorkspaceRecruitment';
 import './workspace-polish.css';
 import './workspace-theme.css';
 import { channelLabel } from './channel-label';
@@ -153,6 +154,7 @@ function WorkspaceScope({
               <NavLink to={`${base}/posts/new`}>Viết bài</NavLink>
               <NavLink to={`${base}/posts`} end>Bài viết</NavLink>
               <NavLink to={`${base}/activities`} end>Hoạt động</NavLink>
+                {(chair||ctx.membership.role==='head')&&<NavLink to={`${base}/recruitments`}>Tuyển thành viên</NavLink>}
               <NavLink to={`${base}/meetings`}>Phòng họp</NavLink>
               <NavLink to={`${base}/recurring-meetings`}>Tạo họp định kỳ</NavLink>
               {chair && <NavLink to={`${base}/review`}>Duyệt nội dung</NavLink>}
@@ -163,6 +165,11 @@ function WorkspaceScope({
           {!inChannel && <header className="cw-topbar"><span>{ctx.club.name}</span><span>{viewer?.displayName} · {chair ? "Chủ nhiệm" : ctx.membership.role === "head" ? "Trưởng ban" : "Thành viên"}</span></header>}
           <main id="workspace-content" ref={main} tabIndex={-1} className={inChannel ? "cw-channel-main" : undefined}>
             <Routes>
+              <Route path={`${base}/recruitments`} element={chair||ctx.membership.role==='head'?<WorkspaceRecruitment />:<Denied />} />
+              <Route path={`${base}/recruitments/new`} element={chair?<RecruitmentEditor />:<Denied />} />
+              <Route path={`${base}/recruitments/:campaignId/edit`} element={chair||ctx.membership.role==='head'?<RecruitmentEditor />:<Denied />} />
+              <Route path={`${base}/recruitments/:campaignId/applications`} element={chair||ctx.membership.role==='head'?<RecruitmentQueue />:<Denied />} />
+              <Route path={`${base}/recruitments/:campaignId/applications/:applicationId`} element={chair||ctx.membership.role==='head'?<RecruitmentApplicationDetail />:<Denied />} />
               <Route path={base} element={<WorkspaceOverview />} />
               <Route path={`${base}/channels/:channel`} element={<WorkspaceChannel />} />
               {(["posts", "activities"] as const).map((kind) => (

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -74,7 +75,7 @@ export class WorkspacePeople {
     const r = await this.db
       .from("club_memberships")
       .select(
-        "membership_id,user_id,role,department_id,joined_at,users(display_name,avatar_url),club_departments(name)",
+        "membership_id,user_id,role,department_id,joined_at,updated_at,users(display_name,avatar_url),club_departments(name)",
         { count: "exact" },
       )
       .eq("club_id", clubId)
@@ -194,6 +195,19 @@ export class WorkspacePeople {
     });
     this.access.check(r.error);
     return { transferred: true };
+  }
+  async setHead(userId: string, clubId: string, id: string, isHead: boolean, expected: string) {
+    await this.access.require(userId, clubId, true);
+    const target = await this.target(clubId, id);
+    if (target.role === "chairperson") throw new ForbiddenException("Không thể đổi vai trò trưởng ban của chủ nhiệm.");
+    const r = await this.db.rpc("clubspace_set_department_head", {
+      p_actor: userId, p_membership: id, p_is_head: isHead, p_expected_updated_at: expected,
+    });
+    if (r.error?.code === "42501") throw new ForbiddenException("Chỉ chủ nhiệm CLB được thay đổi trưởng ban.");
+    if (r.error?.code === "40001") throw new ConflictException("Thành viên đã thay đổi. Hãy tải lại danh sách.");
+    if (r.error?.code === "22023") throw new BadRequestException("Chọn thành viên trong ban thường đang hoạt động của CLB.");
+    this.access.check(r.error);
+    return { updated: true };
   }
   async contact(userId: string, clubId: string, input: ContactDto) {
     await this.access.require(userId, clubId, true);

@@ -12,7 +12,7 @@
 - **Tài khoản** yêu cầu hoàn thiện hồ sơ sau khi đăng ký hoặc khi đăng nhập bằng tài khoản còn thiếu hồ sơ. Sinh viên mặc định về `/`, admin về `/admin`, còn đích nội bộ hợp lệ được giữ. Trang `/me` chứa hồ sơ, theo dõi CLB, hoạt động đã đăng ký và lịch sử đề nghị thành lập CLB.
 - **Không gian sinh hoạt** tại `/workspace` có kênh Chung/kênh ban, chat lưu trên Supabase, quản lý thành viên/ban, nội dung và lịch họp gắn CLB.
 - **Quản trị** tại `/admin` có danh sách CLB và quy trình duyệt hoặc từ chối đề nghị thành lập.
-- **Meeting** dùng LiveKit Cloud cho media, NestJS/Supabase cho phiên/quyền vào, Socket.IO cho chat theo phiên. Chat CLB là luồng riêng qua HTTP polling. Module tuyển dụng/phỏng vấn chưa nối vào workspace.
+- **Meeting** dùng LiveKit Cloud cho media, NestJS/Supabase cho phiên/quyền vào, Socket.IO cho chat theo phiên. Chat CLB là luồng riêng qua HTTP polling. Tuyển thành viên đã nối vào workspace; phỏng vấn chưa triển khai.
 
 ## Cài đặt và cấu hình
 
@@ -101,3 +101,19 @@ Tham khảo [quy tắc gitignore](https://git-scm.com/docs/gitignore) và [xử 
 Bản SQL mở rộng CLB, tuyển dụng, kênh và thông báo được theo dõi trong [gói migration 17/11](output/unicircle-platform-migration-20261117/README.md). Thư mục `supabase/migrations/` ở root hiện chứa migration điều khiển và chat cuộc họp. Khi dựng môi trường mới, kiểm tra schema nền và preflight của gói trước khi áp dụng. Các bảng trong migration có thể phục vụ nghiệp vụ tương lai ngay cả khi ứng dụng chưa gọi chúng.
 
 Lượt rà gần nhất đạt **44 test backend và 94 test frontend**. Đã thử UI với API mô phỏng và kiểm tra chỉ đọc quyền kênh trên Supabase. Nghiệm thu ghi thật và LiveKit hai thiết bị vẫn còn. Xem [bàn giao workspace](docs/design/phase-04-club-workspace.md) để chọn việc cho phiên tiếp theo. [Tổng kết PoC](PHASE_05_SUMMARY.md) lưu lịch sử triển khai media ban đầu.
+
+## Trưởng ban — cập nhật 20/11/2026
+
+Chủ nhiệm vào Khác → Thành viên, dùng Chuyển trưởng ban/Gỡ trưởng ban để đổi
+member/head trong ban hiện tại. Vai trò hiển thị tại tổng quan cá nhân; chuông
+landing nhận thông báo bổ nhiệm và bỏ số khi xem. Cần chạy migration
+`supabase/migrations/202611200001_department_head_notifications.sql`, restart
+backend rồi test hai tài khoản. Xem [hướng dẫn](docs/modules/department-head.mdx).
+
+## Tuyển thành viên - cập nhật 20/11/2026
+
+Đã có tạo/đăng đợt, form 11 loại trường, ứng tuyển, duyệt theo ban và thông báo
+trên landing. Chạy migration `supabase/migrations/202611200002_recruitment_workflow.sql`
+rồi restart backend trước khi test. Xem [hướng dẫn tuyển thành viên](docs/modules/club-recruitment.mdx).
+Build đạt; 60 test backend, 106 test frontend và regression SQL tạm đạt.
+Chưa áp dụng migration hoặc nghiệm thu ghi trên DB development thật.

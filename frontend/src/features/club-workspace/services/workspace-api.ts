@@ -30,6 +30,7 @@ export interface Department {
   status: "active" | "inactive";
 }
 export interface Member {
+  updated_at: string;
   membership_id: string;
   user_id: string;
   role: "chairperson" | "head" | "member";

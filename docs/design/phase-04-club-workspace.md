@@ -102,4 +102,25 @@ Các route `my-clubs` cũ vẫn giữ tương thích; shell mới không sử d�
 | 3 | Khôi phục tạo lịch sau khi rời trang, xử lý buổi đã hủy và chốt quyền vào họp qua mã | `WorkspaceMeetings.tsx`, `meetings.service.ts` |
 | 4 | Sửa câu giới thiệu chat ở trang Ban, thống nhất nhãn Trưởng ban, rà theme tối của form họp và vị trí nút theme mobile | `WorkspacePeople.tsx`, `WorkspaceApp.tsx`, `workspace-theme.css` |
 
-Khi nghiệm thu, dùng các tài khoản test có vai trò khác nhau ở cùng CLB. Ghi lại ca thử thật và ca mô phỏng. Dùng [preflight chỉ đọc](../../supabase/verification/phase-04-workspace-preflight.sql) và [gói SQL mở rộng](../../output/unicircle-platform-migration-20261117/README.md) để đối chiếu schema. Thực hiện migration, seed hoặc nghiệm thu ghi dữ liệu trong môi trường đã được nhóm chọn. Tuyển dụng/phỏng vấn, thông báo và duyệt sửa tên/mô tả CLB vẫn là các luồng chưa nối vào workspace.
+Khi nghiệm thu, dùng các tài khoản test có vai trò khác nhau ở cùng CLB. Ghi lại ca thử thật và ca mô phỏng. Dùng [preflight chỉ đọc](../../supabase/verification/phase-04-workspace-preflight.sql) và [gói SQL mở rộng](../../output/unicircle-platform-migration-20261117/README.md) để đối chiếu schema. Thực hiện migration, seed hoặc nghiệm thu ghi dữ liệu trong môi trường đã được nhóm chọn. Tuyển thành viên và thông báo đã nối vào workspace ở cập nhật 20/11 bên dưới. Phỏng vấn và duyệt sửa tên/mô tả CLB còn chưa triển khai.
+
+## Trưởng ban — cập nhật 20/11/2026
+
+Chủ nhiệm vào Khác → Thành viên, dùng Chuyển trưởng ban/Gỡ trưởng ban để đổi
+member/head trong ban hiện tại. Vai trò hiển thị tại tổng quan cá nhân; chuông
+landing nhận thông báo bổ nhiệm và bỏ số khi xem. Cần chạy migration
+`supabase/migrations/202611200001_department_head_notifications.sql`, restart
+backend rồi test hai tài khoản. Xem [hướng dẫn](../modules/department-head.mdx).
+
+## Tuyển thành viên - cập nhật 20/11/2026
+
+Mục Công việc CLB → Tuyển thành viên chỉ cho chair/head. Chair tạo draft/đăng/đóng
+và duyệt mọi ban; head chỉ xem/duyệt đơn đúng ban mình. Editor/queue/detail thay
+vùng giữa, giữ workspace shell. Bài đã đăng vào activities feed và trang CLB;
+applicant điền form, xem lại, xác nhận rồi theo dõi ở Không gian cá nhân.
+Duyệt thêm member đúng ban trong cùng transaction với kết quả và thông báo.
+Chuông landing giữ luồng bổ nhiệm trưởng ban và mở rộng đơn/kết quả tuyển.
+Cần migration 202611200002 và restart backend; xem
+[hướng dẫn](../modules/club-recruitment.mdx) và
+[work log](../work-logs/2026-11-20-02-phase-04-recruitment-workflow.mdx).
+Chưa nghiệm thu Supabase thật; Phase 04 vẫn In Progress.

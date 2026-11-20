@@ -1,0 +1,74 @@
+---
+title: Phase 04 - Danh sách đợt tuyển và đơn cá nhân
+description: Hiển thị từng dòng, thứ tự thời gian, màu trạng thái và nút thao tác.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-03
+- Thời gian bắt đầu/kết thúc: không có mốc bắt đầu chính xác; ghi kết quả ngày 20/11/2026, Asia/Saigon (+07:00).
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đổi danh sách tuyển của chair/head thành mỗi đợt một dòng theo hạn kết thúc,
+nút chi tiết/đơn rõ ràng, màu trạng thái khác nhau, bỏ preview nội dung bài.
+Đơn sinh viên mỗi dòng một đơn, mới nhất trước, màu kết quả và nút Mở CLB cuối dòng.
+
+## Công việc hoàn thành
+
+- `backend/src/recruitment/recruitment.service.ts`: quản lý sắp theo
+  application_closes_at tăng dần trước phân trang, giữ campaign_id làm thứ tự
+  phụ ổn định. Cá nhân giữ submitted_at giảm dần.
+- `WorkspaceRecruitment.tsx`: mỗi đợt một dòng; hai link thành nút Xem chi tiết
+  và Đơn ứng tuyển; bỏ state/nút/nội dung preview bài tuyển. Giữ preview form.
+- `WorkspaceApp.tsx` và editor: head xem chi tiết ở chế độ chỉ đọc, chair sửa
+  draft như trước. Head không có nút lưu/đăng/đóng, API quyền ghi giữ nguyên.
+- `PublicRecruitment.tsx`: đơn cá nhân thành dòng dọc, Mở CLB cuối dòng khi
+  đã duyệt, giữ thứ tự ngày nộp từ API.
+- `recruitment.css`: màu trạng thái xanh dương/xám cho đợt đăng/đóng; xanh lá,
+  vàng, đỏ cho accepted/pending/rejected, bổ sung draft/cancelled/completed.
+  Nút có nền/viền, danh sách responsive và wrap khi màn hình hẹp.
+- Cập nhật module guide, phase/master, session log, changelog và navigation.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm.cmd --workspace frontend run build | Passed | TypeScript + Vite; còn cảnh báo chunk lớn |
+| npm.cmd --workspace backend test | Passed | 60 tests; script build backend trước khi chạy |
+| npm.cmd --workspace frontend test -- src/features/recruitment/Recruitment.test.tsx | Passed | 7 tests tuyển thành viên |
+| npm.cmd --workspace frontend run typecheck | Passed | Sau điều kiện link công khai của bản nháp |
+| Kiểm tra query bằng Node/Supabase client với fetch giả | Passed | Deadline ASC, ngày nộp DESC, page 2 offset 12; sort trước pagination |
+| git diff --check; docs JSON/navigation mới | Passed | Không lỗi whitespace; JSON hợp lệ, trang mới tồn tại |
+| Browser/DB thật | Skipped | Thay đổi trình bày và sort, không có schema/migration; DOM chưa thay thế nghiệm thu hiển thị browser thật |
+
+## Quyết định và lý do
+
+Sắp xếp tại API để không chỉ sắp các dòng của riêng một trang. Dùng layout riêng
+cho quản lý/cá nhân để không đổi public cards. Thêm màu kèm nhãn chữ để vẫn
+phân biệt trạng thái khi người dùng không nhận diện được màu. Không đổi luồng
+duyệt, admission, thông báo hoặc quyền chủ nhiệm.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho thay đổi được giao. Không thay DB, không cần SQL mới.
+Chưa nghiệm thu giao diện trên tài khoản thật. Phase 04 giữ In Progress.
+Chưa commit/push, giữ thay đổi local từ các phiên trước.
+
+## Bước tiếp theo
+
+Restart backend nếu không chạy watch, refresh frontend. Kiểm tra danh sách nhiều
+đợt với hạn kết thúc khác nhau, head chỉ đọc, đơn cá nhân có đủ ba trạng thái
+và Mở CLB trên desktop/mobile. Migration nền tuyển thành viên nếu chưa áp dụng
+vẫn là điều kiện từ phiên trước, không có migration bổ sung trong phiên này.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan.
+- [x] Cập nhật session log, changelog và module guide.
+- [x] Đăng ký trang mới trong docs.json.
+- [x] Ghi checks và giới hạn xác minh.

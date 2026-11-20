@@ -11,6 +11,7 @@ import {
 } from "../components/PublicContent";
 import { publicDate } from "../../../shared/lib/content-format";
 import type { Collection } from "../services/discovery-api";
+import { RecruitmentPublicDetail,RecruitmentPublicList } from '../../recruitment/PublicRecruitment';
 
 export function PublicDetailPage({
   kind,
@@ -33,6 +34,7 @@ export function PublicDetailPage({
       </div>
     );
   const club = kind === "clubs";
+  if(kind==='activities'&&item.entry_type==='recruitment')return <RecruitmentPublicDetail id={item.campaign_id||id} token={accessToken} />;
   const ended = Boolean(item.ends_at && Date.parse(item.ends_at) <= Date.now());
   const cancelled = item.lifecycle_status === "cancelled";
   return (
@@ -199,6 +201,7 @@ export function PublicDetailPage({
           </p>
         </aside>
       </div>
+      {club&&<RecruitmentPublicList compact clubId={id} />}
     </article>
   );
 }

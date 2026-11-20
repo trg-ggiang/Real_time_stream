@@ -353,7 +353,7 @@ workspaces backend/frontend.
 
 ## 11. Trạng thái và giới hạn cần nhớ
 
-- Phase 03–06 đang **In Progress**. Đã có API và giao diện cho các luồng chính của CLB, meeting và hai loại chat. Tuyển dụng/phỏng vấn chưa nối vào workspace.
+- Phase 03–06 đang **In Progress**. Đã có API và giao diện cho các luồng chính của CLB, meeting và hai loại chat. Tuyển thành viên đã nối vào workspace (xem mục 13); phỏng vấn chưa triển khai.
 - Lượt rà gần nhất trên source `36ff795` đạt **44 test backend và 94 test frontend**. Đã thử giao diện với API mô phỏng, đồng thời đọc quyền kênh thật của AE 18. [Work log](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx)
 - Nghiệm thu ghi Supabase và media LiveKit trên hai thiết bị vẫn còn. Gói SQL mở rộng được lưu cùng [tài liệu migration](output/unicircle-platform-migration-20261117/README.md).
 
@@ -364,3 +364,17 @@ workspaces backend/frontend.
 - [Meeting chat](./docs/modules/meeting-chat.mdx) — chat và giới hạn nghiệm thu.
 - [Module 1 Media PoC](./docs/modules/module-01-media-poc.mdx) — hợp đồng PoC.
 - [Master plan](./docs/plans/master-plan.mdx) — trạng thái phase.
+
+## 13. Tuyển thành viên (20/11/2026)
+
+`backend/src/recruitment` quản lý draft/publish, form theo phiên bản, ứng tuyển,
+quyền đọc/duyệt và file. `frontend/src/features/recruitment` được mount trong
+shell workspace, discovery và personal. API công khai dùng `public_activity_feed`
+để đưa bài tuyển vào cùng danh sách hoạt động. Luồng ghi đi qua RPC v3 trong
+`supabase/migrations/202611200002_recruitment_workflow.sql`: actor từ JWT, khóa
+đơn, kiểm tra phiên bản, admission đúng ban và inbox trong cùng transaction.
+Head chỉ duyệt ban mình; chair duyệt toàn CLB; không chuyển quyền chủ nhiệm.
+
+Dùng chung chuông landing của luồng trưởng ban, thêm loại recruitment.application,
+recruitment.accepted/rejected. Mở chuông lưu mốc đã xem. File riêng tư chỉ tải
+qua API kiểm quyền và signed URL. [Hướng dẫn](docs/modules/club-recruitment.mdx).

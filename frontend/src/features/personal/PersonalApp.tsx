@@ -18,11 +18,13 @@ import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import "./personal.css";
 import "./personal-dashboard.css";
 import "./personal-layout.css";
+import { MyRecruitmentApplication,MyRecruitmentApplications } from '../recruitment/PublicRecruitment';
 const nav = [
   ["/me", "Tổng quan", SquaresFour],
   ["/me/clubs", "CLB tham gia", Users],
   ["/me/follows", "Đang quan tâm", Heart],
   ["/me/registrations", "Hoạt động đã đăng ký", CalendarCheck],
+  ["/me/recruitment-applications", "Đơn ứng tuyển", CalendarCheck],
   ["/me/profile", "Hồ sơ cá nhân", UserCircle],
 ] as const;
 export function PersonalApp({
@@ -117,6 +119,8 @@ export function PersonalApp({
         </header>
         <main id="personal-content" ref={content} tabIndex={-1}>
           <Routes>
+            <Route path="/me/recruitment-applications" element={<MyRecruitmentApplications token={accessToken} />} />
+            <Route path="/me/recruitment-applications/:applicationId" element={<MyRecruitmentApplication token={accessToken} />} />
             <Route
               path="/me"
               element={

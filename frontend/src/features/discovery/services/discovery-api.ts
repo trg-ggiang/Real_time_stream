@@ -15,7 +15,7 @@ export const itemId = (kind: Collection, item: PublicItem) =>
       ? item.activity_id
       : item.post_id;
 export const itemPath = (kind: Collection, item: PublicItem) =>
-  `/${kind}/${itemId(kind, item)}`;
+  kind==='activities'&&item.entry_type==='recruitment'?`/recruitments/${item.campaign_id||item.activity_id}`:`/${kind}/${itemId(kind, item)}`;
 
 export async function getCollection(
   kind: Collection,

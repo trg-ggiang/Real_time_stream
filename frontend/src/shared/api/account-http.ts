@@ -3,6 +3,7 @@ export class AccountApiError extends Error {
     public readonly status: number,
     message: string,
     public readonly code?: string,
+    public readonly fields?: Record<string,string>,
   ) {
     super(message);
   }
@@ -27,7 +28,7 @@ export async function accountRequest<T>(
       headers: {
         ...options.headers,
         Authorization: `Bearer ${token}`,
-        ...(options.body && { "Content-Type": "application/json" }),
+        ...(options.body && !(options.body instanceof FormData) && { "Content-Type": "application/json" }),
       },
     });
     const data = await response.json().catch(() => null);
@@ -42,7 +43,7 @@ export async function accountRequest<T>(
           : Array.isArray(data?.message)
             ? "Một số thông tin chưa hợp lệ. Kiểm tra lại biểu mẫu."
             : "Không thực hiện được thao tác. Vui lòng thử lại.";
-      throw new AccountApiError(response.status, message, data?.code);
+      throw new AccountApiError(response.status, message, data?.code, data?.fields);
     }
     if (data === null)
       throw new Error(

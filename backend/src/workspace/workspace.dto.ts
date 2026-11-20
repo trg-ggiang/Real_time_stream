@@ -38,6 +38,10 @@ export class MoveMemberDto {
 export class TransferDto {
   @IsUUID() membership_id!: string;
 }
+export class HeadRoleDto {
+  @IsBoolean() is_head!: boolean;
+  @IsISO8601() expected_updated_at!: string;
+}
 export class ContactDto {
   @IsOptional() @IsEmail() @MaxLength(320) contact_email?: string | null;
   @IsOptional() @IsString() @MaxLength(32) contact_phone?: string | null;

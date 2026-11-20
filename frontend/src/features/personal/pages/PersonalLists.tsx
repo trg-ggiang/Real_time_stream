@@ -80,7 +80,7 @@ export function PersonalClubsPage({ token }: { token: string }) {
           <div className="ps-club-cards">{entries.map((membership) => (
             <Link className="ps-club-card" to={`/workspace/${membership.club.club_id}`} key={membership.membership_id}>
               <div className="ps-club-card-media"><ContentImage src={membership.club.cover_url} alt="" fallbackText={membership.club.name.trim().charAt(0).toLocaleUpperCase("vi-VN")} /></div>
-              <div className="ps-club-card-copy"><strong>{membership.club.name}</strong><small className="ps-status ps-club-role">{membership.role === "chairperson" ? "Chủ nhiệm · Đang quản lý" : "Thành viên"}</small><span className="ps-club-card-link ps-club-card-action">Mở không gian <ArrowRight size={15} aria-hidden="true" /></span></div>
+              <div className="ps-club-card-copy"><strong>{membership.club.name}</strong><small className="ps-status ps-club-role">{membership.role === "chairperson" ? "Chủ nhiệm · Đang quản lý" : membership.role === "head" ? "Trưởng ban" : "Thành viên"}</small><span className="ps-club-card-link ps-club-card-action">Mở không gian <ArrowRight size={15} aria-hidden="true" /></span></div>
             </Link>
           ))}</div>
         ) : clubs.loading ? <p className="ps-club-empty">Đang tải CLB…</p> : <PersonalEmpty><p>{tab === "managed" ? "Bạn chưa quản lý CLB nào." : "Bạn chưa tham gia CLB nào."}</p></PersonalEmpty>}
@@ -380,7 +380,7 @@ export function PersonalOverview({
                 alt=""
                 fallbackText={m.club.name.trim().charAt(0).toLocaleUpperCase("vi-VN")}
               />
-              <span><strong>{m.club.name}</strong><small>{m.role === "chairperson" ? "Chủ nhiệm" : "Thành viên"}</small></span>
+              <span><strong>{m.club.name}</strong><small>{m.role === "chairperson" ? "Chủ nhiệm" : m.role === "head" ? "Trưởng ban" : "Thành viên"}</small></span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
           ))}</div>

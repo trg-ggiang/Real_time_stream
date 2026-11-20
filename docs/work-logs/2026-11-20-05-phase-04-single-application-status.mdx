@@ -1,0 +1,52 @@
+---
+title: Phase 04 - Hiển thị trạng thái đơn một lần
+description: Bỏ nhãn kết quả lặp trong cột thao tác.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-05
+- Thời gian: không có mốc bắt đầu chính xác; ghi kết quả 2026-11-20T17:35:57+07:00.
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chỉ hiển thị Đã duyệt một lần bên trái, bỏ nhãn lặp bên phải.
+
+## Công việc hoàn thành
+
+`WorkspaceRecruitment.tsx`: DecisionControls không render badge cho đơn đã xử
+lý; queue giữ badge ở cột thông tin, cột phải giữ nút chi tiết. Trang detail đã
+có badge trong ApplicationReadout nên không mất trạng thái. `recruitment.css`:
+bỏ selector dành cho badge trong cụm thao tác.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm.cmd --workspace frontend run typecheck | Passed | Kiểm tra TypeScript sau sửa |
+| git diff --check; JSON/navigation mới | Passed | Trang mới tồn tại, JSON hợp lệ |
+| Build/tests/browser/DB | Skipped | Thay đổi JSX nhỏ, không thay logic; chưa xem browser thật |
+
+## Quyết định và lý do
+
+Dùng badge sẵn có ở phần thông tin làm nguồn hiển thị duy nhất cho cả danh sách
+và chi tiết. Không đổi quyết định, quyền hoặc API.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho chỉnh sửa. Không cần SQL; chưa commit/push. Phase 04 còn
+In Progress, chờ nghiệm thu giao diện thực tế.
+
+## Bước tiếp theo
+
+Refresh danh sách, kiểm tra đơn accepted/rejected chỉ có một nhãn bên trái.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master.
+- [x] Cập nhật session log/changelog/module guide.
+- [x] Đăng ký navigation và ghi kiểm tra/giới hạn.
