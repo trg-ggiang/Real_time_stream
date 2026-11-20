@@ -630,12 +630,6 @@
 .cw-meeting-entry .cw-primary {
   margin-top: 25px;
 }
-.cw-footer {
-  font-size: 12px;
-  color: #53647b;
-  padding: 0 38px 25px;
-  margin: 0;
-}
 .cw-mobile-toggle {
   display: none;
 }
@@ -861,9 +855,6 @@
   .cw-meeting-entry {
     padding: 24px;
   }
-  .cw-footer {
-    padding: 0 20px 24px;
-  }
 }
 
 /* Workspace shell: club rail, channels, then role actions. */
@@ -907,7 +898,6 @@
 
 /* A channel uses the entire content pane; it is not a card. */
 .cw-app--channel .cw-workspace { min-width: 0; height: 100dvh; }
-.cw-app--channel .cw-footer { display: none; }
 .cw-app--channel main.cw-channel-main { width: 100%; max-width: none; height: 100%; margin: 0; padding: 0; }
 .cw-channel { display: flex; flex-direction: column; height: 100%; min-height: 0; background: #fff; }
 .cw-channel-header { flex: none; min-height: 72px; display: flex; align-items: center; gap: 14px; padding: 15px 28px; border-bottom: 1px solid #e2e9f2; }
@@ -1078,3 +1068,11 @@
 
 .cw-session-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .cw-share-notice { overflow-wrap: anywhere; }
+
+/* Let the long club information form scroll within the content column. */
+.cw-app--information .cw-workspace { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
+.cw-app--information .cw-workspace > main { flex: 1; min-height: 0; overflow-y: auto; margin: 0 auto; }
+@media (max-width: 700px) {
+  .cw-app--information .cw-workspace { display: block; height: auto; }
+  .cw-app--information .cw-workspace > main { overflow-y: visible; }
+}

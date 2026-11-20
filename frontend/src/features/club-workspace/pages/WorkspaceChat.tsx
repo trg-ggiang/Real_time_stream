@@ -14,10 +14,9 @@ import { ContentImage } from '../../discovery/components/PublicContent';
 import { ChannelMessageAttachment, DraftChannelAttachment, channelFileAccept, channelFileError, pastedChannelImages } from './ChannelAttachments';
 import { ChannelMessageText } from './ChannelMessageText';
 
-export function WorkspaceChannel() {
+export function WorkspaceChannel({ channels }: { channels: ReturnType<typeof usePersonalQuery<WorkspaceList<ClubChannel>>> }) {
   const { channel } = useParams();
   const { token, clubId } = useClub();
-  const channels = usePersonalQuery<WorkspaceList<ClubChannel>>(token, `workspace/${clubId}/channels`);
   const selected = channels.data?.items.find(item => item.channel_id === channel || (channel === 'general' && item.kind === 'general'));
   if (!channels.data) return <PersonalState {...channels} />;
   if (selected && channel === 'general') return <Navigate replace to={`/workspace/${clubId}/channels/${selected.channel_id}`} />;

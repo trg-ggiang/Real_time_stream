@@ -37,7 +37,10 @@ function fixture(meetings: unknown[] = [], historyItems: unknown[] = []) {
     ] };
     else if (url.includes('/meetings?')) data = { items: meetings, hasMore: false };
     else if (url.endsWith('/messages')) data = { items: historyItems, hasMore: false, cursor: null };
-    else if (url.endsWith('/channels')) data = { items: [{ channel_id: 'real-general', name: 'Chung', kind: 'general', description: 'Kênh thật' }] };
+    else if (url.endsWith('/channels')) data = { items: [
+      { channel_id: 'real-general', name: 'Chung', kind: 'general', description: 'Kênh thật' },
+      { channel_id: 'discussion', name: 'Thảo luận', kind: 'department', description: 'Kênh ban' },
+    ] };
     else if (/^\/api\/workspace\/[^/?]+$/.test(url)) data = { club: { club_id: url.split('/')[3], name: 'CLB', summary: 'Cùng học tập' }, membership: { membership_id: 'm', user_id: 'student', role } };
     else data = { items: [], hasMore: false };
     return { ok: true, json: async () => data };
@@ -58,10 +61,39 @@ it('uses persisted channels, shows chair tools by club, and opens the existing s
   await waitFor(() => expect(location.pathname).toBe('/workspace/beta/channels/real-general'));
   expect(screen.getByRole('link', { name: 'Quản lý ban và kênh' }).getAttribute('href')).toBe('/workspace/beta/departments');
   const nav = screen.getByRole('navigation', { name: 'Điều hướng CLB' });
-  fireEvent.click(within(nav).getByRole('link', { name: 'Tạo họp định kỳ' }));
+  fireEvent.click(within(nav).getByRole('link', { name: 'Họp theo lịch' }));
   await screen.findByRole('heading', { name: 'Họp theo lịch' });
   expect(screen.getByLabelText('Lặp lại')).toBeTruthy();
   expect(fetcher.mock.calls.every(([, options]) => options?.method !== 'POST')).toBe(true);
+});
+
+it('keeps club order and the channel list stable while switching channels', async () => {
+  const { fetcher } = fixture();
+  history.replaceState(null, '', '/workspace/alpha/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  await screen.findByRole('heading', { name: 'Chung' });
+  const rail = screen.getByRole('complementary', { name: 'CLB đã tham gia' });
+  expect(within(rail).getAllByRole('link', { name: /^Mở CLB/ }).map(link => link.getAttribute('aria-label')))
+    .toEqual(['Mở CLB Alpha', 'Mở CLB Beta']);
+  fireEvent.click(within(rail).getByRole('link', { name: 'Mở CLB Beta' }));
+  await screen.findByRole('link', { name: 'Duyệt nội dung' });
+  expect(within(screen.getByRole('complementary', { name: 'CLB đã tham gia' }))
+    .getAllByRole('link', { name: /^Mở CLB/ }).map(link => link.getAttribute('aria-label')))
+    .toEqual(['Mở CLB Alpha', 'Mở CLB Beta']);
+  await screen.findByRole('heading', { name: 'Chung' });
+  const nav = screen.getByRole('navigation', { name: 'Điều hướng CLB' });
+  expect(within(nav).queryByRole('link', { name: /^Phòng họp$/ })).toBeNull();
+  expect(within(nav).queryByRole('link', { name: 'Tạo họp định kỳ' })).toBeNull();
+  expect(within(nav).getAllByRole('link', { name: 'Phòng họp CLB' })).toHaveLength(1);
+  expect(within(nav).getAllByRole('link', { name: 'Họp theo lịch' })).toHaveLength(1);
+  const channelRequests = () => fetcher.mock.calls.filter(([url]) => url === '/api/workspace/beta/channels').length;
+  expect(channelRequests()).toBe(1);
+  fireEvent.click(within(nav).getByRole('link', { name: 'Ban Thảo luận' }));
+  await screen.findByRole('heading', { name: 'Ban Thảo luận' });
+  expect(channelRequests()).toBe(1);
+  fireEvent.click(within(nav).getByRole('link', { name: 'Chung' }));
+  await screen.findByRole('heading', { name: 'Chung' });
+  expect(channelRequests()).toBe(1);
 });
 
 it('links meeting invites and external URLs without swallowing adjacent message text', async () => {

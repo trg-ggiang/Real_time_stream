@@ -1,0 +1,51 @@
+---
+title: Phase 04 — Cuộn trang Thông tin CLB
+description: Cho vùng nội dung Thông tin CLB cuộn độc lập trên màn hình rộng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-10
+- Thời gian: 20/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa trang Khác → Thông tin CLB không cuộn xuống được.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/club-workspace/WorkspaceApp.tsx`: đánh dấu route Thông tin CLB trên shell workspace.
+- `frontend/src/features/club-workspace/workspace.css`: cho cột nội dung của route này chiếm chiều cao viewport và cuộn riêng trên desktop/tablet; dưới 700px giữ chiều cao tự nhiên và cuộn theo trang.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run test -- Workspace` | Passed | 2 file, 13 test |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; còn cảnh báo chunk lớn hiện có |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser fixture / trực quan | Skipped | Chưa xác minh cuộn bằng trình duyệt thật và nội dung CLB dài |
+| Dịch vụ thật / end-to-end | Skipped | Chỉ đổi layout frontend |
+
+## Quyết định và lý do
+
+Chỉ tạo vùng cuộn riêng cho Thông tin CLB, nơi form và mô tả có thể dài; trên mobile dùng cuộn trang để phù hợp layout một cột.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho thay đổi code. Cần rà cuộn trên trình duyệt thật ở các kích thước màn hình. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Mở Khác → Thông tin CLB với mô tả dài; kiểm tra có thể cuộn tới cuối form ở desktop/tablet và cuối trang trên mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và handoff workspace
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh

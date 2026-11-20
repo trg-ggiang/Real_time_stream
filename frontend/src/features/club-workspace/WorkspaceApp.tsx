@@ -1,4 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { Article } from "@phosphor-icons/react/dist/csr/Article";
+import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
+import { ClipboardText } from "@phosphor-icons/react/dist/csr/ClipboardText";
+import { NotePencil } from "@phosphor-icons/react/dist/csr/NotePencil";
+import { UserPlus } from "@phosphor-icons/react/dist/csr/UserPlus";
 import {
   Link,
   NavLink,
@@ -40,11 +45,16 @@ import { channelLabel } from './channel-label';
 export function WorkspaceApp(props: DiscoveryViewer) {
   const match = useMatch("/workspace/:clubId/*");
   const clubId = match?.params.clubId || "";
+  const clubs = usePersonalQuery<PrivatePage<Membership>>(
+    props.accessToken || "",
+    "me/clubs?page=1&limit=24",
+  );
   return (
     <WorkspaceScope
       key={`${props.accessToken}:${clubId}`}
       {...props}
       clubId={clubId}
+      clubs={clubs.data?.items}
     />
   );
 }
@@ -52,19 +62,27 @@ function WorkspaceScope({
   viewer,
   accessToken = "",
   clubId,
+  clubs,
   onMeeting,
   onLogout,
-}: { clubId: string } & DiscoveryViewer) {
+}: { clubId: string; clubs?: Membership[] } & DiscoveryViewer) {
   const location = useLocation();
 
   const state = usePersonalQuery<WorkspaceContext>(
     accessToken,
     `workspace/${clubId}`,
   );
-  const clubs = usePersonalQuery<PrivatePage<Membership>>(
+  const channels = usePersonalQuery<WorkspaceList<ClubChannel>>(
     accessToken,
-    "me/clubs?page=1&limit=24",
+    `workspace/${clubId}/channels`,
   );
+  useEffect(() => {
+    const refresh = (event: Event) => {
+      if ((event as CustomEvent).detail === clubId) channels.retry();
+    };
+    window.addEventListener('uc:workspace-channels-changed', refresh);
+    return () => window.removeEventListener('uc:workspace-channels-changed', refresh);
+  }, [clubId]);
   const [open, setOpen] = useState(false);
   const [workOpen, setWorkOpen] = useState(true);
   const [infoCollapsed, setInfoCollapsed] = useState(false);
@@ -82,7 +100,6 @@ function WorkspaceScope({
     setOpen(false);
     main.current?.focus({ preventScroll: true });
     window.scrollTo(0, 0);
-    document.querySelector<HTMLElement>(".cw-channel-list a.active")?.scrollIntoView?.({ block: "nearest" });
   }, [location.pathname, location.search]);
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
@@ -111,6 +128,7 @@ function WorkspaceScope({
     chair = ctx.membership.role === "chairperson",
     base = `/workspace/${clubId}`;
   const inChannel = location.pathname.startsWith(`${base}/channels/`);
+  const inInformation = location.pathname === `${base}/information`;
   return (
     <ClubContext.Provider
       value={{
@@ -121,11 +139,14 @@ function WorkspaceScope({
         onMeeting,
       }}
     >
-      <div data-theme={darkTheme ? "dark" : "light"} className={`cw-app ${inChannel ? "cw-app--channel" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
+      <div data-theme={darkTheme ? "dark" : "light"} className={`cw-app ${inChannel ? "cw-app--channel" : ""}${inInformation ? " cw-app--information" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
         <a className="cw-skip" href="#workspace-content">
           Đến nội dung
         </a>
-        <WorkspaceRail viewer={viewer} currentId={clubId} onLogout={onLogout} clubs={[{ id: clubId, name: ctx.club.name, logoUrl: ctx.club.logo_url }, ...(clubs.data?.items || []).filter(item => item.club.club_id !== clubId).map(item => ({ id: item.club.club_id, name: item.club.name, logoUrl: item.club.logo_url }))]} />
+        <WorkspaceRail viewer={viewer} currentId={clubId} onLogout={onLogout} clubs={clubs ? [
+          ...clubs.map(item => ({ id: item.club.club_id, name: item.club.name, logoUrl: item.club.logo_url })),
+          ...(!clubs.some(item => item.club.club_id === clubId) ? [{ id: clubId, name: ctx.club.name, logoUrl: ctx.club.logo_url }] : []),
+        ] : []} />
         <aside className="cw-sidebar">
           <div className="cw-club-identity">
             <div>
@@ -148,16 +169,14 @@ function WorkspaceScope({
           >
             <NavLink to={base} end className="cw-overview-link">Tổng quan CLB</NavLink>
             <div className="cw-channel-scroll" role="group" aria-label="Danh sách kênh">
-            <ChannelNavigation token={accessToken} clubId={clubId} chair={chair} />
+            <ChannelNavigation channels={channels} clubId={clubId} chair={chair} />
             </div>
             <details className="cw-nav-details cw-work-pinned" open={workOpen} onToggle={event => setWorkOpen(event.currentTarget.open)}><summary>Công việc CLB</summary><div>
-              <NavLink to={`${base}/posts/new`}>Viết bài</NavLink>
-              <NavLink to={`${base}/posts`} end>Bài viết</NavLink>
-              <NavLink to={`${base}/activities`} end>Hoạt động</NavLink>
-                {(chair||ctx.membership.role==='head')&&<NavLink to={`${base}/recruitments`}>Tuyển thành viên</NavLink>}
-              <NavLink to={`${base}/meetings`}>Phòng họp</NavLink>
-              <NavLink to={`${base}/recurring-meetings`}>Tạo họp định kỳ</NavLink>
-              {chair && <NavLink to={`${base}/review`}>Duyệt nội dung</NavLink>}
+              <NavLink to={`${base}/posts/new`}><NotePencil size={17} aria-hidden="true" />Viết bài</NavLink>
+              <NavLink to={`${base}/posts`} end><Article size={17} aria-hidden="true" />Bài viết</NavLink>
+              <NavLink to={`${base}/activities`} end><CalendarBlank size={17} aria-hidden="true" />Hoạt động</NavLink>
+              {(chair||ctx.membership.role==='head')&&<NavLink to={`${base}/recruitments`}><UserPlus size={17} aria-hidden="true" />Tuyển thành viên</NavLink>}
+              {chair && <NavLink to={`${base}/review`}><ClipboardText size={17} aria-hidden="true" />Duyệt nội dung</NavLink>}
             </div></details>
           </nav>
         </aside>
@@ -171,7 +190,7 @@ function WorkspaceScope({
               <Route path={`${base}/recruitments/:campaignId/applications`} element={chair||ctx.membership.role==='head'?<RecruitmentQueue />:<Denied />} />
               <Route path={`${base}/recruitments/:campaignId/applications/:applicationId`} element={chair||ctx.membership.role==='head'?<RecruitmentApplicationDetail />:<Denied />} />
               <Route path={base} element={<WorkspaceOverview />} />
-              <Route path={`${base}/channels/:channel`} element={<WorkspaceChannel />} />
+              <Route path={`${base}/channels/:channel`} element={<WorkspaceChannel channels={channels} />} />
               {(["posts", "activities"] as const).map((kind) => (
                 <Route
                   key={kind}
@@ -222,7 +241,6 @@ function WorkspaceScope({
               />
             </Routes>
           </main>
-          <footer className="cw-footer">uniCircle · {ctx.club.name}</footer>
         </div>
         <WorkspaceQuickPanel club={ctx.club} token={accessToken} chair={chair} collapsed={infoCollapsed} darkTheme={darkTheme} onThemeToggle={() => setDarkTheme(value => !value)} onToggle={() => setInfoCollapsed(value => !value)} />
 
@@ -230,13 +248,7 @@ function WorkspaceScope({
     </ClubContext.Provider>
   );
 }
-function ChannelNavigation({ token, clubId, chair }: { token: string; clubId: string; chair: boolean }) {
-  const channels = usePersonalQuery<WorkspaceList<ClubChannel>>(token, `workspace/${clubId}/channels`);
-  useEffect(() => {
-    const refresh = (event: Event) => { if ((event as CustomEvent).detail === clubId) channels.retry(); };
-    window.addEventListener('uc:workspace-channels-changed', refresh);
-    return () => window.removeEventListener('uc:workspace-channels-changed', refresh);
-  }, [clubId]);
+function ChannelNavigation({ channels, clubId, chair }: { channels: ReturnType<typeof usePersonalQuery<WorkspaceList<ClubChannel>>>; clubId: string; chair: boolean }) {
   return <>
     <div className="cw-channel-group"><div className="cw-group-heading"><span>Kênh sinh hoạt</span>{chair && <Link to={`/workspace/${clubId}/departments`} title="Quản lý ban và kênh của ban" aria-label="Quản lý ban và kênh">+</Link>}</div></div>
     <div className="cw-channel-list">

@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import { Globe } from "@phosphor-icons/react/dist/csr/Globe";
+import { Info } from "@phosphor-icons/react/dist/csr/Info";
+import { TreeStructure } from "@phosphor-icons/react/dist/csr/TreeStructure";
+import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { usePersonalQuery } from "../personal/use-personal-query";
 import type { ClubMeeting, ContentItem, WorkspaceClub, WorkspaceList } from "./services/workspace-api";
@@ -28,7 +32,7 @@ export function WorkspaceQuickPanel({ club, token, chair, collapsed = false, onT
     <section className="cw-quick-section cw-quick-about"><h2>{club.name}</h2><p>{club.summary || "CLB chưa cập nhật phần giới thiệu ngắn."}</p></section>
     <section className="cw-quick-section"><div className="cw-quick-heading"><span aria-hidden="true">▦</span><h2>Lịch họp</h2></div>{meetings.loading ? <p>Đang tải lịch họp…</p> : meetings.error ? <><p role="alert">{meetings.error}</p><button onClick={meetings.retry}>Thử lại</button></> : sessions.length ? <ul>{sessions.map(session => <li key={session.session_id}>{session.scheduled_start_at ? <PanelDate value={session.scheduled_start_at} year /> : <span className="cw-meeting-live">Đang họp</span>}<Link to={`/workspace/${club.club_id}/meetings`}>{session.title}</Link></li>)}</ul> : <p>Chưa có buổi họp sắp tới.</p>}<Link to={`/workspace/${club.club_id}/meetings`}>Xem tất cả cuộc họp</Link></section>
     <section className="cw-quick-section"><div className="cw-quick-heading"><span aria-hidden="true">◷</span><h2>Hoạt động sắp tới</h2></div>{activities.loading ? <p>Đang tải hoạt động…</p> : activities.error ? <p>Chưa tải được hoạt động.</p> : upcoming.length ? <ul>{upcoming.map(item => <li key={item.activity_id}><PanelDate value={item.starts_at!} year={new Date(item.starts_at!).getFullYear() !== new Date().getFullYear()} /><span>{item.title}</span></li>)}</ul> : <p>Chưa có hoạt động sắp tới.</p>}</section>
-    <details className="cw-quick-other" open={otherOpen} onToggle={event => setOtherOpen(event.currentTarget.open)}><summary>Khác</summary><nav aria-label="Mục khác của CLB"><NavLink to={`/workspace/${club.club_id}/members`}>Thành viên</NavLink>{chair && <NavLink to={`/workspace/${club.club_id}/departments`}>Cơ cấu CLB</NavLink>}{chair && <NavLink to={`/workspace/${club.club_id}/information`}>Thông tin CLB</NavLink>}<Link to={`/clubs/${club.club_id}`}>Trang CLB công khai ↗</Link></nav></details>
+    <details className="cw-quick-other" open={otherOpen} onToggle={event => setOtherOpen(event.currentTarget.open)}><summary>Khác</summary><nav aria-label="Mục khác của CLB"><NavLink to={`/workspace/${club.club_id}/members`}><UsersThree size={17} aria-hidden="true" />Thành viên</NavLink>{chair && <NavLink to={`/workspace/${club.club_id}/departments`}><TreeStructure size={17} aria-hidden="true" />Cơ cấu CLB</NavLink>}{chair && <NavLink to={`/workspace/${club.club_id}/information`}><Info size={17} aria-hidden="true" />Thông tin CLB</NavLink>}<Link to={`/clubs/${club.club_id}`}><Globe size={17} aria-hidden="true" />Trang CLB công khai ↗</Link></nav></details>
     </div>
   </aside>;
 }

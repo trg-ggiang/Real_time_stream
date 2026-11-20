@@ -215,6 +215,8 @@
 .cw-app .cw-sidebar nav>.cw-overview-link{margin-inline:12px}
 .cw-app .cw-sidebar .cw-channel-scroll{padding-inline:12px}
 .cw-app .cw-sidebar .cw-work-pinned{width:100%;margin-inline:0;border-radius:0;padding-inline:12px;box-sizing:border-box}
+.cw-app .cw-work-pinned > div a,.cw-app .cw-quick-other nav a{display:flex;align-items:center;gap:9px}
+.cw-app .cw-work-pinned > div a svg,.cw-app .cw-quick-other nav a svg{flex:none;color:currentColor}
 /* Consecutive messages keep the text column and show identity only once. */
 .cw-app main .cw-message,.cw-app main .cw-message.is-mine{margin-top:14px;margin-bottom:0}
 .cw-app main .cw-message.is-continuation{margin-top:0;padding-top:2px;padding-bottom:2px}

@@ -1,0 +1,52 @@
+---
+title: Phase 04 — Icon cho menu không gian sinh hoạt
+description: Thêm icon vào các mục Công việc CLB và Khác.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-08
+- Thời gian: 20/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm icon để các mục trong Công việc CLB và Khác dễ nhận biết hơn.
+
+## Công việc hoàn thành
+
+- `WorkspaceApp.tsx`: thêm icon Phosphor cho Viết bài, Bài viết, Hoạt động, Tuyển thành viên và Duyệt nội dung.
+- `WorkspaceQuickPanel.tsx`: thêm icon cho Thành viên, Cơ cấu CLB, Thông tin CLB và Trang CLB công khai.
+- `workspace-polish.css`: căn hàng icon với nhãn; icon dùng màu chữ hiện tại để theo trạng thái active và theme.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run test -- Workspace` | Passed | 2 file, 13 test; nhãn và điều hướng vẫn hoạt động |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm typecheck; còn cảnh báo chunk lớn hiện có |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser fixture / trực quan | Skipped | Chưa mở workspace trên trình duyệt với tài khoản thật |
+| Dịch vụ thật / end-to-end | Skipped | Chỉ đổi icon và CSS frontend |
+
+## Quyết định và lý do
+
+Dùng bộ icon Phosphor đã có trong frontend. SVG được đánh dấu `aria-hidden` để tên liên kết tiếp tục lấy từ nhãn chữ.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho thay đổi này. Phase 04 vẫn In Progress; cần kiểm tra trực quan trên desktop/mobile và theme sáng/tối với tài khoản thực.
+
+## Bước tiếp theo
+
+Mở Không gian sinh hoạt trên trình duyệt thật và rà kích thước, khoảng cách icon ở hai nhóm menu trên desktop/mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và handoff workspace
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh

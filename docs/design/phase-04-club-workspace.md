@@ -2,6 +2,14 @@
 
 **Bàn giao 20/11/2026** · Phase 04 kỹ thuật vẫn **In Progress**. Tài liệu này mô tả workspace sau tích hợp kênh, chat và họp gắn CLB. Xem [log tích hợp](../work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx) và [log rà soát](../work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx).
 
+Điều hướng cập nhật 20/11: hai lối họp chỉ nằm trong nhóm Gọi và gặp mặt; chuyển kênh dùng danh sách kênh đã tải trong CLB; dải CLB giữ thứ tự membership từ API. Xem [work log điều hướng](../work-logs/2026-11-20-07-phase-04-workspace-navigation-stability.mdx).
+
+Các mục trong Công việc CLB và Khác có icon Phosphor đi cùng nhãn; quyền hiển thị và đường dẫn không đổi. Xem [work log icon menu](../work-logs/2026-11-20-08-phase-04-workspace-menu-icons.mdx).
+
+Shell CLB không còn footer `uniCircle · tên CLB` ở đáy trang; xem [work log gỡ footer](../work-logs/2026-11-20-09-phase-04-remove-workspace-footer.mdx).
+
+Trang Khác → Thông tin CLB cuộn trong cột nội dung trên desktop/tablet và cuộn theo trang trên mobile; xem [work log cuộn trang](../work-logs/2026-11-20-10-phase-04-club-information-scroll.mdx).
+
 ## Cách mở và luồng chính
 
 Chạy backend và frontend như trước (`npm run dev:backend`, `npm run dev:frontend` ở hai terminal). Đăng nhập, hoàn thiện hồ sơ → Trang chủ → Không gian sinh hoạt → kênh thảo luận. URL `/workspace/:clubId/channels/general` có thể refresh trực tiếp; môi trường deploy cần SPA rewrite. Phải là membership active trong CLB published. Tài khoản chưa thuộc CLB sẽ thấy trạng thái trống; không tự tạo membership demo.
