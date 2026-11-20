@@ -1,6 +1,6 @@
 # Phase 4 — Không gian sinh hoạt và quản lý CLB
 
-**Bàn giao 19/11/2026** · Phase 04 kỹ thuật vẫn **In Progress**. Tài liệu này mô tả workspace sau tích hợp kênh, chat và họp gắn CLB. Xem [log tích hợp](../work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx) và [log rà soát](../work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx).
+**Bàn giao 20/11/2026** · Phase 04 kỹ thuật vẫn **In Progress**. Tài liệu này mô tả workspace sau tích hợp kênh, chat và họp gắn CLB. Xem [log tích hợp](../work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx) và [log rà soát](../work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx).
 
 ## Cách mở và luồng chính
 
@@ -18,7 +18,7 @@ Mỗi CLB có không gian riêng, dải CLB đổi ngữ cảnh và vai trò l�
 | Thông tin CLB | Đọc thông tin | Chỉnh liên hệ/URL ảnh |
 | Phòng họp | Tạo họp ngay/lên lịch trong CLB | Cùng luồng tạo họp. Quyền host theo từng cuộc họp |
 
-DB có role `head` theo ban. Code hiển thị role ở một số màn hình. Chưa có thao tác thêm/gỡ người ngoài ban ở kênh private cho head.
+DB có role `head` theo ban. Giao diện hiện đọc role và có thao tác chuyển ban hoặc chuyển chủ nhiệm. Bổ nhiệm trưởng ban và thêm/gỡ người ngoài ban ở kênh private chưa có luồng API/UI.
 
 Thêm thành viên bằng email là thao tác quản trị trực tiếp, chưa phải lời mời có bước chấp nhận hoặc pipeline tuyển dụng. Không xóa vật lý membership: gỡ đặt removed/left_at. Muốn gỡ chủ nhiệm phải chuyển chủ nhiệm trước. RPC chuyển chủ nhiệm dùng lại `clubspace_transfer_chair`; không mô phỏng bằng hai UPDATE rời nhau.
 
@@ -37,8 +37,10 @@ Hoạt động có thời gian bắt đầu/kết thúc, hình thức onsite/onl
 ## Luồng chat và họp
 
 - **Chat CLB.** NestJS lấy `club_channels` và lọc qua `clubspace_can_read_channel`. Kênh Chung và kênh ban mở dùng chung cho membership active. Kênh private dành cho thành viên trong ban hoặc người được cấp quyền riêng. Quyền chủ nhiệm không tự mở kênh private. Tin lưu theo kênh trong `channel_messages`, tải 50 tin mỗi lượt, polling khoảng 3 giây khi tab hiển thị. Backend dùng UUID do client gửi để chống ghi trùng khi thử lại.
-- **Giao diện.** Navy sáng mặc định, nút Sáng/Tối ở cột thông tin và lưu lựa chọn trên trình duyệt. Có bong bóng tin gửi/nhận, nhóm theo người gửi, Enter gửi và Shift+Enter xuống dòng.
-- **Họp CLB.** Workspace liệt kê cuộc họp theo `clubId`, gửi `clubId` khi tạo và truyền mã/ID buổi sang module meeting. Meeting xử lý phòng chờ, admission và LiveKit. Chat phiên họp đi qua Socket.IO riêng.
+- **Giao diện.** Navy sáng mặc định, nút Sáng/Tối ở cột thông tin và lưu lựa chọn trên trình duyệt. Có bong bóng tin gửi/nhận, nhóm theo người gửi, Enter gửi, Shift+Enter xuống dòng và nút mặt cười chèn emoji Unicode vào ô soạn. Link HTTP/HTTPS trong tin được gạch chân và bấm trực tiếp.
+- **Họp CLB.** Workspace liệt kê cuộc họp theo `clubId`, gửi `clubId` khi tạo và truyền mã/ID buổi sang module meeting. Với họp gắn CLB, API danh sách buổi, join và trạng thái chờ đều kiểm tra membership active trước khi áp dụng quyền riêng của cuộc họp. Mỗi buổi có link mời và phòng LiveKit riêng. Chat phiên họp đi qua Socket.IO riêng.
+
+- **Ảnh và tệp.** Nút kẹp giấy và dán ảnh trực tiếp vào ô soạn dùng chung giới hạn 3 tệp và 15 MiB tổng mỗi tin. Ảnh hiện trực tiếp trong chat và bấm để xem lớn hoặc tải. Tài liệu hiện thành thẻ tệp. Tệp nằm trong Storage private. API chỉ cấp URL xem/tải cho người có quyền đọc kênh và tin chưa bị gỡ. Dùng migration 20261120000100_club_chat_attachments.sql trước khi triển khai bản ứng dụng này.
 
 ## Tổ chức code
 
@@ -55,7 +57,9 @@ frontend/src/features/club-workspace/
   workspace-context             context riêng từng token + CLB
   pages/WorkspaceHome           thông tin và review hub
   pages/WorkspaceOverview       tổng quan và thống kê
-  pages/WorkspaceChat           lịch sử, polling và composer
+  pages/WorkspaceChat           lịch sử, polling và ô soạn
+  pages/ChannelAttachments      dán ảnh, bản nháp và xem/tải tệp
+  pages/ChannelMessageText      hiển thị link HTTP/HTTPS
   pages/WorkspaceMeetings       tạo, lên lịch và mở buổi họp
   pages/WorkspaceContent        list, detail, editor posts/activities
   pages/WorkspacePeople         members, departments
@@ -74,7 +78,9 @@ Tất cả dưới `/api/workspace/:clubId`, yêu cầu JWT và profile hoàn ch
 | --- | --- |
 | GET / | Club context và role của người gọi |
 | GET /channels | Danh sách kênh người gọi được phép đọc |
-| GET/POST /channels/:channelId/messages | Lịch sử và gửi tin |
+| GET/POST /channels/:channelId/messages | Đọc lịch sử và gửi tin văn bản/emoji |
+| POST /channels/:channelId/messages/attachments | Gửi ảnh/tệp qua multipart, có thể kèm chú thích |
+| GET /channels/:channelId/attachments/:attachmentId | Cấp URL xem ảnh hoặc tải tệp sau khi kiểm tra quyền |
 | GET /meetings | Danh sách phòng và buổi họp gắn CLB |
 | GET /departments; POST /departments; PATCH /departments/:id | Đọc/tạo/sửa ban |
 | GET /members; POST /members | Danh sách, thêm tài khoản đã có |
@@ -89,17 +95,17 @@ Các route `my-clubs` cũ vẫn giữ tương thích; shell mới không sử d�
 
 ## Kiểm chứng
 
-- Source `36ff795`: `npm test` đạt **44 test backend và 94 test frontend**.
-- Browser 1440 px và 390 px với API mô phỏng: menu mobile, đóng cột phải, lưu theme, gửi/nhận tin, chặn mở kênh private, mở đúng buổi họp và thử lại khi bước lưu lịch lỗi.
-- Kiểm tra chỉ đọc trên Supabase cho AE 18: chủ nhiệm, thành viên và head có thể dùng kênh Chung và kênh ban mở. Chỉ chủ nhiệm trong ba tài khoản đã kiểm tra có quyền mở Ban quản trị. Chưa nghiệm thu gửi tin, tạo lịch, đổi quyền ban trên DB thật hoặc audio/video giữa hai thiết bị. [Chi tiết ca thử](../work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx)
+- 20/11/2026: npm test đạt **49 backend và 100 frontend**. Build frontend đạt trong lượt sửa cuối. Browser dùng API mô phỏng để kiểm tra ảnh và tài liệu, bấm link ra đúng buổi họp, theme tối và phân trang ở desktop/mobile.
+- Supabase chỉ đọc: đã kiểm tra quyền kênh ở AE 18 và xác nhận bảng metadata, quan hệ API và bucket private cho đính kèm. [Kiểm tra migration đính kèm](../../supabase/verification/20261120_club_chat_attachments_postflight.sql)
+- Quick Tunnel đã chuyển HTTP/WSS với backend mô phỏng. Ca gửi/tải ảnh thật, tạo lịch và audio/video giữa hai thiết bị/hai mạng vẫn cần nghiệm thu. [Sổ phiên](../dev/session-log.mdx)
 
 ## Tiếp tục ở phiên sau
 
 | Ưu tiên | Việc còn mở | Điểm bắt đầu |
 | --- | --- | --- |
 | 1 | Đối chiếu quyền sửa metadata và đổi riêng tư với DB. Bổ sung quản lý người ngoài ban bởi head khi được giao | `workspace-people.service.ts`, `WorkspacePeople.tsx`, migration mở rộng |
-| 2 | Tải bù chat theo mốc tin cuối. Ca mô phỏng 55 tin mới chỉ hiện 50 tin | `WorkspaceChat.tsx`, `workspace-channels.service.ts` |
-| 3 | Khôi phục tạo lịch sau khi rời trang, xử lý buổi đã hủy và chốt quyền vào họp qua mã | `WorkspaceMeetings.tsx`, `meetings.service.ts` |
-| 4 | Sửa câu giới thiệu chat ở trang Ban, thống nhất nhãn Trưởng ban, rà theme tối của form họp và vị trí nút theme mobile | `WorkspacePeople.tsx`, `WorkspaceApp.tsx`, `workspace-theme.css` |
+| 2 | Tải bù chat theo mốc tin cuối, nghiệm thu tải tệp thật và xử lý file upload bỏ dở | `WorkspaceChat.tsx`, `workspace-channels.service.ts` |
+| 3 | Khôi phục tạo lịch sau khi rời trang, xử lý buổi đã hủy và nghiệm thu hai buổi qua HTTPS | `WorkspaceMeetings.tsx`, `meetings.service.ts` |
+| 4 | Sửa câu giới thiệu chat ở trang Ban, thống nhất nhãn Trưởng ban, rà vị trí nút đổi theme trên mobile | `WorkspacePeople.tsx`, `WorkspaceApp.tsx`, `workspace-theme.css` |
 
 Khi nghiệm thu, dùng các tài khoản test có vai trò khác nhau ở cùng CLB. Ghi lại ca thử thật và ca mô phỏng. Dùng [preflight chỉ đọc](../../supabase/verification/phase-04-workspace-preflight.sql) và [gói SQL mở rộng](../../output/unicircle-platform-migration-20261117/README.md) để đối chiếu schema. Thực hiện migration, seed hoặc nghiệm thu ghi dữ liệu trong môi trường đã được nhóm chọn. Tuyển dụng/phỏng vấn, thông báo và duyệt sửa tên/mô tả CLB vẫn là các luồng chưa nối vào workspace.

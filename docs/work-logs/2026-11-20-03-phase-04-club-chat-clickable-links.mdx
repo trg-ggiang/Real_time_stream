@@ -1,0 +1,24 @@
+﻿---
+title: Link bấm được trong chat CLB
+description: Hiển thị URL trong tin nhắn dưới dạng liên kết HTTP hoặc HTTPS.
+---
+
+## Thông tin phiên
+
+Session 2026-11-20-03, Codex. Hoàn thành tính năng, Phase 04 vẫn In Progress.
+
+## Công việc hoàn thành
+
+- ChannelMessageText nhận diện URL HTTP/HTTPS, giữ nguyên văn bản và dấu câu xung quanh. WorkspaceChat dùng cùng cách hiển thị cho tin vừa gửi và lịch sử.
+- Link cùng địa chỉ ứng dụng mở trong tab hiện tại để giữ phiên đăng nhập. Link bên ngoài mở tab mới với noopener và noreferrer.
+- Thêm gạch chân và ngắt dòng cho URL dài trong bong bóng chat sáng/tối. Dữ liệu tin vẫn là văn bản.
+
+## Kiểm tra
+
+- 100 test frontend đạt. Ca Workspace kiểm tra URL buổi họp, query/fragment, dấu câu và đích tab.
+- Frontend build và TypeScript đạt. Còn cảnh báo kích thước bundle.
+- Trình duyệt với API mô phỏng ở 1440 px sáng và 320 px tối xác nhận link vừa khung, bấm được và mở đúng buổi họp.
+
+## Tiếp tục
+
+Khi nghiệm thu tunnel với tài khoản thật, gửi link buổi họp vào kênh và bấm từ tài khoản nhận để kiểm tra luồng qua đăng nhập, quyền CLB và phòng chờ.

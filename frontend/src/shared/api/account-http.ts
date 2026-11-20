@@ -11,23 +11,24 @@ export class AccountApiError extends Error {
 export async function accountRequest<T>(
   token: string,
   path: string,
-  options: RequestInit = {},
+  options: RequestInit & { timeoutMs?: number } = {},
 ): Promise<T> {
+  const { timeoutMs = 15000, ...request } = options;
   const base = (import.meta.env.VITE_API_URL?.trim() || "").replace(/\/$/, "");
   const controller = new AbortController();
   const abort = () => controller.abort();
   options.signal?.addEventListener("abort", abort, { once: true });
   if (options.signal?.aborted) controller.abort();
-  const timeout = window.setTimeout(abort, 15000);
+  const timeout = window.setTimeout(abort, timeoutMs);
   try {
     const response = await fetch(`${base}/api/${path}`, {
-      ...options,
+      ...request,
       signal: controller.signal,
       cache: "no-store",
       headers: {
         ...options.headers,
         Authorization: `Bearer ${token}`,
-        ...(options.body && { "Content-Type": "application/json" }),
+        ...(options.body && !(options.body instanceof FormData) && { "Content-Type": "application/json" }),
       },
     });
     const data = await response.json().catch(() => null);

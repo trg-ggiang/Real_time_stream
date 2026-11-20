@@ -5,7 +5,11 @@ description: Theo dõi Module 1 trong phạm vi đã được giao.
 
 Trạng thái: In Progress. Bắt đầu: 2026-10-19 (Asia/Saigon).
 
-## Mục tiêu và phạm vi
+## Hiện trạng 20/11/2026
+
+Buổi họp CLB có link theo phiên, giữ đích qua đăng nhập và kiểm tra membership. Endpoint cấp token dùng room LiveKit riêng của phiên. Đã thử phân tách token ở test và đường HTTP/WSS qua Quick Tunnel với backend mô phỏng. Phase 05 còn chờ thử media và chat trên thiết bị thật. [Hướng dẫn tunnel](/modules/https-tunnel) · [Work log](/work-logs/2026-11-19-08-phase-05-club-meeting-tunnel)
+
+## Mục tiêu và phạm vi ban đầu của PoC
 
 Token giới hạn room/quyền/TTL, grid camera, audio renderer, controls và lifecycle. Chỉ triển khai Media Connection PoC; chưa thêm database, auth hoặc chat. Phase 03 được để sau PoC; không ánh xạ số phase với số module sản phẩm.
 
@@ -135,3 +139,7 @@ Removed the dedicated self-camera sidebar section during screen sharing; no remo
 ## Audio device dropdown arrows (2026-11-10)
 
 Replaced standalone gear with microphone/headphone caret menus, added receive-audio mute toggle and output-support fallback. FE build/typecheck and 43 tests passed; physical routing pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-15-phase-04-audio-device-arrows).
+
+## Link buổi họp CLB qua HTTPS tunnel — 2026-11-19
+
+Đã thêm link theo buổi họp CLB qua HTTPS, giữ phiên sau đăng nhập và kiểm tra membership ở API. Quick Tunnel đã thử HTTP và WSS với backend mô phỏng. Phase 04/05 vẫn In Progress, chờ thử media và chat với thiết bị thật. [Work log](/work-logs/2026-11-19-08-phase-05-club-meeting-tunnel).

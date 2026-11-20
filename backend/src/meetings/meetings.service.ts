@@ -16,6 +16,7 @@ import { User } from '../users/entities/user.entity';
 
 type Meeting = {
   meeting_id: string;
+  club_id: string | null;
   created_by: string;
   meeting_code: string;
   title: string;
@@ -45,7 +46,7 @@ type Member = {
 };
 
 const MEMBER_SELECT = 'meeting_member_id,meeting_id,user_id,role,admission_status,invited_at,removed_at';
-const MEETING_SELECT = 'meeting_id,created_by,meeting_code,title,recurrence_rule,waiting_room_enabled';
+const MEETING_SELECT = 'meeting_id,club_id,created_by,meeting_code,title,recurrence_rule,waiting_room_enabled';
 const SESSION_SELECT = 'session_id,meeting_id,livekit_room_name,status,scheduled_start_at,scheduled_end_at,started_at,ended_at';
 const ADMISSION_RETRY_LIMIT = 3;
 const ADMISSION_COOLDOWN_MS = 30 * 60 * 1000;
@@ -296,15 +297,18 @@ export class MeetingsService {
     return member;
   }
 
+  private async requireClubMeetingAccess(userId: string, clubId?: string | null) {
+    if (!clubId) return;
+    const [membership, club] = await Promise.all([
+      this.supabase.from('club_memberships').select('membership_id').eq('club_id', clubId).eq('user_id', userId).eq('status', 'active').maybeSingle(),
+      this.supabase.from('clubs').select('club_id').eq('club_id', clubId).eq('status', 'published').maybeSingle(),
+    ]);
+    if (membership.error || club.error) throw new ServiceUnavailableException('Không kiểm tra được quyền cuộc họp CLB.');
+    if (!membership.data || !club.data) throw new ForbiddenException('Chỉ thành viên đang hoạt động được truy cập cuộc họp nội bộ của CLB.');
+  }
+
   private async insertMeeting(owner: User, title: string, waitingRoomEnabled: boolean, recurrenceRule: string | null, clubId?: string) {
-    if (clubId) {
-      const [membership, club] = await Promise.all([
-        this.supabase.from('club_memberships').select('membership_id').eq('club_id', clubId).eq('user_id', owner.userId).eq('status', 'active').maybeSingle(),
-        this.supabase.from('clubs').select('club_id').eq('club_id', clubId).eq('status', 'published').maybeSingle(),
-      ]);
-      if (membership.error || club.error) throw new ServiceUnavailableException('Không kiểm tra được quyền tạo cuộc họp CLB.');
-      if (!membership.data || !club.data) throw new ForbiddenException('Chỉ thành viên đang hoạt động được tạo cuộc họp cho CLB.');
-    }
+    await this.requireClubMeetingAccess(owner.userId, clubId);
     const cleanTitle = title.trim();
     if (!cleanTitle) throw new BadRequestException('Meeting title cannot be empty.');
     const meetingId = randomUUID();
@@ -353,8 +357,9 @@ export class MeetingsService {
     return { ...meeting, session };
   }
 
-  async listSessions(code: string) {
+  async listSessions(user: User, code: string) {
     const meeting = await this.getMeetingByCode(code);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     const { data, error } = await this.supabase.from('meeting_sessions').select(SESSION_SELECT)
       .eq('meeting_id', meeting.meeting_id).order('scheduled_start_at', { ascending: true });
     if (error) throw new ServiceUnavailableException('Could not load meeting sessions.');
@@ -482,6 +487,7 @@ export class MeetingsService {
 
   async join(user: User, code: string, sessionId: string) {
     const meeting = await this.getMeetingByCode(code);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     let session = await this.getSession(meeting.meeting_id, sessionId);
     session = await this.activateSession(session);
 
@@ -581,6 +587,8 @@ export class MeetingsService {
   }
 
   async joinStatus(user: User, meetingId: string, sessionId: string) {
+    const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     const session = await this.getSession(meetingId, sessionId);
     if (session.status === 'ended') return { status: 'session_ended', sessionId };
     const member = await this.getMember(meetingId, user.userId);

@@ -1,7 +1,7 @@
 # Claude project instructions
 
 Read and follow `AGENTS.md`, `README.md`, and `docs/ai-workflow.mdx` at the start of every session.
-Read `docs/plans/master-plan.mdx`, the active phase page, and the latest entry in `docs/dev/session-log.mdx` before editing.
+Read `docs/plans/master-plan.mdx`, the active phase page, and the latest relevant work log linked from `docs/dev/session-log.mdx` before editing.
 
 Use [CODE_FLOW.md](CODE_FLOW.md) and the [workspace handoff](docs/design/phase-04-club-workspace.md) for the current code and verification limits. Add implementation only when the user requests it.
 

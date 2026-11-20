@@ -152,14 +152,15 @@ Trang khám phá dùng route danh sách và chi tiết riêng, chẳng hạn `/c
 
 1. `/workspace` lấy CLB đã tham gia và mở kênh Chung của CLB đầu tiên. `WorkspaceApp` lấy lại context khi đổi CLB. NestJS yêu cầu application JWT, hồ sơ đầy đủ, CLB published và membership active.
 2. `GET /api/workspace/:clubId/channels` chỉ trả kênh mà `clubspace_can_read_channel` cho phép. Kênh ban mở dùng chung trong CLB. Kênh private phụ thuộc ban của người dùng hoặc quyền được cấp riêng.
-3. `GET/POST /api/workspace/:clubId/channels/:channelId/messages` đọc hoặc ghi `channel_messages`. Backend xác định người gửi từ membership và dùng `client_message_id` để xử lý lần gửi lại. UI lấy 50 tin mỗi lượt, tải tin cũ theo cursor, polling khoảng 3 giây khi tab hiển thị. Enter gửi, Shift+Enter xuống dòng. Theme workspace lưu trong trình duyệt.
-4. Trang thành viên, ban, bài viết và hoạt động gọi API workspace. Trang họp liệt kê theo `clubId`. Tạo cuộc họp từ workspace gửi `clubId`, sau đó mở module họp bằng mã/phần định danh buổi. Quyền vào và vai trò host vẫn thuộc module meeting.
+3. `GET/POST /api/workspace/:clubId/channels/:channelId/messages` đọc hoặc ghi `channel_messages`. Backend xác định người gửi từ membership và dùng `client_message_id` để xử lý lần gửi lại. UI lấy 50 tin mỗi lượt, tải tin cũ theo cursor, polling khoảng 3 giây khi tab hiển thị. Enter gửi, Shift+Enter xuống dòng. Giao diện chèn emoji vào văn bản và hiển thị URL HTTP/HTTPS thành link bấm được. Link cùng địa chỉ ứng dụng mở trong tab hiện tại. Theme workspace lưu trong trình duyệt.
+4. Chat nhận ảnh/tệp từ kẹp giấy hoặc ảnh dán vào ô soạn. `POST /api/workspace/:clubId/channels/:channelId/messages/attachments` nhận multipart, kiểm tra tối đa 3 tệp và 15 MiB, nhận diện kiểu tệp từ dữ liệu và upload vào bucket private. RPC `clubspace_send_channel_message_with_attachments` ghi tin và metadata trong cùng giao dịch. `GET /api/workspace/:clubId/channels/:channelId/attachments/:attachmentId` kiểm tra quyền kênh và tin còn hiển thị trước khi cấp URL xem/tải 120 giây. Ảnh hiện trực tiếp, tài liệu hiện thẻ tải xuống.
+5. Trang thành viên, ban, bài viết và hoạt động gọi API workspace. Trang họp liệt kê theo `clubId`. Tạo cuộc họp từ workspace gửi `clubId`, sau đó mở module họp bằng mã/phần định danh buổi. Module meeting kiểm tra membership đang hoạt động trong CLB cho lịch, join và trạng thái phòng chờ, rồi áp dụng quyền theo cuộc họp. Nút Sao chép link buổi lấy origin hiện tại. Link mời giữ mã và ID buổi qua đăng nhập và bước hồ sơ. Dùng origin HTTPS của tunnel khi gửi cho máy ngoài mạng.
 
 Xem [bàn giao workspace](docs/design/phase-04-club-workspace.md) để biết các đầu mối code, ca lỗi tải bù chat, phân quyền head và lịch họp tạo dở.
 
 ## 5. Tạo hoặc mở cuộc họp
 
-Sảnh ở `MeetingPage` mở qua `/?view=meeting` trong ứng dụng đã đăng nhập.
+Sảnh ở `MeetingPage` mở qua `/?view=meeting` trong ứng dụng đã đăng nhập. Link mời `/?view=meeting&meeting=<mã>&session=<id>` giữ đúng buổi qua đăng nhập và hồ sơ.
 Mã có thể nhập trực tiếp hoặc lấy từ query `meeting`; parser chấp nhận mã 10
 chữ/số hoặc link mời chứa query `meeting`.
 
@@ -354,7 +355,7 @@ workspaces backend/frontend.
 ## 11. Trạng thái và giới hạn cần nhớ
 
 - Phase 03–06 đang **In Progress**. Đã có API và giao diện cho các luồng chính của CLB, meeting và hai loại chat. Tuyển dụng/phỏng vấn chưa nối vào workspace.
-- Lượt rà gần nhất trên source `36ff795` đạt **44 test backend và 94 test frontend**. Đã thử giao diện với API mô phỏng, đồng thời đọc quyền kênh thật của AE 18. [Work log](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx)
+- `npm test` trên bản hiện tại đạt **49 test backend và 100 test frontend**. Các work log ghi riêng ca UI/API mô phỏng, kiểm tra chỉ đọc trên Supabase và ca LiveKit/Storage thật còn mở. [Sổ phiên](docs/dev/session-log.mdx)
 - Nghiệm thu ghi Supabase và media LiveKit trên hai thiết bị vẫn còn. Gói SQL mở rộng được lưu cùng [tài liệu migration](output/unicircle-platform-migration-20261117/README.md).
 
 ## 12. Đọc tiếp

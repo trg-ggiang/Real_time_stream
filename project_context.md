@@ -1,6 +1,6 @@
 # PROJECT CONTEXT — HỆ THỐNG PHÒNG HỌP TRỰC TUYẾN VÀ NỀN TẢNG QUẢN LÝ CÂU LẠC BỘ ĐẠI HỌC
 
-> **Hiện trạng 19/11/2026.** Đọc [luồng hệ thống](CODE_FLOW.md), [bàn giao Không gian sinh hoạt](docs/design/phase-04-club-workspace.md) và [work log rà soát](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx) trước phần bối cảnh lịch sử bên dưới. Nền tảng đã có auth/hồ sơ, khám phá, cá nhân, admin, workspace, chat kênh và họp theo CLB. Tuyển dụng/phỏng vấn vẫn là phạm vi phát triển sau.
+> **Hiện trạng 20/11/2026.** Đọc [luồng hệ thống](CODE_FLOW.md), [bàn giao Không gian sinh hoạt](docs/design/phase-04-club-workspace.md) và [sổ phiên](docs/dev/session-log.mdx) trước phần lịch sử bên dưới. Nền tảng đã có auth/hồ sơ, khám phá, cá nhân, admin và không gian CLB. Chat kênh hỗ trợ emoji, ảnh/tệp, dán ảnh và link bấm được. Họp CLB có link theo phiên và chạy thử qua Quick Tunnel. Tuyển dụng/phỏng vấn chưa nối vào workspace.
 
 > Ghi nhận ngày 2026-10-19 (Asia/Saigon) từ nội dung người dùng cung cấp.
 >

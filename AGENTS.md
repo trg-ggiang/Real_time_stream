@@ -7,8 +7,8 @@
 
 ## Session start
 1. Read `README.md`, this file, `.codex/AGENTS.md` (Codex) or `CLAUDE.md` (Claude), `docs/index.mdx`, `docs/ai-workflow.mdx`, `docs/plans/master-plan.mdx`, and `docs/dev/session-log.mdx`.
-2. Read the active phase and its latest work log before editing.
-3. Check `git status --short` if `.git` exists; the project now has a Git repository. Preserve unrelated changes.
+2. Open the active phase and relevant completed work logs via `docs/dev/session-log.mdx`. Check the related source and migrations to distinguish current behavior from historical notes.
+3. Check `git status -sb` before editing. Preserve unrelated changes. Confirm the target branch before an authorized commit or push.
 4. Inspect relevant files with `rg` before changing them. Follow the user's current authorized scope; a roadmap is not permission to implement future phases.
 
 ## Working rules
@@ -17,7 +17,7 @@
 - Never hardcode or log credentials. Keep Supabase secret keys and LiveKit API secrets backend-only; never put secrets in `VITE_*` variables.
 - Before future Supabase schema/RLS/migration work, read the available Supabase Postgres best-practices skill.
 - Do not auto-commit, publish, or execute destructive Git/filesystem commands without user authorization.
-- Use the smallest relevant checks. Record skipped checks and their reasons honestly.
+- Use the smallest relevant checks. Report automated tests, browser fixtures, read-only checks against services and live end-to-end tests separately. Record skipped checks and their reasons.
 
 ## Work logs for completed code changes only
 Create a work log only after requested application or operational script code changes are complete. Do not create logs for questions, explanations, read-only reviews, Git operations, configuration/docs-only changes, or incomplete work. The user's current instruction takes precedence over older logging requirements.

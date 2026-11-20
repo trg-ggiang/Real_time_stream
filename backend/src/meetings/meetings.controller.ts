@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -39,8 +39,9 @@ export class MeetingsController {
   }
 
   @Get(':code/sessions')
-  sessions(@Param('code') code: string) {
-    return this.meetings.listSessions(code);
+  @Header('Cache-Control', 'private, no-store')
+  sessions(@CurrentUser() user: User, @Param('code') code: string) {
+    return this.meetings.listSessions(user, code);
   }
 
   @Post(':meetingId/sessions')

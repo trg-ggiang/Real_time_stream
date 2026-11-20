@@ -77,6 +77,14 @@ export interface ChannelMessage {
   message_id: string; channel_id: string; sender_membership_id: string; content: string;
   sender: string; avatar_url: string | null; created_at: string; edited_at: string | null;
   deleted_at: string | null; mine: boolean; client_message_id?: string;
+  attachments?: ChannelAttachment[];
+}
+export interface ChannelAttachment {
+  attachment_id: string;
+  original_name: string;
+  mime_type: string;
+  size_bytes: number;
+  position: number;
 }
 export interface ChannelHistory {
   items: ChannelMessage[]; hasMore: boolean; cursor: { before: string; before_id: string } | null;
@@ -100,7 +108,7 @@ export const workspaceRequest = <T>(
   token: string,
   clubId: string,
   path = "",
-  options?: RequestInit,
+  options?: RequestInit & { timeoutMs?: number },
 ) =>
   accountRequest<T>(
     token,

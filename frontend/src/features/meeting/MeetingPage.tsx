@@ -6,7 +6,7 @@ import { LinkSimple } from '@phosphor-icons/react/dist/csr/LinkSimple';
 import { CreateMeetingForm, ScheduleSessionForm, type CreateValues } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
 import { useSessionFlow } from './hooks/use-session-flow';
-import { canManageSessions, formatMeetingDate, meetingRequest, parseMeetingCode, roleLabels, type Member, type Membership, type MeetingOverview, type MeetingSession } from './services/meetings-api';
+import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, parseMeetingCode, parseMeetingInvite, roleLabels, type Member, type Membership, type MeetingOverview, type MeetingSession } from './services/meetings-api';
 import './meeting.css';
 import './workspace.css';
 import { UnauthorizedError } from './services/token-api';
@@ -38,8 +38,20 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
   const lock = useRef(false), revision = useRef(0), actionController = useRef<AbortController | null>(null);
   const name = displayName.trim() || 'Bạn';
   const initials = Array.from(name)[0]?.toLocaleUpperCase('vi') || 'B';
-  const selected = overview?.sessions.find(s => s.session_id === (flow.active?.sessionId || selectedId))
-    || overview?.sessions.find(s => s.status === 'ongoing') || overview?.sessions.find(s => s.status === 'scheduled') || overview?.sessions[0];
+  const requestedSessionId = flow.active?.sessionId || selectedId;
+  const selected = requestedSessionId
+    ? overview?.sessions.find(session => session.session_id === requestedSessionId)
+    : overview?.sessions.find(session => session.status === 'ongoing')
+      || overview?.sessions.find(session => session.status === 'scheduled') || overview?.sessions[0];
+  const requestedSessionIndex = requestedSessionId
+    ? overview?.sessions.findIndex(session => session.session_id === requestedSessionId)
+    : undefined;
+
+  useEffect(() => {
+    if (requestedSessionIndex !== undefined && requestedSessionIndex >= 0) {
+      setSessionPage(Math.floor(requestedSessionIndex / 10));
+    }
+  }, [requestedSessionId, requestedSessionIndex]);
 
   const report = useCallback((cause: unknown) => {
     flow.report(cause);
@@ -130,9 +142,8 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     catch (cause) { report(cause); throw cause; }
     finally { lock.current = false; setBusy(false); }
   }
-  async function copyLink() {
-    try { await navigator.clipboard.writeText(window.location.href); setNotice('Đã sao chép đường dẫn cuộc họp.'); }
-    catch { setNotice(`Không sao chép được. Mã cuộc họp: ${code}`); }
+  async function copyLink(sessionId?: string) {
+    if (overview) setNotice(await copyMeetingInvite(overview.meeting.meetingCode, sessionId));
   }
   const waiting = flow.waiting;
   const cooldown = waiting?.retryAt && Date.parse(waiting.retryAt) > now;
@@ -152,13 +163,14 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
       {pageError && (code || !error) ? <p role="alert" className="notice error workspace-error">{pageError}</p> : null}
       <p role="status" className="workspace-feedback">{notice}</p>
       {flow.active && overview ? <>
-        <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><button type="button" className="workspace-icon meeting-share-button" onClick={() => void copyLink()} title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button></div>
+        <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><button type="button" className="workspace-icon meeting-share-button" onClick={() => void copyLink(flow.active?.sessionId)} title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button></div>
         <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} accessToken={accessToken} onLeave={() => void flow.leave()} onEnded={flow.ended}
           management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} /></Suspense>
       </> : code ? <>
         <button className="workspace-back" type="button" disabled={busy || flow.busy} onClick={async () => { await flow.leave(); openMeeting(''); }}><ArrowLeft size={18} aria-hidden="true" />Tổng quan</button>
         {loading ? <p role="status" className="meeting-loading">Đang tải cuộc họp…</p> : overview ? <>
-          <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><button className="workspace-icon meeting-share-button" type="button" title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn" onClick={() => void copyLink()}><ShareNetwork size={22} aria-hidden="true" /></button></div>
+          <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><button className="workspace-icon meeting-share-button" type="button" title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn" disabled={!!requestedSessionId && !selected} onClick={() => void copyLink(selected?.session_id)}><ShareNetwork size={22} aria-hidden="true" /></button></div>
+          {requestedSessionId && !selected ? <p role="status">Buổi họp trong đường dẫn không còn khả dụng. Hãy kiểm tra link hoặc chọn một buổi bên dưới.</p> : null}
           {waiting ? <section className="workspace-waiting" aria-labelledby="waiting-title">
             <span className="workspace-waiting-symbol" aria-hidden="true">{waiting.status === 'pending' ? '◷' : waiting.status === 'denied' ? '×' : '✓'}</span>
             <h2 id="waiting-title">{waiting.status === 'pending' ? 'Đang chờ duyệt' : waiting.status === 'denied' ? 'Yêu cầu đã bị từ chối' : waiting.status === 'session_ended' ? 'Buổi họp đã kết thúc' : 'Yêu cầu không còn hiệu lực'}</h2>
@@ -176,6 +188,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
               return <article className="workspace-session" data-selected={selected?.session_id === session.session_id} key={session.session_id}>
                 <div><span className={`workspace-session-status workspace-session-status--${session.status}`}>{statusLabels[session.status]}</span><h3>Buổi {sessionPage * 10 + index + 1}</h3><time dateTime={session.scheduled_start_at || undefined}>{formatMeetingDate(session.scheduled_start_at || session.started_at)}</time>{session.scheduled_end_at ? <p>Kết thúc: {formatMeetingDate(session.scheduled_end_at)}</p> : null}</div>
                 <div className="workspace-session-actions"><button type="button" disabled={flow.busy || !!waiting || future || session.status === 'ended'} onClick={() => { setSelectedId(session.session_id); const url = new URL(window.location.href); url.searchParams.set('session', session.session_id); history.replaceState(null, '', url); void flow.join(code, overview.meeting.meetingId, session.session_id); }}>{flow.busy && selectedId === session.session_id ? 'Đang tham gia…' : future ? 'Chưa đến giờ' : session.status === 'ended' ? 'Đã kết thúc' : 'Tham gia'}</button>
+                {session.status !== 'ended' ? <button type="button" className="workspace-text-button" onClick={() => void copyLink(session.session_id)}>Sao chép link buổi</button> : null}
                 {canManageSessions(overview.membership) && selected?.session_id !== session.session_id ? <button type="button" className="workspace-text-button" onClick={() => setSelectedId(session.session_id)}>Chọn quản lý</button> : null}</div>
               </article>;
             })}
@@ -190,7 +203,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
           <section className="workspace-join lobby-join" aria-labelledby="join-title">
             <span className="lobby-join-symbol" aria-hidden="true"><LinkSimple size={30} /></span>
             <div className="workspace-section-title"><h2 id="join-title">Tham gia cuộc họp</h2></div>
-            <form className="workspace-form" onSubmit={event => { event.preventDefault(); try { setError(''); openMeeting(parseMeetingCode(String(new FormData(event.currentTarget).get('code')))); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Mã không hợp lệ.'); } }}>
+            <form className="workspace-form" onSubmit={event => { event.preventDefault(); try { setError(''); const invite = parseMeetingInvite(String(new FormData(event.currentTarget).get('code'))); openMeeting(invite.code, invite.sessionId); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Mã không hợp lệ.'); } }}>
               <label htmlFor="meeting-code">Mã hoặc đường dẫn mời</label>
               <div className="lobby-code-field"><LinkSimple size={21} aria-hidden="true" /><input id="meeting-code" name="code" required autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="Mã ..." aria-invalid={!!error} aria-describedby={error ? 'join-code-error' : undefined} /></div>
               {error ? <p id="join-code-error" className="notice error" role="alert">{error}</p> : null}

@@ -118,8 +118,15 @@ try {
     }
     if (-not $publicUrl) { throw "No public URL received. See $tunnelLog" }
     [pscustomobject]@{ url = $publicUrl; processes = $owned } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $statePath -Encoding UTF8
-    Write-Host "HTTPS meeting URL: $publicUrl"
-    Write-Host 'Login is required; registered users share the PoC room. Share only with your test group.'
+    Write-Host "UniCircle HTTPS: $publicUrl"
+    try {
+        Wait-Http "$publicUrl/api/health" $tunnel
+        Write-Host 'Public API health check passed.'
+    } catch {
+        Write-Warning 'This machine could not verify the public API. Check the URL from another network and inspect the tunnel log if it still fails.'
+    }
+    Write-Host 'Open this URL on both devices, then sign in and open the same meeting session from the club workspace.'
+    Write-Host 'Copy the session link from the HTTPS page. The URL changes on the next Quick Tunnel run.'
     Write-Host 'Keep this terminal running. Ctrl+C or npm run tunnel:stop stops this session.'
     while (-not $tunnel.HasExited) {
         if ($preview.HasExited -or ($backend -and $backend.HasExited)) { throw 'A local service stopped.' }

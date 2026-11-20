@@ -1,8 +1,10 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { WorkspaceAccess } from './workspace-access.service';
+import { attachmentBucket, prepareChannelAttachments, type ChannelUpload } from './channel-attachments';
 
 const fields = 'channel_id,club_id,department_id,kind,name,description';
-const messageFields = 'message_id,channel_id,sender_membership_id,client_message_id,content,created_at,edited_at,deleted_at,club_memberships!sender_membership_id(users(display_name,avatar_url))';
+const messageFields = 'message_id,channel_id,sender_membership_id,client_message_id,content,created_at,edited_at,deleted_at,club_memberships!sender_membership_id(users(display_name,avatar_url)),attachments:channel_message_attachments(attachment_id,original_name,mime_type,size_bytes,position)';
+const attachmentLinkSeconds = 120;
 
 @Injectable()
 export class WorkspaceChannels {
@@ -35,8 +37,9 @@ export class WorkspaceChannels {
   }
 
   private publicMessage(row: Record<string, any>, membershipId: string) {
-    const { club_memberships, client_message_id, ...message } = row;
+    const { club_memberships, client_message_id, attachments, ...message } = row;
     return { ...message, content: row.deleted_at ? '' : row.content,
+      attachments: row.deleted_at ? [] : (attachments ?? []).slice().sort((a: { position: number }, b: { position: number }) => a.position - b.position),
       sender: club_memberships?.users?.display_name || 'Thành viên',
       avatar_url: club_memberships?.users?.avatar_url ?? null,
       mine: row.sender_membership_id === membershipId,
@@ -78,5 +81,55 @@ export class WorkspaceChannels {
     }
     this.access.check(result.error);
     return { item: this.publicMessage(result.data!, context.membership.membership_id) };
+  }
+
+  async sendWithAttachments(userId: string, clubId: string, channelId: string,
+    body: { client_message_id: string; content: string }, files: ChannelUpload[]) {
+    const context = await this.authorize(userId, clubId, channelId);
+    const content = body.content.trim();
+    if ([...content].length > 2000) throw new BadRequestException('Chú thích tối đa 2000 ký tự.');
+    const membershipId = context.membership.membership_id;
+    const uploads = await prepareChannelAttachments(files, membershipId, channelId, body.client_message_id);
+    const bucket = this.db.storage.from(attachmentBucket);
+    for (const { buffer, metadata } of uploads) {
+      const { error } = await bucket.upload(`${channelId}/${metadata.attachment_id}`, buffer, {
+        contentType: metadata.mime_type, upsert: false, cacheControl: '0',
+      });
+      // Storage may report an existing object as a legacy Duplicate or a
+      // ResourceAlreadyExists error. Both are safe for these content-bound paths.
+      if (error && !(('statusCode' in error && ['409', 'Duplicate', 'ResourceAlreadyExists'].includes(String(error.statusCode))) ||
+        error.message === 'The resource already exists' || error.message === 'Asset Already Exists')) {
+        throw new ServiceUnavailableException('Chưa tải được tệp lên. Bạn có thể thử gửi lại.');
+      }
+    }
+
+    const result = await this.db.rpc('clubspace_send_channel_message_with_attachments', {
+      p_actor: userId, p_channel: channelId, p_client_message_id: body.client_message_id, p_content: content,
+      p_attachments: uploads.map(upload => upload.metadata),
+    });
+    if (result.error?.code === '42501') throw new ForbiddenException('Bạn không còn quyền gửi trong kênh này.');
+    this.access.check(result.error);
+    const message = await this.db.from('channel_messages').select(messageFields)
+      .eq('message_id', result.data).eq('channel_id', channelId).single();
+    this.access.check(message.error);
+    return { item: this.publicMessage(message.data!, membershipId) };
+  }
+
+  async attachmentUrl(userId: string, clubId: string, channelId: string, attachmentId: string, preview: boolean) {
+    await this.authorize(userId, clubId, channelId);
+    const match = await this.db.from('channel_message_attachments')
+      .select('object_path,original_name,mime_type,channel_messages!inner(channel_id,deleted_at)')
+      .eq('attachment_id', attachmentId).eq('channel_messages.channel_id', channelId)
+      .is('channel_messages.deleted_at', null).maybeSingle();
+    this.access.check(match.error);
+    if (!match.data) throw new NotFoundException('Không tìm thấy tệp trong kênh này.');
+    if (preview && !match.data.mime_type.startsWith('image/')) {
+      throw new BadRequestException('Chỉ ảnh có thể xem trước.');
+    }
+    const signed = await this.db.storage.from(attachmentBucket).createSignedUrl(
+      match.data.object_path, attachmentLinkSeconds, preview ? undefined : { download: match.data.original_name },
+    );
+    if (signed.error || !signed.data) throw new ServiceUnavailableException('Chưa mở được tệp. Vui lòng thử lại.');
+    return { url: signed.data.signedUrl };
   }
 }

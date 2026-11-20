@@ -1075,3 +1075,6 @@
   .cw-channel-history { padding: 23px 20px; }
   .cw-channel-composer { margin: 0 15px 15px; flex-direction: column; align-items: stretch; gap: 0; }
 }
+
+.cw-session-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.cw-share-notice { overflow-wrap: anywhere; }

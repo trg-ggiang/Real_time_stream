@@ -59,6 +59,32 @@ export async function meetingRequest<T>(accessToken: string, path: string, optio
   return data as T;
 }
 
+export function meetingInviteUrl(origin: string, code: string, sessionId?: string): URL {
+  const url = new URL('/', origin);
+  url.searchParams.set('view', 'meeting');
+  url.searchParams.set('meeting', parseMeetingCode(code));
+  if (sessionId) url.searchParams.set('session', sessionId);
+  return url;
+}
+
+export async function copyMeetingInvite(code: string, sessionId?: string) {
+  const link = meetingInviteUrl(window.location.origin, code, sessionId);
+  const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(link.hostname);
+  const hint = loopback ? ' Mở ứng dụng bằng URL HTTPS của tunnel để chia sẻ ra ngoài.' : '';
+  try {
+    await navigator.clipboard.writeText(link.href);
+    return (loopback ? 'Đã sao chép link cục bộ.' : 'Đã sao chép đường dẫn.') + hint;
+  } catch {
+    return link.href + hint;
+  }
+}
+
+export function parseMeetingInvite(value: string) {
+  const code = parseMeetingCode(value);
+  const sessionId = /^https?:\/\//i.test(value.trim()) ? new URL(value.trim()).searchParams.get('session') || '' : '';
+  return { code, sessionId };
+}
+
 export function parseMeetingCode(value: string): string {
   let code = value.trim();
   if (/^https?:\/\//i.test(code)) {

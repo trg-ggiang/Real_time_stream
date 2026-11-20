@@ -1,0 +1,24 @@
+﻿---
+title: Dán ảnh và xem ảnh lớn trong chat CLB
+description: Dán ảnh từ clipboard, hiển thị trực tiếp và mở trình xem ảnh.
+---
+
+## Thông tin phiên
+
+Session 2026-11-20-02, Codex. Hoàn thành phần giao diện. Phase 04 vẫn In Progress.
+
+## Công việc hoàn thành
+
+- WorkspaceChat đưa ảnh từ clipboard vào cùng bản nháp với tệp chọn qua nút kẹp giấy. Dán văn bản vẫn dùng thao tác mặc định. Giới hạn, gửi lại, Enter và Shift+Enter dùng luồng hiện có.
+- ChannelAttachments hiển thị ảnh thu nhỏ ở bản nháp và ảnh trực tiếp trong lịch sử. Thẻ tên/dung lượng chỉ dùng cho tài liệu. Nhấn ảnh mở dialog dùng link mới, có tải xuống và đóng bằng Escape.
+- Workspace theme áp dụng kích thước linh hoạt và màu theo giao diện sáng/tối. Supabase tiếp tục dùng migration đính kèm ngày 20/11.
+
+## Kiểm tra
+
+- 99 test frontend đạt. Test Workspace kiểm tra ảnh dán, gửi lại, tài liệu, mở ảnh và tải xuống.
+- Frontend build và TypeScript đạt. Còn cảnh báo kích thước bundle.
+- Trên trình duyệt với API mô phỏng, tại 1440 px sáng và 320 px tối đã thử sự kiện dán ảnh, gửi kèm PDF, mở dialog, kiểm tra kích thước và trả focus về ảnh khi nhấn Escape.
+
+## Tiếp tục
+
+Nghiệm thu gửi ảnh thật từ clipboard bằng hai tài khoản trên Supabase. Lượt này xác nhận UI và các tuyến API qua dữ liệu mô phỏng.

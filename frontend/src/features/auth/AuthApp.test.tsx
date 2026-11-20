@@ -2,6 +2,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { AuthApp } from './AuthApp';
+import { App } from '../../App';
 
 vi.mock('../meeting/MeetingPage', () => ({
   MeetingPage: ({ accessToken, displayName, onLogout, onBack }: { accessToken: string; displayName: string; onLogout: () => void; onBack: () => void }) =>
@@ -204,4 +205,24 @@ it('sends registration fields, prevents double submit, and keeps a useful server
   await act(async () => resolve({ ok: false, status: 409 }));
   expect(screen.getByRole('alert').textContent).toBe('Email đã được sử dụng.');
   expect((screen.getByRole('button', { name: 'Tạo tài khoản' }) as HTMLButtonElement).disabled).toBe(false);
+});
+
+it('opens login for an invite and returns to its exact session', async () => {
+  const invite = '/?view=meeting&meeting=ABCDEFGHIJ&session=target-session';
+  window.history.replaceState(null, '', invite);
+  const user = { userId: 'member', email: 'member@example.test', displayName: 'Member', role: 'student' };
+  vi.stubGlobal('fetch', vi.fn(async (url: string) => ({
+    ok: true,
+    json: async () => url.endsWith('/profile') ? completedProfile : url.endsWith('/auth/me')
+      ? user : { access_token: 'test-jwt', user },
+  })));
+
+  render(<App />);
+  const email = await screen.findByLabelText('Email');
+  fireEvent.change(email, { target: { value: user.email } });
+  fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+  fireEvent.submit(email.closest('form')!);
+
+  expect((await screen.findByTestId('token')).textContent).toBe('test-jwt');
+  expect(location.pathname + location.search).toBe(invite);
 });

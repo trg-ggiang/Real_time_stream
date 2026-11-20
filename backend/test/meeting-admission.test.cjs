@@ -20,6 +20,8 @@ function fixture(options={}) {
     query.update=values=>{call.mode='update';call.values=values;return query;};
     const execute=()=>{
       if(options.resolve)return options.resolve(call);
+      if(table==='club_memberships')return {data:options.clubMembership?{membership_id:'membership'}:null,error:null};
+      if(table==='clubs')return {data:{club_id:'club'},error:null};
       if(table==='meeting_members' && call.mode==='insert')return {data:{...member(call.values.admission_status),...call.values},error:null};
       if(table==='attendances' && call.mode==='insert')return {data:{attendance_id:'actual-attendance'},error:null};
       return {data:call.mode==='update'?{meeting_member_id:'guest-member'}:[],error:null};
@@ -31,6 +33,7 @@ function fixture(options={}) {
   const values={LIVEKIT_URL:'wss://unit.invalid',LIVEKIT_API_KEY:'synthetic-key',LIVEKIT_API_SECRET:'synthetic-secret-long-enough-for-unit-test',LIVEKIT_TOKEN_TTL_SECONDS:300};
   const service=new MeetingsService({get:key=>values[key],getOrThrow:key=>values[key]}, {client});
   service.getMeetingByCode=async()=>({meeting_id:'meeting',waiting_room_enabled:options.waiting!==false});
+  service.getMeetingById=service.getMeetingByCode;
   service.getSession=async(meetingId,id)=>({meeting_id:meetingId,session_id:id,status:'ongoing',livekit_room_name:'room-'+id});
   service.getMember=async()=>options.member||null;
   service.getMemberById=async()=>options.member||member();
@@ -131,4 +134,28 @@ test('join tokens permit hand raising for every role and screen sources only for
     assert.equal(claims.video.canPublishSources.includes('screen_share_audio'),role==='host');
     assert.equal(joined.role,role);
   }
+});
+
+test('parallel club sessions issue tokens scoped to distinct LiveKit rooms', async () => {
+  const { service, calls } = fixture({ member: member('admitted'), clubMembership: true });
+  service.getMeetingByCode = async () => ({ meeting_id: 'meeting', club_id: 'club', waiting_room_enabled: true });
+  const sessions = ['session-a', 'session-b'];
+  const credentials = await Promise.all(sessions.map(id => service.join(user, 'CODE', id)));
+  for (const [index, joined] of credentials.entries()) {
+    const claims = JSON.parse(Buffer.from(joined.token.split('.')[1], 'base64url').toString());
+    assert.equal(claims.video.room, 'room-' + sessions[index]);
+    assert.equal(joined.sessionId, sessions[index]);
+  }
+  assert.deepEqual(calls.filter(call => call.table === 'attendances').map(call => call.values.session_id).sort(), sessions);
+});
+
+test('club meeting outsiders cannot list sessions, join or read admission status', async () => {
+  const { service, calls } = fixture();
+  service.getMeetingById = service.getMeetingByCode = async () => ({ meeting_id: 'meeting', club_id: 'club' });
+  service.getSession = async () => assert.fail('Access must be checked before touching the session');
+  const forbidden = error => error.getStatus() === 403;
+  await assert.rejects(service.listSessions(user, 'CODE'), forbidden);
+  await assert.rejects(service.join(user, 'CODE', sessionId), forbidden);
+  await assert.rejects(service.joinStatus(user, 'meeting', sessionId), forbidden);
+  assert.ok(calls.every(call => call.mode === 'select' && ['club_memberships', 'clubs'].includes(call.table)));
 });

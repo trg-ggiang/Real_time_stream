@@ -3,12 +3,12 @@ title: Master Plan
 description: Tiến trình phase và thứ tự triển khai theo context.
 ---
 
-**Mốc bàn giao 19/11/2026** · Source đã rà ở `36ff795`, kết quả chi tiết trong [work log](/work-logs/2026-11-19-07-phase-04-workspace-chat-enter). **Phase 04 vẫn In Progress**.
+**Bàn giao 20/11/2026 · Phase 04 vẫn In Progress.**
 
-- Đã có khám phá công khai, hồ sơ bắt buộc, không gian cá nhân, theo dõi CLB, đăng ký hoạt động, đề nghị thành lập và trang admin duyệt CLB.
-- Workspace đã dùng kênh thật, chat qua HTTP polling, họp gắn CLB và công cụ quản lý nội dung/thành viên/ban. Chat có bong bóng gửi/nhận, theme Sáng/Tối và phím Enter để gửi.
-- Lượt rà đạt 44 test backend và 94 test frontend. Browser dùng API mô phỏng ở desktop/mobile; quyền kênh AE 18 được kiểm tra chỉ đọc trên Supabase.
-- Việc tiếp theo: đối chiếu quyền đổi private và quyền quản lý kênh của head với DB, tải bù tin chat, khôi phục tạo lịch dở dang và chốt quyền vào họp bằng mã. Sau đó nghiệm thu thao tác ghi và media hai thiết bị. Tuyển dụng/phỏng vấn chưa nối vào workspace.
+- Không gian sinh hoạt đã có chat kênh, emoji, ảnh/tệp đính kèm, dán ảnh vào ô soạn và URL HTTP/HTTPS bấm được. Tệp dùng Supabase Storage private, giới hạn 3 tệp và 15 MiB tổng mỗi tin. [Đính kèm](/work-logs/2026-11-20-01-phase-04-club-chat-attachments) · [Dán ảnh](/work-logs/2026-11-20-02-phase-04-club-chat-paste-images) · [Link](/work-logs/2026-11-20-03-phase-04-club-chat-clickable-links)
+- Họp CLB có link theo từng buổi, giữ đích qua đăng nhập và kiểm tra membership active khi đọc danh sách phiên, vào họp hoặc đọc trạng thái phòng chờ. Danh sách họp đã chỉnh theme tối và căn giữa phân trang. [Tunnel](/work-logs/2026-11-19-08-phase-05-club-meeting-tunnel) · [Giao diện họp](/work-logs/2026-11-20-04-phase-04-workspace-meeting-controls)
+- npm test ở bản hiện tại đạt **49 test backend và 100 test frontend**. Đã kiểm tra UI với API mô phỏng, xác nhận chỉ đọc bảng/bucket đính kèm trên Supabase và kiểm tra đường HTTPS/WSS qua Quick Tunnel bằng backend mô phỏng.
+- Còn cần nghiệm thu gửi ảnh/tệp thật và họp trên hai thiết bị/hai mạng. Các việc đang mở gồm tải bù chat, dọn tệp upload bỏ dở, quản lý quyền kênh private cho trưởng ban và khôi phục lịch họp tạo dở. Tuyển dụng/phỏng vấn chưa nối vào workspace.
 
 ## Các cập nhật theo phiên
 
@@ -68,7 +68,7 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 
 2026-11-16: Grouped the signed-in personal header by current section, discovery and profile. Frontend build and all 58 tests passed. [Work log](/work-logs/2026-11-16-28-phase-04-personal-header). Phase 04 remains In Progress.
 
-## Trạng thái hiện tại
+## Lịch sử Không gian sinh hoạt đến 18/11
 
 Cập nhật 2026-11-18: Công việc CLB cố định ở đáy sidebar trái, các kênh dùng vùng cuộn chung ở giữa. Build và 60 frontend tests đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-18-09-phase-04-pinned-work-sidebar).
 
@@ -542,3 +542,27 @@ Thêm bong bóng tin gửi/nhận và nút Sáng/Tối có lưu lựa chọn. Ph
 ## Gửi tin nhắn CLB bằng Enter
 
 Enter gửi, Shift+Enter xuống dòng. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-19-07-phase-04-workspace-chat-enter).
+
+## Link buổi họp CLB qua HTTPS tunnel — 2026-11-19
+
+Đã thêm link theo buổi họp CLB qua HTTPS, giữ phiên sau đăng nhập và kiểm tra membership ở API. Quick Tunnel đã thử HTTP và WSS với backend mô phỏng. Phase 04/05 vẫn In Progress, chờ thử media và chat với thiết bị thật. [Work log](/work-logs/2026-11-19-08-phase-05-club-meeting-tunnel).
+
+## Gửi emoji trong chat CLB — 2026-11-19
+
+Thêm chọn và gửi emoji Unicode trong chat kênh CLB. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-19-09-phase-04-workspace-chat-emoji).
+
+## Ảnh và tệp đính kèm trong chat CLB — 2026-11-20
+
+Chat CLB đã có ảnh/tệp đính kèm qua Storage private, xem trong tin nhắn và tải theo quyền kênh. Phase 04 vẫn In Progress, chờ nghiệm thu upload trên Supabase thật. [Work log](/work-logs/2026-11-20-01-phase-04-club-chat-attachments).
+
+## Dán ảnh trong chat CLB — 2026-11-20
+
+Chat CLB đã hỗ trợ dán ảnh vào ô soạn, hiển thị ảnh trực tiếp và mở trình xem có nút tải. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-20-02-phase-04-club-chat-paste-images).
+
+## Link bấm được trong chat CLB — 2026-11-20
+
+Chat CLB hiển thị link HTTP/HTTPS bấm được, gồm link vào đúng buổi họp. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-20-03-phase-04-club-chat-clickable-links).
+
+## Phân trang và theme tối trang họp CLB — 2026-11-20
+
+Sửa các nút còn nền trắng trong trang họp CLB khi dùng theme tối và căn giữa phân trang. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-20-04-phase-04-workspace-meeting-controls).

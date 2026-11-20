@@ -1,11 +1,11 @@
 ---
-title: HTTPS tunnel cho Module 1
+title: HTTPS tunnel cho uniCircle
 description: Chạy thử React, NestJS và LiveKit Cloud từ nhiều thiết bị qua Cloudflare Quick Tunnel.
 ---
 
 ## Chat theo phiên họp
 
-Chat Socket.IO dùng /socket.io cùng origin HTTPS, proxy ws được bật cho dev và preview. Restart backend có ChatModule trước khi chạy tunnel nếu backend cũ đang chạy. Sau login, các thành viên admitted chọn cùng session ongoing trong danh sách rồi join; phòng PoC từ env vẫn thử media nhưng không có chat. Không dùng localhost trong VITE_WS_URL làm địa chỉ chat cho máy khác. [Hướng dẫn chat và giới hạn](/modules/meeting-chat).
+Chat Socket.IO dùng /socket.io cùng origin HTTPS, proxy ws được bật cho dev và preview. Restart backend có ChatModule trước khi chạy tunnel nếu backend cũ đang chạy. Sau đăng nhập, hai thành viên mở cùng buổi họp và được duyệt vào phòng; phòng PoC từ env vẫn thử media nhưng không có chat. Không dùng localhost trong VITE_WS_URL làm địa chỉ chat cho máy khác. [Hướng dẫn chat và giới hạn](/modules/meeting-chat).
 
 ## Chạy và dừng
 
@@ -23,14 +23,23 @@ npm run tunnel:stop
 
 Hoặc Ctrl+C trong terminal chạy tunnel. Chỉ các tiến trình do script tạo được dừng; backend đã chạy sẵn được giữ nguyên. Trạng thái và log nằm trong `logs/tunnel/` (Git ignore). Script kiểm tra PID cùng thời điểm khởi động trước khi dừng tiến trình. URL đổi khi tạo tunnel mới. Bản build không tự cập nhật khi sửa source; dừng và chạy lại lệnh tunnel để build lại.
 
-Giữ `VITE_API_URL=` trống trong frontend env. Script đặt `API_PROXY_TARGET=http://127.0.0.1:3000` cho preview. Các biến Supabase, WS và LiveKit frontend chưa dùng. Backend cần `POC_ENABLED=true`, HOST/PORT mặc định và LiveKit credentials hợp lệ; không bật NODE_ENV=production cho endpoint PoC. Build frontend production và NODE_ENV của tiến trình backend là hai khái niệm khác nhau.
+Giữ `VITE_API_URL=` trống trong frontend env. Script đặt `API_PROXY_TARGET=http://127.0.0.1:3000` cho preview. Các biến Supabase, WS và LiveKit frontend chưa dùng. Dùng HOST/PORT loopback mặc định và LiveKit credentials ở backend. Phiên họp động cần schema `meetings.club_id` đã có trong migration mở rộng và chạy được với `POC_ENABLED=false`. Chỉ bật PoC khi cần phòng thử cố định. Build frontend production và NODE_ENV của tiến trình backend là hai khái niệm khác nhau.
+
+## Chia sẻ link buổi họp từ Không gian sinh hoạt
+
+1. Mở URL HTTPS ở dòng `UniCircle HTTPS:` trong terminal. Đăng nhập và vào **Không gian sinh hoạt → Phòng họp CLB**.
+2. Tạo cuộc họp, tìm đúng buổi trong danh sách rồi bấm **Mở buổi họp** để vào sảnh hoặc **Sao chép link buổi** để gửi link. Link lấy địa chỉ của trang đang mở, kèm mã họp và ID buổi. Có thể gửi vào kênh CLB để người nhận bấm trực tiếp. Nếu host đang dùng localhost, mở lại ứng dụng bằng URL HTTPS để lấy link chia sẻ.
+3. Người nhận mở link, đăng nhập và hoàn thiện hồ sơ nếu cần. Trang họp giữ buổi trong link. Người dùng bấm **Tham gia** khi buổi mở và đợi host duyệt nếu phòng chờ bật.
+4. Để thử song song, tạo hai buổi đang mở, gửi mỗi link cho một nhóm. Dùng cùng origin HTTPS cho cả hai nhóm. Kiểm tra media và chat tách riêng, rồi kết thúc một buổi và kiểm tra buổi còn lại vẫn hoạt động.
+
+Quick Tunnel cấp hostname mới khi khởi động lại. Với lịch cần gửi trước, dùng hostname ổn định và máy chủ có thể duy trì ứng dụng.
 
 ## Luồng kết nối
 
 ```text
 Browser -> HTTPS trycloudflare.com -> cloudflared -> preview 127.0.0.1:4173
                                                      |
-                                                     +-- /api -> NestJS 127.0.0.1:3000
+                                                     +-- /api và /socket.io -> NestJS 127.0.0.1:3000
 Browser <-------------------- audio/video --------------------> LiveKit Cloud
 ```
 
@@ -40,7 +49,7 @@ cloudflared đặt origin Host thành `localhost:4173`, vì vậy không cần t
 
 ## Giới hạn
 
-- Login is required. Registered users can join the shared PoC room; room membership permissions and Cloudflare Access are not implemented. Share only within the test group. See [auth integration](/modules/auth-integration).
+- Link buổi họp yêu cầu tài khoản. Với họp nội bộ gắn CLB, backend yêu cầu membership active trong CLB published trước khi đọc danh sách buổi, vào phòng hoặc kiểm tra trạng thái chờ. Phòng chờ vẫn áp dụng theo cấu hình cuộc họp.
 - Preview là công cụ thử bản build, không phải máy chủ production. Quick Tunnel không bảo đảm uptime, URL không cố định, giới hạn 200 request đang xử lý và không hỗ trợ SSE; đây không phải giới hạn 200 người họp.
 - Backend rate limit trong memory vẫn 10 token request/phút/IP. Qua proxy loopback, nhiều người có thể bị tính chung một IP. Không bật trust proxy vô điều kiện hoặc bỏ giới hạn; nếu cần mở rộng phải thiết kế trusted proxy/rate limit riêng.
 - Máy chạy phải bật, có Internet và chạy đủ các tiến trình. Firewall/VPN có thể chặn kết nối tunnel hoặc LiveKit. Không cần cùng Wi-Fi.
@@ -57,7 +66,7 @@ Chạy lại `npm run tunnel` sau cập nhật và dùng URL mới được in. 
 
 Mở link HTTPS trên laptop và điện thoại (thử cả Wi-Fi và 4G/5G). Cho phép camera/mic, dùng tai nghe, kiểm tra thấy/nghe nhau hai chiều, mute/unmute, Leave/Join lại và mất mạng/reconnect theo [checklist Module 1](/modules/module-01-media-poc).
 
-Trang `/api/health` chỉ là liveness; token 200 chưa chứng minh media hai chiều. Không chia sẻ nội dung token response hoặc log chứa token.
+Script kiểm tra `/api/health` qua HTTPS. Nếu máy host không phân giải được hostname mới, kiểm tra link từ mạng khác và xem log tunnel. Health chỉ xác nhận đường HTTP tới API; token 200 chưa chứng minh media hai chiều. Không chia sẻ nội dung token response hoặc log chứa token.
 
 ## Nguồn
 
