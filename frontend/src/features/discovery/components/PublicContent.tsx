@@ -168,12 +168,12 @@ export function ActivityCard({ item }: { item: PublicItem }) {
           )}
         </time>
         <div>
-          <p className="dc-meta">{item.club_name}</p>
+          <p className="dc-meta">{item.club_name}{item.entry_type==='recruitment'&&' · Tuyển thành viên'}</p>
           <h3>
             <Link to={itemPath("activities", item)}>{item.title}</Link>
           </h3>
           <p className="dc-meta">
-            {item.location_name || "Xem thông tin địa điểm"}
+            {item.entry_type==='recruitment'?'Ứng tuyển trực tuyến':item.location_name || "Xem thông tin địa điểm"}
             {item.lifecycle_status === "cancelled"
               ? " · Đã hủy"
               : ended

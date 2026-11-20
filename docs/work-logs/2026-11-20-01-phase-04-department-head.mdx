@@ -1,0 +1,75 @@
+---
+title: Department head roles and landing notifications
+description: Separate member/head management with persistent landing-only notifications.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-01
+- Thời gian: 2026-11-20, Asia/Saigon; giờ bắt đầu không ghi nhận, kiểm tra khoảng 16:17 +07:00.
+- Agent: Codex
+- Phase: 04 — application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Giao/gỡ trưởng ban trong Thành viên, hiện head trên thẻ cộng đồng cá nhân, thông
+báo bổ nhiệm chỉ ở chuông landing và mất số khi xem. Người dùng nhấn mạnh không
+nhầm hoặc thay đổi luồng chủ nhiệm. Git thực tế: final, working tree sạch đầu phiên.
+
+## Công việc hoàn thành
+
+- API head riêng, kiểm tra actor chair và target đúng CLB, timestamp giữ nguyên.
+- Hai nút cạnh Chuyển chủ nhiệm, trạng thái theo member/head và ban thường active.
+  Không thay RPC/service transfer-chair; head không thao tác trên chairperson.
+- Nhãn Trưởng ban ở community overview và thẻ danh sách CLB.
+- Inbox head theo recipient JWT, read snapshot cutoff, polling/focus chỉ landing;
+  lỗi lưu đọc không xóa badge. Giữ close-on-outside/Escape của header hiện có.
+- Migration nâng cấp RPC head hiện có để ghi role/audit/notification nguyên tử;
+  thêm RPC đánh dấu đọc scoped recipient/type. Không thêm bảng hoặc sửa live DB.
+
+## File thay đổi
+
+- Backend workspace people/controller/DTO; personal module và hai file head-notifications.
+- Frontend WorkspacePeople, workspace-api Member, PersonalLists, DiscoveryApp;
+  HeadNotifications component/CSS, HeadRole và HeadNotifications tests.
+- Migration 202611200001, backend department-head unit tests và disposable DB runner/fixtures.
+- Module guide, README, workspace handoff, phase/master plan, session log/changelog/navigation.
+
+## Kiểm tra
+
+| Lệnh/kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm.cmd run typecheck | Passed | Backend/frontend |
+| npm.cmd run build | Passed | Backend/Vite, cảnh báo chunk lớn có sẵn |
+| npm.cmd --workspace frontend test | Passed | 99/99; gồm head/revoke, role card, read badge/error |
+| node --test backend/test/*.test.cjs | Passed | 49/49; gồm target scoping, chair protection, separate RPC và inbox ownership |
+| node backend/test/department-head-db.cjs | Passed | Sau sửa dấu kết thúc hàm trong fixture export; kiểm tra migration, chair preservation, conflict, inbox, retry/reappoint, rollback |
+| npm.cmd --workspace backend run build (cuối) | Passed | Sau bổ sung lỗi input an toàn |
+| git diff --check | Passed | Trước đóng phiên |
+| Live DB/UI/TCP concurrency | Skipped | Không mutation Supabase; kiểm thử DOM/isolated SQL, chờ người dùng test |
+
+## Quyết định và lý do
+
+Dùng schema/helper clubspace v2 và notification table đã có trong export người
+dùng cung cấp; không mang module tuyển dụng ở nhánh cũ sang. Skill Postgres không
+có trong catalog/local roots đã kiểm tra, đối chiếu tài liệu chính thức Supabase
+về SECURITY DEFINER/search_path/privileges. Không tự thay số head mỗi ban.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa chạy migration trên development thật hoặc nghiệm thu hai tài khoản. Phase
+04 giữ In Progress. Chưa commit/push.
+
+## Bước tiếp theo
+
+Áp dụng migration từ module guide, restart backend và test chủ nhiệm/member trên
+hai trình duyệt. Xác nhận chủ nhiệm không đổi trong cả promote và revoke.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan và module guide.
+- [x] Cập nhật session log/changelog/README/handoff.
+- [x] Đăng ký navigation và kiểm tra JSON/target mới.
+- [x] Ghi kiểm tra và giới hạn xác minh.

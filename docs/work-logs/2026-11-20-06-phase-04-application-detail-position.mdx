@@ -1,0 +1,51 @@
+---
+title: Phase 04 - Giữ nút chi tiết ở hàng dưới
+description: Giữ vị trí nút chi tiết sau khi duyệt đơn và bỏ nhãn lặp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-06
+- Thời gian: không có mốc bắt đầu chính xác; ghi kết quả 2026-11-20T17:37:30+07:00.
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đưa nút Xem chi tiết đơn xuống hàng dưới như trước sau khi bỏ badge phải.
+
+## Công việc hoàn thành
+
+`WorkspaceRecruitment.tsx`: đánh dấu cụm thao tác đơn đã xử lý bằng class
+recruit-review-completed. `recruitment.css`: chừa hàng trên 52 px desktop/56 px
+mobile để nút chi tiết giữ vị trí hàng dưới, cùng vị trí với nút dưới hàng
+Duyệt/Từ chối. Trạng thái vẫn chỉ nằm bên trái.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm.cmd --workspace frontend run typecheck | Passed | TypeScript sau sửa |
+| git diff --check; docs JSON/navigation mới | Passed | JSON hợp lệ, trang mới tồn tại |
+| Build/tests/browser/DB | Skipped | Thay đổi class và spacing nhỏ; chưa xem browser thật |
+
+## Quyết định và lý do
+
+Giữ khoảng trống hàng thao tác bằng CSS, không render lại badge hoặc nút ẩn.
+Không thay logic quyết định/API/quyền/DB.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker. Không cần SQL; chưa commit/push. Phase 04 In Progress,
+chờ nghiệm thu giao diện thực tế.
+
+## Bước tiếp theo
+
+Refresh danh sách, kiểm tra nút chi tiết ở hàng dưới của đơn đã duyệt/từ chối.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master, session log/changelog/module guide.
+- [x] Đăng ký navigation và ghi kiểm tra/giới hạn.

@@ -1,0 +1,58 @@
+---
+title: Phase 04 - Cụm nút duyệt đơn tuyển thành viên
+description: Hai nút duyệt/từ chối ngang và nút chi tiết toàn chiều rộng bên dưới.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-04
+- Thời gian: không có mốc bắt đầu chính xác; ghi kết quả 2026-11-20T17:33:29+07:00.
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chuyển Xem chi tiết đơn sang cột phải, trình bày thành nút nằm dưới hàng hai
+nút Duyệt/Từ chối, rộng bằng toàn bộ hàng phía trên.
+
+## Công việc hoàn thành
+
+- `WorkspaceRecruitment.tsx`: queue truyền detailHref vào DecisionControls,
+  bỏ link cũ ở cột thông tin. Cụm phải hiển thị hai nút trên, chi tiết bên dưới,
+  sau đó mới đến xác nhận/lỗi. Đơn đã xử lý vẫn có nút chi tiết.
+- `recruitment.css`: grid hai cột bằng nhau cho duyệt/từ chối; nút chi tiết
+  rộng 100% cụm. Cột phải 280 px, co phù hợp mobile và căn phải.
+- Cập nhật module guide, phase/master, session log, changelog và docs.json.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm.cmd --workspace frontend run build | Passed | TypeScript + Vite; cảnh báo chunk lớn có sẵn |
+| npm.cmd --workspace frontend test -- src/features/recruitment/Recruitment.test.tsx | Passed | 7 tests gồm xác nhận quyết định và version |
+| git diff --check, docs JSON/navigation mới | Passed | Trang mới tồn tại, JSON parse được |
+| Backend/SQL/browser thật | Skipped | Chỉ sửa JSX/CSS; không đổi API/DB, chưa nghiệm thu kích thước trên browser thật |
+
+## Quyết định và lý do
+
+Dùng chung DecisionControls để nút chi tiết nằm cùng chiều rộng với hàng quyết
+định. Giữ nguyên logic duyệt/từ chối và quyền kiểm tra hiện có; không thêm test
+chỉ lặp lại bố cục CSS.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker. Không cần SQL. Chưa commit/push; Phase 04 vẫn In Progress,
+chờ nghiệm thu giao diện thực tế.
+
+## Bước tiếp theo
+
+Refresh trang đơn ứng tuyển, kiểm tra cột phải desktop/mobile và mở xác nhận.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase và master plan.
+- [x] Cập nhật session log/changelog/module guide.
+- [x] Đăng ký và xác minh navigation mới.
+- [x] Ghi checks và giới hạn.

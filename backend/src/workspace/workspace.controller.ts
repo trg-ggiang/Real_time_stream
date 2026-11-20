@@ -21,6 +21,7 @@ import { WorkspaceContent, WorkspaceKind } from "./workspace-content.service";
 import {
   ActivityDraftDto,
   AddMemberDto,
+  HeadRoleDto,
   ContactDto,
   ContentQuery,
   ContentVersion,
@@ -110,6 +111,12 @@ export class WorkspaceController {
   ) {
     return this.people.remove(u.userId, c, id);
   }
+  @Patch("members/:id/head") setHead(
+    @CurrentUser() u: User,
+    @Param("clubId", ParseUUIDPipe) c: string,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() b: HeadRoleDto,
+  ) { return this.people.setHead(u.userId, c, id, b.is_head, b.expected_updated_at); }
   @Post("transfer-chair") transfer(
     @CurrentUser() u: User,
     @Param("clubId", ParseUUIDPipe) c: string,

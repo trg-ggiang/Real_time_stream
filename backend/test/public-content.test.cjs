@@ -19,7 +19,7 @@ test('reads only public views, bounds pagination and strips unexpected/private f
   for (const collection of ['clubs', 'activities', 'posts']) {
     const { service, calls } = fixture({ data: [{ club_id: 'club', name: 'Published', author_id: 'private-author', review_note: 'private-note', join_url: 'private-url', password_hash: 'private-hash' }], count: 30, error: null });
     const response = await service.list(collection, 2, 12);
-    assert.equal(calls[0][1], { clubs: 'public_clubs', activities: 'public_club_activities', posts: 'public_club_posts' }[collection]);
+    assert.equal(calls[0][1], { clubs: 'public_clubs', activities: 'public_activity_feed', posts: 'public_club_posts' }[collection]);
     assert.deepEqual(calls.find(call => call[0] === 'range'), ['range', 12, 23]);
     assert.equal(response.hasMore, true);
     for (const key of ['author_id', 'review_note', 'join_url', 'password_hash']) assert.equal(Object.hasOwn(response.items[0], key), false);

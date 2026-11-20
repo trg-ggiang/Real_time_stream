@@ -1,4 +1,6 @@
 export interface PublicItem {
+  entry_type?: 'activity'|'recruitment';
+  campaign_id?: string;
   club_id: string;
   name?: string;
   club_name?: string;

@@ -1,0 +1,109 @@
+---
+title: Tuyển thành viên CLB
+description: Tạo đợt tuyển, biểu mẫu, ứng tuyển, duyệt đơn và chuông landing.
+---
+
+## Cấu hình database
+
+Schema nền là clubspace v2 đã có các bảng recruitment, membership và notifications.
+Chạy **toàn bộ** `supabase/migrations/202611200002_recruitment_workflow.sql` trong
+Supabase SQL Editor của môi trường development, rồi restart backend. Không chạy
+fixture trong `backend/test/fixtures` trên Supabase. Migration được kiểm thử trên
+PostgreSQL tạm, chưa tự áp dụng lên DB của nhóm.
+
+Luồng bổ nhiệm trưởng ban dùng migration riêng
+`202611200001_department_head_notifications.sql`; áp dụng nếu chưa chạy.
+Migration tuyển thành viên giữ lại thông báo bổ nhiệm trong cùng inbox.
+
+Migration mới bổ sung phiên bản form, trường câu hỏi có kiểu, giá trị câu trả lời
+JSON, metadata file và hai bucket: ảnh bìa công khai, file ứng tuyển riêng tư.
+Đơn/câu trả lời cũ được gắn phiên bản và backfill, không xóa dữ liệu. RPC mới chỉ
+service role được gọi; API lấy actor từ JWT. View `public_activity_feed` hợp nhất
+hoạt động và bài tuyển, không tạo activity/membership giả.
+
+## Chủ nhiệm tạo đợt tuyển
+
+1. Vào CLB tham gia → chọn CLB → Công việc CLB → Tuyển thành viên.
+2. Bấm Tạo đợt tuyển. Nội dung đổi ở vùng giữa, giữ shell của CLB.
+3. Nhập tiêu đề, tóm tắt, thời gian, nội dung Markdown và chọn ảnh bìa.
+4. Thêm các ban thường đang hoạt động; mỗi ban có mô tả và form riêng. Nếu chưa
+   có ban, tạo tại Khác → Cơ cấu CLB trước.
+5. Thiết kế câu hỏi, lưu nháp, xem trước form rồi bấm **Đăng đợt tuyển**. Lưu nháp
+   chưa công khai bài tuyển. Có thể đăng trước giờ bắt đầu; nhận đơn đúng khoảng
+   thời gian đã chọn. Có nút đóng nhận đơn sớm.
+
+Form hỗ trợ trả lời ngắn/đoạn văn, một lựa chọn, hộp kiểm, danh sách thả xuống,
+số, email, điện thoại, ngày, file và thang điểm 1–5. Có hướng dẫn, bắt buộc,
+giới hạn độ dài/số/file, điền sẵn hồ sơ, nhân bản, sắp xếp và xem trước.
+File tối đa 5 MB, 1–5 file/câu hỏi, định dạng PDF/JPG/PNG/WebP theo cấu hình.
+Đây là bộ trường thông dụng; chưa có phân nhánh, lưới câu hỏi hay chấm điểm quiz.
+
+Sau khi đăng, cấu hình/form được giữ nguyên để bảo toàn câu trả lời đã nộp.
+Ban đã lưu không bị gỡ khỏi bản nháp; tạo bản nháp mới nếu muốn thay danh sách ban.
+
+## Sinh viên ứng tuyển và người quản lý duyệt
+
+Bài đã đăng xuất hiện trong Hoạt động của landing/danh sách hoạt động và trang
+công khai của CLB. Guest xem được bài; ứng tuyển cần đăng nhập và hồ sơ đầy đủ.
+Sinh viên chưa thuộc CLB chọn một ban, điền form, xem lại và xác nhận gửi. Mỗi
+sinh viên có một đơn trong mỗi đợt; backend và SQL cùng kiểm tra thời hạn,
+phiên bản form, câu trả lời và quyền sở hữu file.
+
+| Vai trò | Quyền |
+| --- | --- |
+| Chủ nhiệm | Tạo/đăng/đóng đợt; xem và duyệt đơn của mọi ban trong CLB |
+| Trưởng ban | Xem và duyệt đơn ứng tuyển vào ban mình đang phụ trách |
+| Thành viên thường | Không được xem đơn của người khác hoặc duyệt đơn |
+| Ứng viên | Xem đơn/kết quả của mình tại Không gian cá nhân → Đơn ứng tuyển |
+
+Trong Tuyển thành viên, chọn Đơn ứng tuyển của một đợt. Mỗi dòng có Xem chi
+tiết, Duyệt và Từ chối. Có xác nhận trước quyết định; lý do từ chối không bắt
+buộc. Duyệt tạo membership `member` vào đúng ban; từ chối không thêm membership.
+Không bắt buộc phỏng vấn. Quyết định dùng phiên bản chính xác để chặn duyệt lặp.
+
+## Thông báo và file
+
+Nộp đơn thông báo cho chủ nhiệm và các trưởng ban của đúng ban đã chọn. Kết quả
+duyệt/từ chối thông báo cho ứng viên. Ghi đơn/quyết định, membership và thông báo
+trong cùng transaction: lỗi ghi thông báo thì thao tác hoàn tác.
+
+Chuông chỉ hiện trên landing cho tài khoản đăng nhập, dùng chung với thông báo
+bổ nhiệm trưởng ban. Tự làm mới mỗi 15 giây/khi focus; mở chuông ghi mốc đã xem
+lên DB và bỏ số sau khi ghi thành công. Link mở đúng đơn trong workspace hoặc
+trang kết quả cá nhân. Mốc đọc chỉ tác động tài khoản hiện tại.
+
+Ảnh bìa được công khai. File câu trả lời chỉ chủ file và reviewer đúng quyền tải
+qua signed URL 60 giây; API không công khai đường dẫn bucket riêng tư. File chờ
+quá 2 giờ được tiến trình backend thu hồi theo đợt, có kiểm tra tranh chấp với
+submit. Chưa thu hồi ảnh bìa cũ đã được thay thế.
+
+## Kiểm thử
+
+`npm test`, `npm run build` chạy kiểm tra ứng dụng. Hai runner độc lập
+`node backend/test/recruitment-db.cjs` và `node backend/test/department-head-db.cjs`
+dùng PostgreSQL 17 cục bộ ở single-user mode, không đọc `.env`, không mở cổng,
+không sửa DB hiện có. Có thể đặt `RECRUITMENT_TEST_PG_BIN` nếu đường dẫn PG khác.
+Kiểm tra SQL gồm quyền theo ban, backfill, chạy lại migration, deadline, file
+ownership, rollback và giữ nguyên chủ nhiệm. Cần nghiệm thu trên DB development
+bằng các tài khoản chủ nhiệm, trưởng ban đúng/sai ban và ứng viên.
+
+## Hiển thị danh sách (20/11/2026)
+
+Danh sách quản lý hiển thị mỗi đợt một dòng theo hạn kết thúc tăng dần (thứ tự
+được áp dụng ở API trước phân trang). Có hai nút Xem chi tiết và Đơn ứng tuyển;
+trưởng ban mở chi tiết ở chế độ chỉ đọc, chủ nhiệm sửa được bản nháp. Đã đăng
+màu xanh dương, đã đóng màu xám. Đã bỏ xem trước nội dung bài tuyển; xem trước
+form câu hỏi vẫn được giữ.
+
+Đơn cá nhân hiển thị mỗi đơn một dòng, ngày nộp mới nhất trước. Đã duyệt màu
+xanh lá, chờ duyệt màu vàng, từ chối màu đỏ. Nút Mở CLB nằm bên phải cuối dòng
+của đơn đã duyệt; trên màn hình nhỏ nút xuống cuối dòng để đủ chỗ. Cập nhật
+hiển thị này không cần migration hoặc thay dữ liệu.
+
+Trong danh sách đơn quản lý, cụm phải có hai nút Duyệt/Từ chối bằng nhau trên
+cùng hàng; nút Xem chi tiết đơn ở ngay dưới, rộng bằng cả hàng. Xác nhận quyết
+định nằm dưới cụm nút; đơn đã xử lý vẫn mở được chi tiết.
+
+Nhãn trạng thái đơn chỉ hiển thị một lần trong phần thông tin, không lặp trong cột nút thao tác.
+
+Đơn đã xử lý vẫn giữ nút Xem chi tiết ở hàng dưới cột phải, chừa khoảng hàng trên mà không lặp badge.

@@ -1,0 +1,90 @@
+---
+title: Phase 04 - Tuyển thành viên CLB
+description: Đợt tuyển, form, ứng tuyển, duyệt theo ban và thông báo landing.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-02
+- Thời gian: không có mốc bắt đầu chính xác; ghi kết quả lúc 2026-11-20T17:02:42+07:00.
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+- Nhánh: final, giữ thay đổi trưởng ban từ phiên trước; chưa commit/push.
+
+## Mục tiêu và phạm vi được giao
+
+Chủ nhiệm tạo đợt tuyển/form trong workspace, bài tuyển hiển thị ở activities
+landing và trang CLB. Sinh viên ứng tuyển, chủ nhiệm/trưởng ban đúng ban duyệt
+hoặc từ chối. Duyệt thêm thành viên đúng ban; các bên nhận chuông landing giống
+luồng trưởng ban. Giữ nguyên quyền chủ nhiệm và shell workspace.
+
+## Công việc hoàn thành
+
+- Thêm `backend/src/recruitment/`: DTO, kiểm tra form/answers, API public,
+  quản lý, applicant, quyền review, upload/private download và cleanup staged.
+- Thêm `frontend/src/features/recruitment/`: list/editor/builder/preview,
+  public detail, apply/confirm, queue/inline decision, details và personal result.
+- Form 11 loại trường, profile prefill, required/rules, lựa chọn có ID,
+  reorder/duplicate, file MIME/size/count, versioned snapshots.
+- Nối `WorkspaceApp`, `DiscoveryApp`, `PersonalApp`, public activities cards và
+  club detail; đổi public-content source sang `public_activity_feed`.
+- Mở rộng inbox/head notification types và target links; chỉ mount chuông trên
+  landing, giữ đọc theo snapshot/cutoff và chỉ xóa badge sau ghi thành công.
+- `202611200002_recruitment_workflow.sql`: backfill form/answers cũ, versions,
+  files/buckets, guard/RPC v3, public views. Submit/decision/admission/inbox cùng
+  transaction; chair và head đúng ban duyệt trực tiếp không cần interview.
+- Thêm fixtures/runner SQL và backend/frontend regression tests; cập nhật
+  public-content/head tests cho source/type mới.
+- Cập nhật README, CODE_FLOW, handoff, module guide, phase/master, session log,
+  changelog và docs navigation.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm.cmd run build | Passed | Backend + frontend; cảnh báo bundle trên 500 kB |
+| npm.cmd --workspace backend test | Passed | 60 tests, chạy sau sửa cuối validation; build backend nằm trong script |
+| npm.cmd --workspace frontend test | Passed | 106 tests/20 files; jsdom cảnh báo scrollTo chưa triển khai |
+| node backend/test/recruitment-db.cjs | Passed | PostgreSQL 17 tạm, áp dụng migration hai lần, legacy backfill, 11 kiểu, publish/feed, deadline, authorization, reject/admit, file ownership, rollback khi inbox lỗi, chair preservation |
+| node backend/test/department-head-db.cjs | Passed | Migration và regression quyền trưởng ban/chủ nhiệm |
+| git diff --check | Passed | Sau tài liệu; chỉ cảnh báo chuẩn hóa line endings |
+| JSON/navigation | Passed cho trang mới | docs.json parse được; các target mới tồn tại; còn 11 target lịch sử thiếu từ nhánh nguồn |
+| Supabase development thật | Skipped | Không áp dụng migration/ghi dữ liệu thật; kiểm tra schema từ export và isolated PostgreSQL |
+| Browser/live upload/concurrent TCP sessions | Skipped | Browser localhost bị công cụ chặn từ phần trước; DOM + SQL single-user chưa thay thế nghiệm thu nhiều tài khoản trên DB thật |
+
+## Quyết định và lý do
+
+Giữ schema clubspace v2 từ export; bổ sung RPC mới thay vì mang implementation
+nhánh cũ vào. Không dùng notification worker chưa được đăng ký trên nhánh này:
+ghi inbox trực tiếp cùng transaction. Nội dung/form khóa sau publish để không
+làm lệch đơn đã nộp. Dùng signed URL cho file trả lời; file staging có claim
+trước cleanup để không xóa file vừa được submit gắn vào đơn.
+
+Các ban đã lưu không bị gỡ khỏi draft; ảnh bìa cũ đã attached chưa thu hồi tự
+động. Bộ trường thông dụng chưa gồm phân nhánh/lưới câu hỏi/quiz Google Forms.
+Skill Supabase Postgres không có trong catalog/local roots đã kiểm tra; đã đối
+chiếu tài liệu chính thức Supabase về definer/search_path/privileges ở phần
+schema trước đó của cùng phiên làm việc.
+
+## Blocker và việc chưa hoàn thành
+
+Source yêu cầu đã hoàn thành và build được. Cần migration trên development và
+nghiệm thu tài khoản thật, storage policies/bucket thực tế, hiển thị mobile và
+hai phiên đồng thời. Phase 04 chưa đạt toàn bộ acceptance nên giữ In Progress.
+Không thực hiện phần phỏng vấn hoặc phân nhánh nâng cao ngoài phạm vi.
+
+## Bước tiếp theo
+
+Chạy toàn bộ migration 202611200002 trên Supabase development, restart backend.
+Chủ nhiệm tạo ban/đợt/form, lưu rồi đăng; tài khoản chưa thuộc CLB nộp đơn;
+kiểm tra head đúng/sai ban và chủ nhiệm duyệt/từ chối, membership đúng ban,
+chuông bên nhận và mốc đọc. Xem [module guide](/modules/club-recruitment).
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page/master plan với trạng thái thực tế.
+- [x] Cập nhật session log, changelog, setup và kiến trúc liên quan.
+- [x] Đăng ký trang mới trong docs.json, kiểm tra JSON/target.
+- [x] Ghi checks, giới hạn và bước nghiệm thu development.

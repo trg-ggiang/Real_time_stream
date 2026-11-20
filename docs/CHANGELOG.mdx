@@ -744,3 +744,46 @@ Thêm bong bóng tin gửi/nhận và nút Sáng/Tối có lưu lựa chọn. Ph
 ## Gửi tin nhắn CLB bằng Enter
 
 Enter gửi, Shift+Enter xuống dòng. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-19-07-phase-04-workspace-chat-enter).
+
+## 2026-11-20 — Giao/gỡ trưởng ban và thông báo landing
+
+Đã thêm thao tác member/head riêng, nhãn Trưởng ban trên thẻ cộng đồng và inbox
+bổ nhiệm chỉ trên landing, đánh dấu đã xem để bỏ số. Giữ luồng chủ nhiệm cũ.
+Typecheck/build, 99 frontend tests, 49 backend tests và PostgreSQL tạm đạt.
+Cần áp dụng migration 202611200001 và nghiệm thu thật; Phase 04 In Progress.
+[Hướng dẫn](/modules/department-head),
+[work log](/work-logs/2026-11-20-01-phase-04-department-head).
+
+## 2026-11-20 — Tuyển thành viên CLB
+
+- Thêm đợt tuyển và form 11 loại trường trong Công việc CLB, giữ shell khi đổi trang.
+- Đưa bài đã đăng vào activities feed và trang CLB; sinh viên gửi/xem đơn cá nhân.
+- Chair/head đúng ban duyệt hoặc từ chối; admission và thông báo trong cùng transaction.
+- Mở rộng chuông landing, bảo toàn thông báo bổ nhiệm trưởng ban và quyền chair.
+- Thêm migration v3, upload/download riêng tư, cleanup file chờ và regression SQL/API/UI.
+- Build và 166 tests đạt; cần áp dụng migration trên development rồi nghiệm thu.
+[Work log](/work-logs/2026-11-20-02-phase-04-recruitment-workflow).
+
+## 20/11/2026 — Hiển thị danh sách tuyển thành viên
+
+Hoàn thành mỗi đợt/đơn một dòng, sắp quản lý theo hạn kết thúc tăng dần trước
+phân trang; đơn sinh viên theo ngày nộp giảm dần. Thêm màu trạng thái, nút rõ
+ràng, Xem chi tiết cho chair/head (head chỉ đọc), Mở CLB cuối dòng và bỏ preview
+nội dung bài tuyển. Không thay DB. Phase 04 **In Progress**.
+[Work log](/work-logs/2026-11-20-03-phase-04-recruitment-lists).
+
+## 20/11/2026 — Cụm thao tác duyệt đơn
+
+Duyệt/Từ chối nằm ngang bên phải, nút Xem chi tiết đơn toàn chiều rộng nằm
+bên dưới. Build frontend và 7 tests tuyển thành viên đạt; không đổi DB.
+Phase 04 In Progress. [Work log](/work-logs/2026-11-20-04-phase-04-recruitment-review-actions).
+
+## 20/11/2026 — Bỏ trạng thái đơn lặp
+
+Chỉ giữ trạng thái trong phần thông tin bên trái; cột thao tác chỉ giữ nút chi tiết
+với đơn đã xử lý. Typecheck đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-05-phase-04-single-application-status).
+
+## 20/11/2026 — Vị trí nút chi tiết đơn đã xử lý
+
+Giữ nút chi tiết ở hàng dưới bên phải sau duyệt/từ chối, chỉ có trạng thái bên
+trái. Typecheck đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-20-06-phase-04-application-detail-position).

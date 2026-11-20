@@ -118,7 +118,7 @@ export function MembersPage() {
           <div className="cw-members">
             {state.data.items.map((member) => (
               <MemberRow
-                key={member.membership_id + ":" + member.department_id}
+                key={member.membership_id + ":" + member.department_id + ":" + member.role}
                 member={member}
                 departments={depts.data?.items || []}
                 chair={chair}
@@ -166,12 +166,14 @@ function MemberRow({
   const mutation = useWorkspaceMutation();
   const [department, setDepartment] = useState(member.department_id);
   const [message, setMessage] = useState("");
-  async function action(kind: "move" | "remove" | "transfer") {
+  async function action(kind: "move" | "remove" | "transfer" | "head" | "unhead") {
     if (
       kind !== "move" &&
       !window.confirm(
         kind === "remove"
           ? `Gỡ ${member.users.display_name} khỏi CLB?`
+          : kind === "head" ? `Chọn ${member.users.display_name} làm trưởng ${member.club_departments.name}?`
+          : kind === "unhead" ? `Gỡ quyền trưởng ban của ${member.users.display_name}? Thành viên vẫn ở ban hiện tại.`
           : `Chuyển quyền chủ nhiệm cho ${member.users.display_name}? Bạn sẽ trở thành thành viên.`,
       )
     )
@@ -179,16 +181,16 @@ function MemberRow({
     const path =
       kind === "transfer"
         ? "transfer-chair"
-        : `members/${member.membership_id}/${kind === "move" ? "department" : "remove"}`;
+        : `members/${member.membership_id}/${kind === "move" ? "department" : kind === "head" || kind === "unhead" ? "head" : "remove"}`;
     const body =
       kind === "move"
         ? { department_id: department }
         : kind === "transfer"
           ? { membership_id: member.membership_id }
-          : undefined;
+          : kind === "head" || kind === "unhead" ? { is_head: kind === "head", expected_updated_at: member.updated_at } : undefined;
     const r = await mutation.run((signal) =>
       workspaceRequest(token, clubId, path, {
-        method: kind === "move" ? "PATCH" : "POST",
+        method: kind === "move" || kind === "head" || kind === "unhead" ? "PATCH" : "POST",
         signal,
         ...(body && { body: JSON.stringify(body) }),
       }),
@@ -212,14 +214,14 @@ function MemberRow({
           {member.role === "chairperson" ? "Chủ nhiệm" : member.role === "head" ? "Trưởng ban" : "Thành viên"} ·{" "}
           {member.club_departments.name}
         </p>
-        {chair && member.role === "member" && (
+        {chair && member.role !== "chairperson" && (
           <div className="cw-member-tools">
             <label className="cw-sr-label">
               Chuyển ban cho {member.users.display_name}
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                disabled={mutation.busy}
+                disabled={mutation.busy || member.role === "head"}
               >
                 {departments
                   .filter((d) => d.status === "active")
@@ -231,17 +233,19 @@ function MemberRow({
               </select>
             </label>
             <button
-              disabled={mutation.busy || department === member.department_id}
+              disabled={mutation.busy || member.role === "head" || department === member.department_id}
               onClick={() => action("move")}
             >
               Lưu ban
             </button>
-            <button disabled={mutation.busy} onClick={() => action("transfer")}>
+            <button disabled={mutation.busy || member.role !== "member"} onClick={() => action("transfer")}>
               Chuyển chủ nhiệm
             </button>
+            <button disabled={mutation.busy || member.role !== "member" || !member.updated_at || !departments.some(d => d.department_id === member.department_id && d.status === "active" && !d.is_management)} onClick={() => action("head")}>Chuyển trưởng ban</button>
+            <button disabled={mutation.busy || member.role !== "head" || !member.updated_at} onClick={() => action("unhead")}>Gỡ trưởng ban</button>
             <button
               className="cw-danger"
-              disabled={mutation.busy}
+              disabled={mutation.busy || member.role === "head"}
               onClick={() => action("remove")}
             >
               Gỡ thành viên

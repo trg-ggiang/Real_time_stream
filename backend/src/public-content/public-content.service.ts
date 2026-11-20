@@ -15,9 +15,9 @@ const sources = {
       "club_id,name,summary,description,mission,logo_url,cover_url,contact_email,contact_phone,published_at",
   },
   activities: {
-    view: "public_club_activities",
+    view: "public_activity_feed",
     columns:
-      "activity_id,club_id,club_name,club_logo_url,title,summary,description,cover_url,starts_at,ends_at,format,location_name,location_address,registration_opens_at,registration_closes_at,capacity,lifecycle_status,published_at,updated_at",
+      "activity_id,club_id,club_name,club_logo_url,title,summary,description,cover_url,starts_at,ends_at,format,location_name,location_address,registration_opens_at,registration_closes_at,capacity,lifecycle_status,published_at,updated_at,entry_type,campaign_id",
   },
   posts: {
     view: "public_club_posts",
@@ -122,9 +122,8 @@ export class PublicContentService {
     if (search)
       query.ilike(collection === "clubs" ? "name" : "title", `%${search}%`);
     if (collection === "activities" && filters.period === "upcoming") {
-      query
-        .gte("starts_at", new Date().toISOString())
-        .eq("lifecycle_status", "scheduled");
+      const now = new Date().toISOString();
+      query.or(`and(entry_type.eq.recruitment,ends_at.gt.${now}),and(entry_type.eq.activity,starts_at.gte.${now},lifecycle_status.eq.scheduled)`);
     } else if (collection === "activities" && filters.period === "past") {
       query.lt("ends_at", new Date().toISOString());
     }
