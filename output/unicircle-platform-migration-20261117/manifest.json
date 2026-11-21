@@ -1,0 +1,30 @@
+[
+  {
+    "file": "supabase/migrations/20261117000100_club_platform_extension.sql",
+    "sha256": "4eb1f84f7b4f1e74b784c96fca7a3eadf54f3e03102437fdac2985bc2dec7421"
+  },
+  {
+    "file": "supabase/verification/20261117_platform_preflight.sql",
+    "sha256": "de6fc6c79a01f6d5bc93e9120d5c3cf7ad38f0ee86f01da8287681b600099416"
+  },
+  {
+    "file": "supabase/verification/20261117_platform_postflight.sql",
+    "sha256": "795f5e05f72a7bbb184c90eba29b82ae0f95638aeb72d447fb6501b9dfe8418a"
+  },
+  {
+    "file": "docs/database/20261117-platform-migration.md",
+    "sha256": "1b123d71d9f7af0883ef2d56856ebbf987b9717603edaf0fc3a42d7fc17eb7ef"
+  },
+  {
+    "file": "docs/database/20261117-platform-schema-dictionary.md",
+    "sha256": "5ee6e6e77711e682e062dc75dd29ffac13690a334cbeec88a691b44ec037c277"
+  },
+  {
+    "file": "validation-results.json",
+    "sha256": "1d3837d0333d1d744fa100bb54520678b8d2b51fb52d7106b6af492f9b42f887"
+  },
+  {
+    "file": "README.md",
+    "sha256": "633030242a5055de1074be69b3a30fd8c07edfbe25c1ea5d83685edc4ae6f96b"
+  }
+]

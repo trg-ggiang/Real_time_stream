@@ -1,0 +1,81 @@
+---
+title: 2026-11-08-03 — Frontend cho meeting API hiện có
+description: Tạo/lên lịch, tham gia, phòng chờ và các thao tác quản lý qua API hiện hành; không thay đổi backend.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-03
+- Thời gian: 2026-11-08, Asia/Saigon; không lưu chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04, 05 — In Progress
+- Kết quả phiên: Completed trong phạm vi FE tích hợp hợp đồng API hiện có; các giới hạn dữ liệu/quyền phía BE được ghi bên dưới.
+
+## Mục tiêu và phạm vi được giao
+
+Hoàn thiện giao diện cho chức năng backend đã có. Theo điều chỉnh rõ ràng của người dùng: chỉ làm FE, hoàn tác mọi sửa đổi BE trong lượt triển khai; icon sáng, tương phản rõ, bỏ nút trùng và mô tả phụ. Không thêm chat/ghi chú hay workflow chưa có backend.
+
+## Công việc hoàn thành
+
+- Dashboard tạo meeting nhanh, tạo meeting theo lịch/lặp và mở mã/đường dẫn mời.
+- Danh sách buổi họp có phân trang, trạng thái, thời gian địa phương, chọn buổi, lên lịch và sao chép link. URL giữ mã/session để mở lại sau đăng nhập.
+- Luồng join dùng API meeting/session thay endpoint PoC cố định. Phòng chờ poll trạng thái, không tự gửi lại request; xử lý từ chối, cooldown, hết phiên và kết thúc session.
+- Rời phòng gửi chính xác attendanceId; nếu chưa xác nhận được departure, lần join sau xác nhận lại trước khi nhận credentials mới. Có best-effort keepalive khi đóng trang; không thay thế webhook phía backend.
+- Quản lý duyệt/từ chối, mời theo email, đổi moderator, mute/remove thành viên đã biết trong phiên, chọn bật/tắt phòng chờ và kết thúc buổi. Thao tác loại/từ chối/kết thúc có dialog xác nhận native.
+- Thanh điều khiển dùng icon sáng, aria-label/title, trạng thái mic/camera tắt màu hồng, hoạt động màu xanh. Một nút rời phòng duy nhất; ẩn đăng xuất khi đang gọi, bỏ mô tả phụ. Badge giơ tay cũng dùng icon cùng bộ.
+- Không đổi trang đăng nhập/đăng ký; không thêm dependency hoặc lưu JWT vào storage. Giữ lazy-loaded LiveKit và callback kết nối ổn định.
+
+### File code thay đổi
+
+- `frontend/src/features/meeting/MeetingPage.tsx`
+- `frontend/src/features/meeting/components/MeetingRoom.tsx`
+- `frontend/src/features/meeting/components/ScreenShareButton.tsx`
+- `frontend/src/features/meeting/components/MeetingForms.tsx`
+- `frontend/src/features/meeting/components/MeetingManagement.tsx`
+- `frontend/src/features/meeting/components/ConfirmAction.tsx`
+- `frontend/src/features/meeting/hooks/use-session-flow.ts`
+- `frontend/src/features/meeting/hooks/use-session-flow.test.tsx`
+- `frontend/src/features/meeting/services/meetings-api.ts`
+- `frontend/src/features/meeting/services/meetings-api.test.ts`
+- `frontend/src/features/meeting/workspace.css`
+
+## Kiểm tra
+
+| Lệnh/kiểm tra | Kết quả | Phạm vi và giới hạn |
+| --- | --- | --- |
+| npm --workspace frontend run typecheck | Passed | Chạy sau điều chỉnh FE-only và toolbar |
+| npm --workspace frontend test | Passed | 23 tests, 5 files; phòng chờ, late response, departure retry, JWT hết hạn, credentials lỗi, cooldown, hợp đồng overview cũ |
+| npm --workspace frontend run build | Passed | TypeScript và Vite; LiveKit chunk khoảng 703 kB được lazy-load, còn cảnh báo >500 kB |
+| Browser với mock BE nguyên bản | Passed | Họp nhanh, join/leave, duyệt khách, mời, moderator, waiting room, dialog cancel/confirm end, lịch WEEKLY, denied cooldown; không gọi endpoint không tồn tại |
+| Responsive dashboard | Passed | 320/390/768/1024/1440px: scrollWidth bằng viewport |
+| Toolbar/thiết bị/giơ tay | Passed cho FE | Harness tạm với production RoomContent, RoomContext và quyền giả lập; icon-only có accessible name, giơ/hạ tay, mở/đóng thiết bị, một nút leave; harness đã xóa |
+| Backend diff | Passed | git diff --name-only -- backend không có output; mọi chỉnh sửa BE/test BE mới trong lượt này đã hoàn tác |
+| API thật | Limited | Backend tạm ban đầu không truy cập được dữ liệu user; chạy ngoài sandbox đăng nhập được nhưng quick meeting trả 503 Could not register meeting owner. Không sửa BE/schema để khắc phục; không xác nhận E2E DB/media thật |
+| Backend tests | Not acceptance for this FE change | Một lượt chạy khi còn thử BE hỗ trợ đã đạt sau chỉnh test; tất cả chỉnh sửa BE/test BE đó đã gỡ. Test LiveKit gốc có expectation nguồn media cũ; không sửa trong phạm vi FE-only |
+| git diff --check | Passed | Còn warning LF/CRLF của Git trên một số file |
+| Navigation JSON | Failed từ trước | docs/docs.json có conflict markers; log mới được đăng ký và target tồn tại, không tự giải quyết conflict |
+
+Ảnh và mã kiểm tra cục bộ trong `output/playwright/workspace-*` bị Git ignore. Browser mock cố ý tạo 403 và signaling timeout/cancel; không dùng chúng làm bằng chứng kết nối thật.
+
+## Quyết định và lý do
+
+Giữ nguyên BE theo yêu cầu. `GET /meetings/:code/sessions` không có role/membership hoặc settings; FE không yêu cầu các trường đó và không gọi GET members mới. Quyền owner chỉ được ghi nhớ trong tab sau response tạo meeting thành công. Những thao tác chưa biết quyền được backend hiện hành xác thực; danh sách chờ được ẩn khi endpoint trả 403.
+
+## Blocker và việc chưa hoàn thành
+
+- Chưa có API đọc toàn bộ members/quyền người xem/cài đặt hiện tại: danh sách quản trị chỉ gồm thành viên đã mời/duyệt trong phiên tab này, không phải directory đầy đủ. Reload/đăng xuất xóa bộ nhớ này; FE không giả lập danh sách còn thiếu.
+- Token meeting/session hiện chỉ cho camera/microphone, chưa cấp screen share hoặc canUpdateOwnMetadata. FE kiểm tra permissions để khóa share/giơ tay khi chưa có quyền; không thay token BE.
+- Không xác nhận E2E với Supabase/LiveKit do lỗi owner membership khi thử quick meeting. Không thay schema/migration, không đánh dấu Phase 04/05 Done.
+- Đóng màn hình chờ chỉ ngừng polling tại client; backend chưa có endpoint hủy request. Người dùng mở lại cùng buổi để theo dõi tiếp; không báo request đã bị hủy trên server.
+- Tạo meeting + lịch hẹn gồm hai request; nếu tạo meeting thành công nhưng lưu lịch lỗi, FE giữ mã meeting để lên lịch lại thay vì tạo trùng meeting.
+
+## Bước tiếp theo
+
+Chạy FE với BE hiện có và kiểm tra owner/moderator/guest trên hai thiết bị. Các lỗi schema/quyền token hoặc dữ liệu đọc còn thiếu cần được xử lý trong một yêu cầu BE riêng; phiên này không thay BE.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase pages/master plan, giữ In Progress
+- [x] Cập nhật session log/changelog/tài liệu hợp đồng FE
+- [x] Đăng ký log trong docs.json; ghi rõ conflict tồn tại
+- [x] Ghi kết quả, giới hạn và hoàn tác BE

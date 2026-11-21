@@ -1,0 +1,61 @@
+---
+title: 2026-11-08-07 — Đồng bộ trạng thái ongoing
+description: Sửa lỗi 503 tiếp theo do active không khớp meeting_sessions_status_check và xác minh API thật.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-07
+- Ngày: 2026-11-08, Asia/Saigon; không lưu giờ bắt đầu/kết thúc chính xác.
+- Agent: Codex
+- Phase: 03, 04, 05 — In Progress
+- Kết quả: Completed cho lỗi trạng thái tạo session.
+
+## Mục tiêu và chẩn đoán
+
+Người dùng vẫn gặp 503 tại POST /api/meetings/quick sau sửa role host. Kiểm tra source/dist và tiến trình đang phục vụ cổng 3000: backend đang dùng bản role mới. Supabase có ba meeting và ba membership host, chưa có session, cho thấy lỗi đã chuyển sang bước tạo session.
+
+Probe có FK guard (meeting UUID được xác minh không tồn tại, không thể lưu session) xác nhận active vi phạm 23514 meeting_sessions_status_check. ongoing, scheduled và ended qua CHECK rồi bị chặn bởi FK có chủ đích. Không thay schema.
+
+## Công việc hoàn thành
+
+- backend/src/meetings/meetings.service.ts: Session status union, quick meeting, chuyển scheduled thành ongoing, kiểm tra session đang mở và điều kiện mute dùng ongoing.
+- backend/test/meetings-roles.test.cjs: thêm regression cho quick meeting ghi host + ongoing, scheduled chuyển ongoing và ongoing vẫn joinable; fixture mute dùng ongoing.
+- frontend/src/features/meeting/services/meetings-api.ts: status type theo schema.
+- frontend/src/features/meeting/MeetingPage.tsx: chọn session đang chạy, nhãn Đang diễn ra dùng ongoing.
+- frontend/src/features/meeting/components/MeetingManagement.tsx: điều kiện mute dùng ongoing.
+- frontend/src/features/meeting/workspace.css và meeting-theme.css: màu trạng thái ongoing cho cả hai theme.
+
+Tên state flow.active trong React và lớp SDK lk-active vẫn giữ nguyên: chúng không phải giá trị cột status.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Phạm vi |
+| --- | --- | --- |
+| npm run typecheck | Passed | BE và FE |
+| npm --workspace backend run build | Passed | dist cập nhật |
+| node --test backend/test/meetings-roles.test.cjs | Passed | 6 tests liên quan role/status/phân quyền |
+| npm --workspace frontend test | Passed | 23 tests |
+| npm --workspace frontend run build | Passed | Còn cảnh báo chunk LiveKit lớn, lazy-loaded |
+| POST quick API thật cổng 3000 | Passed | Tạo meeting kiểm thử bằng tài khoản demo, nhận session ongoing |
+| GET sessions API thật | Passed | Đọc lại đúng ongoing |
+| POST end API thật | Passed | Buổi kiểm thử chuyển ended; giữ lịch sử theo workflow ứng dụng |
+| Media thật/luồng guest đầy đủ | Skipped | Chưa nghiệm thu trong lượt sửa trạng thái |
+| git diff --check | Passed | Warning LF/CRLF còn tồn tại |
+| Navigation | Limited | Target log tồn tại; docs/docs.json vẫn có conflict từ trước |
+
+Một meeting mới tên Status alignment verification được tạo để kiểm thử API rồi kết thúc qua end endpoint; không xóa hoặc thay đổi ba meeting đã có trước lượt kiểm thử. Các diagnostic request dùng FK không tồn tại đều bị reject, không lưu session.
+
+## Quyết định và giới hạn
+
+Theo schema hiện hành dùng scheduled/ongoing/ended, cùng role host/moderator/participant. Đây là lỗi thứ hai độc lập trong hợp đồng BE–schema sau role owner. Không đổi quyền token hoặc schema. Các phase vẫn In Progress vì media và các luồng phân quyền khác chưa nghiệm thu đầy đủ.
+
+## Bước tiếp theo
+
+Tải lại FE và thử tạo cuộc họp mới. Backend đang chạy đã được xác minh trả kết quả thành công; các bản start/preview triển khai khác cần dùng build mới.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan/session log/changelog/API docs
+- [x] Đăng ký log, kiểm tra target và ghi rõ JSON conflict
+- [x] Ghi kiểm tra thật, dữ liệu kiểm thử và giới hạn

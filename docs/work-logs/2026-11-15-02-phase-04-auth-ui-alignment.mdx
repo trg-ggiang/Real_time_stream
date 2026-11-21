@@ -1,0 +1,49 @@
+﻿---
+title: Auth UI alignment
+---
+
+## Session information
+
+- Session ID: 2026-11-15-02
+- Date: 2026-11-15 (Asia/Bangkok); start time unavailable
+- Agent: Codex
+- Phase: 04 — Application foundation (auth UI)
+- Session outcome: Partial
+- Phase status: In Progress
+
+## Objective
+
+Align login/register UI with the public landing page and fix visible layout issues.
+
+## Completed
+
+- Applied the landing page's navy/blue colors, UniCircle identity, campus imagery and matching control shapes to the login/register screen.
+- Repositioned the return-to-landing link into the header so it no longer overlaps the brand.
+- Refined form width, mobile wrapping and focus states.
+
+## Changed files
+
+- `frontend/src/features/auth/AuthApp.tsx`
+- `frontend/src/features/auth/auth.css`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+- `docs/work-logs/2026-11-15-02-phase-04-auth-ui-alignment.mdx`
+
+## Checks
+
+| Command/check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run typecheck` | Passed | |
+| `npm.cmd --workspace frontend test` | Passed | 13 files, 53 tests |
+| `npm.cmd --workspace frontend run build` | Passed | Existing large LiveKit chunk warning remains |
+| Browser visual QA | Skipped | Browser access host unavailable |
+
+## Outstanding
+
+- No specific authentication runtime error details were provided; functional Auth behavior remains covered by passing frontend tests.
+- `docs/docs.json` already contains merge-conflict markers; the work log was not added to navigation.
+
+## Next step
+
+Open `/?mode=login` and `/?mode=register` in the local browser to confirm the visual layout at desktop and mobile sizes once browser access is available.

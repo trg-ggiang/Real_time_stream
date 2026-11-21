@@ -1,0 +1,47 @@
+---
+title: 2026-11-08-05 — Gom cài đặt tài khoản
+description: Đưa chọn theme và đăng xuất vào một menu bánh răng trên header.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-05
+- Ngày: 2026-11-08, Asia/Saigon; không lưu giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — In Progress
+- Kết quả: Completed trong phạm vi UI.
+
+## Mục tiêu và công việc hoàn thành
+
+Gom theme sáng/tối và đăng xuất vào một icon cài đặt theo yêu cầu. Thêm AccountSettings.tsx, tích hợp trong MeetingPage.tsx và bổ sung CSS trong meeting-theme.css. Giữ bộ chọn theme hiện có bên trong panel, một nút đăng xuất; khi đang gọi, đăng xuất vẫn thực hiện leave trước. Cài đặt thiết bị trong toolbar là thao tác riêng.
+
+Menu có tên hỗ trợ đọc màn hình, aria-expanded/controls, focus vào lựa chọn đầu khi mở, Escape trả focus về trigger, bấm ra ngoài hoặc tab ra ngoài để đóng; hỗ trợ cả theme sáng/tối.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm --workspace frontend run build | Passed | Bao gồm TypeScript; cảnh báo chunk LiveKit lớn còn tồn tại |
+| npm --workspace frontend test | Passed | 23 tests hiện có |
+| Browser login giả lập | Passed | Theme/đăng xuất nằm trong panel, logout trở về auth |
+| Escape/outside click/focus | Passed | aria-expanded đóng đúng; focus khôi phục về trigger |
+| Mobile 320px | Passed | scrollWidth 320px; panel right 304px, nằm trong viewport |
+| BE/auth source | Unchanged | Không thay backend hoặc source login/register |
+| Media/attendance logout thật | Skipped | Giữ callback leave đã có; lượt này kiểm tra menu bằng mock |
+| Navigation | Limited | Log đã đăng ký, target tồn tại; docs/docs.json vẫn có conflict từ trước |
+
+Ảnh trong output/playwright/account-settings-*.png bị Git ignore.
+
+## Quyết định và giới hạn
+
+Dùng disclosure chứa các button tiêu chuẩn, không khai báo ARIA menu rồi thiếu điều khiển mũi tên. Không thay luồng auth hoặc quyền BE. Phase 04 vẫn In Progress, chưa có nghiệm thu media mới.
+
+## Bước tiếp theo
+
+Tải lại FE và mở icon bánh răng trên header. Tiếp tục các kiểm tra media/BE còn tồn tại theo log trước.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan/session log/changelog/module docs
+- [x] Đăng ký log và kiểm tra target; ghi rõ JSON conflict
+- [x] Ghi kiểm tra và giới hạn

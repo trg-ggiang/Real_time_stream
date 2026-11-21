@@ -1,0 +1,22 @@
+---
+title: Simplify input placeholders
+description: Replace input examples with the requested short placeholder.
+---
+
+## Session
+
+2026-11-10-06 Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 04 In Progress.
+
+## Objective and completed code
+
+Replaced placeholders with the requested Vietnamese word Tim (with the grave accent) across auth, meeting join/create/invite and chat composer. Existing visible labels and validation retained. Files: AuthApp.tsx, MeetingPage.tsx, MeetingForms.tsx, MeetingManagement.tsx, MeetingChat.tsx.
+
+## Checks
+
+Source search confirms placeholders contain only the requested text. git diff --check run. Build/tests skipped for string-only changes. No BE/DB changes. Navigation JSON parsed and log target exists.
+
+## Next step and checklist
+
+Reload frontend to see updated text. Phase 04 remains In Progress.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

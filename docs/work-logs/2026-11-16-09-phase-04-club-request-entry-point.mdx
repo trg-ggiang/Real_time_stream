@@ -1,0 +1,42 @@
+---
+title: Move club request entry point
+description: Bỏ trang danh sách đề nghị CLB khỏi sidebar và chuyển nút tạo sang CLB tham gia.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-09
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Bỏ mục/trang danh sách đề nghị CLB khỏi điều hướng cá nhân và đưa nút tạo đề nghị lên trang CLB tham gia.
+
+## Công việc hoàn thành
+
+- Bỏ mục sidebar và route danh sách `/me/club-requests`.
+- Chuyển nút `Tạo đề nghị mới` sang header trang CLB tham gia.
+- Giữ route form tạo và chi tiết đề nghị.
+- Files: `frontend/src/features/personal/PersonalApp.tsx`, `frontend/src/features/personal/pages/PersonalLists.tsx`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Không chạy theo yêu cầu trong phiên. |
+
+## Quyết định và lý do
+
+Chỉ đổi vị trí điểm vào tạo đề nghị và ẩn trang danh sách khỏi navigation; giữ form/chi tiết hiện tại.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra trực quan trên trình duyệt.
+
+## Bước tiếp theo
+
+Mở `/me/clubs` để xem nút tạo đề nghị ở header.

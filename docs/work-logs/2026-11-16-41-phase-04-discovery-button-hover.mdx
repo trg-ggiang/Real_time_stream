@@ -1,0 +1,30 @@
+---
+title: Discovery landing button hover
+description: Match the section buttons to the banner hover effect.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-41
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+`frontend/src/features/discovery/discovery-home.css` shares the banner's darker hover background with the three section buttons and moves their arrows 5 px to the right. The arrow effect respects reduced motion. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. |
+| CSS source check | Passed | Verified the shared hover background and reduced-motion query. |
+| Frontend test suite | Skipped | CSS-only hover change. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the hover effect in the browser before continuing the page-by-page update.

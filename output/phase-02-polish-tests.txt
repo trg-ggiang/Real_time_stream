@@ -1,0 +1,13 @@
+
+> @real-time-stream/frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.5 D:/Project/Livekit project/Real_time_stream/frontend
+
+
+ Test Files  15 passed (15)
+      Tests  60 passed (60)
+   Start at  11:35:50
+   Duration  5.62s (environment 79%, import 14%, tests 5%, transform 1%)
+

@@ -1,0 +1,12 @@
+
+> real-time-stream@0.0.0 typecheck
+> npm --workspaces run typecheck
+
+
+> @real-time-stream/backend@0.0.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @real-time-stream/frontend@0.0.0 typecheck
+> tsc --noEmit
+

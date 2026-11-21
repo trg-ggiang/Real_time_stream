@@ -1,0 +1,24 @@
+---
+title: Separate admin layout
+description: Extract the administration shell and retain its feature routes.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-49
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04
+- Outcome: Completed
+- Phase status: In Progress
+
+## Completed work
+
+- `AdminApp.tsx` continues to gate access and declares nested routes below `/admin`.
+- `AdminLayout.tsx` owns sidebar, header, footer, menu and route focus and renders page content through an outlet.
+- `AdminApp.test.tsx` exercises navigation through the shared layout and denies non-admin access before requests run.
+- Existing URLs, API contracts, dashboard data and personal routes remain unchanged. Updated phase and master plans, session log, changelog and documentation navigation.
+
+## Verification and next step
+
+Frontend build and all 61 tests passed, including the new shared layout and permission tests. Documentation navigation and whitespace checks passed. Verify the existing admin views visually at desktop and mobile widths. Browser review remains pending due to the preceding localhost restriction.

@@ -1,0 +1,36 @@
+---
+title: Join lobby redesign
+description: Prioritize joining and simplify meeting session selection.
+---
+
+## Session
+
+2026-11-09-01, Asia/Saigon. Start/end not captured. Codex. Phase 04 In Progress. Outcome: Completed code.
+
+## Objective and completed code
+
+User requested frontend-design and design-taste-frontend to improve the meeting join surface. Preserve redesign: Be Vietnam Pro, existing dark/light colors and Phosphor icons retained. Design dials 5/2/4. No new dependency, marketing illustrations or backend changes.
+
+MeetingPage.tsx now places join first with a larger labeled code/link field, inline validation and one primary action. Creation/scheduling stays alongside on desktop and below on mobile. Session list spans the available width, management is in native details/summary disclosure. join-lobby.css scopes layout and uses existing semantic theme tokens. Call/media/auth behavior unchanged.
+
+## Checks and critique
+
+- Frontend build including typecheck passed; existing large media chunk warning remains.
+- Frontend suite: 27 tests passed; rerun outside sandbox passed after slow initial worker run.
+- git diff --check run.
+- Source audit: no new decorative labels, images, fake content or repeated CTAs; native labels, keyboard focus, error/busy states retained; explicit mobile collapse at 767px; no animations added. Existing light/dark tokens used.
+- Browser screenshots and Lighthouse not performed: local Playwright CLI/browser package unavailable; no reachable dev listener observed. Both theme visual QA and measured contrast/Core Web Vitals remain unverified. Source review is not a substitute for these checks.
+- Navigation target exists; docs.json has preexisting merge conflict and cannot be fully validated. No conflict resolved as part of UI work.
+
+## Decisions and remaining work
+
+Join input is primary; creation is secondary. Do not apply marketing-only taste-skill image/hero rules to this functional product form. Unknown moderation rights are still enforced by existing backend endpoints. Phase stays In Progress pending real browser/media acceptance.
+
+## Next step
+
+Open frontend and review lobby and session selection at desktop/mobile widths in both themes; exercise code/link validation, session join and management disclosure.
+
+## Checklist
+
+- [x] Phase/master/session/changelog/module updated
+- [x] Navigation registered and limits recorded

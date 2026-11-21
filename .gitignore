@@ -1,9 +1,13 @@
 # Dependencies, generated builds and test output (all workspaces)
+# Independent nested checkout: do not add it as a submodule.
+/Real_time_stream/
 node_modules/
 dist/
 build/
 coverage/
 .vite/
+.playwright-cli/
+output/playwright/
 *.tsbuildinfo
 
 # Local environment files, including variants and editor backups.

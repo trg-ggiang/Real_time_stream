@@ -1,0 +1,53 @@
+---
+title: Chỉnh luồng và giao diện sinh viên
+description: Trang chủ sau đăng nhập, không gian CLB dạng kênh và tài khoản rõ ràng hơn.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-18-03
+- Thời gian: 2026-11-18 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa frontend sinh viên: sau đăng nhập vào trang chủ; không gian sinh hoạt mở giao diện kênh ngay, chat không nằm trong thẻ; loại bỏ điều hướng cá nhân/CLB trùng và menu avatar hai thẻ; làm sidebar và các mục dễ hiểu hơn.
+
+## Công việc hoàn thành
+
+- Tài khoản sinh viên có hồ sơ hoàn chỉnh trở về trang chủ `/` sau đăng nhập. Luồng hoàn thiện hồ sơ cho tài khoản thiếu thông tin vẫn giữ.
+- Header công khai dùng một nút avatar mở menu tài khoản; menu chỉ còn các lối cần thiết.
+- `/me` thành tổng quan tài khoản dạng danh sách tác vụ. `/me/clubs` chuyển sang `/workspace`; lối sinh hoạt CLB nằm riêng.
+- `/workspace` mở thẳng kênh thảo luận của CLB đầu tiên đã tham gia. Rail đổi CLB; sidebar xếp kênh trước, công việc và chức năng CLB sau. Kênh chiếm toàn bộ vùng nội dung với lịch sử và ô soạn ở đáy; bỏ khung thẻ quanh chat.
+- Thay tổng quan CLB nhiều thẻ bằng phần giới thiệu, bài viết gần đây và liên kết nhanh. Cập nhật các test điều hướng tương ứng.
+
+File code chính: `frontend/src/features/auth/AuthApp.tsx`, `discovery/DiscoveryApp.tsx`, `discovery/discovery.css`, `personal/PersonalApp.tsx`, `personal/pages/AccountOverview.tsx`, `personal/pages/PersonalLists.tsx`, `personal/personal.css`, `club-workspace/WorkspaceApp.tsx`, `club-workspace/WorkspaceHub.tsx`, `club-workspace/pages/WorkspaceChannel.tsx`, `club-workspace/pages/WorkspaceOverview.tsx`, `club-workspace/pages/WorkspaceHome.tsx`, `club-workspace/workspace.css`, `guest/GuestLanding.tsx`, `profile/ProfileForm.tsx` và các test frontend liên quan.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite; cảnh báo kích thước chunk LiveKit |
+| `npm.cmd --workspace frontend run test` | Passed | 14 files, 59 tests |
+| `git diff --check` | Passed | Không có lỗi whitespace trong thay đổi tracked |
+| `docs/docs.json` và navigation | Partial | JSON hợp lệ và work log mới đã đăng ký/đúng file; 11 liên kết work log cũ từ 2026-10/11-06 đang thiếu file trong repo |
+| Kiểm tra trực quan trong browser | Skipped | Phiên điều khiển browser không khả dụng trong môi trường này |
+| Backend/API channel | Skipped | Phạm vi frontend; chưa có endpoint channel trong workspace API |
+
+## Quyết định và giới hạn
+
+Các tên kênh là bản xem trước ở frontend; ô nhắn tin vô hiệu hóa và không hiển thị tin giả. Tạo họp định kỳ mở công cụ họp hiện có; meeting chưa được gắn `club_id` bởi API. Trạng thái phase không đổi vì chưa nghiệm thu browser thật, channel API và media hai thiết bị.
+
+## Bước tiếp theo
+
+Xem giao diện ở browser desktop/mobile với tài khoản sinh viên và CLB thật. Khi được giao backend, nối danh sách/tin nhắn kênh và meeting với CLB từ schema hiện có.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

@@ -1,0 +1,40 @@
+---
+title: Campus Board với bộ lọc phía trên
+description: Mẫu guest thứ bảy có cấu trúc khám phá riêng.
+---
+
+## Thông tin phiên
+
+- Session ID 2026-11-15-03, Asia/Saigon. Không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Codex, Phase 04, Completed trong phạm vi tạo mẫu. Phase In Progress.
+
+## Mục tiêu và công việc hoàn thành
+
+Tạo một mẫu khác sáu mẫu trước theo design-taste-frontend. Campus Board dùng bố cục bảng tin: tìm kiếm đầu trang, poster CLB bất đối xứng, lịch hoạt động và hướng dẫn ứng tuyển. Theo yêu cầu tiếp theo của người dùng, bộ lọc sở thích đặt thành thanh ngang sticky dưới header thay cho cột trái. Giữ nền sáng, điểm vàng, chữ sans; variance 8, motion 3, density 5.
+
+Thêm frontend/public/guest-concepts/board.html, board.css, board.js và assets/campus-board.jpg. Ảnh sinh viên tạo bằng imagegen, chuyển JPEG cục bộ. index.html và bright.css có liên kết sang mẫu 7; app.js cập nhật tổng số mẫu. Trang mới có lọc, tìm kiếm, trạng thái rỗng/reset, chi tiết, sao và gate đăng nhập, ứng tuyển CLB và đăng ký hoạt động. Nội dung vẫn minh họa, không gửi đơn hoặc ghi database.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+|---|---|---|
+| node --check board.js | Passed | JavaScript syntax |
+| Frontend build và TypeScript | Passed | Chạy sau đổi bộ lọc lên trên; cảnh báo chunk media hiện hữu |
+| Playwright tương tác | Passed | Lọc, tìm kiếm rỗng, reset, sao, popup, ứng tuyển/login gate, đăng ký hoạt động, Escape |
+| Desktop/mobile | Passed | Đã review screenshots; 390px không tràn ngang/ảnh hỏng; xác minh thanh lọc nằm trên main |
+| Lighthouse | Đã đo | Bản trước chuyển thanh lọc đạt performance/accessibility 100, LCP 1.0s, CLS 0 trên dev server; chưa đo lại sau đổi thanh lọc. Có khuyến nghị label-content-name và image delivery |
+| Backend/DB tests | Skipped | Không thay backend hoặc database |
+
+## Quyết định và phần còn lại
+
+Trang mẫu độc lập tại /guest-concepts/board.html, không chỉ đổi màu stylesheet mẫu cũ. Không thay trang chủ/auth flow. Chưa triển khai guest mode thật, API public hoặc lưu quan tâm. Không sửa các thay đổi ngoài phạm vi.
+
+## Bước tiếp theo
+
+Người dùng xem mẫu và chọn hướng; nối dữ liệu và nghiệp vụ sau khi giao diện được chốt. Phase 04 không tự động Done.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan, session log, changelog và hướng dẫn.
+- [x] Đăng ký work log trong docs.json và kiểm tra trang mới.
+- [x] Ghi kiểm tra và giới hạn xác minh.

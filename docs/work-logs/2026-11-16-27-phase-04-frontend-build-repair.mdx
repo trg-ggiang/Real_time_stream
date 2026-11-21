@@ -1,0 +1,30 @@
+---
+title: Frontend build repair
+description: Remove obsolete list rendering and stabilize onboarding tests.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-27
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and changes
+
+Repair the frontend errors found during the branch review. Removed the unreachable ClubRequest render branch from `frontend/src/features/personal/pages/PersonalLists.tsx`. Updated two tests in `frontend/src/features/auth/AuthApp.test.tsx` to wait for the actual profile input after the async request. Updated `frontend/src/features/guest/GuestLanding.test.tsx` and `frontend/src/features/guest/ClubActivitiesPage.test.tsx` for the current public detail routes, account menu, and club workspace navigation.
+
+## Verification
+
+| Check | Result |
+| --- | --- |
+| Dependency install | User ran npm install. React Router 7.18.5 verified locally. |
+| Root typecheck and build | Both passed. Vite reported a bundle size warning. |
+| Frontend tests | All 58 passed across 14 files. |
+| Backend tests | 36 passed. Two HTTP tests hit localhost EACCES in the execution environment. |
+
+## Next step
+
+Run the two backend HTTP tests in a terminal with localhost access. Phase 04 remains In Progress pending its existing acceptance checks.

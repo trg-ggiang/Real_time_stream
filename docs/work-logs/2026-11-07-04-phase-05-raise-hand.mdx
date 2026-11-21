@@ -1,0 +1,47 @@
+---
+title: 2026-11-07-04 — Giơ tay trong phòng họp
+description: Đồng bộ trạng thái giơ tay bằng LiveKit participant attributes.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-04
+- Thời gian: 2026-11-07, Asia/Saigon.
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed trong phạm vi thay đổi code
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Cho người tham gia tự giơ hoặc hạ tay và cho cả phòng thấy trạng thái, kể cả người vào sau.
+
+## Công việc hoàn thành
+
+LivekitService cấp quyền canUpdateOwnMetadata. Bài kiểm tra livekit.test.cjs xác minh quyền trong JWT. MeetingRoom.tsx thêm nút, khóa thao tác khi chờ cập nhật hoặc mất kết nối, báo lỗi và đọc trạng thái từ participant attribute handRaised. styles.css đặt badge trên ô camera hoặc placeholder.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm --workspace frontend run build | Passed | Gồm TypeScript, cảnh báo kích thước chunk LiveKit |
+| npm --workspace backend test | Passed | 3 bài, bao gồm kiểm tra quyền trong token |
+| Browser và LiveKit Cloud thật | Skipped | Chưa kiểm thử đồng bộ giữa các tab |
+
+## Quyết định và lý do
+
+Trạng thái thuộc participant của phiên hiện tại. LiveKit đồng bộ trạng thái cho người đang họp và người mới vào. Quyền gửi data packet tiếp tục tắt.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác nhận giao diện và đồng bộ trên cuộc gọi thật. Phase 05 tiếp tục In Progress.
+
+## Bước tiếp theo
+
+Tham gia lại để lấy token mới. Thử A giơ tay khi tắt camera, B thấy badge, C vào sau thấy badge, rồi thử hạ tay và rời phòng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase, master plan, session log và changelog
+- [x] Đăng ký navigation và kiểm tra đích
+- [x] Ghi kết quả và giới hạn xác minh

@@ -1,0 +1,35 @@
+---
+title: Personal activities page
+description: Thiết kế trang hoạt động của tôi theo mẫu tham chiếu.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-18
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thiết kế lại trang hoạt động cá nhân theo ảnh: tiêu đề, view switch, tabs và danh sách.
+
+## Công việc hoàn thành
+
+Thêm tabs đăng ký/từ CLB thành viên/đã hoàn thành, nút danh sách/lịch-kiểu agenda và responsive rows dựa trên registrations/memberships API hiện có. Files: `frontend/src/features/personal/PersonalApp.tsx`, `frontend/src/features/personal/pages/PersonalLists.tsx`, `frontend/src/features/personal/personal.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Không chạy theo yêu cầu trong phiên. |
+
+## Blocker và việc chưa hoàn thành
+
+Chưa duyệt trực quan; tab hiển số liệu trong trang kết quả hiện tại (tối đa 24 mục mỗi trang API).
+
+## Bước tiếp theo
+
+Mở `/me/registrations` để duyệt tabs và hai kiểu hiển thị.

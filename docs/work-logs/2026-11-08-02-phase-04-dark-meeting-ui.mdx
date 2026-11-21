@@ -1,0 +1,65 @@
+---
+title: 2026-11-08-02 — Giao diện họp tối
+description: Thiết kế lại sảnh và phòng họp, giữ nguyên đăng ký và đăng nhập.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-02
+- Thời gian: 2026-11-08, Asia/Saigon; không ghi chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04, 05 — In Progress
+- Kết quả phiên: Completed trong phạm vi thiết kế lại giao diện hiện có.
+
+## Mục tiêu và phạm vi được giao
+
+Dùng frontend-design, vercel-react-best-practices và web-design-guidelines để làm lại các trang ngoài đăng ký/đăng nhập với thiết kế tối, hiện đại. Frontend hiện có sảnh tham gia và phòng họp; không thêm dashboard, API phòng động hoặc chat.
+
+## Công việc hoàn thành
+
+- Sảnh mới với header tài khoản, vùng nhận diện người dùng, thao tác tham gia, trạng thái chờ/hủy/lỗi và hướng dẫn thiết bị.
+- Nền than xanh, điểm nhấn xanh dịu, typography Be Vietnam Pro sẵn có, bố cục responsive.
+- Phòng họp có header gọn, trạng thái kết nối, số người tham gia, video/sidebar camera và thanh điều khiển đồng bộ. Việt hóa nút rời phòng, bổ sung icon và aria-pressed cho giơ tay.
+- CSS giới hạn trong `.meeting-app`; không sửa source auth hoặc stylesheet dùng chung. Theme-color được đổi khi mở meeting và khôi phục khi đăng xuất.
+- Giữ lazy loading phòng LiveKit, callbacks SDK hiện có, imports icon trực tiếp; không thêm dependency.
+- Bổ sung skip link, focus-visible, reduced motion, dark color-scheme và xử lý tên dài.
+
+File code: `frontend/src/features/meeting/MeetingPage.tsx`, `frontend/src/features/meeting/meeting.css`, `frontend/src/features/meeting/components/MeetingRoom.tsx`, `frontend/src/features/meeting/components/ScreenShareButton.tsx`.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| npm --workspace frontend run typecheck | Passed | Chạy lại sau thay đổi cuối |
+| npm --workspace frontend test | Passed | 15 tests trong 3 files; trước tinh chỉnh CSS/theme-color cuối |
+| npm --workspace frontend run build | Passed | Chạy lại sau thay đổi cuối; cảnh báo chunk LiveKit khoảng 690 kB, lazy-loaded |
+| Browser sảnh 1440/1024/768/390/320px | Passed | scrollWidth bằng viewport; auth/token API được mock cục bộ |
+| Browser chờ/lỗi 503/hủy/đăng xuất | Passed | Không gọi tài khoản hoặc phòng thật |
+| Keyboard, reduced motion, tên dài | Passed | focus-visible có outline; animation none; tên dài không tràn ở 390px |
+| Theme đăng nhập | Passed | meta theme-color khôi phục về giá trị cũ; source auth không đổi |
+| Browser phòng họp | Passed cho layout | Production build, kết nối signaling giả lập đang chờ; chưa xác minh media thật |
+| Browser screen share desktop/mobile | Passed cho layout | Harness tạm dùng RoomContext, participant giả và canvas video; production RoomContent/media components; harness đã xóa |
+| Web Interface Guidelines | Reviewed | Kiểm tra các file UI thay đổi về semantics, focus, labels, contrast, responsive và reduced motion |
+| Backend tests / hai thiết bị thật / native picker | Skipped | Không đổi backend; phiên này kiểm tra giao diện bằng dữ liệu giả lập |
+| docs/docs.json | Failed từ trước | Có merge conflict markers; chỉ đăng ký log mới trong phần navigation hợp lệ, không giải quyết conflict ngoài phạm vi |
+
+Ảnh kiểm tra trong `output/playwright/meeting-dark-*.png` (Git ignored). Dev server từng reload dependency khi lazy load và báo invalid hook call; bài kiểm tra production build không gặp lỗi này. Các lỗi 503 và signaling timeout là tình huống giả lập có chủ đích.
+
+## Quyết định và lý do
+
+Tập trung vào danh tính và thao tác vào họp, không thêm số liệu hoặc menu chưa có chức năng. Camera không mở trước khi tham gia. Giữ xử lý media của LiveKit và bố cục self camera độc lập khi chia sẻ màn hình.
+
+## Blocker và việc chưa hoàn thành
+
+Không blocker cho phần UI. Phase 04/05 vẫn In Progress, chưa có nghiệm thu media hai thiết bị hoặc native screen capture mới. JSON navigation đang có conflict từ trước; không thể xác nhận toàn bộ navigation hợp lệ trước khi conflict được xử lý.
+
+## Bước tiếp theo
+
+Mở frontend, đăng nhập và thử cuộc gọi hai thiết bị; kiểm tra camera/mic, giơ tay, nhiều người share và rời phòng. Nếu dùng tunnel/preview cũ, khởi động lại để lấy build mới.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase pages và master plan
+- [x] Cập nhật session log, changelog và module docs
+- [x] Đăng ký log mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh; JSON conflict vẫn tồn tại

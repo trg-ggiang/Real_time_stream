@@ -1,0 +1,22 @@
+---
+title: Gửi emoji trong chat CLB
+description: Chọn và chèn emoji Unicode vào ô soạn chat kênh.
+---
+
+## Thông tin phiên
+
+Session 2026-11-19-09, Codex. Hoàn thành phần emoji, Phase 04 vẫn In Progress.
+
+## Đã làm
+
+- WorkspaceChat có nút mặt cười và 16 emoji Unicode. Chèn hoặc thay vùng đang chọn, trả focus về ô nhập, giữ Enter gửi và Shift+Enter xuống dòng.
+- workspace-theme.css điều chỉnh bảng chọn cho theme sáng/tối. Tin dùng payload content và client_message_id hiện hành.
+- Ảnh và file để sang phiên bổ sung Supabase Storage và metadata. Phiên này không ghi dữ liệu Supabase.
+
+## Kiểm tra
+
+TypeScript đạt. 7 test Workspace đạt, gồm chèn tại con trỏ, gửi emoji riêng và dùng lại mã tin khi thử gửi lại. Trình duyệt với API mô phỏng ở 1440 px sáng và 320 px tối xác nhận bảng chọn vừa màn hình và chèn được emoji.
+
+## Tiếp tục
+
+Chốt migration và quy tắc quyền tải tệp trước khi triển khai ảnh/file.

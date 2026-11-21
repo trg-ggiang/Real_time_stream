@@ -1,0 +1,32 @@
+---
+title: Discovery landing header controls
+description: Refresh the wordmark and navigation underline and add dismissible landing header panels.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-32
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+- `frontend/src/features/discovery/DiscoveryApp.tsx` updates the landing wordmark and adds a signed-in notification bell. The account and notification panels close on outside clicks or Escape.
+- `frontend/src/features/discovery/discovery-home.css` styles the new wordmark, navigation underline, bell and notification panel.
+- `frontend/src/features/guest/GuestLanding.test.tsx` verifies dismissal and keyboard focus. `frontend/src/features/guest/ClubActivitiesPage.test.tsx` opens the avatar by its accessible name.
+- Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported its bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | 59 frontend tests. |
+| Browser visual check | Skipped | Loopback was blocked during the preceding landing checks. |
+
+## Next step
+
+Review the header in desktop and mobile layouts. The bell displays a placeholder until the project has a notification source.

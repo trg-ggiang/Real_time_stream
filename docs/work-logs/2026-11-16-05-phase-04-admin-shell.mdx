@@ -1,0 +1,33 @@
+---
+title: Admin shell and cross-module verification
+description: Redesign Phase 5, xét duyệt CLB và kiểm tra các không gian.
+---
+
+## Thông tin phiên
+
+- Session: 2026-11-16-05, Asia/Bangkok; không có giờ bắt đầu chính xác.
+- Agent: Codex. Outcome: Completed trong phạm vi code Phase 5 redesign, ready for review.
+- Historical Phase 04 vẫn In Progress; không tự đóng roadmap media/database.
+
+## Công việc hoàn thành
+
+Thay admin ở landing bằng shell /admin riêng, overview số liệu DB, queue phân trang/tìm kiếm/lọc server, detail độc lập và quyết định có lý do/phiên bản. Tách backend admin module và frontend admin pages. Bỏ insert/delete membership bù trong approve cũ; kiểm tra cấu trúc CLB và conditional UPDATE pending/version. Chuyển menu/hash cũ, bảo vệ role/profile phía backend, dùng shared account mutation.
+
+Không migration, seed, ghi DB live, cấp role, commit hoặc push. Giữ thay đổi các phase trước. Quyền admin không tự là quyền chủ nhiệm một CLB.
+
+## Kiểm tra
+
+Typecheck/build, 65 backend + 75 frontend tests đạt. Browser API fixtures: admin 35, personal 41, workspace 45 (121 checks), không lỗi flow/overflow/ảnh/console; 0 live writes. App-screen probes 0 FAIL; source lint 0 FAIL, 1 warning do khai báo box-shadow:none. Đã xem screenshot desktop/tablet/mobile. Local health 200, admin không JWT 401. Git diff whitespace và JSON hợp lệ; docs nav vẫn thiếu 11 work log lịch sử có từ trước.
+
+## Quyết định / giới hạn
+
+Approval dựa trigger khởi tạo CLB đã tồn tại, không tạo membership khi xét duyệt. Conditional UPDATE chống quyết định trên bản cũ; không claim toàn bộ quyền/structure checks là transaction row-lock. Không thêm revision, suspend action, user management hoặc audit table ngoài scope. Media hai thiết bị và Supabase writes thật chưa nghiệm thu.
+
+## Bàn giao và bước tiếp theo
+
+[Báo cáo Phase 5](/design/phase-05-admin-and-integration) có route/API/file, kết quả, design direction và checklist tài khoản thật. Nhóm review UI, rồi nghiệm thu ghi dữ liệu trên môi trường test; không tự coi toàn bộ sản phẩm final.
+
+- [x] Cập nhật phase/master plan
+- [x] Session log, changelog và docs
+- [x] Đăng ký docs navigation
+- [x] Ghi kết quả và giới hạn kiểm tra

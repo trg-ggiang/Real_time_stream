@@ -1,0 +1,65 @@
+flowchart TB
+    MY_CLUBS["CLB tham gia /me/clubs"] --> ACCESS{"Đăng nhập, đủ profile, membership active và CLB published?"}
+    ACCESS -->|"Không"| DENIED["Yêu cầu đăng nhập, hoàn thiện hồ sơ hoặc báo không có quyền"]
+    ACCESS -->|"Có"| HOME["Tổng quan /workspace/:clubId"]
+    HOME --> SWITCH["Chọn CLB khác"]
+    SWITCH -->|"Cảnh báo nếu chưa lưu - kiểm tra lại quyền"| ACCESS
+
+    subgraph COMMON["SINH HOẠT CHUNG - THÀNH VIÊN VÀ CHỦ NHIỆM"]
+        POST_LIST["Bài viết /posts - thuộc workspace"]
+        ACTIVITY_LIST["Hoạt động /activities - thuộc workspace"]
+        CONTENT_DETAIL["Chi tiết bài hoặc hoạt động /:kind/:id"]
+        EDITOR["Soạn mới /:kind/new hoặc sửa /:kind/:id/edit"]
+        MEMBERS["Thành viên /members"]
+        DEPARTMENTS["Cơ cấu CLB /departments"]
+        MEETING_ENTRY["Phòng họp /meetings - thuộc workspace"]
+        POST_LIST --> CONTENT_DETAIL
+        ACTIVITY_LIST --> CONTENT_DETAIL
+        POST_LIST --> EDITOR
+        ACTIVITY_LIST --> EDITOR
+        CONTENT_DETAIL -->|"Chỉ tác giả được sửa"| EDITOR
+        EDITOR -->|"Lưu nháp hoặc gửi duyệt thành công"| CONTENT_DETAIL
+    end
+
+    HOME --> POST_LIST
+    HOME --> ACTIVITY_LIST
+    HOME --> MEMBERS
+    HOME --> DEPARTMENTS
+    HOME --> MEETING_ENTRY
+    HOME --> CHAIR{"Chủ nhiệm của CLB đang chọn?"}
+
+    subgraph MANAGEMENT["QUẢN LÝ CLB - CHỈ CHỦ NHIỆM"]
+        REVIEW["Nội dung chờ duyệt /review"]
+        REVIEW_POSTS["Bài viết - list=review"]
+        REVIEW_ACTIVITIES["Hoạt động - list=review"]
+        INFORMATION["Thông tin và liên hệ /information"]
+        MEMBERS_EDIT["Thêm thành viên bằng email, chuyển ban, gỡ thành viên, chuyển chủ nhiệm"]
+        DEPARTMENT_EDIT["Tạo hoặc sửa ban - trạng thái và is_private"]
+        REVIEW --> REVIEW_POSTS
+        REVIEW --> REVIEW_ACTIVITIES
+        REVIEW_POSTS --> CONTENT_DETAIL
+        REVIEW_ACTIVITIES --> CONTENT_DETAIL
+        INFORMATION -->|"Chỉ lưu liên hệ và URL ảnh"| INFORMATION
+    end
+
+    CHAIR -->|"Có"| REVIEW
+    CHAIR -->|"Có"| INFORMATION
+    MEMBERS -->|"Chủ nhiệm"| MEMBERS_EDIT
+    DEPARTMENTS -->|"Chủ nhiệm"| DEPARTMENT_EDIT
+    CONTENT_DETAIL -->|"Pending và người xem là chủ nhiệm"| DECISION["Duyệt đăng hoặc yêu cầu chỉnh sửa có lý do"]
+    DECISION --> CONTENT_DETAIL
+
+    MEETING_ENTRY --> HUB["Mở công cụ họp - query view=meeting"]
+    HUB --> CREATE["Tạo cuộc họp hoặc lên lịch phiên"]
+    HUB --> JOIN["Nhập mã hoặc mở link mời - chọn phiên"]
+    CREATE --> JOIN
+    JOIN --> PREJOIN["Kiểm tra quyền, phiên họp và thiết bị"]
+    PREJOIN --> ADMISSION{"Được tham gia ngay?"}
+    ADMISSION -->|"Chờ xét duyệt"| WAITING["Phòng chờ"]
+    WAITING -->|"Được duyệt"| PREJOIN
+    WAITING -->|"Bị từ chối"| HUB
+    ADMISSION -->|"Có"| ROOM["Phòng họp: camera, mic, chia sẻ màn hình, giơ tay, chat"]
+    ADMISSION -->|"Không đủ điều kiện"| HUB
+    ROOM -->|"Rời phòng hoặc phiên kết thúc"| HUB
+    HUB -->|"Thoát công cụ họp"| MEETING_ENTRY
+    HOME -->|"Về không gian cá nhân"| MY_CLUBS

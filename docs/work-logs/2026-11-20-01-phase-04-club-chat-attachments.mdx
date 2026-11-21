@@ -1,0 +1,33 @@
+﻿---
+title: Ảnh và tệp đính kèm trong chat CLB
+description: Upload qua NestJS, lưu Storage private và cấp link theo quyền kênh.
+---
+
+## Thông tin phiên
+
+- Session ID 2026-11-20-01, Asia/Saigon
+- Agent Codex
+- Kết quả Completed trong phạm vi triển khai. Phase 04 vẫn In Progress.
+
+## Phạm vi và công việc hoàn thành
+
+- WorkspaceChat và ChannelAttachments thêm nút kẹp giấy, xem trước ảnh/tên tệp, bỏ từng tệp, gửi có hoặc không có chữ. Tin nhận qua polling hiển thị ảnh khi vào vùng nhìn và nút tải tệp.
+- WorkspaceChannels nhận multipart ở tuyến đính kèm, kiểm tra chữ ký định dạng tệp và giới hạn tối đa 3 tệp hoặc tổng 15 MiB. Hỗ trợ JPEG, PNG, WebP, PDF, DOCX, XLSX và PPTX.
+- NestJS upload vào bucket private rồi gọi RPC để ghi tin và metadata cùng giao dịch. Cùng bản nháp gửi lại dùng cùng ID tin và đường dẫn gắn với bytes, upload không ghi đè.
+- API xem/tải kiểm tra membership, quyền kênh và trạng thái tin nhắn trước khi cấp URL trong 120 giây. Lịch sử chỉ trả metadata cần hiển thị. Ảnh và tệp của tin bị gỡ bị ẩn và không cấp URL mới.
+- Schema phụ thuộc migration 20261120000100_club_chat_attachments.sql. Kiểm tra chỉ đọc xác nhận bảng, quan hệ PostgREST và bucket private hiện có trên project Supabase.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| npm test | 49 backend và 99 frontend đạt. Kiểm tra multipart, retry, file sai định dạng, chặn đọc/tải khi thiếu quyền và render ảnh |
+| npm run typecheck | Đạt |
+| Frontend build | Đạt, còn cảnh báo kích thước bundle |
+| Trình duyệt với API mô phỏng | Gửi một ảnh và một PDF không kèm chữ, ảnh hiển thị, không tràn ngang tại 1440 px sáng và 320 px tối |
+| Nhận diện DOCX, XLSX, PPTX | Đạt với ba fixture OOXML cục bộ |
+| Supabase ghi dữ liệu | Chưa thực hiện trong phiên |
+
+## Giới hạn và bước tiếp theo
+
+URL đã cấp có hiệu lực đến lúc hết hạn. Nếu gửi dở sau khi upload hoặc mất phản hồi, file có thể nằm trong Storage chờ lần gửi lại. Chưa có tác vụ dọn tệp upload bỏ dở. Nghiệm thu upload thật bằng hai tài khoản trong kênh test riêng, kiểm tra xem/tải sau khi người dùng mất quyền, rồi thiết kế dọn tệp dựa trên tuổi object và metadata tham chiếu.

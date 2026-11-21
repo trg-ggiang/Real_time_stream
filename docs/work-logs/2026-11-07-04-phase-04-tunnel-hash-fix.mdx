@@ -1,0 +1,66 @@
+---
+title: 2026-11-07-04 — Tunnel hash/startup fix
+description: Sửa lỗi cmdlet hash khi khởi động tunnel qua npm, xác minh HTTPS và lifecycle.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-04
+- Mốc ghi nhận: 2026-11-07T09:50:21+07:00, Asia/Saigon; không ghi chính xác bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04, 05
+- Kết quả phiên: Completed — operational script fix
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng báo không chạy được tunnel. Kiểm tra, tái hiện và sửa lỗi trong vận hành hiện tại. Không đổi auth, database schema, env hoặc credentials.
+
+## Công việc hoàn thành
+
+Xác nhận draft working tree sạch, backend PID 22604 ở 3000 và frontend dev PID 28024 ở 5173 đang chạy; không có preview 4173. JWT_SECRET hiện đã có và đủ độ dài, PoC bật. Đọc log cũ với credentials được redaction trước output; không coi session JSON cũ là tunnel đang sống.
+
+Tái hiện npm run tunnel: build đạt nhưng PowerShell dừng tại Get-FileHash với CommandNotFoundException trước khi mở tunnel. Các lần kiểm tra shell khác tìm được cmdlet, nên chỉ kết luận phiên npm tái hiện không resolve cmdlet, không khẳng định Windows hoàn toàn không có module đó.
+
+Thay hai lời gọi hash bằng Get-Sha256 dùng FileStream và .NET SHA256, chuẩn hóa hex lowercase và dispose tài nguyên trong finally. Giữ nguyên expectedHash của cloudflared đã pin; không tắt integrity check. Cập nhật thông báo console đúng với auth hiện tại: login-required shared PoC room.
+
+Chạy thành công npm tunnel, HTTP smoke qua HTTPS, test dừng và restart. Giữ backend đã chạy sẵn, không đóng frontend dev. Để lại phiên cuối chạy nền với URL ở logs/tunnel/session.json; thông báo URL trong phản hồi, không ghi cố định URL tạm vào docs.
+
+File thay đổi: scripts/https-tunnel.ps1, docs/modules/https-tunnel.mdx, docs/modules/module-01-team-guide.mdx, docs/plans/master-plan.mdx, docs/plans/phase-04-application-foundation.mdx, docs/plans/phase-05-livekit-poc.mdx, docs/dev/session-log.mdx, docs/CHANGELOG.mdx, docs/docs.json, work log này.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| Reproduce npm run tunnel trước sửa | Failed as reproduced | Build đạt, Get-FileHash không được nhận diện |
+| Build qua npm run tunnel sau sửa | Passed | Backend/frontend; cảnh báo SDK chunk trên 500 kB vẫn còn |
+| PowerShell parser | Passed | Không lỗi cú pháp |
+| SHA256 vector abc | Passed | Khớp digest chuẩn; mở lại file exclusive được, stream đã dispose |
+| Pinned cloudflared hash | Passed | Startup tiếp tục sau so sánh expectedHash |
+| HTTPS page/JS/health | 200/200/200 | Kiểm tra HTTP qua public URL |
+| Anonymous auth/me và livekit/token | 401/401 | Guard auth còn được áp dụng; không tạo tài khoản hoặc in token |
+| npm run tunnel:stop | Passed | Preview/tunnel dừng, backend cũ PID 22604 giữ nguyên |
+| Restart và HTTPS smoke phiên cuối | Passed | Page/health 200, anonymous token 401 |
+| JSON/navigation/internal docs links, diff check | Passed | Sau cập nhật docs |
+| Full application unit tests | Skipped | Không đổi business logic; dùng build và operational smoke phù hợp |
+| Browser/media hai thiết bị | Skipped | Không có nghiệm thu cuộc gọi mới |
+| Mintlify render | Skipped | Không chạy CLI docs |
+
+## Quyết định và lý do
+
+Dùng .NET SHA256 để không phụ thuộc việc tự nạp Get-FileHash trong nested PowerShell/npm; vẫn giữ kiểm tra binary và process ownership. Không xoay JWT_SECRET hoặc đổi Supabase/LiveKit keys vì không phải lỗi tái hiện.
+
+## Blocker và việc chưa hoàn thành
+
+Không còn blocker của lỗi startup đã tái hiện. Link Quick Tunnel tạm, máy chủ cần tiếp tục hoạt động; không bảo đảm uptime. DB/media acceptance đầy đủ vẫn chưa thực hiện. Không commit/push.
+
+## Bước tiếp theo
+
+Người dùng mở URL mới, đăng nhập và thử meeting; sau khi thử chạy npm run tunnel:stop. Các lần sau chạy npm run tunnel từ root và dùng URL mới được in.
+
+## Checklist đóng phiên
+
+- [x] Hoàn thành thay đổi script và kiểm tra vận hành trước khi ghi log
+- [x] Cập nhật phase/master plan, session log, changelog và hướng dẫn
+- [x] Đăng ký navigation và kiểm tra targets
+- [x] Ghi giới hạn xác minh và phần acceptance còn chờ

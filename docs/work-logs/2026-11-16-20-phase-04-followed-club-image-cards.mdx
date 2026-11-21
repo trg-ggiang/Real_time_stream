@@ -1,0 +1,41 @@
+---
+title: Followed club image cards
+description: Chuyển danh sách CLB đang quan tâm sang thẻ ảnh.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-20
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chuyển các mục CLB dạng ngang ở trang “Đang quan tâm” thành thẻ ảnh như hình tham chiếu.
+
+## Công việc hoàn thành
+
+Trang `/me/follows` dùng lưới responsive với ảnh bìa lớn, logo, tên CLB, trạng thái quan tâm, giới thiệu và liên kết xem CLB. Danh sách CLB tham gia và hoạt động đăng ký tiếp tục giữ bố cục hiện có.
+
+Files: `frontend/src/features/personal/pages/PersonalLists.tsx`, `frontend/src/features/personal/personal.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Không chạy trong phiên. |
+
+## Quyết định và lý do
+
+Giữ nguyên API, dữ liệu và route của nút xem CLB; chỉ thay đổi phần trình bày danh sách theo dõi.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xem trực quan trên trình duyệt.
+
+## Bước tiếp theo
+
+Mở `/me/follows` để duyệt thẻ ảnh và bố cục responsive.

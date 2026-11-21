@@ -1,0 +1,52 @@
+---
+title: Phase 04 — Ổn định điều hướng không gian sinh hoạt
+description: Bỏ mục họp trùng, giữ danh sách kênh khi chuyển kênh và giữ thứ tự CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-07
+- Thời gian: 20/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa mục Phòng họp/Họp theo lịch bị lặp trong Công việc CLB, trạng thái tải lại khi chuyển kênh và thứ tự CLB thay đổi theo CLB đang mở.
+
+## Công việc hoàn thành
+
+- `WorkspaceApp.tsx`: bỏ hai lối họp trùng trong Công việc CLB; giữ chúng trong Gọi và gặp mặt. Dùng chung truy vấn danh sách kênh giữa sidebar và trang chat, giữ truy vấn danh sách CLB khi đổi CLB, hiển thị dải CLB theo thứ tự API trả về. Bỏ thao tác tự cuộn vào kênh active gây dịch chuyển danh sách.
+- `pages/WorkspaceChat.tsx`: nhận danh sách kênh đã tải từ workspace, không tự gọi lại API danh sách khi chuyển kênh.
+- `Workspace.test.tsx`: kiểm tra thứ tự CLB, hai lối họp duy nhất và số lần gọi API danh sách kênh khi đổi qua lại.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run test -- Workspace` | Passed | 2 file, 13 test |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; còn cảnh báo chunk MeetingRoom lớn |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser fixture | Skipped | Test jsdom đã kiểm tra điều hướng và số lần gọi API; chưa kiểm tra bố cục trực quan |
+| Dịch vụ thật / end-to-end | Skipped | Không dùng tài khoản và dữ liệu thật cho sửa frontend này |
+
+## Quyết định và lý do
+
+Danh sách kênh được tải một lần theo CLB; nội dung tin nhắn của kênh mới vẫn tải riêng theo kênh. Dải CLB dùng thứ tự membership từ API thay vì đưa CLB đang mở lên đầu.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho phạm vi sửa. Phase 04 vẫn In Progress; nghiệm thu trực quan và các việc workspace còn mở theo master plan chưa hoàn tất.
+
+## Bước tiếp theo
+
+Kiểm tra trên trình duyệt thật với tài khoản thuộc nhiều CLB: chuyển CLB/kênh, kiểm tra thứ tự dải CLB và vị trí sidebar ở desktop/mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và handoff workspace
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh

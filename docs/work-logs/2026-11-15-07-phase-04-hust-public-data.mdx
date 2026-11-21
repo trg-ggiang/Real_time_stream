@@ -1,0 +1,46 @@
+---
+title: HUST public content dataset
+description: Research, local image assets and repeatable import into existing public-content tables.
+---
+
+## Session information
+
+Session 2026-11-15-07, Codex, Asia/Saigon. Exact start time was not recorded; completed 15/11/2026. Phase 04 remains In Progress. Session outcome: Completed for the requested initial dataset.
+
+## Objective and completed work
+
+User requested real HUST clubs, images and activities researched through Google/social platforms and saved to the connected database. Imported SINNO, HUROS and HBAC: 3 clubs, 3 historical activities (two HUST Robot Arena rounds and HBAAC 2026), and 3 newly compiled introduction posts. Downloaded and optimized 5 actual club photos/logos; no AI-generated club evidence. HUROS uses its logo; activity images are explicitly described as organizer logo/member photograph rather than event photographs.
+
+`data/hust-public.json` stores source links, date precision, original image URLs, local file hashes and image dimensions. Public descriptions/content retain provenance. Facebook requests were throttled/blocked and TikTok robots prevented reading videos; imported facts came from official HUST/club sites and HBAC's public LinkedIn announcement. No claim of collecting Facebook/TikTok post content.
+
+`scripts/seed-hust-public.mjs` uses backend-only environment credentials, dry run by default and an explicit existing owner UUID for writes. It batches inserts, uses deterministic UUIDs, ignores duplicates, preserves existing published records and resumes only drafts whose title, text and owner still match the manifest. REST batches across different tables are not a single transaction; failure stops processing and rerun can resume.
+
+Existing account named Tài khoản Demo was used for internal ownership/review metadata; no account, password, role, schema or RLS change. Review notes identify imported reference content, not actual club administration. Database triggers assign publication timestamps. The frontend activity section now has a general discovery heading and displays Đã kết thúc on completed cards.
+
+## Validation
+
+| Check | Result | Evidence / limits |
+|---|---|---|
+| Import dry run and Node syntax | Passed | 3/3/3 records, local asset existence |
+| Live database import | Passed | All 9 records visible through their public views |
+| Repeat import | Passed | 0 additional rows in all three tables; public counts unchanged |
+| Live backend and Vite proxy | Passed | HTTP 200 and 3 items per collection at ports 3000/5174 |
+| Browser desktop/mobile | Passed | 3 clubs, 3 activities, 3 posts; nine rendered image occurrences loaded; sources visible in detail; three completed labels; no horizontal overflow at 390px |
+| Frontend build/typecheck | Passed | Existing large media chunk warning remains |
+| Targeted frontend tests | Passed | 7 tests across GuestLanding.test.tsx and App.test.tsx |
+| New unit tests/backend rebuild | Skipped | Import verified against live DB/API; backend code unchanged |
+| Documentation JSON/navigation | Partial | JSON parsed, new log registered and exists; 84 unique targets checked, 11 older work-log targets already missing (October and early November). Left unrelated navigation untouched. |
+
+Early insert attempts were rejected by DB constraints without creating rows: clubs requires `published`, publication metadata is required, activities use `onsite`/`hybrid`, and content must transition `draft` → `pending_review` → `published`. The completed importer follows these requirements. Three activities temporarily remained drafts until the corrected run published them; final view checks confirm none remain hidden.
+
+A temporary shell-based UI text replacement produced garbled Vietnamese; corrected with a UTF-8 patch before build/browser verification. No garbled replacement remains in the changed JSX.
+
+## Remaining work and next step
+
+This is an initial reference dataset, not an exhaustive/current recruitment directory. HRA dates are the organizer's published proposed schedule, not independently verified results. HBAAC day-only dates are normalized to day boundaries and marked as such. Expanding the dataset should use verified sources and actual event photos where available. Authenticated follow/apply workflows are outside this import. Phase 04 is not complete.
+
+## Closing checklist
+
+- [x] Updated phase/master plan, session log and changelog.
+- [x] Updated guest guide and README; registered work log.
+- [x] Recorded actual commands, failed attempts and verification limits.

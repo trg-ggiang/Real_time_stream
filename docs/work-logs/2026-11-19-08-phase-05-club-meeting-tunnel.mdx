@@ -1,0 +1,35 @@
+---
+title: Link buổi họp CLB qua HTTPS tunnel
+description: Chia sẻ đúng phiên, giữ phiên sau đăng nhập và giới hạn truy cập theo CLB.
+---
+
+## Thông tin phiên
+
+- Session ID 2026-11-19-08
+- Ngày 2026-11-19 (Asia/Saigon)
+- Agent Codex
+- Phase 04 và 05, **In Progress**
+- Hoàn thành phần code. Nghiệm thu thiết bị thật còn mở.
+
+## Công việc hoàn thành
+
+- MeetingPage tạo link từ origin hiện tại theo mã họp và phiên đã chọn. Có nút sao chép ở từng hàng, thông báo khi sao chép localhost, và hiển thị URL khi không dùng được clipboard. Link giữ phiên khi dán vào sảnh hoặc mở trước khi đăng nhập.
+- MeetingsService kiểm tra membership active trong CLB published trước khi đọc danh sách phiên, join và đọc trạng thái phòng chờ. Các cuộc họp không gắn CLB tiếp tục dùng admission của cuộc họp. Dùng cột meetings.club_id hiện có.
+- Script Quick Tunnel in lối vào uniCircle và kiểm tra public API health. Khi máy chạy script chưa xác nhận được địa chỉ public, script báo trạng thái để nhóm kiểm tra từ mạng khác. Cùng một tunnel phục vụ các phiên. Mỗi phiên dùng phòng LiveKit riêng.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| npm test | 46 backend và 96 frontend đạt. Có test link khách đăng nhập, chọn/sao chép đúng phiên, outsider bị chặn và hai lượt join đồng thời nhận token scoped hai phòng |
+| npm run build | Backend và frontend đạt. Cảnh báo bundle MeetingRoom lớn đã có từ trước |
+| Quick Tunnel với preview và backend mô phỏng cô lập | HTTP /api/health và WSS /chat đạt qua URL public. Hostname mới mất thời gian phân giải trong lượt thử đầu |
+| Supabase ghi dữ liệu và LiveKit trên hai mạng | Chưa chạy với tài khoản và thiết bị thật |
+
+## Tiếp tục
+
+Khởi động lại backend theo bản mới rồi chạy npm run tunnel. Mở cùng URL HTTPS trên các thiết bị, tạo hai phiên và thử từng link bằng hai nhóm. Kiểm tra quyền truy cập, phòng chờ, hai chiều camera/mic, chat và kết thúc độc lập theo [hướng dẫn tunnel](/modules/https-tunnel).
+
+## Sao chép link ngay tại workspace
+
+Danh sách họp CLB có nút **Sao chép link buổi** bên cạnh **Mở buổi họp** cho phiên đang diễn ra hoặc đã lên lịch. Workspace và sảnh dùng chung hàm tạo/copy link. Test Workspace và MeetingPage đạt 8 ca, gồm sao chép đúng buổi và mở trực tiếp đúng buổi.

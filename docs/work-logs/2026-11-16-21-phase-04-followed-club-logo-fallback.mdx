@@ -1,0 +1,41 @@
+---
+title: Followed club logo fallback sizing
+description: Sửa logo dự phòng bị co và ngắt dòng trong thẻ CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-21
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa logo dự phòng bị co hẹp và chữ “uniCircle” xuống dòng trên thẻ ở trang “Đang quan tâm”.
+
+## Công việc hoàn thành
+
+Tăng độ ưu tiên CSS của fallback logo trong hàng nhận diện CLB, giữ kích thước 48 × 48 và ngăn chữ fallback xuống dòng.
+
+File: `frontend/src/features/personal/personal.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Chưa chạy trong phiên. |
+
+## Quyết định và lý do
+
+CSS chung của ảnh dự phòng đặt lại chiều rộng và chiều cao, nên selector cụ thể của logo trong thẻ theo dõi cần độ ưu tiên cao hơn.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xem trực quan lại trên trình duyệt.
+
+## Bước tiếp theo
+
+Tải lại `/me/follows` và xác nhận logo fallback hiển thị vuông, chữ không bị ngắt dòng.

@@ -1,0 +1,24 @@
+---
+title: Wider page and larger activity images
+description: Reduce page gutters and enlarge agenda photographs.
+---
+
+## Session information
+
+2026-11-15-14, Codex, Asia/Saigon. Exact times not recorded. Outcome Completed. Phase 04 In Progress.
+
+## Request and completed work
+
+User accepted the agenda idea but requested larger images and half the page edge spacing. guest.css removes the main/footer max-width inset and applies a shared responsive content gutter approximating half the old combined inset. Hero/section/footer/join align to that gutter; header padding halves separately. At 1680px content inset is now 100px instead of about 199px, and at 1440px it is 39.6px instead of 79.2px. Mobile uses 2.5% instead of 5%. Vertical section spacing is retained. guest-editorial.css enlarges activity images from 160x130 to 280x190 on desktop, 200x165 on tablet and 175px height on mobile. Agenda structure and interactions retained. No backend/database changes.
+
+## Validation
+
+Frontend build/typecheck passed with existing media chunk warning. Browser confirmed 100px inset and 280x190 image at 1680px; screenshot visually reviewed. No horizontal overflow at 1440, 900 or 390px. Unit tests not repeated for this CSS-only reversible adjustment; prior 10 tests remain the latest test result. No Lighthouse rerun/performance claim. JSON navigation and new log target checked. Existing missing historical navigation pages remain unrelated.
+
+## Next step and checklist
+
+Phase 04 remains In Progress; continue visual acceptance.
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered this log and verified JSON/new target.
+- [x] Recorded actual checks and skipped checks.

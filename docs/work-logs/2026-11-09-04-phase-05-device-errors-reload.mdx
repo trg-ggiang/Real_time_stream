@@ -1,0 +1,41 @@
+---
+title: Device error sources and meeting reload
+description: Separate capture errors and rejoin the active session after reload.
+---
+
+## Session
+
+- Session ID: 2026-11-09-04. Agent: Codex. Timezone: Asia/Saigon; start/end timestamps not captured.
+- Phase: 04/05. Outcome: Completed code and isolated browser verification.
+- Phase status: In Progress, not full physical-device acceptance.
+
+## Objective and scope
+
+Investigate camera/mic errors on entry and screen sharing, and restore an active meeting after reload. Backend changes were allowed but were not needed. No DB/schema changes.
+
+## Completed code
+
+MeetingRoom now handles device errors by media kind and failure category (blocked, missing, in use, other). Enabling the affected track clears its error without clearing an unrelated device error. Connection errors are separate from capture failures. SDK source review confirmed screen capture emits MediaDevicesError with undefined kind; screen picker cancellation is handled by ScreenShareButton rather than reported as camera/mic failure.
+
+useSessionFlow stores only session identifiers and user binding in tab-scoped storage, never room tokens. On reload of the matching URL, it closes the previous attendance idempotently and requests fresh credentials through the existing join API. Explicit leave/end clears resume data. Deferred restoration avoids duplicate joins during React StrictMode setup/cleanup. Device preferences keep manually muted camera/mic off after reload.
+
+Files: MeetingRoom.tsx, ScreenShareButton.tsx, use-session-flow.ts, services/meeting-resume.ts, services/device-errors.ts, services/media-preferences.ts and corresponding regression tests.
+
+## Verification
+
+- Frontend typecheck/build passed; final combined frontend suite: 38 tests passed.
+- New tests cover cancellation source filtering, separate camera/mic failures and recovery, fresh join after reload, user binding, StrictMode, explicit leave, invalid preferences and muted-device restoration.
+- Chromium connected to a unique LiveKit Cloud test room. Meeting/auth/attendance HTTP APIs were mocked to avoid modifying DB records. Tests used canvas video and synthetic audio, not the user's physical devices.
+- Browser result: cancelled picker produced zero alerts; screen stage appeared; share/stop worked; reload returned to the room (2 joins, 1 prior-attendance cleanup); no capture errors in the fully synthetic run; both muted preferences remained false after reload.
+- A run with no camera returned browser NotFoundError; UI correctly reported the missing camera. This does not establish the state of the user's physical hardware.
+- Screenshots: output/playwright/screen-share-audit.png and device-reload-audit.png (local ignored artifacts). Temporary script containing short-lived test credentials was removed; artifact scan found no JWT patterns remaining.
+- No backend tests rerun for this frontend-only change. Existing large media bundle warning remains.
+
+## Limits and next step
+
+Physical camera/mic availability, OS permissions and other apps holding devices require verification on the user's machine. Screen capture itself cannot restart automatically after reload due to browser user-gesture requirements; only meeting and mic/camera preferences resume. Run a two-device test with actual hardware before closing Phase 05.
+
+## Close checklist
+
+- [x] Phase/master/session/changelog/module updates and navigation registration.
+- [x] Actual test results and limits recorded. docs.json full validation is blocked by preexisting merge markers, unrelated to this change.

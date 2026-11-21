@@ -3,16 +3,15 @@ title: Real-time Stream
 description: Khung công nghệ và tiến trình dự án.
 ---
 
-## Hiện trạng
+## Hiện trạng 20/11/2026
 
-Đã cài dependencies cho NestJS, React/Vite, LiveKit Cloud, Supabase và Socket.IO.
-Đã triển khai mã Module 1: token API và meeting UI; chưa có schema/auth/chat. Đã điền env LiveKit và nhận token qua backend; người dùng xác nhận media nhiều tab cùng máy, chưa nghiệm thu hai thiết bị.
+uniCircle dùng React/Vite, NestJS, Supabase và LiveKit Cloud. Không gian sinh hoạt có chat kênh qua HTTP polling, ảnh/tệp riêng tư, dán ảnh và link bấm được. Chat trong phiên họp dùng Socket.IO. Buổi họp CLB có link theo phiên và quyền truy cập theo membership.
+
+Phase 04 vẫn **In Progress**. Bộ test hiện tại đạt 49 backend và 100 frontend. Xem [sổ phiên](/dev/session-log), [bàn giao workspace](/design/phase-04-club-workspace) và [hướng dẫn tunnel](/modules/https-tunnel) để tách các ca đã kiểm tra với ca chờ nghiệm thu.
 
 - [Chạy và nghiệm thu Module 1](/modules/module-01-media-poc)
 - [Thử nhiều thiết bị qua HTTPS tunnel](/modules/https-tunnel)
 - [Giải thích code Module 1 cho nhóm](/modules/module-01-team-guide)
-
-Ngày 2026-11-06: người dùng xác nhận nghe/thấy giữa nhiều tab trên một máy. Đã bổ sung HTTPS tunnel để tiếp tục kiểm thử hai thiết bị; chưa hoàn thành nghiệm thu toàn bộ checklist.
 
 ## Theo dõi tiến trình
 
@@ -23,3 +22,5 @@ Ngày 2026-11-06: người dùng xác nhận nghe/thấy giữa nhiều tab trê
 - [Changelog](/CHANGELOG)
 
 - [Bối cảnh dự án và Module 1](/project-context)
+
+- [Backend meeting controls](/modules/meeting-controls)

@@ -1,0 +1,32 @@
+---
+title: Discovery landing activity link
+description: Remove the historical-activity note and highlight the activity-list link.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-37
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+- `frontend/src/features/discovery/pages/DiscoveryHome.tsx` removes the requested note and uses the existing button class on the `/activities` link. Activity selection and the loading, error and empty states were preserved.
+- `frontend/src/features/discovery/discovery-home.css` styles the rounded activity button and removes the note's local styles.
+- Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | All 59 frontend tests passed. |
+| Note and link source check | Passed | Confirmed removal of the note and preservation of the `/activities` link. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the activity-list button on desktop and mobile before continuing the page-by-page update.

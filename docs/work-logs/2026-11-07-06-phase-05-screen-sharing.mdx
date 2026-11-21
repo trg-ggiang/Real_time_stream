@@ -1,0 +1,57 @@
+---
+title: 2026-11-07-06 — Chia sẻ màn hình
+description: Publish màn hình bằng LiveKit Cloud, nhiều người trình chiếu và chọn màn hình xem.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-06
+- Thời gian: 2026-11-07, Asia/Saigon; không lưu chính xác thời điểm bắt đầu.
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed trong phạm vi code được giao
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Cho mọi thành viên share màn hình không cần host duyệt, xem kỹ luồng, kiểm thử và báo cáo. Giữ nguyên log local/remote đang có. Không triển khai dynamic rooms hoặc module phân quyền.
+
+## Công việc hoàn thành
+
+- Backend: thêm meeting-permissions.ts làm điểm quyết định publish sources; LivekitService cấp screen_share/screen_share_audio cho mọi thành viên. Test token thật xác minh grant; test policy restricted không có screen sources.
+- Frontend: ScreenShareButton đọc connection, SDK share state và permission; khóa thao tác lặp, xử lý cancel/error, hỗ trợ video khi không có screen-audio permission. ScreenShareStage hiển thị video lớn, chọn nhiều người trình chiếu, fallback/ẩn khi share dừng; MeetingRoom giữ camera và giơ tay riêng.
+- CSS: stage responsive, giữ tỷ lệ video trên mobile, camera grid thu nhỏ khi có stage.
+- Kiểm thử: thêm screen-share.test.tsx cho pending, SDK ended state, stop, permission sources, hủy picker, unsupported/reconnect, người trình chiếu xuất hiện/biến mất và chọn fallback.
+- Tài liệu: README, module screen-sharing, master plan, phase 05, changelog, session log và navigation.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm run typecheck | Passed | Backend và frontend |
+| npm test | Backend 4 passed; frontend sau sửa 20 passed | Lượt đầu phát hiện DOMException không thuộc cùng Error realm, đã sửa nhận dạng theo name và chạy lại frontend |
+| npm run build | Passed | Còn cảnh báo chunk LiveKit lớn |
+| Playwright + LiveKit Cloud thật | Passed | Ba tab cùng máy, video canvas giả lập getDisplayMedia; gọi service cấp token với user synthetic trong room test riêng, không sửa DB |
+| Cloud nhận video, người vào sau, nhiều người share, chọn màn hình, nút dừng, sự kiện browser ended | Passed | Dùng component production trong harness LiveKitRoom, không phải toàn bộ luồng login/UI meeting |
+| Giao diện 1440/768/390 | Đã chụp/quan sát | Sửa letterbox quá cao trên mobile; không phải nghiệm thu physical mobile capture |
+| docs.json, navigation targets, git diff --check | Passed | Không còn conflict markers; MDX chưa render bằng Mintlify |
+| Hộp chọn native, share âm thanh thật, camera/mic cùng share, hai thiết bị/hai mạng | Skipped | Cần thử thiết bị thực qua HTTPS; không coi synthetic capture là native picker acceptance |
+
+## Quyết định và lý do
+
+Cho phép nhiều người share, mỗi viewer tự chọn. Dùng tracks/permissions SDK làm nguồn trạng thái; không lưu share state trong DB hoặc participant attributes. canPublishData giữ false. Giữ palette/type và cấu trúc meeting hiện có; stage nội dung là vùng lớn, không redesign auth. Harness và artifacts thử nghiệm nằm ngoài source bàn giao; credentials chỉ dùng trong bộ nhớ, không log secret.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker code. Phase 05 vẫn In Progress vì chưa nghiệm thu media hai thiết bị, native picker và screen audio. Chưa giới hạn số người share hay chỉ subscribe người đang xem; chưa có host revoke permission. MDX chưa chạy Mintlify renderer.
+
+## Bước tiếp theo
+
+Restart backend, tham gia lại để nhận token mới, rồi thử checklist trong /modules/screen-sharing trên hai thiết bị qua HTTPS. Nếu dùng tunnel đang chạy bản build cũ, dừng và chạy lại tunnel để cập nhật frontend.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh

@@ -1,0 +1,23 @@
+---
+title: Discovery landing post copy
+description: Update the post section link, cover fallback and date display.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-42
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04
+- Outcome: Completed
+- Phase status: In Progress
+
+## Completed work
+
+- `DiscoveryHome.tsx` updates the section link label and opts the landing preview into the post display format.
+- `PublicContent.tsx` keeps the original cover frame and image handling while removing its fallback wordmark on the landing preview. The current API supplies the full club name and has no abbreviation or author name field for posts.
+- `content-format.ts` adds the shared date-only formatter with Vietnam time-zone handling. API data, hrefs, event handlers and post layout were preserved.
+
+## Verification and next step
+
+Date formatting, invalid date fallback, Vietnam time-zone rollover and whitespace checks passed. Browser visual verification remains pending due to the preceding loopback restriction. Review the landing preview with posts that have and lack covers.

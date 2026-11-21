@@ -1,5 +1,7 @@
 # PROJECT CONTEXT — HỆ THỐNG PHÒNG HỌP TRỰC TUYẾN VÀ NỀN TẢNG QUẢN LÝ CÂU LẠC BỘ ĐẠI HỌC
 
+> **Hiện trạng 20/11/2026.** Đọc [luồng hệ thống](CODE_FLOW.md), [bàn giao Không gian sinh hoạt](docs/design/phase-04-club-workspace.md) và [sổ phiên](docs/dev/session-log.mdx) trước phần lịch sử bên dưới. Nền tảng đã có auth/hồ sơ, khám phá, cá nhân, admin và không gian CLB. Chat kênh hỗ trợ emoji, ảnh/tệp, dán ảnh và link bấm được. Họp CLB có link theo phiên và chạy thử qua Quick Tunnel. Tuyển dụng/phỏng vấn chưa nối vào workspace.
+
 > Ghi nhận ngày 2026-10-19 (Asia/Saigon) từ nội dung người dùng cung cấp.
 >
 > Cập nhật triển khai ngày 2026-10-19: Module 1 đã có token API, meeting UI, scripts build/test và `.env` cục bộ. Credentials LiveKit chưa được điền; chưa xác minh media thật trên hai thiết bị. Tài liệu nguồn bên dưới giữ nguyên để tham khảo yêu cầu, không phải bản mô tả tính năng đã nghiệm thu.

@@ -1,0 +1,54 @@
+---
+title: Gộp auth Hải vào backend và FE chính
+description: Completed code integration; real DB and media acceptance pending.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-01
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác thời điểm bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 03, 04, 05
+- Kết quả phiên: Completed — thay đổi code đã hoàn thành; không coi là nghiệm thu DB/media thật.
+- Trạng thái phase sau phiên: In Progress.
+
+## Mục tiêu và phạm vi được giao
+
+Gộp code auth/users/Supabase của Hải vào backend đang phục vụ frontend main; nối đăng nhập và bảo vệ cấp token LiveKit. Không mở rộng phòng động/chat hoặc sửa schema DB.
+
+## Công việc hoàn thành
+
+- Chuyển auth, users, Supabase và decorator vào backend/src; loại app standalone và lockfile thừa khỏi source được theo dõi, giữ nguyên các file local bị ignore.
+- Hợp nhất dependencies vào backend workspace/root lockfile; giữ bootstrap, proxy và tunnel hiện có.
+- Global DTO validation, password byte limit, generic DB errors, JWT HS256/expiry và rate limiting.
+- API cấp token xác thực JWT, identity gắn user và phiên; giữ phòng/grants/production PoC gate.
+- FE auth forms, Bearer token, in-memory session, logout/unmount cleanup và xử lý 401.
+- File thay đổi: backend/src/{auth,users,supabase,common,livekit,config}, app.module.ts, configure-app.ts, backend/package.json, backend/.env.example, backend/test, package-lock.json, frontend/src/{main.tsx,styles.css,features/auth,features/meeting}, README, AGENTS và docs liên quan.
+- Tạo JWT_SECRET cục bộ nếu thiếu, không in/commit secret. Supabase URL/secret hiện trống.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm run typecheck | Passed | Backend và frontend |
+| npm test | Passed | 3 backend, 13 frontend; mock UsersService và synthetic credentials |
+| npm run build | Passed | Vite có cảnh báo kích thước chunk SDK LiveKit |
+| Supabase thật | Skipped | Thiếu SUPABASE_URL và SUPABASE_SECRET_KEY |
+| Browser/media hai thiết bị | Skipped | Chưa có phiên đăng nhập DB thật và nghiệm thu thủ công |
+
+## Quyết định và lý do
+
+Một app NestJS ở cổng 3000, API chung prefix /api. Auth dùng NestJWT/bcrypt với bảng users có sẵn của Hải; không chuyển sang Supabase Auth. JWT ứng dụng và token LiveKit tách biệt. Chỉ giữ token trong memory, chưa refresh/revoke server-side. Giữ giới hạn PoC production và fixed room.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa có migration schema trong repo. Chưa xác minh DB Cloud, auth thật, phân quyền phòng hoặc media hai thiết bị. Không đánh dấu phase Done.
+
+## Bước tiếp theo
+
+Nhận development Supabase URL/secret và schema từ Hải, điền backend/.env, khởi động lại backend/frontend; đăng ký/đăng nhập và thử Join/Leave trên hai thiết bị theo auth integration guide.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page/master plan, session log, changelog và hướng dẫn.
+- [x] Đăng ký navigation; kiểm tra JSON và target trước bàn giao.

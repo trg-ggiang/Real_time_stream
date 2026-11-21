@@ -1,0 +1,26 @@
+.club-application-dialog{position:fixed;inset:0;margin:auto;width:min(390px,calc(100% - 20px));max-height:calc(100dvh - 20px);overflow:auto;padding:16px 15px 14px;border:1px solid #e5e5e5;border-radius:5px;background:#fff;color:#171717;box-shadow:0 12px 45px #0003;font-family:Arial,sans-serif;line-height:1.35}
+.club-application-dialog::backdrop{background:#0006}
+.club-application-dialog h2{margin:0 26px 5px 0;font-size:14px;line-height:1.35;font-weight:700;color:#171717}
+.club-application-note{margin:0 0 10px;color:#777;font-size:10px}
+.club-application-dialog form{display:grid;gap:0}
+.club-application-section{display:grid;gap:6px;padding:8px 0 10px;border-bottom:1px solid #eee}
+.club-application-section h3{margin:0 0 1px;font-size:10px;font-weight:700;color:#222}
+.club-application-dialog label{display:grid;gap:3px;font-size:9px;font-weight:400;color:#444}
+.club-application-dialog input:not([type=file]),.club-application-dialog textarea,.club-application-dialog select{width:100%;min-height:22px;padding:4px 9px;border:1px solid #e1e1e1;border-radius:14px;background:#fff;color:#333;font:inherit;font-size:9px;resize:vertical}
+.club-application-dialog textarea{min-height:40px;border-radius:5px;padding:7px 9px}
+.club-application-dialog :is(input,textarea,select)::placeholder{color:#999}
+.club-upload-box{position:relative;display:grid;place-items:center;gap:3px;height:43px;border:1px dashed #e1e1e1;border-radius:5px;color:#777;font-size:9px;cursor:pointer}
+.club-upload-box svg{color:#777}
+.club-upload-box input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.club-upload-hint{margin:0;color:#8a8a8a;font-size:8px;font-weight:400}
+.club-application-dialog .club-affiliation-label select{appearance:auto}
+.club-application-dialog .club-category-picker{margin:8px 0;padding:8px;border-color:#e1e1e1;font-size:10px}
+.club-application-dialog .club-category-picker p{font-size:9px;margin-bottom:7px}
+.club-application-dialog .club-category-options{gap:5px 10px}
+.club-application-dialog .club-category-options label{display:inline-flex;gap:5px;font-size:9px}
+.club-application-dialog .club-category-options input[type=checkbox]{width:14px;min-height:14px;height:14px;padding:0;margin:0;border-radius:2px}
+.club-application-close{position:absolute;right:10px;top:8px;width:24px;height:24px;padding:0;border:0;background:transparent;color:#777;font-size:20px;line-height:1}
+.club-application-error{margin:8px 0;color:#a32727;font-size:10px}
+.club-application-submit{width:100%;min-height:21px!important;margin-top:8px;padding:4px 10px!important;justify-content:center!important;border:0!important;border-radius:14px!important;background:#111!important;color:#fff!important;font-size:8px!important;font-weight:700!important}
+.club-application-submit:hover{background:#252525!important;text-decoration:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}

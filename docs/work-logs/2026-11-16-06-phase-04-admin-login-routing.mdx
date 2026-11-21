@@ -1,0 +1,22 @@
+---
+title: Correct admin default destination after authentication
+description: Admin vào /admin sau profile, giữ link đích cụ thể.
+---
+
+## Thông tin và kết quả
+
+2026-11-16-06, Asia/Bangkok; không có dữ liệu giờ bắt đầu chính xác. Codex, Completed scoped fix sau redesign Phase 5; historical Phase 04 vẫn In Progress.
+
+## Nguyên nhân / thay đổi
+
+Người dùng admin@gmail.com có role admin và profile đầy đủ (đã kiểm tra read-only), nhưng AuthApp.finishProfile luôn chuyển trang gốc về /me. Shell admin chỉ mở khi chọn menu hoặc vào /admin. Đã sửa đích mặc định theo role: admin → /admin, còn lại → /me. Chờ hoàn tất refresh role từ /auth/me trước khi dựng router để cache role cũ không làm chọn sai đích; fetch có timeout 8 giây, fallback session hiện tại khi không thể refresh, quyền API vẫn kiểm tra backend. Không ép redirect các deep link public/workspace/personal hoặc meeting đã mở.
+
+Thay AuthApp.tsx và bổ sung test AuthApp.test.tsx. Không thay DB/role, không đăng nhập bằng mật khẩu thật, không commit/push.
+
+## Kiểm tra
+
+77 frontend tests passed; typecheck và frontend build passed (chunk MeetingRoom lớn vẫn cảnh báo). Browser fixture khởi tạo session role student cũ, server trả admin: vào / → /admin, có admin shell, không alert/console error, 0 live writes. Read-only Supabase xác nhận account tồn tại, role admin, đủ năm trường profile. Artifact tại output/phase-05-admin/auth-*.
+
+## Bàn giao
+
+Tab đang ở /me giữ nguyên vì là route cụ thể: mở /admin hoặc chọn Quản trị hệ thống ngay. Đăng nhập từ trang gốc sau reload code sẽ vào admin mặc định. Không gọi mọi trang admin là layout riêng tự động áp lên trang khám phá.

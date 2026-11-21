@@ -1,0 +1,24 @@
+---
+title: Student shared layout
+description: Standardize student navigation, page chrome and shared list states.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-46
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04
+- Outcome: Completed
+- Phase status: In Progress
+
+## Completed work
+
+- `PersonalApp.tsx`, `personal-layout.css`, and `personal-dashboard.css` share the sidebar drawer, stable header and content offsets, sticky footer layout and student typography.
+- `PersonalLists.tsx` and `PersonalState.tsx` share tab counters and empty state presentation. Existing empty text and actions remain unchanged.
+- Styled pagination controls using their existing disabled state. Both pagination containers previously rendered unconditionally. A new visibility rule is pending the user's answer.
+- Updated phase and master plans, session log, changelog and documentation navigation.
+
+## Verification and next step
+
+`npm.cmd --workspace frontend run build` and all 59 frontend tests passed. The documentation navigation and whitespace checks passed. The measured muted text ratios were 7.17:1 on tab badges and 7.41:1 on the page background. Verify responsive layout and keyboard interaction in a browser. Localhost was blocked during preceding checks.

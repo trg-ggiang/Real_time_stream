@@ -1,0 +1,37 @@
+---
+title: New club detail consistency
+description: Reuse the standard club detail presentation for newly approved clubs.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-34
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đảm bảo CLB mới khi chọn Xem CLB có popup cùng style và nội dung như các CLB hiện có.
+
+## Công việc hoàn thành
+
+- CLB tiếp tục dùng chung ContentDialog hiện tại.
+- Dialog dùng cover trước, logo làm fallback, và hiển thị placeholder cùng kích thước khi chưa có ảnh.
+- Thẻ CLB cũng dùng logo làm fallback nếu thiếu cover.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+
+## Giới hạn
+
+File ảnh được chọn trong form đăng ký chưa được upload/lưu; CLB không có `cover_url`/`logo_url` sẽ hiển thị placeholder cùng style.
+
+## Bước tiếp theo
+
+Không có.

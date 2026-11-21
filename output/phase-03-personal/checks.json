@@ -1,0 +1,397 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "path": "/me",
+      "h1": "Không gian của tôi",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/clubs",
+      "h1": "CLB tham gia",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/follows",
+      "h1": "Đang quan tâm",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/registrations",
+      "h1": "Hoạt động đã đăng ký",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/club-requests/30000000-0000-4000-8000-000000000002",
+      "h1": "CLB Công nghệ sinh viên",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/club-requests/new",
+      "h1": "Đưa CLB đến cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/profile",
+      "h1": "Hồ sơ cá nhân",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "interaction": "follow actual UI, fixture API",
+      "passed": true
+    },
+    {
+      "interaction": "cancel registration (fixture only)",
+      "passed": true
+    },
+    {
+      "interaction": "register again (fixture only)",
+      "passed": true
+    },
+    {
+      "interaction": "save profile (fixture only)",
+      "passed": true
+    },
+    {
+      "interaction": "create request -> own detail (fixture only)",
+      "passed": true
+    },
+    {
+      "width": 768,
+      "path": "/me",
+      "h1": "Không gian của tôi",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/me/clubs",
+      "h1": "CLB tham gia",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/me/follows",
+      "h1": "Đang quan tâm",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/me/registrations",
+      "h1": "Hoạt động đã đăng ký",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/me/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/me/club-requests/30000000-0000-4000-8000-000000000002",
+      "h1": "CLB Công nghệ sinh viên",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/me/club-requests/new",
+      "h1": "Đưa CLB đến cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 768,
+      "path": "/me/profile",
+      "h1": "Hồ sơ cá nhân",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me",
+      "h1": "Không gian của tôi",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me/clubs",
+      "h1": "CLB tham gia",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me/follows",
+      "h1": "Đang quan tâm",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me/registrations",
+      "h1": "Hoạt động đã đăng ký",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me/club-requests/30000000-0000-4000-8000-000000000002",
+      "h1": "CLB Công nghệ sinh viên",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me/club-requests/new",
+      "h1": "Đưa CLB đến cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 390,
+      "path": "/me/profile",
+      "h1": "Hồ sơ cá nhân",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "interaction": "personal menu",
+      "passed": true
+    },
+    {
+      "width": 320,
+      "path": "/me",
+      "h1": "Không gian của tôi",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/me/clubs",
+      "h1": "CLB tham gia",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/me/follows",
+      "h1": "Đang quan tâm",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/me/registrations",
+      "h1": "Hoạt động đã đăng ký",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/me/club-requests",
+      "h1": "Đề nghị thành lập CLB",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/me/club-requests/30000000-0000-4000-8000-000000000002",
+      "h1": "CLB Công nghệ sinh viên",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/me/club-requests/new",
+      "h1": "Đưa CLB đến cộng đồng",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "width": 320,
+      "path": "/me/profile",
+      "h1": "Hồ sơ cá nhân",
+      "overflow": false,
+      "errors": [],
+      "broken": [],
+      "exceptions": []
+    },
+    {
+      "scenario": "incomplete",
+      "passed": true
+    },
+    {
+      "scenario": "expired",
+      "passed": true
+    },
+    {
+      "scenario": "guest",
+      "passed": true
+    }
+  ],
+  "writes": [
+    {
+      "path": "me/follows/10000000-0000-4000-8000-000000000001",
+      "method": "PUT",
+      "simulated": true
+    },
+    {
+      "path": "me/registrations/20000000-0000-4000-8000-000000000001",
+      "method": "DELETE",
+      "simulated": true
+    },
+    {
+      "path": "me/registrations/20000000-0000-4000-8000-000000000001",
+      "method": "PUT",
+      "simulated": true
+    },
+    {
+      "path": "users/me/profile",
+      "method": "PATCH",
+      "simulated": true
+    },
+    {
+      "path": "public/clubs",
+      "method": "POST",
+      "simulated": true
+    }
+  ],
+  "visual": [
+    {
+      "width": 1440,
+      "path": "/me",
+      "findings": []
+    },
+    {
+      "width": 1440,
+      "path": "/me/profile",
+      "findings": []
+    },
+    {
+      "width": 768,
+      "path": "/me",
+      "findings": []
+    },
+    {
+      "width": 768,
+      "path": "/me/profile",
+      "findings": []
+    },
+    {
+      "width": 390,
+      "path": "/me",
+      "findings": []
+    },
+    {
+      "width": 390,
+      "path": "/me/profile",
+      "findings": []
+    },
+    {
+      "width": 320,
+      "path": "/me",
+      "findings": []
+    },
+    {
+      "width": 320,
+      "path": "/me/profile",
+      "findings": []
+    }
+  ]
+}

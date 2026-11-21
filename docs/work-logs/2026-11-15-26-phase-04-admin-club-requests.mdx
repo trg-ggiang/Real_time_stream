@@ -1,0 +1,39 @@
+---
+title: Admin club requests
+description: Replace the empty admin destination with a database-backed club request list.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-26
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed (code); live DB acceptance pending
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Hiển thị trang quản lý yêu cầu thành lập CLB theo ảnh tham chiếu và lấy dữ liệu từ database.
+
+## Công việc hoàn thành
+
+- Thêm endpoint GET admin-only đọc danh sách từ `clubs`, lấy tên người tạo từ `users`, và trả số tổng/chờ duyệt/đã xử lý.
+- Thêm giao diện lọc trạng thái, tìm theo tên CLB/người gửi, thống kê, danh sách, dialog chi tiết.
+- Nút từ chối cập nhật `clubs.status = rejected` cho yêu cầu đang pending; backend giới hạn thao tác theo `users.role = admin`.
+- Không hiển thị ngành/lĩnh vực giả định vì không có cột đã biết trong payload/schema code hiện tại; dòng phụ dùng giới thiệu ngắn từ DB.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+| Đọc schema/DB thật | Skipped | Chưa xác minh cột `created_at` và constraint cho trạng thái `rejected` trong DB đang dùng. |
+
+## Quyết định và giới hạn
+
+Endpoint dùng các cột `clubs` đã thấy trong importer (`club_id`, `name`, `summary`, `description`, `mission`, `logo_url`, `cover_url`, `contact_email`, `contact_phone`, `status`, `created_by`) cùng `created_at` để hiển thị ngày gửi. `approved` và `published` được nhóm vào trạng thái đã duyệt.
+
+## Bước tiếp theo
+
+Đối chiếu các cột `created_at` và giá trị hợp lệ của `clubs.status` với Supabase thật, sau đó nghiệm thu tải danh sách/từ chối bằng tài khoản admin.

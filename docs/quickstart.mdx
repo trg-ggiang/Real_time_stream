@@ -1,22 +1,24 @@
 ---
 title: Cài đặt
-description: Cài dependencies, cấu hình môi trường và chạy Module 1.
+description: Cấu hình và chạy uniCircle trên máy hoặc qua HTTPS tunnel.
 ---
 
-Node.js 22.12+ và npm 10+. Chạy `npm install` tại root. Phiên triển khai đã kiểm tra Node 22.23.2 và npm 10.9.8.
+## Cài và cấu hình
 
-`backend/.env` và `frontend/.env` đã được tạo cục bộ, không được Git theo dõi. Trên máy mới, chỉ copy `.env.example` khi chưa có `.env`. Điền `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` ở backend. Supabase và Socket.IO chưa dùng trong Module 1.
+Node.js 22.12+ và npm 10+. Chạy `npm install` tại thư mục gốc.
 
-Chạy hai terminal từ root: `npm run dev:backend` và `npm run dev:frontend`. Mở `http://localhost:5173` hoặc `http://127.0.0.1:5173`. Để trống VITE_API_URL để dùng API proxy; API_PROXY_TARGET mặc định http://127.0.0.1:3000. API liveness: `http://localhost:3000/api/health`. Backend vẫn chạy khi thiếu credentials nhưng token endpoint trả 503.
+Tạo `backend/.env` với `SUPABASE_URL`, `SUPABASE_SECRET_KEY` và `JWT_SECRET` dài ít nhất 32 ký tự. Để tham gia họp, bổ sung `LIVEKIT_URL`, `LIVEKIT_API_KEY` và `LIVEKIT_API_SECRET` của nhóm. Phiên họp động dùng mặc định `POC_ENABLED=false`.
 
-Kiểm tra: `npm run typecheck`, `npm test`, `npm run build`. Sau build: `npm --workspace backend start`. Preview frontend: `npm --workspace frontend run preview` (cổng 4173, hỗ trợ API proxy cùng origin).
+Trong `frontend/.env`, giữ `VITE_API_URL=` để Vite proxy `/api` và `/socket.io` về `http://127.0.0.1:3000`. Chat kênh cần schema mở rộng CLB và migration đính kèm. Xem thứ tự và postflight ở [README](../README.md).
 
-[Hướng dẫn Module 1](/modules/module-01-media-poc) có hợp đồng API, cấu hình HTTPS khi thử hai thiết bị và checklist nghiệm thu còn chờ.
+## Chạy trên máy
 
-Docs dùng MDX/Mintlify, chưa cài/chạy CLI docs.
+Chạy `npm run dev:backend` và `npm run dev:frontend` trong hai terminal ở thư mục gốc. Mở `http://localhost:5173`. Kiểm tra API qua `http://127.0.0.1:3000/api/health`. Đăng nhập, hoàn thiện hồ sơ, rồi mở Không gian sinh hoạt bằng tài khoản đã tham gia CLB.
 
-## Chuẩn bị đưa lên Git
+Chạy `npm run typecheck`, `npm test` và `npm run build` khi cần xác minh bản hiện tại. Sau build, dùng `npm --workspace backend start` và `npm --workspace frontend run preview` để thử bản build ở cổng 4173.
 
-Chỉ chia sẻ mẫu `.env.example` với key/secret trống; mỗi thành viên nhận credentials development riêng qua trình quản lý mật khẩu có chia sẻ hoặc kênh mã hóa riêng. Không commit `.env`, khóa riêng hoặc logs. `.gitignore` không tác động tới file đã tracked và không bảo vệ key hardcode trong source. Nếu key đã lộ, thu hồi/thay key.
+## Thử qua HTTPS
 
-Phiên 2026-10-19-04 kiểm tra hai env không tracked, mẫu không chứa credentials và không thấy hai key LiveKit hiện tại trong candidate files, staging hoặc hai commit hiện có. Đây không phải kiểm toán toàn bộ secret hoặc key cũ.
+Chạy `npm run tunnel` và mở URL ở dòng `UniCircle HTTPS:`. Chọn buổi họp rồi bấm **Sao chép link buổi**. Quick Tunnel dùng địa chỉ tạm và cần máy đang chạy. [Hướng dẫn tunnel](/modules/https-tunnel)
+
+Giữ `.env` và credentials trên máy. Chia sẻ cấu hình development qua kênh riêng của nhóm.

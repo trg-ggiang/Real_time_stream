@@ -1,0 +1,64 @@
+﻿---
+title: Auth and personal profile workflow
+description: Implemented authenticated student profile completion alongside existing NestJS auth.
+---
+
+## Session information
+
+- Session ID: 2026-11-15-01
+- Time: 2026-11-15 (Asia/Bangkok); start time unavailable
+- Agent: Codex
+- Phase: 03 — Auth, database and profile
+- Session outcome: Partial
+- Phase status: In Progress
+
+## Objective and scope
+
+Implement the previously prepared registration/login/profile workflow plan in the existing NestJS and React application, retaining the fixed-room meeting flow and not expanding into club or chat workflows.
+
+## Completed work
+
+- Added authenticated profile read and update endpoints at `GET/PATCH /api/users/me/profile`.
+- Profile ownership is derived from the authenticated JWT; request-supplied `user_id` is rejected by DTO validation.
+- Added the post-login student profile screen for full name, student code, school/faculty, major, cohort, phone and bio. Users can save, continue to the fixed meeting or log out.
+- Added backend HTTP assertions for profile authentication and owner-bound updates, and updated the auth UI test for the profile step.
+
+## Files changed
+
+- `backend/src/users/users.service.ts`
+- `backend/src/users/users.module.ts`
+- `backend/src/users/users.controller.ts`
+- `backend/src/users/dto/update-profile.dto.ts`
+- `backend/test/auth.test.cjs`
+- `frontend/src/features/auth/PersonalProfile.tsx`
+- `frontend/src/features/auth/AuthApp.tsx`
+- `frontend/src/features/auth/AuthApp.test.tsx`
+- `frontend/src/features/auth/auth.css`
+- `docs/plans/phase-03-auth.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+- `docs/work-logs/2026-11-15-01-phase-03-auth-profile.mdx`
+
+## Checks
+
+| Command/check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend and frontend TypeScript checks |
+| `npm.cmd --workspace backend run build` | Passed | NestJS build |
+| `node --test backend/test/auth.test.cjs` | Passed | Includes profile endpoint/auth ownership assertions |
+| `npm.cmd --workspace frontend test` | Passed | 15 tests |
+| `npm.cmd test` | Partial | Frontend passed; backend auth/config passed; LiveKit test failed because it expects camera/microphone only while current permission set also includes screen share/audio |
+| Supabase live DB/RLS check | Skipped | No live database operation/configuration verified in this session |
+
+## Decisions and limitations
+
+- Kept the existing NestJS bcrypt/JWT authentication rather than switching auth providers, consistent with the current app integration.
+- Used `student_profiles.user_id` upsert on conflict; the schema extract did not include constraints, so verify that `user_id` is unique/primary key in the development database before exercising save.
+- Did not change schema or add migrations. The provided schema extract did not establish current foreign keys, unique constraints, duplicate profile rows, or RLS policies.
+- Email verification, password reset, and edits to `users.display_name`/`avatar_url` are not implemented in this code change.
+- `docs/docs.json` has pre-existing merge conflict markers, so it was not modified; this new work-log page cannot be registered in navigation until that file's conflict is resolved.
+
+## Next step
+
+Verify `student_profiles.user_id` uniqueness/FK and RLS in Supabase development, then test registration → login → profile save → fixed-room join with development credentials. Resolve the pre-existing `docs/docs.json` conflict before registering the work log in navigation.

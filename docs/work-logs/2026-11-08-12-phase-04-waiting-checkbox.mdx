@@ -1,0 +1,25 @@
+---
+title: Waiting room checkbox
+description: Replace waiting room select and save button with an immediate checkbox.
+---
+
+## Session
+
+2026-11-08-12, Asia/Saigon; start/end timestamps not captured. Codex. Phase 04 In Progress. Outcome Completed.
+
+## Objective and completed changes
+
+User requested a Meet-style checkbox. MeetingManagement.tsx replaces the select and save button with a labeled native checkbox. Change calls existing PATCH settings immediately; checked state updates only on success. Disabled while busy; unavailable current settings render indeterminate rather than an assumed value. Existing dark/light checkbox styles and keyboard interaction retained. No BE or DB changes.
+
+## Checks
+
+Frontend build including typecheck passed (existing chunk-size warning). Frontend tests: 27 passed. No new tests for this small reversible UI edit. Browser visual/API mutation verification skipped. git diff --check run. Navigation target exists; full JSON validation limited by existing docs.json conflict.
+
+## Decisions and next step
+
+Waiting room admission logic unchanged. Try checkbox with host permissions. Phase remains In Progress pending real media acceptance.
+
+## Checklist
+
+- [x] Phase/master/session/changelog/module updated
+- [x] Navigation registered; limits recorded

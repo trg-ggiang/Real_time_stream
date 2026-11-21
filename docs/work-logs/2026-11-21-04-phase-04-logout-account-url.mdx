@@ -1,0 +1,52 @@
+---
+title: Xóa URL tài khoản cũ khi đăng xuất
+description: Ngăn đăng nhập admin quay lại workspace hoặc trang cá nhân của tài khoản trước.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-21-04; ngày theo Asia/Saigon, không có mốc bắt đầu/kết thúc chính xác.
+- Agent: Codex.
+- Phase: 04 — Application foundation.
+- Kết quả phiên: Completed.
+- Trạng thái phase sau phiên: In Progress.
+- Nhánh: final; working tree sạch lúc bắt đầu, không commit/push.
+
+## Mục tiêu và phạm vi được giao
+
+Sửa lỗi đăng xuất từ workspace/trang cá nhân rồi đăng nhập admin bị giữ URL tài khoản cũ.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/auth/AuthApp.tsx`: logout thay entry hiện tại bằng `/?mode=login`, xóa đường dẫn/query/hash của tài khoản trước cùng với phiên. Form đăng nhập vẫn mở khi tải lại trang. Tài khoản tiếp theo về trang mặc định theo role; hàm quay lại từ cuộc họp và xử lý returnTo của đăng nhập trực tiếp được giữ nguyên.
+- `frontend/src/features/auth/AuthApp.test.tsx`: ba regression từ workspace, trang cá nhân có query/hash và admin; xác nhận logout xóa session, URL về login, remount từ App vẫn thấy form và tài khoản mới được đưa tới `/admin` hoặc `/` đúng role.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run test -- AuthApp` trước sửa | Failed đúng dự kiến | 3 regression mới lỗi vì URL vẫn là trang cũ; 18 test cũ đạt |
+| `npm.cmd --workspace frontend run test -- AuthApp redirect` sau sửa | Passed | 43 tests, 2 files; API mô phỏng, kiểm tra DOM/URL |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; cảnh báo bundle trên 500 kB |
+| `git diff --check`, JSON/navigation mới | Passed | Parse docs.json và kiểm tra target mới tồn tại |
+| Browser đăng nhập bằng tài khoản thật | Skipped | Chưa nghiệm thu trực quan/credential thật; không gửi mutation lên dịch vụ |
+| Backend/database/LiveKit | Skipped | Không thay đổi các phần này |
+
+## Quyết định và lý do
+
+Xóa đích cũ tại logout, nơi bắt đầu đổi tài khoản. Giữ returnTo hợp lệ khi mở link đăng nhập trực tiếp để không phá luồng lời mời họp hoặc link nội dung.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho thay đổi code. Phase 04 vẫn In Progress, chưa có nghiệm thu trình duyệt thật.
+
+## Bước tiếp theo
+
+Đăng xuất từ CLB bằng tài khoản sinh viên/chủ nhiệm, đăng nhập admin cùng tab và xác nhận URL `/admin`; thử lại khi tải trang sau logout.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và CODE_FLOW
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

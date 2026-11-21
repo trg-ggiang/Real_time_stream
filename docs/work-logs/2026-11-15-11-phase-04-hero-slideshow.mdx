@@ -1,0 +1,35 @@
+---
+title: Full-width guest hero slideshow
+description: Extract hero and rotate four images between large and small frames.
+---
+
+## Session information
+
+2026-11-15-11, Codex, Asia/Saigon; exact start/end not recorded. Outcome Completed. Phase 04 In Progress.
+
+## Objective and final implementation
+
+User requested a separate hero component, subtle bottom decoration and five-second slideshow, then clarified the original overlapping two-image arrangement and full-screen-width section without a card enclosure. Further requested dot indicators, no pause behavior/control and removal of the club discovery subtitle.
+
+GuestHero.tsx and guest-hero.css isolate hero state/styles from GuestLanding.tsx. Four existing assets rotate: campus illustration, SINNO, HBAC and technology photograph. Initial large campus/small technology pair matches the original composition. Every five seconds the current large image transforms into the small lower-left frame and the next image moves into the large frame. The section spans the viewport with no outer border/radius, while content stays aligned with page columns. Thin curved lines decorate the lower edge. Dot buttons select slides with aria-pressed and accessible names. No pause state, hover/focus stop or pause control remains, per explicit user instruction. Reduced-motion CSS removes animated transitions while retaining requested automatic cycling.
+
+Removed the club discovery subtitle and retained the right-aligned search label. Reused local assets without adding dependencies or modifying backend/database. GuestHero.test.tsx covers exact five-second timing, four-image looping, large-to-small ownership, manual dot selection and continued cycling on hover.
+
+## Validation
+
+- Frontend build/typecheck passed; existing large media chunk warning remains.
+- 10 targeted tests across GuestHero, GuestLanding and App passed. Earlier tests were adjusted for missing jsdom matchMedia and an ambiguous region locator; final version no longer uses matchMedia because pause behavior was removed.
+- Real browser confirmed large image becomes the small image after five seconds, including when hovered; all hero images loaded.
+- At 1680px hero width is 1680px, left 0, no border; initial image pair matches original. Four 7px dots render and support manual selection; pause text absent; club subtitle absent.
+- Desktop/mobile screenshots reviewed; 390px has no horizontal overflow.
+- JSON navigation parsed and new log target exists. Previously reported 11 missing historical navigation targets were not changed.
+
+## Remaining work and next step
+
+Phase 04 remains In Progress. Continue guest visual acceptance. No future club workflows were implemented.
+
+## Closing checklist
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered log and checked JSON/new target.
+- [x] Recorded checks, changes in scope and verification limits.

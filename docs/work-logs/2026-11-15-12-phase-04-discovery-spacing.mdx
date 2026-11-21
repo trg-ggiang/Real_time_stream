@@ -1,0 +1,28 @@
+---
+title: Airier discovery sections
+description: Consistent three-column cards for clubs, activities and stories.
+---
+
+## Session information
+
+2026-11-15-12, Codex, Asia/Saigon; exact start/end not recorded. Outcome Completed. Phase 04 In Progress.
+
+## Objective and completed code
+
+User explicitly invoked design-taste-frontend and requested more whitespace and activity/story sections matching the club section. Design read: preserve the existing student landing identity with white/navy, Be Vietnam Pro and a calmer discovery rhythm. Dials: DESIGN_VARIANCE 4, MOTION_INTENSITY 3 for this edit, VISUAL_DENSITY 3. Native project CSS retained; no new dependency or image generation necessary because this is an arrangement of existing sourced content. User-requested uniform three-column grids override the skill's default layout-variety guidance. Existing approved light theme, supplied content and hero/nav motion were preserved.
+
+GuestLanding.tsx now uses the club image/card/copy/title/action structure for activities and posts. Activities retain summary, date, location, completed status and interest/login gate; stories retain club/date and add a clear read-story action. Existing detail dialog and safe source links continue to work. guest.css adds shared spacing: 72px top/bottom section padding, 36px heading gap and 28px grid gutters, with 44px section padding and single-column mobile grids. Title/summary slots and bottom actions align across each row. No backend/database changes.
+
+## Validation
+
+Frontend build/typecheck and 10 targeted tests across GuestHero, GuestLanding and App passed. Existing large media chunk warning remains. Browser at 1440px confirmed three equal columns in all sections, 210px images, equal card heights and identical action-row positions within each section. Cards measured 458.78px clubs, 577.94px activities, 529.56px stories; heights vary between content types intentionally. Story detail opens correctly. Desktop screenshots reviewed for both updated sections; mobile at 390px collapses to one 351px column without horizontal overflow. Existing loading/empty/error components remain unchanged. No new tests were added for the reversible visual layout; meaningful existing tests and real browser geometry were used. Lighthouse was not repeated for this layout-only change; no new performance score is claimed.
+
+JSON navigation/new target verified. Eleven previously documented missing historical navigation targets remain unrelated.
+
+## Next step and checklist
+
+Phase 04 remains In Progress; continue guest visual acceptance.
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered work log and verified JSON/new target.
+- [x] Recorded actual checks and limitations.

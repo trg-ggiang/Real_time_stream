@@ -1,30 +1,369 @@
+## Chọn nhiều loại khi tạo CLB — 2026-11-21
+
+Thêm checkbox loại CLB ở cả hai form tạo, lưu nhiều liên kết và hiển thị lại cho người gửi/admin. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-01-phase-04-club-types-on-create).
+
+## Phân loại đủ 10 CLB — 2026-11-20
+
+Xếp tạm năm CLB thiếu mô tả rõ vào `Khác`; bộ lọc nay bao phủ cả 10 CLB công khai trên Supabase development. [Work log](/work-logs/2026-11-20-14-phase-04-classify-all-clubs).
+
+## Loại CLB — 2026-11-20
+
+Đổi bộ lọc thành Loại CLB, thêm sáu loại và phân loại năm CLB có nội dung rõ trên Supabase development. [Work log](/work-logs/2026-11-20-13-phase-04-club-types).
+
+## Lọc CLB theo sở thích — 2026-11-20
+
+Thêm chọn sở thích ở `/clubs`, kết hợp tìm tên và phân trang từ dữ liệu CLB công khai. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-12-phase-04-club-interest-filter).
+
+## Header công khai thống nhất — 2026-11-20
+
+Cố định header khi cuộn và đồng bộ giao diện, menu tài khoản, thông báo trên trang chủ, CLB, hoạt động và bài viết. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-11-phase-04-public-header).
+
+## 2026-11-20 - App audit and content detail cards
+
+Unified post/activity detail card with publication-status border and numeric date ranges. Fixed stale popup navigation, socket timeout copy, recruitment key warnings and current-user rate limiting. [Review and remaining findings](/work-logs/2026-11-20-13-phase-04-app-audit-content-card).
+
+## 2026-11-20 - Confirmation popups and image uploads
+
+Shared styled confirmation dialogs replace browser confirm calls. Club/logo and content cover fields select files, upload them and assign returned URLs automatically. [Work log](/work-logs/2026-11-20-12-phase-04-popups-image-upload).
+
+## 2026-11-20 - Realtime chat and meeting overview cleanup
+
+Club messages use Socket.IO with reconnect catch-up; meeting acknowledgement no longer waits on recipient delivery. The full-page room stays, while its duplicate welcome/create/join overview is removed. [Work log](/work-logs/2026-11-20-11-phase-04-realtime-chat-room-cleanup).
+
+## Cuộn trang Thông tin CLB — 2026-11-20
+
+Cho nội dung Thông tin CLB cuộn độc lập trên desktop/tablet, giữ cuộn trang trên mobile. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-10-phase-04-club-information-scroll).
+
+## Bỏ footer không gian CLB — 2026-11-20
+
+Gỡ dòng `uniCircle · tên CLB` khỏi các trang trong workspace. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-09-phase-04-remove-workspace-footer).
+
+## Icon menu Không gian sinh hoạt — 2026-11-20
+
+Thêm icon cho các mục trong Công việc CLB và Khác. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-08-phase-04-workspace-menu-icons).
+
+## Điều hướng Không gian sinh hoạt — 2026-11-20
+
+Bỏ mục họp trùng trong Công việc CLB, tránh tải lại danh sách kênh khi chuyển kênh và giữ thứ tự CLB. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-07-phase-04-workspace-navigation-stability).
+
+## Phân trang và theme tối trang họp CLB — 2026-11-20
+
+Sửa các nút còn nền trắng trong trang họp CLB khi dùng theme tối và căn giữa phân trang. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-20-04-phase-04-workspace-meeting-controls).
+
+## Link bấm được trong chat CLB — 2026-11-20
+
+Chat CLB hiển thị link HTTP/HTTPS bấm được, gồm link vào đúng buổi họp. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-20-03-phase-04-club-chat-clickable-links).
+
+## Dán ảnh trong chat CLB — 2026-11-20
+
+Chat CLB đã hỗ trợ dán ảnh vào ô soạn, hiển thị ảnh trực tiếp và mở trình xem có nút tải. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-20-02-phase-04-club-chat-paste-images).
+
+## Ảnh và tệp đính kèm trong chat CLB — 2026-11-20
+
+Chat CLB đã có ảnh/tệp đính kèm qua Storage private, xem trong tin nhắn và tải theo quyền kênh. Phase 04 vẫn In Progress, chờ nghiệm thu upload trên Supabase thật. [Work log](/work-logs/2026-11-20-01-phase-04-club-chat-attachments).
+
+## Gửi emoji trong chat CLB — 2026-11-19
+
+Thêm chọn và gửi emoji Unicode trong chat kênh CLB. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-19-09-phase-04-workspace-chat-emoji).
+
+## Link buổi họp CLB qua HTTPS tunnel — 2026-11-19
+
+Đã thêm link theo buổi họp CLB qua HTTPS, giữ phiên sau đăng nhập và kiểm tra membership ở API. Quick Tunnel đã thử HTTP và WSS với backend mô phỏng. Phase 04/05 vẫn In Progress, chờ thử media và chat với thiết bị thật. [Work log](/work-logs/2026-11-19-08-phase-05-club-meeting-tunnel).
+
+## 2026-11-19 — Chat và theme Không gian sinh hoạt
+
+Thêm theme Navy sáng và Sáng/Tối có lưu lựa chọn, bong bóng tin gửi/nhận, Enter để gửi và Shift+Enter để xuống dòng. [Kết quả rà và các việc còn mở](/work-logs/2026-11-19-07-phase-04-workspace-chat-enter).
+
+## 2026-11-19 - Workspace integration and UI refinement
+
+- DB-backed channel/chat and club-scoped meetings connected.
+- Central workspace polished; right information panel can collapse.
+- Compact chat aligns own messages right and groups consecutive messages by sender.
+- Light sidebar restored; work section spans its width.
+- [Work log and handoff](/work-logs/2026-11-19-04-phase-04-workspace-handoff).
+
+## 2026-11-07 — Backend meeting controls
+
+- Added authenticated NestJS meeting APIs for ownership, moderator roles, waiting room approval, participant removal, microphone mute, self-unmute policy and capacity.
+- Added Supabase migration for capacity settings and atomic seat reservations. Frontend/auth signup integration and LiveKit disconnect cleanup remain pending. [Work log](/work-logs/2026-11-07-01-phase-03-meeting-controls).
+
 ---
+
+## 2026-11-19 - Student login opens home
+
+The default student post-login destination is `/`; admin and explicit internal destinations are preserved. Targeted auth/redirect tests (39) and frontend build passed. [Work log](/work-logs/2026-11-19-03-phase-04-student-login-home).
+
+## 2026-11-19 - haimoi1 UI with final club workspace
+
+Restored the haimoi1 application layout while retaining the final club workspace. My Clubs and a new desktop/mobile header link open `/workspace`; the admin area remains separate. Frontend build and 90 tests passed. [Work log](/work-logs/2026-11-19-02-phase-04-haimoi1-ui-final-workspace).
+
+## 2026-11-19 - Final UI and admin merge
+
+Resolved merge conflicts while retaining the `final` layout and the existing admin area. Restored admin login return path and added a regression test. Frontend build and 86 tests passed; two backend HTTP token tests returned 500. [Work log](/work-logs/2026-11-19-01-phase-04-final-ui-admin-merge).
+
+## Admin account menu cleanup (2026-11-16)
+
+Removed the student-view shortcut from the admin account menu. [Work log](/work-logs/2026-11-16-52-phase-04-admin-menu-cleanup).
+
+## Admin overview redesign (2026-11-16)
+
+Updated the admin shell and dashboard using the existing statistics and approval queue. [Work log](/work-logs/2026-11-16-51-phase-04-admin-overview-design).
+
+## Explicit post-login destination (2026-11-16)
+
+Added a shared returnTo resolver, kept legacy login URL fallbacks, and preserved the admin access screen. [Work log](/work-logs/2026-11-16-50-phase-04-post-login-redirect).
+
+## Separate admin layout (2026-11-16)
+
+Extracted the administration shell and nested its existing pages under the same routes. [Work log](/work-logs/2026-11-16-49-phase-04-admin-layout).
+
+## Student list styling (2026-11-16)
+
+Updated student club cards, followed-list count visibility and activity view controls. [Work log](/work-logs/2026-11-16-48-phase-04-student-list-styling).
+
+## Student pagination visibility (2026-11-16)
+
+Show student pagination only when the result spans multiple pages. [Work log](/work-logs/2026-11-16-47-phase-04-student-pagination).
+
+## Student shared layout (2026-11-16)
+
+Standardized the student shell, tab counters, pagination styles and shared empty states. [Work log](/work-logs/2026-11-16-46-phase-04-student-shared-layout).
+
+## Student dashboard layout (2026-11-16)
+
+Improved overview typography, card layout and responsive sidebar navigation. [Work log](/work-logs/2026-11-16-45-phase-04-student-dashboard).
+
+## Shared uniCircle logo (2026-11-16)
+
+Unified the frontend logo and favicon, and removed the closing CTA hover underline. [Work log](/work-logs/2026-11-16-44-phase-04-unicircle-brand).
+
+## Discovery landing post alignment (2026-11-16)
+
+Vertically centered the image and text in the landing page's secondary post cards. [Work log](/work-logs/2026-11-16-43-phase-04-discovery-post-alignment).
+
+## Discovery landing post copy (2026-11-16)
+
+Updated the post section link, missing-cover text and byline date display. [Work log](/work-logs/2026-11-16-42-phase-04-discovery-post-copy).
+
+## Discovery landing button hover (2026-11-16)
+
+Applied the banner's hover color and arrow movement to the three section buttons. [Work log](/work-logs/2026-11-16-41-phase-04-discovery-button-hover).
+
+## Discovery landing section buttons (2026-11-16)
+
+Matched the three section buttons and removed their hover underlines. [Work log](/work-logs/2026-11-16-40-phase-04-discovery-section-buttons).
+
+## Discovery landing post layout (2026-11-16)
+
+Restored the featured-story layout and hid secondary links on landing club and post cards. [Work log](/work-logs/2026-11-16-39-phase-04-discovery-post-layout).
+
+## Discovery landing club and post cards (2026-11-16)
+
+Matched the club and post previews to the activity section's buttons, equal-height cards, media and mobile grid. [Work log](/work-logs/2026-11-16-38-phase-04-discovery-club-post-cards).
+
+## Discovery landing activity link (2026-11-16)
+
+Removed the historical-activity note and styled the activity-list link as a filled button. [Work log](/work-logs/2026-11-16-37-phase-04-discovery-activity-link).
+
+## Discovery landing activity cards (2026-11-16)
+
+Moved the fallback activity note above the cards, aligned the list link, and updated the card images, dates, and ended badges. [Work log](/work-logs/2026-11-16-36-phase-04-discovery-activity-cards).
+
+## Discovery landing image and banner (2026-11-16)
+
+Separated the hero image and caption and styled the responsive club discovery banner. [Work log](/work-logs/2026-11-16-35-phase-04-discovery-image-banner).
+
+## Discovery landing search underline (2026-11-16)
+
+Removed the gray underline from the focused landing search field. [Work log](/work-logs/2026-11-16-34-phase-04-discovery-search-underline).
+
+## Discovery landing search and action styling (2026-11-16)
+
+Simplified search focus and account hover styles and clarified the two hero actions. [Work log](/work-logs/2026-11-16-33-phase-04-discovery-search-actions).
+
+## Discovery landing header controls (2026-11-16)
+
+Refreshed the landing wordmark and navigation underline, added a notification panel placeholder, and enabled outside-click dismissal. [Work log](/work-logs/2026-11-16-32-phase-04-discovery-header-controls).
+
+## Discovery landing header refinement (2026-11-16)
+
+Highlighted the landing header with a tinted background and simplified the signed-in navigation and avatar. [Work log](/work-logs/2026-11-16-31-phase-04-discovery-header-refinement).
+
+## Discovery landing page styling (2026-11-16)
+
+Updated the public landing page with Material Design 3 color roles, responsive cards, visible keyboard focus, and a registration link on small screens. [Work log](/work-logs/2026-11-16-30-phase-04-discovery-home-material).
+
+## Signed-in discovery header (2026-11-16)
+
+Applied the header grouping to the signed-in public landing page and restored the personal header. Frontend build and all 58 tests passed. [Work log](/work-logs/2026-11-16-29-phase-04-discovery-header).
+
+## Personal header layout (2026-11-16)
+
+Grouped the signed-in personal header by current section, discovery and profile. Frontend build and all 58 tests passed. [Work log](/work-logs/2026-11-16-28-phase-04-personal-header).
+
+## Frontend build repair (2026-11-16)
+
+Removed an unreachable personal list branch and fixed onboarding test synchronization. Updated public and club workspace test fixtures for current routes. Typecheck, build, and all 58 frontend tests passed after dependency installation. Two backend HTTP tests remain blocked by localhost access. [Work log](/work-logs/2026-11-16-27-phase-04-frontend-build-repair).
+
 title: Changelog
 description: Lịch sử thay đổi dự án.
 ---
+
+## 2026-11-18 — Công việc CLB ở đáy sidebar
+
+Nhóm Công việc CLB cố định ở cuối sidebar trái; kênh văn bản và gọi nhanh cuộn chung trong vùng còn lại. [Work log](/work-logs/2026-11-18-09-phase-04-pinned-work-sidebar).
+
+## 2026-11-18 — Mục Khác sang cột phải
+
+Nhóm điều hướng Khác chuyển khỏi sidebar trái sang cuối cột phải; phần xem nhanh bỏ mục tiêu và liên hệ CLB. [Work log](/work-logs/2026-11-18-08-phase-04-move-secondary-links-right).
+
+## 2026-11-18 — Trái thao tác, phải thông tin
+
+Sidebar trái ưu tiên kênh và công việc hay dùng; cột phải chỉ đọc giới thiệu CLB, trạng thái lịch họp và hoạt động sắp tới. [Work log](/work-logs/2026-11-18-07-phase-04-sidebar-priority-readonly-panel).
+
+## 2026-11-18 — Dải CLB và cột xem nhanh
+
+Dải CLB đổi sang xanh nhạt; Trang chủ ở đầu, avatar tài khoản ở cuối. Cột Xem nhanh bên phải hiển thị lối họp, hoạt động sắp tới từ API và liên kết CLB. [Work log](/work-logs/2026-11-18-06-phase-04-workspace-rail-quick-view).
+
+## 2026-11-18 — Sidebar CLB và kênh gọi nhanh
+
+Giới hạn vùng cuộn danh sách kênh, thu gọn nhóm công việc/thông tin CLB; thêm hai lối gọi nhanh và form tạo bản nháp kênh cho chủ nhiệm. [Work log](/work-logs/2026-11-18-05-phase-04-compact-club-sidebar).
+
+## 2026-11-18 — Avatar CLB ở dải trái
+
+Ảnh CLB nằm trong ô chuyển CLB ngoài cùng bên trái; bỏ ảnh lặp ở sidebar và thu hẹp sidebar. [Work log](/work-logs/2026-11-18-04-phase-04-club-rail-avatar).
+
+## 2026-11-18 — Chỉnh luồng và giao diện sinh viên
+
+Đăng nhập về trang chủ. Không gian sinh hoạt mở thẳng kênh CLB, chat chiếm toàn vùng; sidebar phân kênh/công việc/CLB. Tài khoản cá nhân bỏ mục CLB trùng và các thẻ khó hiểu; avatar dùng một menu. Build và 59 frontend tests đạt. [Work log](/work-logs/2026-11-18-03-phase-04-student-ux-navigation).
+
+## 2026-11-18 — Đối chiếu schema CLB đúng
+
+Sửa lối họp định kỳ để dùng công cụ họp đã hỗ trợ recurrence, thay cho nháp cục bộ. Ghi rõ kênh hiện là giao diện xem trước dù DB đã có các bảng channel; API workspace chưa kết nối. [Work log](/work-logs/2026-11-18-02-phase-04-schema-alignment).
+
+## 2026-11-18 — Không gian sinh hoạt sinh viên
+
+Thêm lối vào từ header để mở ngay shell CLB ba vùng kiểu Discord, tự chọn CLB đã tham gia. Kênh chỉ có UI; thao tác bài viết, duyệt và họp nối với các route hiện có. Nháp lịch họp định kỳ lưu cục bộ. [Work log](/work-logs/2026-11-18-01-phase-04-student-club-space-frontend).
+## 2026-11-16 — Compact follow menu
+
+Anchored the unfollow menu immediately below its trigger and reduced its width, spacing and padding. [Work log](/work-logs/2026-11-16-26-compact-follow-menu).
+
+## 2026-11-16 — Hide follow confirmation text
+
+Removed the extra confirmation line after following or unfollowing a club; the button itself reflects the current state. [Work log](/work-logs/2026-11-16-25-hide-follow-confirmations).
+
+## 2026-11-16 — Hide unfollow confirmation line
+
+Removed the extra “Đã bỏ quan tâm CLB” line after unfollowing a club. [Work log](/work-logs/2026-11-16-24-phase-04-hide-unfollow-message).
+
+## 2026-11-16 — Follow menu
+
+On a club detail page, the active “Đang quan tâm” button now opens a menu with an explicit “Bỏ quan tâm” action. [Work log](/work-logs/2026-11-16-23-phase-04-follow-menu).
+
+## 2026-11-16 — Story card spacing
+
+Reduced the vertical gap between adjacent story cards and stopped the posts grid rows from stretching to the featured story height. Checks were not run. [Work log](/work-logs/2026-11-16-22-phase-04-story-card-spacing).
+
+## 2026-11-16 — Followed club logo fallback sizing
+
+Kept the followed club fallback logo square and prevented “uniCircle” from wrapping inside it. Checks were not run. [Work log](/work-logs/2026-11-16-21-phase-04-followed-club-logo-fallback).
+
+## 2026-11-16 — Followed club image cards
+
+Changed `/me/follows` from horizontal club rows to responsive image cards with cover, logo, follow status, summary and club link. Checks were not run. [Work log](/work-logs/2026-11-16-20-phase-04-followed-club-image-cards).
+
+## 2026-11-16 — Personal club image cards
+
+Changed joined, managed and pending club items on `/me/clubs` into responsive cover image cards with the existing name, role or request status, and destination link. Checks were not run. [Work log](/work-logs/2026-11-16-19-phase-04-personal-club-image-cards).
+
+## 2026-11-16 — Personal activities page
+
+Restyled `/me/registrations` with list/calendar-agenda controls and registration, joined-club and completed tabs using existing personal data. Automated checks were not run. [Work log](/work-logs/2026-11-16-18-phase-04-personal-activities).
+
+## 2026-11-16 — Club card wrapping
+
+Fixed compact club cards so fallback logos keep their intended size and names do not collapse into narrow vertical text. Automated checks were not run. [Work log](/work-logs/2026-11-16-17-phase-04-club-card-overflow).
+
+## 2026-11-16 — Request detail return link
+
+Changed the request detail breadcrumb to “CLB tham gia” and `/me/clubs`. [Work log](/work-logs/2026-11-16-16-phase-04-request-detail-return-clubs).
+
+## 2026-11-16 — My clubs tabs
+
+Restyled `/me/clubs` with the reference heading, create action and joined/pending/managed tabs backed by the existing personal data. Automated checks were not run. [Work log](/work-logs/2026-11-16-15-phase-04-my-clubs-tabs).
+
+## 2026-11-16 — Personal overview dashboard
+
+Redesigned `/me` with a greeting, account stats, activity discovery banner and community section, with responsive styling. Automated checks were not run. [Work log](/work-logs/2026-11-16-14-phase-04-personal-overview-dashboard).
+
+## 2026-11-16 — Personal sidebar active state
+
+The selected navigation item now receives an active highlight, including the CLB tham gia entry while creating or viewing a club request. [Work log](/work-logs/2026-11-16-13-phase-04-sidebar-active-state).
+
+## 2026-11-16 — Create club menu label
+
+Renamed the account menu action to “Tạo CLB” without changing its behavior. [Work log](/work-logs/2026-11-16-12-phase-04-create-club-menu-label).
+
+## 2026-11-16 — Create club button label
+
+Renamed the joined clubs page action to “Tạo câu lạc bộ”. Its location and destination remain the same. [Work log](/work-logs/2026-11-16-11-phase-04-create-club-label).
+
+## 2026-11-16 — Club request return link
+
+Changed the new club request form's back link to “CLB tham gia” and `/me/clubs`. Automated checks were not run. [Work log](/work-logs/2026-11-16-10-phase-04-club-request-back-link).
+
+## 2026-11-16 — Club request entry point
+
+Removed the club request list from personal navigation and moved its creation button to the joined clubs page. Request form and detail routes remain available. Automated checks were not run. [Work log](/work-logs/2026-11-16-09-phase-04-club-request-entry-point).
+
+## 2026-11-16 — Personal sidebar icons
+
+Added icons and aligned labels in the personal account sidebar while keeping existing menu items and behavior. Automated checks were not run. [Work log](/work-logs/2026-11-16-08-phase-04-personal-sidebar-icons).
+
+## 2026-11-16 — Account dropdown visual refresh
+
+Restyled the signed-in public header account menu with an initials avatar, rounded panel, icon-led actions and highlighted sign-out row. Existing navigation and handlers remain the same. No automated checks run. [Work log](/work-logs/2026-11-16-07-phase-04-account-menu-visual).
+
+## 2026-11-07 — Tunnel startup hash fix
+
+- Replaced Get-FileHash calls with a .NET SHA256 helper to fix the reproduced npm/PowerShell startup failure, retaining pinned release verification.
+- Updated tunnel console notice for the login-required shared room. Build, hash vector/resource cleanup, HTTPS smoke and stop/restart passed; existing backend retained.
+- [Work log](/work-logs/2026-11-07-04-phase-04-tunnel-hash-fix). No env, credentials or database changes.
+
+## 2026-11-07 - Full-height auth photo
+
+Changed the desktop form:image ratio to 1:1.5. The existing photo now covers the full right-hand panel with no inset border or supporting copy. Build and 15 frontend tests passed.
+
+## 2026-11-07 - Desktop login/register design
+
+Added desktop-first auth layout, light/dark/system themes, self-hosted Vietnamese typography, generated supporting image, inline validation and password visibility. API contract and in-memory session remain unchanged. Frontend typecheck, 15 tests and build passed; local Lighthouse desktop scored 99 performance and 100 accessibility. [Work log](/work-logs/2026-11-07-02-phase-04-desktop-auth-ui).
+
+## 2026-11-07 - Auth integration
+
+Merged Hai auth/users/Supabase into the main NestJS workspace; added React login/register/logout, application JWT protection for LiveKit tokens, validation and auth tests. Legacy standalone app removed from tracked source. Real Supabase credentials/schema and two-device acceptance remain pending. [Guide](/modules/auth-integration).
 
 ## 2026-11-06 — Kiểm tra và bàn giao Git
 
 - Tạo nhánh `feature/livekit-mockdata-cloudflare-tunnel` từ main để bàn giao tunnel và tài liệu, theo yêu cầu người dùng; message được chọn: `update code cloudfare tunnel`.
 - Chạy lại typecheck, backend 2 tests, frontend 10 tests và build: đạt; kiểm tra env không tracked và credentials hiện tại không có trong candidate files.
-- [Checkpoint trước commit/push](/work-logs/2026-11-06-05-phase-05-git-handoff). Phase 04/05 vẫn In Progress, chưa có nghiệm thu media mới.
+- . Phase 04/05 vẫn In Progress, chưa có nghiệm thu media mới.
 
 ## 2026-11-06 — Giải thích implementation cho nhóm
 
 - Thêm tài liệu giải thích toàn bộ source Module 1 theo file/hàm, dictionary biến/props/config, units/defaults, flow và giới hạn; cuối mỗi hàm chốt trách nhiệm.
 - Đối chiếu source dependencies đã cài về config scope, throttler, token TTL và SDK cleanup. Không sửa application code, env hoặc runtime.
-- Thêm navigation/liên kết từ README và các trang overview. Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-06-04-phase-05-team-code-guide).
+- Thêm navigation/liên kết từ README và các trang overview. Phase 04/05 vẫn In Progress.
 
 ## 2026-11-06 — Hướng dẫn đọc code
 
 - Thêm bản giải thích file/hàm theo luồng bootstrap, Join/token, media, Leave và HTTPS tunnel.
-- Không thay đổi source/runtime; Phase 04/05 vẫn In Progress. [Work log](/work-logs/2026-11-06-03-phase-05-code-walkthrough).
+- Không thay đổi source/runtime; Phase 04/05 vẫn In Progress.
 
 ## 2026-11-06 — HTTPS tunnel
 
 - Thêm `npm run tunnel` và `npm run tunnel:stop`: build, kiểm tra cloudflared SHA256, khởi động local services và Quick Tunnel, dừng theo PID/start time.
 - Dùng preview loopback và origin Host cố định; không mở wildcard Vite/CORS, không sửa env/secrets. Tài liệu hóa luồng và giới hạn public PoC/rate limit.
-- Build và HTTP smoke qua HTTPS đạt; start/stop được thử. Người dùng xác nhận media nhiều tab cùng máy; hai thiết bị còn chờ. [Work log](/work-logs/2026-11-06-02-phase-05-https-tunnel).
+- Build và HTTP smoke qua HTTPS đạt; start/stop được thử. Người dùng xác nhận media nhiều tab cùng máy; hai thiết bị còn chờ.
 
 ## 2026-10-19 — Tổng kết phase
 
@@ -75,4 +414,439 @@ description: Lịch sử thay đổi dự án.
 ## 2026-11-06 - Module 1 review
 
 - Reviewed join/media support and loopback limitations; typecheck and 12 tests passed.
-- No application/env changes. Phase 04/05 remain In Progress. [Work log](/work-logs/2026-11-06-01-phase-05-readiness-review).
+- No application/env changes. Phase 04/05 remain In Progress.
+
+## 2026-11-07 — Giơ tay trong phòng họp
+
+- Người tham gia có thể giơ/hạ tay và thấy biểu tượng trên ô của người đang giơ tay. [Giơ tay trong phòng họp](/work-logs/2026-11-07-04-phase-05-raise-hand).
+
+## Bố cục nút giơ tay
+
+- Đặt nút giữa Camera và Leave, tăng kích thước biểu tượng bàn tay trên ô. [Bố cục nút giơ tay](/work-logs/2026-11-07-05-phase-05-hand-controls).
+
+## Chia sẻ màn hình 2026-11-07
+
+Đã triển khai quyền screen_share/screen_share_audio, nút share và vùng chọn nhiều người trình chiếu. Backend 4 tests, frontend 20 tests, typecheck/build đạt. Browser dùng video giả lập qua LiveKit Cloud xác minh nhận hình, late join, nhiều người share và dừng. Phase 05 giữ In Progress, chờ native picker/audio và hai thiết bị. [Work log](/work-logs/2026-11-07-06-phase-05-screen-sharing) — [Hướng dẫn](/modules/screen-sharing).
+
+## Bố cục screen và camera 2026-11-07
+
+Tách camera local luôn hiện trong sidebar khi có screen share; remote cameras cuộn riêng. Desktop đặt screen/camera cạnh nhau, mobile dùng dải camera bên dưới. Typecheck, 20 frontend tests và build đạt. Browser với LiveKit Cloud/video giả lập xác minh screen và self camera ở 1440/1024/768/390px, dừng share trở về grid. Phase 05 vẫn In Progress; chờ thiết bị thật/tunnel. [Work log](/work-logs/2026-11-07-07-phase-05-meeting-layout).
+
+
+## Thiết kế migration chat 2026-11-08
+
+Đã soạn migration meeting_messages theo session, chống trùng, index và quyền backend-only. Chưa áp dụng Supabase, chưa có code chat. Phase 06 In Progress. [Phase 06](/plans/phase-06-chat) — [Work log](/work-logs/2026-11-08-01-phase-06-chat-migration).
+
+
+## Chat meeting 2026-11-09
+
+Đã triển khai session selection và mapping LiveKit room, ChatModule Socket.IO, Supabase repository, UI history/outbox/reconnect và proxy WS. Typecheck/build, 14 backend tests và 26 frontend tests đạt. Browser thử với LiveKit Cloud thật và Cloudflare HTTPS → Vite preview → Socket.IO đạt; DB/user/session/messages là fixtures bộ nhớ, Supabase thật chỉ đọc. Chưa nghiệm thu ghi DB/two-device; Phase 06 vẫn In Progress. [Hướng dẫn](/modules/meeting-chat) — [Work log](/work-logs/2026-11-09-01-phase-06-meeting-chat).
+## Giao diện họp tối 2026-11-08
+
+Thiết kế lại sảnh và phòng họp bằng nền than xanh, typography Be Vietnam Pro, bố cục responsive, trạng thái chờ/lỗi rõ ràng và controls đồng bộ. Giữ nguyên đăng ký/đăng nhập và luồng LiveKit hiện tại. Frontend typecheck, 15 tests và build đạt; browser kiểm tra 320–1440px, keyboard, reduced motion, tên dài, screen share giả lập. Phase 04/05 vẫn In Progress, chờ media hai thiết bị thật. [Work log](/work-logs/2026-11-08-02-phase-04-dark-meeting-ui).
+
+## Frontend meeting API 2026-11-08
+
+Đã thêm FE tạo/lên lịch, mở mã/chọn buổi, chờ duyệt/cooldown, các thao tác quản trị qua API có sẵn và đồng bộ attendance khi leave. Toolbar dùng icon sáng, bỏ nút rời phòng trùng và mô tả phụ. 23 frontend tests, typecheck và build đạt; browser kiểm tra bằng mock hợp đồng BE nguyên bản. Không còn thay đổi trong backend. Danh sách thành viên đầy đủ/quyền người xem và quyền token media còn giới hạn phía BE; thử quick meeting thật gặp 503 khi ghi owner. Phase 04/05 vẫn In Progress, chưa nghiệm thu E2E. [Work log](/work-logs/2026-11-08-03-phase-04-meeting-frontend).
+
+## Theme sáng/tối 2026-11-08
+
+Thêm bộ chọn mặt trời/mặt trăng cho các màn hình meeting, lưu lựa chọn trên trình duyệt. Theme sáng đồng bộ palette auth, theme tối giữ màu hiện có; không đổi backend/auth hoặc ngắt session khi chuyển theme. Typecheck, 23 tests và build đạt; browser kiểm tra responsive 320–1440px và persistence. Phase 04/05 vẫn In Progress, không có media acceptance mới. [Work log](/work-logs/2026-11-08-04-phase-04-meeting-themes).
+
+## Menu tài khoản 2026-11-08
+
+Gom chọn theme và đăng xuất vào một icon bánh răng trên header. Build/23 tests đạt; browser xác minh Escape, outside click, focus và 320px. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-08-05-phase-04-account-settings).
+
+## Đồng bộ role schema 2026-11-08
+
+Theo yêu cầu người dùng, code BE/FE đã đổi giá trị role owner thành host để khớp meeting_members_role_check. Đồng bộ tạo chủ phòng, rank/moderation và bảo vệ host khỏi remove/demote; nhãn UI vẫn là Chủ phòng. Typecheck/build, 4 tests quyền BE và 23 tests FE đạt. Không thay schema/dữ liệu, chưa thử tạo meeting thật sau sửa; các phase vẫn In Progress. [Work log](/work-logs/2026-11-08-06-phase-03-schema-host-role).
+
+## Session ongoing 2026-11-08
+
+Sửa lỗi 503 còn lại khi tạo meeting nhanh: code gửi active nhưng meeting_sessions_status_check dùng ongoing. Đồng bộ BE/FE và thêm regression; 6 tests BE liên quan, 23 tests FE, typecheck/build đạt. API thật cổng 3000 đã tạo session ongoing, đọc lại và kết thúc thành công. Giữ schema và các meeting đã có, các phase vẫn In Progress do chưa nghiệm thu media/phân quyền đầy đủ. [Work log](/work-logs/2026-11-08-07-phase-03-session-status).
+
+## Chuẩn bị session admission 2026-11-08
+
+Đã chuẩn bị logic pending/admitted trong meeting_members với requested_session_id, không tạo attendance trước khi được duyệt và join. Attendance giữ NOT NULL; FE dùng requestId. 17 tests BE liên quan, 23 tests FE, typecheck/build đạt. Theo lựa chọn người dùng, migration 202611080001 chưa áp dụng DB nên chưa nghiệm thu luồng thật; các phase vẫn In Progress. [Work log](/work-logs/2026-11-08-08-phase-03-session-admission).
+
+## LiveKit room đã biến mất khi leave — 2026-11-08
+
+Sửa cleanup leave/remove/end để gọi removeParticipant trực tiếp và chấp nhận SDK 404/not_found như đã rời; tiếp tục đóng attendance. Không bỏ qua lỗi mạng/quyền hoặc lỗi DB. Backend typecheck/build và 22 tests liên quan đạt. Không thay schema hoặc áp dụng migration phòng chờ; Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-08-09-phase-05-missing-room-leave).
+
+
+## Ph?ng ch? d?ng schema hi?n c? ? 2026-11-08
+
+B? migration ch?a ?p d?ng v? ph? thu?c requested_session_id theo y?u c?u. D?ng pending ? admitted ? c?p meeting; attendance ch? ghi khi join ???c c?p token. Build v? 19 tests BE ??t; ch?a E2E th?t. Phase 03/05 In Progress. [Work log](/work-logs/2026-11-08-10-phase-03-existing-admission-status).
+
+
+## Login survives reload (2026-11-08)
+
+Valid auth sessions persist in tab-scoped sessionStorage; logout/expiry clears them. Frontend 27 tests and build passed. No BE/DB changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-08-11-phase-04-auth-reload).
+
+
+## Waiting room checkbox (2026-11-08)
+
+Replaced select/save with an immediate native checkbox using existing settings API. Build and 27 frontend tests passed. No BE/DB change. Phase 04 In Progress. [Work log](/work-logs/2026-11-08-12-phase-04-waiting-checkbox).
+
+
+## Join lobby redesign (2026-11-09)
+
+Join-first layout with wider code/link input, secondary create/schedule panel, full-width session list and collapsible management. Both theme tokens retained. Build and 27 tests passed; browser/Lighthouse unavailable. Phase 04 In Progress. [Work log](/work-logs/2026-11-09-01-phase-04-join-lobby-redesign).
+
+
+## Role based screen sharing (2026-11-09)
+
+All roles may raise hands. Host shares immediately; moderator/participant requests are approved by the actual host via LiveKit permissions. No schema changes. Existing grid/focused screen stage retained. BE 24 tests, FE 27 tests, typecheck/build passed; real media acceptance pending. Phase 05 In Progress. [Work log](/work-logs/2026-11-09-02-phase-05-role-screen-sharing).
+
+
+## Neutral dark / white turquoise themes (2026-11-09)
+
+Charcoal dark palette matches supplied reference; light uses white surfaces and turquoise accents. Saved theme synchronizes across tabs. Build and 29 FE tests passed; browser visual review pending. Phase 04 In Progress. [Work log](/work-logs/2026-11-09-03-phase-04-neutral-themes).
+
+
+## Device error sources and meeting reload (2026-11-09)
+
+Capture errors are source-specific; screen picker cancellation is not a camera/mic error. Active session IDs resume with fresh credentials after reload; manual muted preferences survive. Isolated Chromium/LiveKit verification used synthetic media and HTTP fixtures, not physical hardware or DB writes. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-04-phase-05-device-errors-reload).
+
+
+## Full frontend theme audit (2026-11-09)
+
+Unified semantic light/dark colors for auth, forms, settings, dialogs and LiveKit controls; fixed device selection styling, gear click handling and theme persistence across logout/reload. Build and 38 frontend tests passed; 40 browser states had zero measured text-contrast/overflow failures. UI simulation used; physical media acceptance remains pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-05-phase-04-theme-audit).
+
+
+## Specific scheduling conflicts (2026-11-09)
+
+Session overview now exposes recurrence/settings metadata, preventing an invalid extra-session scheduling affordance after reload. Distinct localized 409 reasons cover invalid times and existing single sessions. No schema changes. BE 18 tests, FE 40 tests and both builds passed; no live DB writes for testing. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-06-phase-04-schedule-conflicts).
+
+
+## Chat merge repair (2026-11-10)
+
+Resolved accept-both JSX/function/render duplication; kept modern meeting lobby and connected chat to its session flow. Chat follows both themes. Legacy session tokens reuse admission/attendance/role policy. BE 31 tests, FE 42 tests, typecheck and both builds passed; browser UI fixtures reviewed. No DB changes. Phase 04/05/06 In Progress. [Work log](/work-logs/2026-11-10-01-phase-06-chat-merge-repair).
+
+
+## Lobby create background (2026-11-10)
+
+Fixed a theme-selector specificity conflict that painted a rectangle behind the secondary create form. Chromium confirmed transparent background in dark mode. CSS-only; no BE/DB changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-02-phase-04-lobby-background).
+
+
+## Remove manual chat reconnect button (2026-11-10)
+
+Removed the manual reconnect action from the chat header at user request; automatic Socket.IO reconnection remains unchanged. Phase 06 In Progress. [Work log](/work-logs/2026-11-10-03-phase-06-remove-chat-reconnect-button).
+
+
+## Chat toolbar icon (2026-11-10)
+
+Moved chat open/close into the bottom meeting toolbar as a labeled icon with unread badge; connection status now lives inside the chat panel. FE build and 42 tests passed. No BE/DB changes. Phase 04/06 In Progress. [Work log](/work-logs/2026-11-10-04-phase-06-chat-toolbar-icon).
+
+
+## Hide technical session name (2026-11-10)
+
+Removed the internal LiveKit room-name heading from the meeting UI. No media/chat logic changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-05-phase-04-hide-session-name).
+
+
+## Simplify placeholders (2026-11-10)
+
+Replaced input example/hint placeholders with the short text requested by the user; labels and validation retained. Text-only FE edit. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-06-phase-04-input-placeholders).
+
+
+## Remove cancel join button (2026-11-10)
+
+Removed the requested cancel-join action from the meeting page. No join/media logic changes. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-07-phase-04-remove-cancel-join).
+
+
+## Meeting toolbar order (2026-11-10)
+
+Placed hand before sharing and device settings directly before leave, using DOM order. Frontend typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-08-phase-04-toolbar-order).
+
+
+## Restore form hints (2026-11-10)
+
+Restored field-specific hints/examples for auth, meeting creation, invitations and chat after user clarification; only meeting lookup retains the short search placeholder. Text-only FE correction. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-09-phase-04-restore-form-hints).
+
+
+## Email placeholder (2026-11-10)
+
+Email fields now use email@gmail.com as requested. Text-only FE edit. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-10-phase-04-email-placeholder).
+
+
+## Meeting code placeholder (2026-11-10)
+
+Updated meeting lookup placeholder to the requested short code hint. Text-only FE edit. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-11-phase-04-meeting-code-placeholder).
+
+
+## Remove meeting title example (2026-11-10)
+
+Removed the title input example placeholder at user request. Label and validation unchanged. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-12-phase-04-remove-meeting-title-example).
+
+
+## Share link icon (2026-11-10)
+
+Replaced the displayed meeting code/copy group with a top-right share icon in detail and active-call headers. Clipboard behavior retained. Frontend typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-10-13-phase-04-share-link-icon).
+
+
+## Remove self camera section (2026-11-10)
+
+Removed the dedicated self-camera sidebar section during screen sharing; no remote cameras means full-width presentation. Normal camera grid/publication unchanged. FE typecheck passed. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-14-phase-04-remove-self-camera-section).
+
+
+## Audio device dropdown arrows (2026-11-10)
+
+Replaced standalone gear with microphone/headphone caret menus, added receive-audio mute toggle and output-support fallback. FE build/typecheck and 43 tests passed; physical routing pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-10-15-phase-04-audio-device-arrows).
+
+
+## Guest landing concepts — 2026-11-15
+
+Completed three interactive guest landing concepts for selection: Campus, Editorial and After Hours. Demo data only; Phase 04 In Progress. Frontend build/typecheck, 9 auth tests and browser interactions passed. [Work log](/work-logs/2026-11-15-01-phase-04-guest-landing-concepts). [Preview guide](/modules/guest-landing-concepts).
+
+## Bright guest concepts (2026-11-15)
+
+Added Navy (white/navy), Sky and Coral interactive light landing concepts, bringing the selector to six designs. Generated local campus photography and responsive JPEG assets; kept preview outside the meeting bundle. Build and browser interaction checks passed; Phase 04 remains In Progress pending design selection and real guest integration. [Work log](/work-logs/2026-11-15-02-phase-04-bright-guest-concepts).
+
+## Campus Board top navigation (2026-11-15)
+
+Completed a seventh guest concept with its own discovery-board composition. At user request, interests are a horizontal sticky rail below the header rather than a left sidebar. Build, browser interactions and desktop/mobile checks passed; demo data only. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-03-phase-04-campus-board).
+
+## Navy Mix concept (2026-11-15)
+
+Added separate concept 08: Navy colors/hero from 04 and uniform club grid from 03. Desktop/mobile, filtering, login gate and build passed. Preview only; Phase 04 In Progress. [Work log](/work-logs/2026-11-15-04-phase-04-navy-mix).
+
+## Live guest mode Navy Mix (2026-11-15)
+
+Integrated selected Navy Mix as the React guest homepage with paginated NestJS reads from public_clubs, public_club_activities and public_club_posts. Live public views return zero rows; empty states are truthful. Typecheck, builds, 16 frontend tests, 3 backend tests and HTTP/browser checks passed. No schema/data writes. Phase 04 In Progress; authenticated follow/application workflows remain separate. [Work log](/work-logs/2026-11-15-05-phase-04-live-guest-mode). [Guide](/modules/guest-mode).
+
+## Guest cleanup and text actions (2026-11-15)
+
+Removed guest concepts from the served project, moved production images to /images/guest, and applied self-hosted Google Font Be Vietnam Pro. Guest actions now have transparent backgrounds, no decorative icons/avatars and underline on hover/focus. Build and browser checks passed. Recursive deletion was blocked by automatic policy; original concepts remain in a temp archive outside the project. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-06-phase-04-remove-guest-concepts).
+
+
+## HUST public dataset (2026-11-15)
+
+Imported 3 clubs (SINNO, HUROS, HBAC), 3 historical activities and 3 compiled introduction posts with 5 sourced local club images/logos. Source manifest: data/hust-public.json; repeatable importer: scripts/seed-hust-public.mjs. Public views, backend/Vite API, image loads and mobile layout verified; repeat import adds zero rows. Frontend build and 7 targeted tests passed. Facebook/TikTok reading was restricted; official HUST/club sites and HBAC LinkedIn were used. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-07-phase-04-hust-public-data).
+
+
+## Aligned club cards (2026-11-15)
+
+Equalized title/summary slots and bottom-aligned club actions. Build/typecheck and browser geometry checks passed; mobile has no horizontal overflow. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-08-phase-04-align-club-cards).
+
+
+## Clickable public URLs (2026-11-15)
+
+Public detail URLs now open in a new tab with safe anchor attributes and visible underline; HTML remains escaped. Final club title first-line alignment verified. Build/typecheck and 8 targeted tests passed; real fanpage click opened the correct external page. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-09-phase-04-clickable-public-links).
+
+
+## Active guest navigation (2026-11-15)
+
+Header section links follow scroll position with blue underline and 1.15 scale. Build/typecheck, 8 tests and desktop browser scroll/anchor checks passed. Mobile layout remains unchanged. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-10-phase-04-active-guest-navigation).
+
+
+## Full-width hero slideshow (2026-11-15)
+
+Extracted GuestHero with the original overlapping large/small image form, four local images rotating every five seconds, selectable dots and subtle lower-edge decoration. Full-width section without a card border; no pause behavior/control per user instruction. Removed club discovery subtitle. Build/typecheck, 10 tests and desktop/mobile browser checks passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-11-phase-04-hero-slideshow).
+
+
+## Discovery section spacing (2026-11-15)
+
+More whitespace between sections and consistent three-column club-style activity/story cards. Shared image heights, title/summary slots and bottom-aligned actions; one column on mobile. Build/typecheck, 10 tests and browser geometry/detail checks passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-12-phase-04-discovery-spacing).
+
+
+## Distinct activity and story layouts (2026-11-15)
+
+Activities now use a date-led horizontal agenda on pale blue; stories use a featured editorial article with compact secondary pieces. Clubs retain their grid. Desktop/tablet/mobile overflow and detail/auth-gate checks passed; build/typecheck and 10 tests passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-13-phase-04-distinct-discovery-layouts).
+
+
+## Wider page and event images (2026-11-15)
+
+Halved effective content gutters and enlarged agenda images to 280x190px on desktop, with responsive tablet/mobile sizes. Build/typecheck and browser sizing/overflow checks passed. CSS-only; no repeated unit tests. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-14-phase-04-wider-page-event-images).
+
+
+## Bold active navigation (2026-11-15)
+
+Added bold blue active header labels with 2px underline and 1.15 scale; preserved active state through section gaps. Browser scroll/computed-style checks and build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-15-phase-04-bold-active-navigation).
+
+
+## Visible mobile section navigation (2026-11-15)
+
+Reproduced hidden section links below 768px and exposed them in a second header row. Desktop/mobile real scroll checks on port 5173 verified all active effects and sticky visibility. Build/typecheck passed. Phase 04 In Progress. [Work log](/work-logs/2026-11-15-16-phase-04-visible-mobile-navigation).
+
+## 2026-11-15 — Auth UI alignment
+
+- Updated the login/register brand, palette, imagery and responsive layout to match the public landing page. Moved the guest-return link into the header flow to prevent overlap with the brand.
+- Frontend typecheck, 53 tests and production build passed. Browser visual QA was not available in this session; the computer-use browser host reported unavailable. [Work log](/work-logs/2026-11-15-02-phase-04-auth-ui-alignment).
+
+## 2026-11-15 — Student profile flow
+
+- Registration opens profile completion; returning users with incomplete profiles must save required student details. Completed profiles continue to the meeting. Backend profile controller registered. Typecheck, build and 53 frontend tests passed. [Work log](/work-logs/2026-11-15-17-phase-03-student-profile-flow).
+
+## 2026-11-15 — Registration profile visibility
+
+- Explicit login/register links bypass an older saved session and show the requested form. New registration-to-profile behavior is covered by tests. Frontend typecheck and 55 tests passed. [Work log](/work-logs/2026-11-15-18-phase-03-register-profile-visibility).
+
+## 2026-11-15 — Profile before call
+
+- Removed automatic transition to meeting after auth and redesigned the student profile form. Continuing now requires a click and an incomplete profile must be saved first. Frontend tests (55), typecheck and build passed. [Work log](/work-logs/2026-11-15-19-phase-03-profile-before-call).
+
+## 2026-11-15 — Auth/profile flow fix
+
+- Completed profile no longer reopens on returning login; registration stays on profile until save succeeds. Profile layout fills the viewport. Frontend typecheck, 56 tests and build passed. [Work log](/work-logs/2026-11-15-20-phase-03-auth-profile-flow-fix).
+
+## 2026-11-15 — Student landing
+
+- Authenticated students now see a signed-in landing after profile completion; meeting is opened by a separate button. Typecheck, 57 frontend tests and build passed. [Work log](/work-logs/2026-11-15-21-phase-03-student-landing).
+
+## 2026-11-15 — Meeting return to landing
+
+- Meeting navigation now supports a Trang chủ action and browser Back to the signed-in landing. Frontend typecheck, 57 tests and build passed. [Work log](/work-logs/2026-11-15-22-phase-04-meeting-return-landing).
+
+## Club application form — 2026-11-15
+
+Authenticated students can submit club name, summary, description, mission, contact and image URLs through a guest-feature dialog. NestJS inserts requests into `clubs` with the current user as `created_by` and `status: pending`. Supabase schema acceptance and real insertion are pending. [Work log](/work-logs/2026-11-15-23-phase-04-club-application).
+
+## Club application layout — 2026-11-15
+
+Aligned the registration dialog with the supplied compact, four-section form. Local image selection and affiliation are shown but not persisted; those integrations need confirmed storage/schema support. [Work log](/work-logs/2026-11-15-24-phase-04-club-application-layout).
+
+## Admin club navigation — 2026-11-15
+
+The users role is included in auth responses and refreshed for existing sessions. Accounts with `role: admin` see Quản lý CLB beside Bài viết; the destination is intentionally blank. [Work log](/work-logs/2026-11-15-25-phase-04-admin-club-navigation).
+
+## Admin club request list — 2026-11-15
+
+Replaced the blank admin page with database-backed club requests, counts, status filters, creator-name search and detail view. Admins can reject pending requests. Live schema confirmation and automated checks remain pending. [Work log](/work-logs/2026-11-15-26-phase-04-admin-club-requests).
+
+## Neutral admin navigation — 2026-11-15
+
+The Quản lý CLB link no longer receives selected-link emphasis or a persistent pointer-focus outline when opened, matching the surrounding navigation style. [Work log](/work-logs/2026-11-15-27-phase-04-nav-admin-neutral-style).
+
+## Neutral section navigation — 2026-11-15
+
+Active navigation links, including Bài viết, no longer change color, weight, underline or scale. The active location remains exposed through `aria-current`. [Work log](/work-logs/2026-11-15-28-phase-04-neutral-section-nav).
+
+## Admin club page styling — 2026-11-15
+
+Aligned the management dashboard, request cards, filters and detail dialog with the guest landing's Be Vietnam Pro typography, navy/blue palette, spacing and responsive behavior. No data or action logic changed. [Work log](/work-logs/2026-11-15-29-phase-04-admin-club-style).
+
+## Compact admin club summary — 2026-11-15
+
+Reduced the heading, summary cards, search field and status chips on the club management page to create a denser layout matching the supplied reference. [Work log](/work-logs/2026-11-15-30-phase-04-compact-admin-club-summary).
+
+## Student club application progress — 2026-11-15
+
+After a student submits a club request, the create button is replaced with a progress tracker under the club section heading. The latest application is loaded from the database by authenticated user ID and refreshed every 30 seconds. [Work log](/work-logs/2026-11-15-31-phase-04-student-club-application-progress).
+
+## Club review decisions — 2026-11-15
+
+Admins can approve pending applications, publish clubs, and add their creators to `club_memberships` as `president`; rejection writes review metadata and a note. Applicant progress reflects the resulting status. Membership schema/role assumptions and live DB behavior remain unverified. [Work log](/work-logs/2026-11-15-32-phase-03-04-club-review-decisions).
+
+## Club detail modal styling — 2026-11-15
+
+Updated the club detail dialog to match the supplied reference: natural image proportions, blue source links, white scrollable modal, revised spacing and mobile sizing. [Work log](/work-logs/2026-11-15-33-phase-04-club-detail-modal-style).
+
+## New club detail consistency — 2026-11-15
+
+Newly approved clubs reuse the standard detail modal. Cards/dialogs fall back from cover image to logo and keep a matching placeholder when neither exists. Local image files selected during application are still not persisted. [Work log](/work-logs/2026-11-15-34-phase-04-new-club-detail-consistency).
+
+## Hoạt động CLB — 2026-11-15
+
+Thêm **CLB của tôi**, đề xuất hoạt động của thành viên và tab xét duyệt theo CLB. Chủ nhiệm có thể đăng trực tiếp. Hoạt động đã công khai dùng danh sách trang chủ hiện có. [Work log](/work-logs/2026-11-15-35-phase-04-club-activities).
+
+## 2026-11-16 — Public discovery redesign
+
+- New public home, collection/detail routes, responsive navy/blue design and account menu.
+- Server-side name/title search, activity time filters and allowlisted public detail endpoints.
+- Scoped discovery module, GET retry/cancellation and legacy admin/club adapter; no DB writes.
+- [Work log](/work-logs/2026-11-16-01-phase-04-public-discovery).
+
+## 2026-11-16 — Discovery polish
+
+- Optical hero typography, viewport reveal, bounded desktop photo drift and reduced-motion fallback.
+- Clearer search CTA and responsive title down to 320px; no backend or DB changes.
+- [Work log](/work-logs/2026-11-16-02-phase-04-discovery-polish).
+
+## 2026-11-16 — Personal student experience
+
+- Added personal overview, memberships, follows, registrations, requests and shared profile form.
+- Added authenticated owner-scoped APIs, mandatory profile gate, PUT/DELETE CORS and private no-store responses.
+- Kept rejected requests immutable and exposed a fresh-application flow; no live database mutations during validation.
+- [Work log](/work-logs/2026-11-16-03-phase-04-personal-space).
+
+## 2026-11-16 — Redesign Phase 4: club workspace
+
+Workspace CLB có context/role riêng, draft/submit/review posts/activities, quản lý ban/thành viên, chuyển chủ nhiệm qua RPC, liên hệ/ảnh allowlist và meeting entry giữ return path. 57 backend + 70 frontend tests, typecheck/build và 45 browser fixture checks đạt. Không mutation DB/migration/commit/push; UI ready for review, admin shell Phase 5 chưa triển khai. [Báo cáo](/design/phase-04-club-workspace), [work log](/work-logs/2026-11-16-04-phase-04-club-workspace).
+
+## 2026-11-16 — Redesign Phase 5: admin and integration
+
+Đã hoàn thiện shell /admin, queue/detail/directory, search/phân trang và approve/reject có version/lý do; API admin tách module, bỏ provisioning/rollback membership cũ. Typecheck/build, 65 backend + 75 frontend tests và 121 browser fixture checks đạt (35 admin, 41 personal, 45 workspace), 0 live writes. Historical roadmap vẫn In Progress; code redesign Phase 5 ready for review, chờ nhóm nghiệm thu UI và ghi DB thật trên môi trường test. [Báo cáo](/design/phase-05-admin-and-integration), [work log](/work-logs/2026-11-16-05-phase-04-admin-shell).
+
+## 2026-11-16 — Admin default login destination fix
+
+Auth/profile từ trang gốc nay chờ refresh role rồi admin → /admin, student → /me; giữ deep link/meeting. Đã xác nhận read-only admin@gmail.com có role admin và profile đầy đủ. Typecheck/frontend build, 77 frontend tests và browser stale-role→admin landing đạt. Không ghi DB/commit/push. [Work log](/work-logs/2026-11-16-06-phase-04-admin-login-routing).
+
+## Navy sáng cho Không gian sinh hoạt — 2026-11-19
+
+Áp dụng theme Navy sáng cho Không gian sinh hoạt, tăng tương phản của kênh, tin nhắn và ô nhập. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-19-05-phase-04-workspace-navy-light).
+
+## Bong bóng chat và theme Sáng/Tối
+
+Thêm bong bóng tin gửi/nhận và nút Sáng/Tối có lưu lựa chọn. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-19-06-phase-04-workspace-chat-theme).
+
+## Gửi tin nhắn CLB bằng Enter
+
+Enter gửi, Shift+Enter xuống dòng. Phase 04 vẫn In Progress. [Work log](/work-logs/2026-11-19-07-phase-04-workspace-chat-enter).
+
+## 2026-11-20 — Giao/gỡ trưởng ban và thông báo landing
+
+Đã thêm thao tác member/head riêng, nhãn Trưởng ban trên thẻ cộng đồng và inbox
+bổ nhiệm chỉ trên landing, đánh dấu đã xem để bỏ số. Giữ luồng chủ nhiệm cũ.
+Typecheck/build, 99 frontend tests, 49 backend tests và PostgreSQL tạm đạt.
+Cần áp dụng migration 202611200001 và nghiệm thu thật; Phase 04 In Progress.
+[Hướng dẫn](/modules/department-head),
+[work log](/work-logs/2026-11-20-01-phase-04-department-head).
+
+## 2026-11-20 — Tuyển thành viên CLB
+
+- Thêm đợt tuyển và form 11 loại trường trong Công việc CLB, giữ shell khi đổi trang.
+- Đưa bài đã đăng vào activities feed và trang CLB; sinh viên gửi/xem đơn cá nhân.
+- Chair/head đúng ban duyệt hoặc từ chối; admission và thông báo trong cùng transaction.
+- Mở rộng chuông landing, bảo toàn thông báo bổ nhiệm trưởng ban và quyền chair.
+- Thêm migration v3, upload/download riêng tư, cleanup file chờ và regression SQL/API/UI.
+- Build và 166 tests đạt; cần áp dụng migration trên development rồi nghiệm thu.
+[Work log](/work-logs/2026-11-20-02-phase-04-recruitment-workflow).
+
+## 20/11/2026 — Hiển thị danh sách tuyển thành viên
+
+Hoàn thành mỗi đợt/đơn một dòng, sắp quản lý theo hạn kết thúc tăng dần trước
+phân trang; đơn sinh viên theo ngày nộp giảm dần. Thêm màu trạng thái, nút rõ
+ràng, Xem chi tiết cho chair/head (head chỉ đọc), Mở CLB cuối dòng và bỏ preview
+nội dung bài tuyển. Không thay DB. Phase 04 **In Progress**.
+[Work log](/work-logs/2026-11-20-03-phase-04-recruitment-lists).
+
+## 20/11/2026 — Cụm thao tác duyệt đơn
+
+Duyệt/Từ chối nằm ngang bên phải, nút Xem chi tiết đơn toàn chiều rộng nằm
+bên dưới. Build frontend và 7 tests tuyển thành viên đạt; không đổi DB.
+Phase 04 In Progress. [Work log](/work-logs/2026-11-20-04-phase-04-recruitment-review-actions).
+
+## 20/11/2026 — Bỏ trạng thái đơn lặp
+
+Chỉ giữ trạng thái trong phần thông tin bên trái; cột thao tác chỉ giữ nút chi tiết
+với đơn đã xử lý. Typecheck đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-05-phase-04-single-application-status).
+
+## 20/11/2026 — Vị trí nút chi tiết đơn đã xử lý
+
+Giữ nút chi tiết ở hàng dưới bên phải sau duyệt/từ chối, chỉ có trạng thái bên
+trái. Typecheck đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-20-06-phase-04-application-detail-position).
+
+
+## 21/11/2026 — Thông báo CLB đã quan tâm
+
+Bổ sung thông báo bài viết công khai, hoạt động và đợt tuyển mới cho người đã quan tâm CLB; link mở chi tiết và đánh dấu đã đọc. Build backend, typecheck, 5 backend tests và 3 frontend tests đạt. SQL runner chưa chạy được do thiếu PostgreSQL; cần áp dụng migration mới và nghiệm thu thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-02-phase-04-followed-club-notifications).
+
+
+## 21/11/2026 — Giữ khung khi chuyển CLB
+
+Sửa nháy toàn màn hình khi chuyển CLB: giữ rail/sidebar/main và theme, chỉ tải lại nội dung và quyền CLB đích. Ẩn công cụ/chat cũ ngay khi chuyển. Frontend build và 19 workspace tests đạt; chưa rà trực quan browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-03-phase-04-club-switch-flicker).
+
+
+## 21/11/2026 — Xóa URL cũ khi đăng xuất
+
+Logout đưa về `/?mode=login` và xóa session; đăng nhập tài khoản khác không giữ workspace/trang cá nhân cũ, admin về `/admin`. Refresh sau logout vẫn mở form. Ba regression tái hiện trước sửa, 43 auth/redirect tests và frontend build đạt; chưa thử tài khoản thật trên browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-04-phase-04-logout-account-url).

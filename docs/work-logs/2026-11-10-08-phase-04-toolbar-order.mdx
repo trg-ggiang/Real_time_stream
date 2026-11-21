@@ -1,0 +1,22 @@
+---
+title: Reorder meeting toolbar controls
+description: Put hand raising before sharing and device settings before leave.
+---
+
+## Session
+
+2026-11-10-08 Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 04 In Progress.
+
+## Objective and completed code
+
+Reordered actual JSX in MeetingRoom.tsx so visual and keyboard order match: microphone, camera, raise hand, screen sharing, chat, management, device settings, leave. Conditional controls retained. Device settings keeps its explicit disconnected disable condition after moving outside the device fieldset.
+
+## Checks
+
+Frontend typecheck passed. Source ordering verified. git diff --check run. No tests added for this reversible reorder; no behavior or BE/DB changes. Navigation JSON parsed; new log target exists.
+
+## Next step and checklist
+
+Reload the room. Phase 04 remains In Progress.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

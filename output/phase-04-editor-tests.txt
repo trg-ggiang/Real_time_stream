@@ -1,0 +1,13 @@
+
+> @real-time-stream/frontend@0.0.0 test
+> vitest run --run src/features/club-workspace/WorkspaceContent.test.tsx
+
+
+ RUN  v5.0.5 D:/Project/Livekit project/Real_time_stream/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  12:47:44
+   Duration  3.89s (environment 75%, import 13%, tests 9%, transform 3%)
+

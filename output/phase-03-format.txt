@@ -1,0 +1,29 @@
+frontend/src/features/personal/components/AccountAction.tsx 82ms (unchanged)
+frontend/src/features/personal/components/PersonalState.tsx 5ms (unchanged)
+frontend/src/features/personal/pages/ClubRequestPages.tsx 52ms (unchanged)
+frontend/src/features/personal/pages/PersonalLists.tsx 60ms (unchanged)
+frontend/src/features/personal/personal.css 74ms
+frontend/src/features/personal/personal.test.tsx 27ms
+frontend/src/features/personal/PersonalApp.tsx 11ms
+frontend/src/features/personal/services/personal-api.ts 9ms (unchanged)
+frontend/src/features/personal/use-personal-query.ts 4ms (unchanged)
+frontend/src/features/profile/profile-model.ts 5ms (unchanged)
+frontend/src/features/profile/profile.css 15ms (unchanged)
+frontend/src/features/profile/ProfileForm.test.tsx 9ms (unchanged)
+frontend/src/features/profile/ProfileForm.tsx 15ms (unchanged)
+frontend/src/shared/api/account-http.ts 7ms (unchanged)
+frontend/src/shared/lib/use-unsaved-changes.ts 3ms
+frontend/src/features/auth/AuthApp.tsx 39ms (unchanged)
+backend/src/users/complete-profile.guard.ts 3ms (unchanged)
+backend/src/users/dto/update-profile.dto.ts 3ms (unchanged)
+backend/src/users/entities/user.entity.ts 2ms (unchanged)
+backend/src/users/users.controller.ts 3ms
+backend/src/users/users.module.ts 2ms (unchanged)
+backend/src/users/users.service.ts 17ms (unchanged)
+backend/src/personal/personal.controller.ts 6ms (unchanged)
+backend/src/personal/personal.module.ts 2ms (unchanged)
+backend/src/personal/personal.service.ts 28ms (unchanged)
+backend/src/configure-app.ts 2ms
+backend/src/public-content/create-club.dto.ts 3ms
+backend/test/personal-http.test.cjs 27ms (unchanged)
+backend/test/personal.test.cjs 12ms (unchanged)

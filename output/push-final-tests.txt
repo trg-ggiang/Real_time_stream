@@ -1,0 +1,428 @@
+
+> real-time-stream@0.0.0 test
+> npm --workspaces run test
+
+
+> @real-time-stream/backend@0.0.0 test
+> npm run build && node --test test/*.test.cjs
+
+
+> @real-time-stream/backend@0.0.0 build
+> tsc -p tsconfig.json
+
+TAP version 13
+# Subtest: admin HTTP uses current database role, complete profile, typed UUID and version; legacy endpoint shares policy
+ok 1 - admin HTTP uses current database role, complete profile, typed UUID and version; legacy endpoint shares policy
+  ---
+  duration_ms: 707.3242
+  type: 'test'
+  ...
+# Subtest: admin service denies student/chair/null role before touching database
+ok 2 - admin service denies student/chair/null role before touching database
+  ---
+  duration_ms: 8.7681
+  type: 'test'
+  ...
+# Subtest: directory pagination has stable order, excludes pending, and neutralizes wildcard search
+ok 3 - directory pagination has stable order, excludes pending, and neutralizes wildcard search
+  ---
+  duration_ms: 2.1798
+  type: 'test'
+  ...
+# Subtest: approval updates only expected pending version and never provisions or deletes membership
+ok 4 - approval updates only expected pending version and never provisions or deletes membership
+  ---
+  duration_ms: 1.5035
+  type: 'test'
+  ...
+# Subtest: missing chair or management department blocks approval without partial writes
+ok 5 - missing chair or management department blocks approval without partial writes
+  ---
+  duration_ms: 0.4504
+  type: 'test'
+  ...
+# Subtest: rejection requires nonblank reason, records trimmed reason and handles stale decision as conflict
+ok 6 - rejection requires nonblank reason, records trimmed reason and handles stale decision as conflict
+  ---
+  duration_ms: 1.666
+  type: 'test'
+  ...
+# Subtest: database failures remain generic and are not retried as writes
+ok 7 - database failures remain generic and are not retried as writes
+  ---
+  duration_ms: 0.4225
+  type: 'test'
+  ...
+# Subtest: detail distinguishes missing record and exposes only selected creator/reviewer fields
+ok 8 - detail distinguishes missing record and exposes only selected creator/reviewer fields
+  ---
+  duration_ms: 0.78
+  type: 'test'
+  ...
+# Subtest: HTTP auth validates, hashes passwords, signs JWT and never returns password hashes
+ok 9 - HTTP auth validates, hashes passwords, signs JWT and never returns password hashes
+  ---
+  duration_ms: 1745.1678
+  type: 'test'
+  ...
+# Subtest: creation follows database transitions and only a chairperson publishes immediately
+ok 10 - creation follows database transitions and only a chairperson publishes immediately
+  ---
+  duration_ms: 47.1646
+  type: 'test'
+  ...
+# Subtest: membership and chairperson checks are scoped to the selected club
+ok 11 - membership and chairperson checks are scoped to the selected club
+  ---
+  duration_ms: 6.0713
+  type: 'test'
+  ...
+# Subtest: rejection records a reason and only updates a pending activity in the selected club
+ok 12 - rejection records a reason and only updates a pending activity in the selected club
+  ---
+  duration_ms: 3.5536
+  type: 'test'
+  ...
+# Subtest: a member only receives their own proposals and failed submission can reuse its draft ID
+ok 13 - a member only receives their own proposals and failed submission can reuse its draft ID
+  ---
+  duration_ms: 10.1543
+  type: 'test'
+  ...
+# Subtest: configuration rejects invalid values and production PoC token issuance
+ok 14 - configuration rejects invalid values and production PoC token issuance
+  ---
+  duration_ms: 9.9505
+  type: 'test'
+  ...
+# Subtest: token API enforces room, identity, permissions, expiry and rate limit
+ok 15 - token API enforces room, identity, permissions, expiry and rate limit
+  ---
+  duration_ms: 895.5477
+  type: 'test'
+  ...
+# Subtest: legacy session token requests reuse current admission and role policy
+ok 16 - legacy session token requests reuse current admission and role policy
+  ---
+  duration_ms: 0.7209
+  type: 'test'
+  ...
+# Subtest: waiting requests use existing membership status and never create attendance, including repeat joins
+ok 17 - waiting requests use existing membership status and never create attendance, including repeat joins
+  ---
+  duration_ms: 2.195
+  type: 'test'
+  ...
+# Subtest: approved guests create a real non-null attendance only when joining
+ok 18 - approved guests create a real non-null attendance only when joining
+  ---
+  duration_ms: 3.6315
+  type: 'test'
+  ...
+# Subtest: turning the waiting room off admits new guests without inserting a placeholder attendance
+ok 19 - turning the waiting room off admits new guests without inserting a placeholder attendance
+  ---
+  duration_ms: 1.1113
+  type: 'test'
+  ...
+# Subtest: approval updates only the matching pending request and does not create attendance
+ok 20 - approval updates only the matching pending request and does not create attendance
+  ---
+  duration_ms: 0.5154
+  type: 'test'
+  ...
+# Subtest: approval and denial cannot operate on an already processed request
+ok 21 - approval and denial cannot operate on an already processed request
+  ---
+  duration_ms: 1.3935
+  type: 'test'
+  ...
+# Subtest: pending list reads membership requests and exposes request IDs, never fake attendance IDs
+ok 22 - pending list reads membership requests and exposes request IDs, never fake attendance IDs
+  ---
+  duration_ms: 0.4673
+  type: 'test'
+  ...
+# Subtest: join status reflects approval before attendance without attendance
+ok 23 - join status reflects approval before attendance without attendance
+  ---
+  duration_ms: 0.504
+  type: 'test'
+  ...
+# Subtest: ending a session uses existing columns only
+ok 24 - ending a session uses existing columns only
+  ---
+  duration_ms: 0.6208
+  type: 'test'
+  ...
+# Subtest: join tokens permit hand raising for every role and screen sources only for the actual host
+ok 25 - join tokens permit hand raising for every role and screen sources only for the actual host
+  ---
+  duration_ms: 1.5198
+  type: 'test'
+  ...
+# Subtest: leave records departure when LiveKit room/participant is already absent
+ok 26 - leave records departure when LiveKit room/participant is already absent
+  ---
+  duration_ms: 2.8032
+  type: 'test'
+  ...
+# Subtest: normal leave disconnects then records attendance, and repeated leave is harmless
+ok 27 - normal leave disconnects then records attendance, and repeated leave is harmless
+  ---
+  duration_ms: 0.3732
+  type: 'test'
+  ...
+# Subtest: permission, network and unrecognized 404 errors are not swallowed or recorded as successful departures
+ok 28 - permission, network and unrecognized 404 errors are not swallowed or recorded as successful departures
+  ---
+  duration_ms: 0.8824
+  type: 'test'
+  ...
+# Subtest: database failure after absent room still reports an unconfirmed departure
+ok 29 - database failure after absent room still reports an unconfirmed departure
+  ---
+  duration_ms: 0.7141
+  type: 'test'
+  ...
+# Subtest: cleanup used by member removal and session end tolerates only SDK not_found
+ok 30 - cleanup used by member removal and session end tolerates only SDK not_found
+  ---
+  duration_ms: 0.2877
+  type: 'test'
+  ...
+# Subtest: future first appointment succeeds for a nonrecurring meeting
+ok 31 - future first appointment succeeds for a nonrecurring meeting
+  ---
+  duration_ms: 2.1303
+  type: 'test'
+  ...
+# Subtest: existing single session and invalid times produce distinct actionable codes without inserts
+ok 32 - existing single session and invalid times produce distinct actionable codes without inserts
+  ---
+  duration_ms: 1.1177
+  type: 'test'
+  ...
+# Subtest: session overview exposes recurrence and waiting settings after reload
+ok 33 - session overview exposes recurrence and waiting settings after reload
+  ---
+  duration_ms: 0.312
+  type: 'test'
+  ...
+# Subtest: meeting creation uses the schema host role for the creator membership
+ok 34 - meeting creation uses the schema host role for the creator membership
+  ---
+  duration_ms: 1.9326
+  type: 'test'
+  ...
+# Subtest: quick meetings insert an ongoing session using the schema status
+ok 35 - quick meetings insert an ongoing session using the schema status
+  ---
+  duration_ms: 0.6336
+  type: 'test'
+  ...
+# Subtest: scheduled sessions transition to ongoing and ongoing sessions remain joinable
+ok 36 - scheduled sessions transition to ongoing and ongoing sessions remain joinable
+  ---
+  duration_ms: 0.416
+  type: 'test'
+  ...
+# Subtest: host and moderator pass moderation checks; ordinary participants do not
+ok 37 - host and moderator pass moderation checks; ordinary participants do not
+  ---
+  duration_ms: 1.2643
+  type: 'test'
+  ...
+# Subtest: moderators cannot mute a host; session-only guests cannot manage sessions
+ok 38 - moderators cannot mute a host; session-only guests cannot manage sessions
+  ---
+  duration_ms: 0.7498
+  type: 'test'
+  ...
+# Subtest: a host target cannot be removed or demoted
+ok 39 - a host target cannot be removed or demoted
+  ---
+  duration_ms: 0.6357
+  type: 'test'
+  ...
+# Subtest: HTTP requires JWT and complete profile, ignores spoofed owner, supports PUT/DELETE CORS
+ok 40 - HTTP requires JWT and complete profile, ignores spoofed owner, supports PUT/DELETE CORS
+  ---
+  duration_ms: 664.7639
+  type: 'test'
+  ...
+# Subtest: private history is scoped to its owner; a foreign request returns 404
+ok 41 - private history is scoped to its owner; a foreign request returns 404
+  ---
+  duration_ms: 3.5837
+  type: 'test'
+  ...
+# Subtest: repeated active registration is idempotent and does not reset its timestamp
+ok 42 - repeated active registration is idempotent and does not reset its timestamp
+  ---
+  duration_ms: 1.578
+  type: 'test'
+  ...
+# Subtest: capacity/window DB rejection is a conflict and never retried as a second insert
+ok 43 - capacity/window DB rejection is a conflict and never retried as a second insert
+  ---
+  duration_ms: 0.6741
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate insert re-reads the same registration; cancellation stays owner-scoped
+ok 44 - concurrent duplicate insert re-reads the same registration; cancellation stays owner-scoped
+  ---
+  duration_ms: 0.6969
+  type: 'test'
+  ...
+# Subtest: follow retries tolerate uniqueness; unfollow always filters user and club
+ok 45 - follow retries tolerate uniqueness; unfollow always filters user and club
+  ---
+  duration_ms: 0.8675
+  type: 'test'
+  ...
+# Subtest: hidden activity details do not leak through registration history
+ok 46 - hidden activity details do not leak through registration history
+  ---
+  duration_ms: 0.6073
+  type: 'test'
+  ...
+# Subtest: reads only public views, bounds pagination and strips unexpected/private fields
+ok 47 - reads only public views, bounds pagination and strips unexpected/private fields
+  ---
+  duration_ms: 3.5011
+  type: 'test'
+  ...
+# Subtest: public detail uses only its view, strips internal fields and hides absent items
+ok 48 - public detail uses only its view, strips internal fields and hides absent items
+  ---
+  duration_ms: 1.277
+  type: 'test'
+  ...
+# Subtest: search and upcoming filtering run before pagination on the public view
+ok 49 - search and upcoming filtering run before pagination on the public view
+  ---
+  duration_ms: 1.0371
+  type: 'test'
+  ...
+# Subtest: empty public views return empty collections without fabricated records
+ok 50 - empty public views return empty collections without fabricated records
+  ---
+  duration_ms: 0.3521
+  type: 'test'
+  ...
+# Subtest: database failures return a generic unavailable error without fallback or secrets
+ok 51 - database failures return a generic unavailable error without fallback or secrets
+  ---
+  duration_ms: 0.574
+  type: 'test'
+  ...
+# Subtest: only the actual meeting host approves sharing, never moderators or participants
+ok 52 - only the actual meeting host approves sharing, never moderators or participants
+  ---
+  duration_ms: 2.378
+  type: 'test'
+  ...
+# Subtest: approval enables screen and audio sources on the exact connected identity
+ok 53 - approval enables screen and audio sources on the exact connected identity
+  ---
+  duration_ms: 0.5996
+  type: 'test'
+  ...
+# Subtest: denial grants no sharing sources and reports the decision
+ok 54 - denial grants no sharing sources and reports the decision
+  ---
+  duration_ms: 1.1004
+  type: 'test'
+  ...
+# Subtest: ended sessions, removed members and cancelled requests cannot be approved
+ok 55 - ended sessions, removed members and cancelled requests cannot be approved
+  ---
+  duration_ms: 0.9407
+  type: 'test'
+  ...
+# Subtest: HTTP rejects forged role/author/club fields and requires typed IDs/versions
+ok 56 - HTTP rejects forged role/author/club fields and requires typed IDs/versions
+  ---
+  duration_ms: 700.6854
+  type: 'test'
+  ...
+# Subtest: access requires active membership in a published club, scoped per club even for a chair elsewhere
+ok 57 - access requires active membership in a published club, scoped per club even for a chair elsewhere
+  ---
+  duration_ms: 2.4027
+  type: 'test'
+  ...
+# Subtest: ordinary members cannot read another author draft or the review queue
+ok 58 - ordinary members cannot read another author draft or the review queue
+  ---
+  duration_ms: 0.8506
+  type: 'test'
+  ...
+# Subtest: published activity does not expose a join URL to an unrelated member
+ok 59 - published activity does not expose a join URL to an unrelated member
+  ---
+  duration_ms: 0.3196
+  type: 'test'
+  ...
+# Subtest: author edit uses version/club/owner conditions and returns conflict instead of overwriting stale content
+ok 60 - author edit uses version/club/owner conditions and returns conflict instead of overwriting stale content
+  ---
+  duration_ms: 0.8107
+  type: 'test'
+  ...
+# Subtest: stable draft retry rejects changed form data rather than publishing an older draft
+ok 61 - stable draft retry rejects changed form data rather than publishing an older draft
+  ---
+  duration_ms: 0.5576
+  type: 'test'
+  ...
+# Subtest: review binds decision to current chair, club, pending state and exact version
+ok 62 - review binds decision to current chair, club, pending state and exact version
+  ---
+  duration_ms: 0.8967
+  type: 'test'
+  ...
+# Subtest: review does not retry ambiguous failures, but supports a known rolled-back legacy status CHECK
+ok 63 - review does not retry ambiguous failures, but supports a known rolled-back legacy status CHECK
+  ---
+  duration_ms: 1.4125
+  type: 'test'
+  ...
+# Subtest: chair cannot move/remove the chair row or move a member into another club department
+ok 64 - chair cannot move/remove the chair row or move a member into another club department
+  ---
+  duration_ms: 1.2973
+  type: 'test'
+  ...
+# Subtest: chair transfer uses atomic RPC with server actor; contact edit cannot rewrite club identity
+ok 65 - chair transfer uses atomic RPC with server actor; contact edit cannot rewrite club identity
+  ---
+  duration_ms: 0.8678
+  type: 'test'
+  ...
+1..65
+# tests 65
+# suites 0
+# pass 65
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5189.2913
+
+> @real-time-stream/frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.5 D:/Project/Livekit project/Real_time_stream/frontend
+
+
+ Test Files  19 passed (19)
+      Tests  77 passed (77)
+   Start at  15:13:11
+   Duration  7.45s (environment 75%, import 14%, tests 9%, transform 2%)
+
+    Isolate  19 workers spawned · ~3.59s startup each (spawn + environment, per file)
+             at least ~958ms faster with isolate: false — reuses workers across files instead of one per file
+

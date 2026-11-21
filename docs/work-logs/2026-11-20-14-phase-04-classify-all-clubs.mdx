@@ -1,0 +1,53 @@
+---
+title: Phase 04 — Phân loại đủ câu lạc bộ công khai
+description: Đưa năm CLB chưa rõ lĩnh vực vào Khác để bộ lọc bao phủ cả mười CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-14
+- Thời gian: 20/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng chỉ ra danh sách có 10 CLB nhưng các loại đang lọc được tổng cộng 5 CLB. Bảo đảm cả 10 CLB hiện có đều thuộc ít nhất một loại.
+
+## Công việc hoàn thành
+
+- `scripts/seed-club-types.mjs`: gắn thêm `testhai2`, `testhai1`, `AE 18`, `aaaaaaaaaaaaaa`, `sadsda` vào loại `Khác`, giữ các phân loại rõ trước đó.
+- Áp dụng năm liên kết còn thiếu lên Supabase development; không thay schema, CLB hay phân loại cũ.
+- `README.md`: cập nhật số liên kết và giải thích nhóm `Khác` là tạm thời cho CLB thiếu mô tả.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run seed:club-types` | Passed | Dry-run hiển thị sáu loại và mười liên kết; không ghi DB |
+| `npm.cmd run seed:club-types -- --apply` | Passed | Thêm đúng năm liên kết `Khác` còn thiếu trên Supabase development |
+| API công khai qua Vite proxy | Passed | Tổng 10 CLB; Học thuật & công nghệ 3, Thể thao 2, Khác 5, ba loại còn lại 0; 10 ID thuộc loại là duy nhất |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser / trực quan | Skipped | Chưa kiểm tra thao tác trên trình duyệt thật |
+| Automated tests | Skipped | Chỉ đổi dữ liệu seed; API thực với đủ mười CLB đã được kiểm tra |
+
+## Quyết định và lý do
+
+Năm CLB chưa có nội dung đủ để xác định lĩnh vực được xếp tạm vào `Khác` để không biến mất khỏi kết quả lọc. Có thể chuyển sang loại chính xác hơn sau khi chủ CLB cập nhật thông tin.
+
+## Blocker và việc chưa hoàn thành
+
+Form tạo CLB hiện chưa chọn/lưu loại; liên kết loại mới được thêm riêng qua script. Schema `club_category_links` cho phép gắn nhiều loại cho một CLB. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Nếu cần loại ngay khi tạo CLB, thêm chọn nhiều loại vào form đề nghị và lưu các liên kết cùng luồng tạo; sau đó kiểm tra trường hợp ghi liên kết thất bại và hiển thị loại trong chi tiết đề nghị.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và README
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

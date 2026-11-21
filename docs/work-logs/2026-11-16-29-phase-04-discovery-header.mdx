@@ -1,0 +1,30 @@
+---
+title: Signed-in discovery header
+description: Separate branding, public navigation, and the account menu on the landing page.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-29
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and changes
+
+Apply the header update to the signed-in public landing page. Restored the personal-space header to its original layout. The landing page displays the brand, centered discovery navigation, and the account control in three distinct groups. The compact layout keeps the existing mobile navigation toggle.
+
+Changed `frontend/src/features/discovery/DiscoveryApp.tsx` and `frontend/src/features/discovery/discovery.css`.
+
+## Verification
+
+- Frontend TypeScript and production build passed.
+- All 58 frontend tests passed.
+- Confirmed the personal header files match the branch baseline.
+- Browser visual review is pending.
+
+## Next step
+
+Review the signed-in landing header on desktop and mobile.

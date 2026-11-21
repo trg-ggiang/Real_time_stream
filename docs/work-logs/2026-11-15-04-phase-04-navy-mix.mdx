@@ -1,0 +1,35 @@
+---
+title: Navy Mix kết hợp mẫu 04 và 03
+description: Giữ màu và hero Navy, sử dụng lưới CLB đồng đều của After Hours.
+---
+
+## Thông tin phiên
+
+2026-11-15-04, Asia/Saigon. Không ghi nhận chính xác giờ bắt đầu/kết thúc. Codex. Phase 04 In Progress. Kết quả Completed trong phạm vi mẫu giao diện.
+
+## Mục tiêu và công việc hoàn thành
+
+Người dùng yêu cầu mẫu mới: màu và phần đầu của 04 Navy, bố cục danh sách CLB của 03 After Hours. Thêm mẫu 08 Navy Mix tại /guest-concepts/index.html?theme=navy-night. Chỉ sửa frontend/public/guest-concepts/index.html, app.js và bright.css, tái sử dụng ảnh hiện có.
+
+Giữ token Navy, ảnh ghép, headline và CTA. Lưới CLB có ba thẻ cùng hàng, cùng chiều rộng/chiều cao ảnh, bỏ stagger và thẻ đầu lớn của 04; mobile một cột. Thêm lựa chọn riêng và cập nhật tổng số mẫu lên 8. Không tích hợp vào React hoặc đổi trang chủ; yêu cầu tích hợp trước đó đã được người dùng dừng.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+|---|---|---|
+| JavaScript syntax | Passed | node --check |
+| Frontend build và TypeScript | Passed | Cảnh báo chunk media lớn hiện hữu |
+| Playwright desktop | Passed | Ba thẻ cùng top 818.64px và rộng 411.875px tại viewport 1440px |
+| Playwright mobile | Passed | 390px không overflow, đã review ảnh desktop/mobile |
+| Lọc, tìm kiếm rỗng, sao/login gate, Escape | Passed | Không gửi yêu cầu ghi DB |
+| Lighthouse | Skipped | Thay đổi giới hạn ở việc phối hai mẫu đã kiểm tra; không có lo ngại hiệu năng mới cần đo lại |
+
+## Quyết định và bước tiếp theo
+
+Đây là preview với dữ liệu minh họa. Chờ người dùng review mẫu 08 trước khi tích hợp guest mode. Không sửa backend/schema hoặc các thay đổi ngoài phạm vi.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan, session log, changelog và hướng dẫn preview.
+- [x] Đăng ký work log và kiểm tra JSON/navigation mới.
+- [x] Ghi checks và giới hạn; Phase 04 chưa Done.

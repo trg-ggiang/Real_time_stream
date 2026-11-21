@@ -1,34 +1,45 @@
 ---
 title: Quy trình AI
-description: Mở phiên, làm việc và đóng phiên theo phase.
+description: Mở phiên, đối chiếu source, kiểm tra và bàn giao.
 ---
 
 ## Mở phiên
 
-Đọc hướng dẫn agent, master plan, phase hiện tại và work log gần nhất.
-Xác định phạm vi được người dùng giao; ghi tiến trình đúng với hiện trạng thực tế.
+1. Kiểm tra nhánh và working tree bằng `git status -sb`. Xác định phạm vi được giao và giữ các thay đổi local không liên quan.
+2. Đọc [luồng hệ thống](../CODE_FLOW.md), [Master Plan](/plans/master-plan), phase liên quan và [sổ phiên](/dev/session-log). Từ đó mở work log theo đúng module cần làm. Với Không gian sinh hoạt, xem thêm [bàn giao workspace](/design/phase-04-club-workspace).
+3. Đối chiếu hành vi trong source và schema hiện hành. Nếu tài liệu lịch sử khác với code, giữ lịch sử và cập nhật mục hiện trạng kèm mốc xác minh.
 
-## Đóng phiên bắt buộc
+## Kiểm tra theo phạm vi
 
-Mỗi phiên làm việc phải có work log riêng, kể cả chỉ sửa tài liệu/config.
+| Phạm vi | Kiểm tra |
+| --- | --- |
+| Thay đổi tính năng | Chạy test liên quan `npm --workspace frontend run test -- Workspace` cho workspace hoặc `npm test` cho cả hai workspace. Dùng `npm run typecheck` và `npm run build` khi cần kiểm tra kiểu và bản build. |
+| Giao diện chat hoặc họp | Dùng API mô phỏng cho ca desktop/mobile, theme sáng/tối, gửi lại hoặc mở đúng buổi tùy phần sửa. Ghi kích thước màn hình và ca đã chạy. |
+| Supabase | Ghi kết quả preflight/postflight hoặc đọc schema riêng với kiểm thử ghi. Nếu được giao kiểm thử ghi, dùng môi trường và tài khoản test do nhóm chọn. |
+| Tunnel và LiveKit | Phân biệt API health, WebSocket, cấp token theo phiên và media hai chiều. Ca media thật dùng hai thiết bị/hai mạng. |
+| Tài liệu | Kiểm tra đường dẫn, cấu trúc MDX/JSON, mục điều hướng có chỉnh và `git diff --check`. |
+
+## Chỉ ghi log khi hoàn thành thay đổi code
+
+Chỉ tạo work log sau khi hoàn thành thay đổi code ứng dụng hoặc script vận hành. Không tạo log cho câu hỏi, giải thích, đọc/review, thao tác Git, sửa tài liệu/config hoặc công việc chưa hoàn thành.
 Tên file: `YYYY-MM-DD-NN-phase-XX-topic.mdx`, ngày giờ theo Asia/Saigon.
 NN là số thứ tự trong ngày, không ghi đè log cũ. Phiên chạm nhiều phase ghi tất cả phase liên quan.
 
 1. Ghi mục tiêu, kết quả, file thay đổi, kiểm tra và kết quả thực tế.
 2. Ghi quyết định, blocker, phần chưa xong và bước tiếp theo.
-3. Cập nhật phase page và master plan, liên kết work log.
+3. Cập nhật mục hiện trạng ở phase page và Master Plan, liên kết work log. Cập nhật README, CODE_FLOW hoặc hướng dẫn module nếu thay đổi luồng, điều kiện setup hoặc cách chạy.
 4. Thêm entry vào session log, cập nhật changelog và docs liên quan.
 5. Thêm trang mới vào docs.json; kiểm tra JSON, navigation và liên kết.
 6. Trả lời người dùng với kết quả, xác minh, trạng thái phase và việc còn lại.
 
-Đóng phiên không đồng nghĩa đóng phase. Phase chỉ Done khi đủ tiêu chí nghiệm thu.
+Khi bàn giao, nêu các kiểm tra đã chạy và phần còn chờ nghiệm thu. Commit/push theo phạm vi người dùng đã giao. Đóng phiên không đồng nghĩa đóng phase. Phase chỉ Done khi đủ tiêu chí nghiệm thu.
 Các phase tương lai là kế hoạch dự kiến, chưa được phép tự triển khai.
 
 ## Cơ chế áp dụng
 
 Codex đọc root AGENTS.md; Claude đọc CLAUDE.md, trong đó tham chiếu AGENTS.md.
 Đây là quy tắc dành cho agent, không phải hook tự động chạy khi ứng dụng bị đóng đột ngột.
-Nếu phiên bị ngắt, phiên sau phải ghi checkpoint còn thiếu bằng thông tin có thể xác minh.
+Nếu phiên bị ngắt, tiếp tục công việc ở phiên sau; không tự tạo log chưa hoàn thành trừ khi người dùng yêu cầu rõ ràng. Không bịa kết quả kiểm tra.
 
 ## Nguồn tham khảo
 

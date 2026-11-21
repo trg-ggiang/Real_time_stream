@@ -1,0 +1,49 @@
+---
+title: Ba mẫu guest nền sáng
+description: Navy, Sky và Coral bổ sung vào bộ lựa chọn landing page.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-02, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex. Phase 04, trạng thái In Progress. Kết quả Completed trong phạm vi tạo thêm mẫu.
+
+## Mục tiêu và phạm vi
+
+Người dùng yêu cầu thêm 2–3 mẫu màu sáng, trong đó có trắng và xanh than; áp dụng design-taste-frontend và vercel-react-best-practices. Thực hiện 3 mẫu Navy, Sky, Coral, giữ ba mẫu cũ. Dials thiết kế: variance 6, motion 3, density 4; native CSS, hình ảnh cục bộ, không thêm thư viện/framework.
+
+## Công việc hoàn thành
+
+- index.html: bộ chọn sáu mẫu, stylesheet mới, khởi tạo preview tránh nháy bố cục, favicon và ảnh avatar lazy.
+- app.js: thêm theme, nội dung hero, chuyển ảnh theo mẫu, ảnh responsive srcset/sizes, ưu tiên hero, chọn mẫu hoạt động trong thanh cuộn mobile và hiển thị sau khi font sẵn sàng.
+- bright.css: ba bố cục nền sáng riêng; trắng/xanh than + xanh lam cho Navy; ảnh trái với tông trời cho Sky; banner ngang và directory bất đối xứng cho Coral. Có responsive, reduced motion và hover feedback.
+- assets/campus-bright.jpg, campus-bright-640.jpg, campus-bright-1000.jpg: ảnh sinh viên Việt Nam tạo bằng imagegen và các bản JPEG phục vụ web. PNG gốc giữ trong output QA, không nằm trong public.
+- Cập nhật hướng dẫn mẫu và các trang tiến độ/navigation.
+
+Không đổi React/backend/schema trong phiên này. Theo hướng dẫn hiệu năng, giữ preview ngoài bundle meeting, không thêm dependency, xử lý tương tác bằng event handlers, đổi theme bằng class và dataset, không dùng scroll listeners.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+|---|---|---|
+| Frontend build, bao gồm TypeScript | Passed | Cảnh báo chunk media lớn hiện hữu |
+| node --check app.js | Passed | Syntax JavaScript |
+| Playwright | Passed | Cả 6 mẫu: lọc, tìm kiếm rỗng, sao yêu cầu login, chi tiết và ứng tuyển, hoạt động, Escape |
+| Responsive và ảnh | Passed | Ba mẫu mới ở 390px không overflow/ảnh hỏng; CTA desktop hiển thị trong viewport; đã chụp và review desktop/mobile |
+| Selector mobile | Passed | Coral được cuộn vào vùng nhìn thấy sau font load |
+| Lighthouse Navy | Đã đo | Lượt đầu performance 62/accessibility 100, CLS 0.295; sau sửa cuối performance 90/accessibility 100, CLS 0 và LCP 3.5s (chưa đạt mục tiêu 2.5s trên mobile throttle). Xem kết quả cuối trong output/playwright/guest-navy-lighthouse-latest.json; đo trên dev server, chưa phải số liệu production |
+| Auth tests | Skipped | Không thay đổi React/auth trong phiên này; phiên trước 9 tests đạt |
+
+## Quyết định và việc còn lại
+
+Dữ liệu CLB/hoạt động và tên thương hiệu vẫn minh họa. Light mode được yêu cầu rõ nên ba mẫu mới giữ nền sáng. Chưa nối API public, lưu sao hoặc gửi đơn thật. Không đánh dấu Phase 04 Done. Không sửa file package-lock đang bị xóa từ trước.
+
+## Bước tiếp theo
+
+Người dùng chọn mẫu hoặc phối hợp thành phần, sau đó mới triển khai guest mode thật theo thiết kế và schema đã chốt.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase, master plan, session log, changelog và hướng dẫn preview.
+- [x] Đăng ký work log trong navigation và kiểm tra JSON/trang mới.
+- [x] Ghi kết quả kiểm tra và giới hạn, không thêm migration hoặc thay database.

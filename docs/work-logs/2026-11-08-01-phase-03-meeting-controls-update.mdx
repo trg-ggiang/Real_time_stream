@@ -1,0 +1,76 @@
+﻿---
+title: Backend meeting/session controls update
+description: Thực hiện phân quyền meeting theo schema hiện hành và rà soát frontend.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-01
+- Thời gian bắt đầu/kết thúc: bắt đầu không có dữ liệu; kết thúc 2026-11-08 (Asia/Bangkok)
+- Agent: Codex
+- Phase: 03 — Database, auth và meeting controls
+- Kết quả phiên: Partial
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đọc lại kế hoạch `docs/backend-meeting-controls-db-review.md`, triển khai backend chủ phòng/duyệt người tham gia/cho phép vào/mute theo DB và nghiệp vụ đã chốt; sau đó rà soát frontend và lập kế hoạch tích hợp tương ứng.
+
+## Công việc hoàn thành
+
+- Meeting endpoints chuyển sang JWT ứng dụng và `users.user_id`.
+- Thêm luồng tạo meeting nhanh một session và meeting dùng lại; thêm session list, schedule, join theo session, status, approve/deny, invitation member lâu dài, role, waiting room, mute/remove, leave và end.
+- Session room name lấy từ `meeting_sessions`; attendance ghi theo `session_id` và trả `attendanceId`.
+- Guest request gắn với đúng session, hết hạn sau khi session kết thúc. Thêm giới hạn ba lần bị từ chối/30 phút.
+- Mute hiện tại áp dụng lên audio track đang publish; reconnect không duy trì mute theo quyết định của người dùng.
+- Cập nhật API docs, phase page và kế hoạch frontend. Frontend hiện vẫn gọi room PoC cố định; chưa thay đổi UI/API client.
+
+## File thay đổi
+
+- `backend/src/meetings/meetings.controller.ts`
+- `backend/src/meetings/meetings.service.ts`
+- `backend/src/meetings/dto/`
+- `docs/modules/meeting-controls.mdx`
+- `docs/plans/phase-03-database-auth.mdx`
+- `docs/backend-meeting-controls-db-review.md`
+- `docs/work-logs/2026-11-08-01-phase-03-meeting-controls-update.mdx`
+- `docs/CHANGELOG.mdx`
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace backend run typecheck` | Passed | Chạy sau thay đổi backend |
+| `npm.cmd --workspace frontend run typecheck` | Passed | Frontend không có lỗi type; chưa tích hợp meeting API |
+| `npm.cmd --workspace frontend run build` | Passed | Cảnh báo chunk LiveKit > 500 kB |
+| Automated tests | Skipped | Không chạy trong phiên này |
+| Supabase/LiveKit development | Skipped | Không kết nối DB/Cloud; chưa xác minh schema triển khai hoặc media thật |
+
+## Quyết định và lý do
+
+- Không sửa schema; dùng `meeting_sessions`/`attendances` theo ERD. Guest request được liên kết với session bằng attendance chưa có `joined_at`.
+- Tắt waiting room không tự duyệt request đang chờ; giữ họ trong hàng chờ để người điều hành quyết định.
+- RRULE có phạm vi field/tổ hợp hỗ trợ giới hạn; field ngoài phạm vi bị từ chối rõ ràng.
+
+## Blocker và việc chưa hoàn thành
+
+- Cần so nullable/default/FK/allowed values với Supabase development thật.
+- Tạo meeting và owner membership chưa atomic qua transaction/RPC.
+- Chưa có worker tự kết thúc session theo lịch hoặc webhook dọn attendance.
+- Frontend chưa gọi meeting API; kế hoạch tích hợp ở `docs/backend-meeting-controls-db-review.md`.
+- `docs/docs.json` có merge conflict từ trước; không sửa để tránh ghi đè. `docs/dev/session-log.mdx` và `docs/plans/master-plan.mdx` cũng có conflict markers sẵn.
+- Không chạy tests tự động.
+
+## Bước tiếp theo
+
+Triển khai frontend theo kế hoạch: dashboard quick/scheduled, nhập meeting code và chọn session, waiting room polling qua join-status, truyền `attendanceId` khi leave, sau đó thêm member/role/moderation controls. Tiếp theo kiểm thử với Supabase và LiveKit development.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page
+- [x] Cập nhật API docs và kế hoạch frontend
+- [ ] Session log/master plan: có conflict markers từ trước; chưa giải quyết merge conflict
+- [ ] Đăng ký tài liệu mới trong `docs/docs.json`: file đang conflict, cần cập nhật sau khi conflict được xử lý
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh
+
+

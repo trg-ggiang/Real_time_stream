@@ -1,0 +1,36 @@
+---
+title: Sửa chat phòng họp và khôi phục slideshow landing
+description: Xử lý kết nối lại, phản hồi trễ và dữ liệu chat theo phiên; nối slideshow cũ vào landing hiện tại.
+---
+
+## Phạm vi và thay đổi
+
+- Chat phòng họp vẫn dùng Socket.IO namespace `/chat`. Không đổi backend, quyền truy cập, database hoặc luồng mở phòng họp.
+- Thêm nút kết nối lại chat khi mất kết nối hoặc đồng bộ lỗi. Socket bị từ chối ở bước xác thực cần thao tác kết nối lại; không bỏ qua kiểm tra quyền.
+- Tin đã nhận qua broadcast không bị báo gửi thất bại nếu acknowledgement đến trễ. Giải phóng khóa gửi khi nhận được tin xác nhận.
+- Xóa lịch sử, outbox và cursor khi đổi phòng/tài khoản; bỏ qua phản hồi từ socket cũ. Xóa lịch sử khi quyền chat bị thu hồi và bỏ qua tin/ack đến sau khi ngắt kết nối.
+- Tải thêm lịch sử không còn bị tính là có tin mới ở cuối danh sách.
+- Nguyên nhân slideshow mất: `DiscoveryHome` dùng ảnh tĩnh thay vì component có sẵn. Tách `GuestHeroCarousel` từ `GuestHero`, dùng lại tại landing mới, giữ tìm kiếm và các section hiện tại.
+- Bốn ảnh, hai khung lớn/nhỏ, đổi sau 5 giây, ảnh lớn cũ chuyển sang khung nhỏ, chấm chọn ảnh. Chặn phần slide ẩn gây tràn ngang trên điện thoại.
+
+## Kiểm tra
+
+- Frontend typecheck và production build: đạt; build vẫn cảnh báo kích thước chunk lớn.
+- Toàn bộ frontend: 139 tests trong 28 files đạt. Có regression test landing thực tế và bốn test hook chat (reconnect, ack trễ, đổi phiên, thu hồi quyền).
+- Trình duyệt tại server người dùng đang chạy: xác nhận ảnh đổi sau 5,2 giây, cả bốn ảnh tải được, không tràn ngang ở 390px. Đã xem ảnh chụp desktop 1440px và mobile 390px.
+- Chưa kiểm tra hai tài khoản trong phòng LiveKit thật; không tạo/join phòng, gửi tin thật hoặc ghi database. Test chat dùng socket giả lập.
+- Không tự khởi động/dừng server của người dùng, không commit/push.
+
+## Kiểm tra bổ sung chat nhóm
+
+- `backend/test/meeting-chat-socket.test.cjs`: dùng Nest gateway, ChatService, xác thực JWT thật và 12 Socket.IO clients qua WebSocket trên cổng test tạm. Repository, membership và LiveKit presence dùng fixture; không kết nối DB/LiveKit thật.
+- Cả 12 người cùng gửi: cả 12 clients nhận đủ 12 tin. Kiểm tra gửi hai chiều, retry không tạo bản ghi mới, không lọt sang phiên khác, từ chối giả mạo sender, tải bù tin lúc offline và ngừng giao tin khi quyền bị thu hồi: đạt.
+- Hook frontend: 6 tests đạt, gồm nhận tin từ nhiều người khi đóng panel, đếm unread không trùng, mở panel không mất tin và tải bù đủ 126 tin qua nhiều trang sau reconnect.
+- Backend build, frontend typecheck và `git diff --check`: đạt. Không khẳng định nghiệm thu LiveKit thật hoặc khả năng chịu tải chỉ từ ca 12 clients.
+
+## Rà soát sau cùng
+
+- Phát hiện khóa gửi còn tồn tại sau disconnect, khiến thử lại ngay sau reconnect bị bỏ qua trước khi lượt cũ timeout. Đã giải phóng khóa khi ngắt kết nối và gắn token cho từng lượt gửi; catch/finally trễ của lượt trước không còn làm thất bại hay mở khóa nhầm lượt retry đang chạy.
+- Regression test: gửi đang pending, ngắt mạng, nối lại, retry cùng client ID ngay, timeout lượt cũ, xác nhận lượt mới. Đạt trong 7 tests hook chat.
+- Kiểm tra toàn dự án trước bản sửa cuối: 79 backend tests, 151 frontend tests và root build đạt. Chưa nghiệm thu âm thanh/camera nhiều thiết bị thật. Các test backend dùng fixtures, không ghi database thật.
+- Sau bản sửa cuối: toàn bộ **152 frontend tests / 30 files**, frontend build/typecheck và diff check đạt; backend giữ kết quả 79 tests đạt. Build còn cảnh báo chunk lớn hiện hữu, không phải lỗi biên dịch.

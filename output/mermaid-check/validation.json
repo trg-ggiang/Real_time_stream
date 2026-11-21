@@ -1,0 +1,18 @@
+[
+  {
+    "file": "01-screen-navigation.mmd",
+    "syntax": "passed"
+  },
+  {
+    "file": "02-workspace-meeting-navigation.mmd",
+    "syntax": "passed"
+  },
+  {
+    "file": "03-system-business-flow.mmd",
+    "syntax": "passed"
+  },
+  {
+    "file": "04-system-architecture.mmd",
+    "syntax": "passed"
+  }
+]

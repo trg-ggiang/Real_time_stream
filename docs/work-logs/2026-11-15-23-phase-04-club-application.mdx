@@ -1,0 +1,43 @@
+---
+title: Club application form
+description: Authenticated students can submit a club application from the guest landing page.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-23
+- Thời gian bắt đầu/kết thúc: Không ghi nhận
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed (code); Supabase schema acceptance pending
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng yêu cầu người đã đăng nhập mở popup đăng ký CLB từ nút trên trang chủ, với trường khớp bảng `clubs` và gửi dữ liệu vào bảng. Popup đặt trong folder `frontend/src/features/guest/`.
+
+## Công việc hoàn thành
+
+- Thêm `ClubApplicationDialog.tsx` và CSS trong feature guest, với tên, tóm tắt, mô tả, sứ mệnh, email, điện thoại, URL logo và ảnh bìa.
+- Trang guest chuyển khách chưa đăng nhập tới màn hình đăng nhập; người dùng đã đăng nhập mở popup bằng application JWT.
+- Thêm DTO, route `POST /api/public/clubs` có JWT guard, và thao tác insert qua backend Supabase service. Ghi `created_by`, `status: pending` và các trường CLB, trả lỗi không chứa chi tiết database.
+- Trạng thái gửi đăng ký được hiển thị sau khi API trả thành công.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated tests, typecheck, build | Skipped | Không được yêu cầu chạy kiểm tra trong phiên này. |
+| Supabase insert thật | Skipped | Không ghi dữ liệu vào database trong phiên này; cần xác nhận cấu trúc/check constraint của bảng `clubs` ở môi trường đang dùng. |
+
+## Quyết định và lý do
+
+Tên và các trường nội dung dựa trên payload insert hiện có của `scripts/seed-hust-public.mjs`. `status: pending` được dùng để đăng ký mới chờ xem xét; schema live chưa được truy vấn để xác nhận constraint của trường trạng thái.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa có xác nhận từ DB thật rằng `clubs.status` chấp nhận `pending` và các cột form có thể null/default như dự kiến. Chưa nghiệm thu insert Supabase thật.
+
+## Bước tiếp theo
+
+Đối chiếu schema/check constraint hiện có của bảng `clubs`, sau đó kiểm tra luồng submit với tài khoản test nếu cần nghiệm thu tích hợp.

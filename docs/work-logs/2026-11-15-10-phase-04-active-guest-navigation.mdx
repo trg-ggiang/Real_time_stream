@@ -1,0 +1,26 @@
+---
+title: Active guest section navigation
+description: Highlight the header link matching the current scroll position.
+---
+
+## Session information
+
+2026-11-15-10, Codex, Asia/Saigon. Exact start/end not recorded. Outcome Completed. Phase 04 In Progress.
+
+## Objective and implementation
+
+User requested the matching header section label to turn blue, underline and scale 1.15 while scrolling. GuestLanding.tsx tracks three section rectangles against a reading line below the sticky header, using one passive scroll listener batched by requestAnimationFrame. ResizeObserver updates after asynchronous content/section resizing. Listeners, observer and frame are cleaned on unmount. Matching link uses aria-current=location. guest.css applies the accent color, underline and transform scale without reflow; anchor offsets account for the header and reduced-motion disables transitions. No backend/database changes.
+
+## Validation
+
+Frontend build/typecheck and 8 targeted guest/App tests passed; existing media chunk warning remains. Browser verified all three sections while scrolling down and back up, desktop anchor click, underline and final transform matrix scale 1.15. Mobile 390px has no horizontal overflow. Existing mobile CSS hides header navigation; a click check on that hidden link timed out, then was corrected to test visible desktop navigation. Mobile navigation visibility was not redesigned. Initial browser command quoting failed and was corrected before final checks.
+
+## Next step and checklist
+
+Phase 04 remains In Progress. Continue guest acceptance; mobile navigation redesign is separate.
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered log and verified JSON/new target.
+- [x] Recorded checks and existing mobile limitation.
+
+Previously reported 11 missing historical navigation targets remain unchanged.

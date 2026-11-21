@@ -1,0 +1,34 @@
+---
+title: Preserve login on reload
+description: Restore valid application sessions in the current browser tab.
+---
+
+## Session
+
+- ID: 2026-11-08-11; Agent: Codex; Phase 04 In Progress.
+- Outcome: Completed code. Start time unavailable; finished 2026-11-08T22:49:18.405304+07:00.
+
+## Objective and completed work
+
+Fix reload returning users to login. AuthApp now saves login/register sessions in versioned sessionStorage and restores them with a lazy state initializer. Validates stored user fields and JWT expiration, clears malformed/expired sessions, removes storage on logout and expires active sessions by timer. Removed obsolete reload-login warning. No password persistence, BE or DB changes. Files: AuthApp.tsx, session-storage.ts, AuthApp.test.tsx.
+
+## Checks
+
+- Frontend tests: 27 passed, including remount restoration, logout persistence clearing and malformed/expired storage.
+- Frontend build (includes tsc --noEmit): passed; existing large chunk warning remains.
+- Real browser/media test: skipped; tests simulate reload with unmount/remount. Reload preserves authentication, not an active media connection.
+- Storage disabled: login remains available in memory; reload persistence unavailable.
+- Navigation target checked. Existing docs.json conflict prevents full JSON validation.
+
+## Decisions and remaining work
+
+Uses tab-scoped storage. Backend remains responsible for JWT signature validation; client expiration check does not grant API permissions. No refresh token exists; expired sessions require login again. Phase remains In Progress pending real media acceptance.
+
+## Next step
+
+Login once, reload the same tab and confirm the meeting dashboard remains accessible.
+
+## Close checklist
+
+- [x] Phase/master/session/changelog/module updated
+- [x] Navigation entry registered and verification limits recorded

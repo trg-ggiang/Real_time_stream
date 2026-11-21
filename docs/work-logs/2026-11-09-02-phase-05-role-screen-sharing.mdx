@@ -1,0 +1,43 @@
+---
+title: Role based screen sharing and hand raising
+description: Host approval of connected guest screen sharing without DB migration.
+---
+
+## Session
+
+2026-11-09-02 Asia/Saigon. Start/end not captured. Agent Codex. Phase 05 In Progress. Outcome Completed code.
+
+## Objective and completed code
+
+Everyone can raise a hand. Only the actual host gets screen-share and screen-share-audio sources on initial join token; moderators and participants request permission. MeetingsService returns role in join response and enables canUpdateOwnMetadata for hand/request attributes. New authenticated screen-share/decision endpoint validates actual creator plus admitted host membership, ongoing session, active attendance matching session and exact LiveKit identity, admitted/nonremoved target and pending request. Server updates LiveKit permission, not database schema.
+
+FE ScreenShareButton requests/cancels through participant attributes when not permitted. Host sees realtime requester names and approve/deny controls through ScreenShareRequests. Approval grants sources to the current connection; user clicks again to open browser picker. Denial displays status and allows retry. Arbitrary client attributes never grant publication permission. MeetingRoom uses the server role to show host UI, while BE independently authorizes every decision.
+
+Existing MeetingMediaLayout displays camera grid without sharing, and a large object-fit contain screen stage with camera sidebar while sharing; mobile collapses to screen plus camera strip. Multiple approved presenters use existing presenter selector. Added request styles to match both themes.
+
+## Files
+
+backend meetings service/controller, new dto/screen-share.dto.ts, test/screen-share-roles.test.cjs, admission token regression; frontend types.ts, MeetingRoom.tsx, ScreenShareButton.tsx, new ScreenShareRequests.tsx, meeting.css.
+
+## Checks
+
+- Backend typecheck/build: passed.
+- Role/admission/leave/sharing tests: 24 passed (5 new role/approval regressions).
+- Frontend typecheck/build: passed; existing chunk-size warning remains.
+- Frontend suite: 27 passed.
+- git diff --check run. No real DB writes, schema changes or LiveKit participants disrupted for testing.
+- No live browser/media E2E; runtime LiveKit permission delivery, browser picker and two-device layout still need acceptance.
+- Navigation target exists; existing docs.json merge conflict prevents full JSON validation.
+
+## Decisions and limits
+
+No persistent approval store. Grants last for the current LiveKit participant connection; a fresh join requires approval again. No automatic screen capture after approval because browser requires a user gesture. Owner alone approves; moderator also requests. No revoke action added in this scope. Existing SDK room disappearance race during moderation can require retry.
+
+## Next step
+
+Restart backend if not watching and rejoin to obtain updated tokens. Test host/guest on two tabs/devices: raise/lower hand, request/cancel/deny/approve, share/stop, grid restoration and mobile layout. Phase remains In Progress until actual media acceptance.
+
+## Checklist
+
+- [x] Phase/master/session/changelog/module updated
+- [x] Navigation registered; actual checks and limits recorded

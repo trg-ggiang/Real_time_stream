@@ -1,0 +1,41 @@
+---
+title: Ba mẫu landing page guest
+description: Bản xem trước tương tác phục vụ lựa chọn thiết kế.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-01; Asia/Saigon. Không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex. Phase 04. Kết quả Completed trong phạm vi tạo mẫu; phase In Progress.
+
+## Mục tiêu và công việc hoàn thành
+
+Tạo ba hướng thiết kế guest landing để người dùng chọn trước khi triển khai đầy đủ. Thêm frontend/public/guest-concepts/index.html, style.css, app.js và assets ảnh/font cục bộ. Ba theme đổi bố cục, màu, typography và thứ tự nội dung. Có tìm kiếm/lọc, chi tiết CLB/hoạt động, login gate cho sao/ứng tuyển và header đăng nhập/đăng ký cố định khi cuộn.
+
+AuthApp.tsx đọc query mode=register khi khởi tạo để CTA đăng ký mở đúng form. Chưa thay landing mặc định, chưa thêm backend/schema hoặc nghiệp vụ guest thật.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+|---|---|---|
+| Frontend build và typecheck | Passed | Build lặp lại sau sửa AuthApp; cảnh báo chunk media lớn hiện hữu |
+| AuthApp.test.tsx | Passed | 9 tests hiện hữu |
+| Browser Playwright | Passed | Cả 3 theme ở mobile 390px không overflow, không ảnh hỏng; đã xem screenshot desktop/mobile |
+| Lọc, tìm kiếm rỗng, popup, Escape, đăng ký | Passed | Kiểm tra trên browser thật, không gửi form hay ghi DB |
+| Lượt kiểm tra browser ban đầu | Failed rồi sửa | Đợi avatar bị ẩn trong theme night; đổi locator sang hero-photo, chạy lại đạt |
+| Preview URL ban đầu | Đã sửa | Vite fallback cho /guest-concepts/; dùng đường dẫn index.html đầy đủ |
+
+## Quyết định và giới hạn
+
+Dùng HTML/CSS/JS độc lập trong public để so sánh mẫu mà không thêm bundle vào meeting. Mẫu dùng dữ liệu minh họa. Chưa kết nối CLB/hoạt động thật, lưu sao, form ứng tuyển hoặc luồng hoàn thiện hồ sơ. Không sửa thay đổi ngoài phạm vi, gồm file package-lock cũ đang bị xóa bởi người dùng.
+
+## Bước tiếp theo
+
+Người dùng chọn Campus, Editorial hoặc After Hours; sau đó triển khai guest mode phù hợp hướng đã chọn. Không coi chọn mẫu là nghiệm thu nghiệp vụ hoặc hoàn thành Phase 04.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase và master plan.
+- [x] Cập nhật session log, changelog và hướng dẫn xem mẫu.
+- [x] Đăng ký trang mới trong docs.json.
+- [x] Ghi checks và giới hạn; navigation mới được kiểm tra riêng, lỗi liên kết lịch sử không thuộc phạm vi.

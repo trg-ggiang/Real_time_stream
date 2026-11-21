@@ -1,0 +1,39 @@
+---
+title: Gỡ concept và tinh chỉnh font nút guest
+description: Tách ảnh production, loại bỏ preview và chuyển các nút sang dạng chữ.
+---
+
+## Thông tin phiên
+
+2026-11-15-06, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc. Codex, Phase 04 In Progress. Completed trong phạm vi gỡ mẫu khỏi dự án và tinh chỉnh giao diện; có giới hạn xóa vĩnh viễn bên dưới.
+
+## Mục tiêu và công việc hoàn thành
+
+Người dùng yêu cầu xóa các guest concept, sau đó đổi sang Google Font và nút không nền/không biểu tượng bên cạnh, hover gạch chân. Tách campus-bright-1000.jpg, campus-bright-640.jpg và tech.jpg sang frontend/public/images/guest; GuestLanding.tsx đổi đường dẫn, không còn phụ thuộc preview.
+
+Lệnh Remove-Item đệ quy bị bộ kiểm duyệt tự động chặn dù người dùng đã yêu cầu xóa. Không xóa vòng qua công cụ khác: chuyển cả thư mục cũ ra ngoài dự án tại C:/Users/Admin/AppData/Local/Temp/Real_time_stream-guest-concepts-1794712050. frontend/public/guest-concepts không còn tồn tại; bản ngoài dự án chưa được xóa vĩnh viễn. Build đã loại các mẫu khỏi dist.
+
+GuestLanding.tsx dùng Be Vietnam Pro từ Google Fonts qua Fontsource cục bộ có sẵn (400/500/600/700); bỏ mũi tên trang trí, sao icon và avatar/logo nhỏ cạnh nội dung thao tác. Quan tâm chuyển thành nút chữ trong hàng hành động dưới ảnh. guest.css đặt nền trong suốt, bỏ viền/nền nút, hover và focus có gạch chân, giữ outline focus. Nút đóng dialog giữ biểu tượng X có ý nghĩa chức năng. Không thay auth/meeting buttons.
+
+Trang hướng dẫn concept chuyển thành ghi chú lịch sử, gỡ khỏi navigation chính; giữ work log cũ để không mất lịch sử. Cập nhật hướng dẫn guest và tiến độ.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+|---|---|---|
+| Frontend build và TypeScript | Passed | Sau đổi asset và sau đổi font/nút; cảnh báo chunk media hiện hữu |
+| Browser ảnh thật | Passed | Hero và inset tải ở /images/guest; không còn request /guest-concepts/ |
+| Browser font/nút | Passed | Computed font Be Vietnam Pro, nền rgba(0,0,0,0), hover underline, không img/svg trong nút đăng ký |
+| Mobile/desktop | Passed | Review screenshot, 390px không overflow |
+| Browser HTTP fixtures | Passed sau sửa locator | Quan tâm vẫn mở login gate, chi tiết hoạt động mở đúng; locator heading ban đầu trùng giữa thẻ/dialog, thu hẹp vào dialog rồi đạt; fixture được tháo sau kiểm tra |
+| Unit tests mới | Skipped | Thay đổi asset/style có thể đảo ngược; dùng build và browser checks trực tiếp |
+
+## Phần còn lại và bước tiếp theo
+
+Không ghi DB hoặc sửa backend. Phase 04 vẫn In Progress. Xóa vĩnh viễn bản lưu ngoài dự án chưa thực hiện do policy chặn xóa. Tiếp tục nghiệm thu giao diện guest với dữ liệu public khi được xuất bản.
+
+## Checklist
+
+- [x] Cập nhật phase/master plan, changelog/session log và hướng dẫn.
+- [x] Đăng ký work log, kiểm tra JSON và target mới.
+- [x] Ghi kiểm tra, giới hạn và hành động bị policy chặn.

@@ -1,0 +1,29 @@
+---
+title: Khung họp toàn màn hình, thông báo chờ duyệt và chọn âm thanh trước khi vào
+description: Hoàn thiện giao diện phòng họp, đổi giao diện trực tiếp và cấu hình micro/loa trước khi tham gia.
+---
+
+## Thay đổi
+
+- Khung đang họp chiếm toàn bộ chiều rộng và phần chiều cao còn lại dưới thanh đầu trang; bỏ giới hạn 1480px, lề ngoài và trần chiều cao video. Video và chat giãn cùng chiều cao. Màn hình nhỏ giữ cuộn khi cần, không tràn ngang.
+- Đưa tên cuộc họp vào header trong khung thay chữ “Đã kết nối”. Trạng thái đang kết nối/kết nối lại vẫn hiện khi cần. Nút chia sẻ chuyển cùng vào trong khung.
+- Giữ component quản lý được mount khi đóng để tiếp tục tải danh sách người chờ duyệt qua API hiện có mỗi 6 giây. Hiển thị số chờ cạnh nút quản lý; cập nhật sau thao tác duyệt/từ chối. Không thay đổi API hoặc quyền duyệt.
+- Đổi nút “Cho vào” thành “Duyệt”.
+- Bỏ menu tài khoản/đăng xuất tại MeetingPage, thay bằng hai nút chọn giao diện Sáng/Tối trực tiếp. Giữ xử lý phiên đăng nhập hết hạn trong logic hiện có.
+- Khi bấm Tham gia hoặc Gửi lại yêu cầu, mở `PreJoinAudio` để chọn bật/tắt micro và loa. Chỉ gửi yêu cầu join sau khi xác nhận; Hủy không gửi join hoặc xin quyền thiết bị.
+- Lựa chọn được truyền trực tiếp vào MeetingRoom, đồng thời lưu sessionStorage để áp dụng khi khôi phục phiên. Micro tắt dùng `LiveKitRoom.audio=false`; loa tắt dùng `RoomAudioRenderer.volume=0`. Nút loa trong phòng cập nhật lựa chọn lưu. Camera giữ tùy chọn hiện có.
+
+## Kiểm tra
+
+- Toàn bộ frontend: **148 tests / 29 files đạt**; production build (gồm typecheck) đạt. Build vẫn có cảnh báo chunk lớn hiện hữu.
+- Regression: chưa gọi join khi mở/hủy hộp chọn; áp dụng micro/loa tắt; bật loa trở lại; đổi giao diện trực tiếp và không còn nút đăng xuất/cài đặt; tên nằm trong khung; badge cập nhật khi quản lý đang đóng và sau khi duyệt.
+- Browser kiểm tra CSS thật trên fixture giao diện: viewport 1440×900, khung phòng x=0, y=64, rộng 1440, cao 836; video cao khoảng 706px khi có chat. 390px không tràn ngang. Ảnh fixture: `output/playwright/meeting-full-layout.png`.
+- Không tạo/join phòng LiveKit thật, không ghi database, không tự khởi động lại server hoặc commit/push. Thiết bị thật và âm thanh thực tế chưa được nghiệm thu.
+
+## Bổ sung xem trước camera
+
+- `PreJoinAudio` có khung video 16:9, ảnh tự xem được lật ngang; micro, camera và loa nằm bên dưới. Camera sử dụng `getUserMedia` cục bộ với `audio:false`; chưa kết nối phòng ở bước này.
+- Dừng tracks khi tắt camera, hủy, đóng component hoặc xác nhận tham gia. Nếu yêu cầu cấp quyền trả về sau khi đóng, tracks vừa nhận cũng được dừng. Camera bị từ chối quyền không chặn tham gia; lựa chọn camera tắt được truyền vào LiveKitRoom và lưu cùng tùy chọn thiết bị.
+- Typecheck và 10 tests liên quan đạt, gồm ba test riêng cho preview: áp dụng lựa chọn, giải phóng capture đến muộn và từ chối quyền camera.
+- Yêu cầu tiếp theo về bỏ các dòng mô tả/hướng dẫn chữ nhỏ trên toàn dự án còn mơ hồ; đã hỏi lại phạm vi, chưa tự xóa nội dung diện rộng.
+- Điều chỉnh theo yêu cầu tiếp: bước xem trước chỉ còn hai nút icon micro/camera, không hiển thị chữ tên thiết bị hay Bật/Tắt, bỏ nút loa. Giữ aria-label, tooltip và trạng thái pressed; icon tắt có dấu gạch và nền đỏ. Loa vẫn dùng tùy chọn hiện có và có thể đổi trong phòng.

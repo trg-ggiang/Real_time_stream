@@ -1,0 +1,41 @@
+---
+title: Compact follow menu
+description: Neo menu bỏ quan tâm sát nút và giảm kích thước.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-16-26
+- Thời gian: 2026-11-16, Asia/Saigon; không có dữ liệu giờ chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Làm dropdown bỏ quan tâm gọn và nằm sát nút trạng thái.
+
+## Công việc hoàn thành
+
+Đặt nút trạng thái và menu trong cùng một vùng định vị, neo menu cách nút 5px, giới hạn menu tối đa 190px và giảm padding/typography. Luồng thao tác không đổi.
+
+Files: `frontend/src/features/personal/components/AccountAction.tsx`, `frontend/src/features/personal/personal.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Automated checks | Skipped | Chưa chạy trong phiên. |
+
+## Quyết định và lý do
+
+Neo menu vào wrapper của nút thay vì toàn bộ khối hành động để menu không bị đẩy xuống dưới liên kết không liên quan.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xem trực quan trên trình duyệt.
+
+## Bước tiếp theo
+
+Mở trang chi tiết CLB, bấm “Đang quan tâm” và kiểm tra menu gọn ngay bên dưới.

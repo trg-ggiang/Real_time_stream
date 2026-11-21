@@ -1,0 +1,23 @@
+---
+title: Bong bóng chat và theme Sáng/Tối
+description: Phân biệt tin gửi và nhận, cùng cài đặt giao diện trong Không gian sinh hoạt.
+---
+
+## Phạm vi
+
+Phase 04 — In Progress. Hoàn thành phần giao diện chat và chuyển theme cục bộ.
+
+## Thay đổi
+
+- `WorkspaceApp.tsx` đọc và lưu theme qua localStorage, mặc định sáng.
+- `WorkspaceQuickPanel.tsx` đặt nút theme cạnh nút thu gọn và giữ nút truy cập được khi panel đóng.
+- `workspace-theme.css` tạo bong bóng tin gửi và nhận, đặt bảng màu tối trong phạm vi workspace.
+
+## Kiểm tra
+
+- Frontend build và 5 test Workspace đạt, gồm ca kiểm tra chuyển, lưu và khôi phục theme.
+- Chưa nghiệm thu trực quan trong trình duyệt. Không ghi Supabase.
+
+## Tiếp theo
+
+Rà tương phản và bố cục giao diện sáng/tối với chat thật trên desktop và mobile.

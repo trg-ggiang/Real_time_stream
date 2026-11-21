@@ -1,0 +1,64 @@
+---
+title: 2026-11-08-04 — Chuyển giao diện sáng và tối
+description: Thêm theme sáng đồng bộ auth, giữ theme tối và lưu lựa chọn cho các màn hình meeting.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-04
+- Ngày: 2026-11-08, Asia/Saigon; không lưu chính xác thời gian bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — In Progress
+- Kết quả phiên: Completed trong phạm vi theme FE.
+
+## Mục tiêu và phạm vi được giao
+
+Thêm chọn trắng/đen, giữ theme đen hiện có và tạo theme trắng như trang đăng nhập/đăng ký. Chỉ thay FE.
+
+## Công việc hoàn thành
+
+- Bộ chọn hai icon mặt trời/mặt trăng trên header các màn hình meeting, có aria-label, title và aria-pressed.
+- Theme sáng dùng cùng palette với auth: nền #fafbfa, bề mặt #eaf0ed, chữ #202d29, điểm nhấn #21654f. Bao phủ dashboard, lịch hẹn, chi tiết meeting, phòng chờ, quản lý, dialog, media canvas, screen share, menu thiết bị và toolbar.
+- Theme tối tiếp tục dùng màu hiện có. Default dark nếu chưa lưu hoặc storage không dùng được; lưu preference ở localStorage key rts.meeting-theme.v1, không lưu token đăng nhập.
+- Đồng bộ color-scheme trên trang và theme-color; khôi phục theme-color khi rời màn hình meeting. Effect theme độc lập với lifecycle session, không abort thao tác hoặc dựng lại phòng khi đổi theme.
+- Tinh chỉnh header 320px để đủ chỗ cho bộ chọn; chỉ ẩn avatar phụ ở mobile.
+
+File: `frontend/src/features/meeting/MeetingPage.tsx`, `frontend/src/features/meeting/hooks/use-meeting-theme.ts`, `frontend/src/features/meeting/components/MeetingThemeToggle.tsx`, `frontend/src/features/meeting/meeting-theme.css`.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm --workspace frontend run typecheck | Passed | Tích hợp hook và toggle |
+| npm --workspace frontend test | Passed | 23 tests hiện có, 5 files |
+| npm --workspace frontend run build | Passed | Có TS check; cảnh báo chunk LiveKit ~703 kB, vẫn lazy-loaded |
+| Browser theme dashboard/detail/dialog/phòng | Passed | API/signaling giả lập; đã xem ảnh desktop/mobile |
+| Responsive sáng 320/390/768/1024/1440px | Passed | scrollWidth bằng viewport |
+| Responsive tối 320px | Passed | Không tràn ngang khi thêm toggle |
+| Lưu lựa chọn | Passed | Theme light giữ lại sau tải trang và đăng nhập lại |
+| Đổi theme trong cuộc gọi | Passed với mock | DOM phòng vẫn tồn tại; join API chỉ gọi một lần khi đổi dark/light |
+| Browser dark/light colors | Passed | Nền tối rgb(17,21,28), nền sáng rgb(250,251,250), color-scheme light và meta #fafbfa đúng; meta khôi phục #101827 sau logout |
+| Backend/auth diff | Passed | Không chỉnh backend hoặc source auth |
+| Media hai thiết bị thật | Skipped | Thay theme không đổi media logic; không thay thế nghiệm thu Phase 04/05 |
+| JSON navigation | Failed từ trước | docs/docs.json còn merge conflict; log mới được đăng ký, target tồn tại |
+
+Ảnh kiểm tra trong `output/playwright/theme-*` (Git ignored). Màu silhouette camera tắt được chỉnh lại sau khi xem ảnh để rõ hơn trên nền sáng. Không thêm test đơn vị mô phỏng CSS cho thay đổi theme có thể xác minh trực tiếp bằng browser.
+
+## Quyết định và lý do
+
+Chỉ có hai lựa chọn theo yêu cầu, không thêm chế độ thứ ba. Theme của meeting được lưu độc lập; màn hình auth và bộ chọn light/system/dark của auth giữ nguyên. CSS sáng giới hạn bởi `.meeting-app[data-theme='light']`.
+
+## Blocker và việc chưa hoàn thành
+
+Không blocker theme. Các giới hạn BE/DB đã ghi ở log trước còn nguyên; Phase 04/05 vẫn In Progress. Navigation JSON chưa thể xác nhận toàn bộ do conflict có sẵn.
+
+## Bước tiếp theo
+
+Mở frontend, dùng icon mặt trời/mặt trăng ở góc trên bên phải. Nếu đang dùng preview/tunnel cũ, khởi động lại để lấy build mới; tiếp tục nghiệm thu media thật riêng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan, giữ In Progress
+- [x] Cập nhật session log/changelog/module docs
+- [x] Đăng ký log mới, ghi rõ JSON conflict
+- [x] Ghi kết quả kiểm tra và giới hạn

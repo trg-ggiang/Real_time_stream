@@ -1,0 +1,117 @@
+.workspace-welcome { margin: 8px 0 40px; }
+.meeting-app .meeting-skip { visibility: hidden; }
+.meeting-app .meeting-skip:focus { visibility: visible; }
+.workspace-welcome > span { color: #bcbcc0; font-size: 13px; overflow-wrap: anywhere; }
+.workspace-welcome h1 { font-size: clamp(30px, 3.7vw, 48px); line-height: 1.3; margin-top: 16px; }
+.workspace-dashboard { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr); gap: 28px; align-items: start; }
+.workspace-create { background: #2a2a2e; border: 1px solid #515155; border-radius: 18px; padding: 32px; }
+.workspace-join { border-left: 1px solid #444448; padding: 12px 0 12px 30px; }
+.workspace-section-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.workspace-section-title > svg { color: #dddde1; flex: 0 0 auto; }
+.workspace-section-title h2 { font-size: 19px; line-height: 1.5; font-weight: 500; flex: 1; letter-spacing: -.6px; }
+.workspace-mode { display: flex; padding: 5px; border: 1px solid #5a5a5e; background: #1e1e22; border-radius: 10px; margin-bottom: 26px; gap: 5px; }
+.meeting-app .workspace-mode button { display: flex; justify-content: center; align-items: center; gap: 9px; flex: 1; padding: 10px; color: #d5d5d9; background: transparent; border-radius: 6px; font-size: 12px; }
+.meeting-app .workspace-mode button[aria-pressed='true'] { background: #d6d6da; color: #2b2b2f; }
+.workspace-form, .workspace-form fieldset { display: grid; gap: 20px; }
+.workspace-form fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
+.workspace-form label { display: grid; gap: 8px; color: #e7e7eb; font-size: 12px; min-width: 0; }
+.workspace-form :is(input:not([type='checkbox']), select) { width: 100%; min-width: 0; min-height: 46px; padding: 11px 12px; color: #f9f9fd; background: #202024; border: 1px solid #7a7a7e; border-radius: 8px; font: inherit; }
+.workspace-form input::placeholder { color: #b5b5b9; }
+.workspace-form input:focus-visible { outline: 3px solid #dcdce0; outline-offset: 3px; }
+.workspace-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.workspace-form .workspace-check { display: flex; align-items: center; gap: 10px; min-height: 32px; cursor: pointer; }
+.workspace-check input { width: 18px; height: 18px; accent-color: #d6d6da; margin: 0; }
+.workspace-check input:focus-visible { outline: 3px solid #dcdce0; outline-offset: 4px; }
+.meeting-app .workspace-form button, .meeting-app .workspace-session-actions > button:first-child { background: #d6d6da; color: #2b2b2f; border: 1px solid #e0e0e4; min-height: 44px; padding: 10px 16px; font-size: 12px; border-radius: 8px; }
+.meeting-app .workspace-form button:hover:not(:disabled), .meeting-app .workspace-session-actions > button:first-child:hover:not(:disabled) { background: #e4e4e8; }
+.workspace-error { margin: 0 0 20px !important; font-size: 13px; }
+.workspace-feedback { color: #a6e1cd; font-size: 12px; overflow-wrap: anywhere; }
+.workspace-feedback:not(:empty) { margin-bottom: 18px !important; }
+.workspace-help { color: #cacace; font-size: 11px; line-height: 1.8; }
+.workspace-back { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 26px; }
+.meeting-app :is(.workspace-back, .workspace-text-button) { background: transparent; border: 1px solid transparent; color: #dbdbdf; padding: 8px 0; font-size: 12px; }
+.meeting-app :is(.workspace-back, .workspace-text-button):hover { color: #fff; text-decoration: underline; }
+.workspace-detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 36px; }
+.workspace-detail-heading h1 { font-size: clamp(26px, 3vw, 38px); line-height: 1.4; overflow-wrap: anywhere; margin-top: 10px; }
+.workspace-role { display: inline-flex; padding: 4px 10px; background: #39393d; color: #dedee2; border-radius: 5px; font-size: 11px; white-space: nowrap; }
+.workspace-code-actions { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+.workspace-code-actions code, .workspace-code { font: 500 13px 'Be Vietnam Pro', sans-serif; color: #dedee2; letter-spacing: 1px; }
+.meeting-app .workspace-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; background: #39393d; color: #f5f5f9; padding: 8px; border: 1px solid #69696d; border-radius: 9px; }
+.meeting-app .workspace-icon:hover { background: #555559; }
+.workspace-detail-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr); gap: 28px; align-items: start; }
+.workspace-sessions { min-width: 0; }
+.meeting-app .workspace-sessions > .workspace-section-title button, .meeting-app .workspace-pagination button, .meeting-app .workspace-person-actions button, .meeting-app .workspace-setting button { background: #3f3f43; color: #f6f6fa; border: 1px solid #76767a; font-size: 11px; padding: 8px 12px; min-height: 38px; }
+.meeting-app .workspace-management button:hover:not(:disabled), .meeting-app .workspace-sessions > .workspace-section-title button:hover { background: #5b5b5f; }
+.workspace-session { display: flex; justify-content: space-between; align-items: center; padding: 22px; border: 1px solid #48484c; border-radius: 12px; background: #252529; gap: 18px; margin-top: 14px; content-visibility: auto; contain-intrinsic-size: auto 160px; }
+.workspace-session[data-selected='true'] { border-color: #c1c1c5; }
+.workspace-session h3 { font-size: 15px; font-weight: 500; margin: 10px 0 5px; }
+.workspace-session :is(time,p) { color: #ccccd0; font-size: 12px; }
+.workspace-session-status { display: inline-block; font-size: 10px; color: #dadade; background: #404044; border-radius: 4px; padding: 3px 8px; }
+.workspace-session-status--ongoing { color: #a8ead1; background: #24453d; }
+.workspace-session-status--ended { color: #cacace; background: #39393d; }
+.workspace-session-actions { display: grid; gap: 8px; flex: 0 0 auto; }
+.meeting-app .workspace-schedule-toggle { background: #d6d6da; color: #2b2b2f; font-size: 12px; min-height: 44px; margin-bottom: 20px; }
+.workspace-sessions > .workspace-form { margin-bottom: 24px; padding: 20px; background: #252529; border: 1px solid #636367; border-radius: 10px; }
+.workspace-empty { padding: 20px 0; color: #c8c8cc; font-size: 12px; }
+.workspace-management { min-width: 0; padding: 24px; border: 1px solid #555559; background: #27272b; border-radius: 14px; }
+.workspace-management h3 { font-size: 14px; font-weight: 500; margin: 24px 0 14px; }
+.workspace-management .notice { font-size: 12px; margin-bottom: 16px; }
+.workspace-setting { display: flex; align-items: flex-start; gap: 16px; justify-content: space-between; margin-bottom: 24px; }
+.workspace-setting strong { font-size: 13px; font-weight: 500; }
+.workspace-setting p { margin-top: 5px; color: #c9c9cd; font-size: 11px; }
+.workspace-setting button { flex: 0 0 auto; }
+.workspace-setting button[aria-checked='true'] { background: #a9d8c6; color: #173b30; border-color: #c2ecdc; }
+.workspace-invite { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 10px; margin-bottom: 10px; }
+.workspace-person { padding: 16px 0; border-bottom: 1px solid #4d4d51; display: flex; flex-direction: column; gap: 12px; content-visibility: auto; contain-intrinsic-size: auto 110px; }
+.workspace-person-info { display: grid; gap: 4px; overflow-wrap: anywhere; }
+.workspace-person-info strong { font-weight: 500; font-size: 12px; }
+.workspace-person-info > span { color: #c5c5c9; font-size: 10px; }
+.workspace-person-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.workspace-person > span { overflow-wrap: anywhere; font-size: 13px; }
+.workspace-pagination { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 20px; font-size: 11px; }
+.workspace-management > .workspace-help { margin: 12px 0; }
+.meeting-app .workspace-danger { background: #6c3547; color: #fff1f4; border: 1px solid #bc7a90; font-size: 12px; min-height: 44px; margin-top: 20px; }
+.meeting-app .workspace-danger:hover { background: #87465d; }
+.workspace-confirm { position: fixed; inset: 0; width: min(460px, calc(100% - 32px)); max-height: calc(100dvh - 48px); overflow: auto; overscroll-behavior: contain; border: 1px solid #b6899b; padding: 26px; border-radius: 14px; background: #2f2635; color: #f9f9fd; margin: auto; }
+.workspace-confirm::backdrop { background: #0d0d11c9; }
+.workspace-confirm h2 { font-size: 18px; font-weight: 500; line-height: 1.7; }
+.workspace-confirm > div { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.workspace-confirm .workspace-danger { margin: 0; }
+.workspace-waiting { display: grid; justify-items: center; gap: 18px; text-align: center; border: 1px solid #8e8e92; background: #313135; border-radius: 16px; padding: 38px 24px; margin-bottom: 30px; }
+.workspace-waiting-symbol { display: grid; place-items: center; width: 64px; height: 64px; background: #dbdbdf; color: #3a3a3e; border-radius: 20px; font-size: 38px; }
+.workspace-waiting h2 { font-size: 23px; font-weight: 500; }
+.workspace-waiting p { color: #dcdce0; font-size: 13px; }
+.workspace-waiting > button { font-size: 12px; }
+.meeting-app .meeting-controls .meeting-control-icon { display: inline-grid; place-items: center; width: 50px; height: 50px; min-height: 50px; padding: 0; color: #f8f8fc; background: #454549; border: 1px solid #919195; border-radius: 13px; }
+.meeting-app .meeting-controls .meeting-control-icon:hover:not(:disabled) { background: #68686c; border-color: #dadade; }
+.meeting-app .meeting-controls .meeting-control-icon[aria-pressed='true'] { background: #6d6d71; color: #f9f9fd; border-color: #d1d1d5; }
+.meeting-app .raised-hand-badge { color: #e7e7eb; }
+.meeting-app .meeting-controls .meeting-control-icon[data-lk-enabled='false'] { background: #603446; color: #ffe4ed; border-color: #ca829e; }
+.meeting-app .meeting-controls .meeting-control-leave { background: #aa405c; color: #fff7f9; border-color: #ed9cb2; }
+.meeting-app .meeting-controls .meeting-control-leave:hover { background: #c75270; }
+.meeting-app .meeting-controls .meeting-control-icon:disabled { opacity: .65; }
+.meeting-app .lk-device-menu { background: #36363a; color: #f9f9fd; border: 1px solid #adadb1; border-radius: 12px; font-size: 13px; padding: 12px; }
+.meeting-app .lk-device-menu button { color: #f9f9fd; }
+.meeting-app .lk-device-menu .lk-active { background: #727276; }
+.meeting-room .workspace-management { margin-top: 24px; }
+.meeting-device-controls { display: contents; border: 0; padding: 0; margin: 0; }
+@media (max-width: 1000px) {
+  .workspace-dashboard, .workspace-detail-grid { grid-template-columns: minmax(0, 1fr); }
+  .workspace-join { border-left: 0; border-top: 1px solid #444448; padding: 28px 0; }
+  .workspace-detail-heading { align-items: flex-start; flex-wrap: wrap; }
+}
+@media (max-width: 600px) {
+  .workspace-welcome { margin-bottom: 28px; }
+  .workspace-welcome h1 { font-size: 31px; }
+  .workspace-create { padding: 22px 18px; }
+  .workspace-form-row { grid-template-columns: 1fr; }
+  .workspace-management { padding: 20px 16px; }
+  .workspace-invite { grid-template-columns: 1fr; }
+  .workspace-session { padding: 18px; align-items: flex-start; flex-direction: column; gap: 20px; }
+  .workspace-session-actions { width: 100%; }
+  .workspace-section-title { gap: 10px; }
+  .workspace-section-title h2 { font-size: 16px; }
+  .workspace-pagination { flex-wrap: wrap; }
+  .meeting-app .meeting-controls { gap: 8px; }
+  .meeting-app .meeting-controls .meeting-control-icon { width: 44px; height: 44px; min-height: 44px; border-radius: 11px; }
+}

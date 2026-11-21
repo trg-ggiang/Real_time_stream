@@ -1,0 +1,33 @@
+---
+title: Personal space and student onboarding
+description: Phase 3 redesign, profile gate và các thao tác tài khoản.
+---
+
+## Phiên
+
+- Ngày 16/11/2026, Asia/Bangkok; không có giờ bắt đầu/kết thúc chính xác.
+- Agent Codex. Kết quả Completed trong phạm vi mã nguồn được giao, ready for review.
+- Historical Phase 03/04 vẫn In Progress; redesign Phase 3 đã triển khai, chờ nhóm review.
+
+## Công việc
+
+Tạo module backend personal và frontend personal/profile. Hoàn thiện onboarding bắt buộc, /me shell, membership/follows/registrations/requests/profile, form đề nghị mới sau từ chối, follow và đăng ký tại public detail. Thêm guard profile, CORS PUT/DELETE, no-store, xử lý idempotency và lỗi mạng không tự retry POST. Giữ bridge workflow CLB/admin/meeting.
+
+Không chạy migration, SQL, seed hoặc mutation lên Supabase; không tạo account thật, commit hay push. Thay đổi Phase 1/2 trước đó được giữ nguyên.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| Typecheck và production build | Passed; cảnh báo chunk meeting hiện hữu |
+| Backend tests | 47 passed |
+| Frontend tests | 67 passed |
+| Browser fixtures desktop/tablet/mobile/320 | 41 checks, không lỗi |
+| App-screen probes overview/profile | 0 FAIL ở 4 viewport |
+| Read-only schema và live smoke | Cột cần thiết có; health 200, private không JWT 401 |
+
+Owner/profile/duplicate/cancel/late-response/uncertain-write được kiểm thử. Browser fixture chặn mọi API, không ghi live. Capacity thật phụ thuộc trigger migration hiện có; chưa load-test đồng thời trên Supabase. File preflight chỉ đọc được chuẩn bị, chưa thực thi.
+
+## Giới hạn / tiếp theo
+
+Xem [báo cáo Phase 3](/design/phase-03-personal-experience) cho API, các file, cách chạy và giới hạn Back/Forward khi form chưa lưu. Nhóm review personal flow; Phase 4 mới thay shell CLB và Phase 5 mới thay admin. Không tự nâng trạng thái toàn dự án thành Done.

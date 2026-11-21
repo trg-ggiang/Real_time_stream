@@ -1,0 +1,40 @@
+---
+title: Public discovery redesign
+description: Phase 2 giao diện công khai trên base hiện tại.
+---
+
+## Thông tin phiên
+
+- Ngày: 2026-11-16, Asia/Bangkok; không ghi chính xác thời gian bắt đầu/kết thúc.
+- Agent: Codex.
+- Phase lịch sử: 04 — Application foundation, vẫn In Progress.
+- Phase redesign: 2 — public foundation, implemented/ready for visual review.
+- Kết quả: Completed trong phạm vi mã nguồn công khai; không phải nghiệm thu toàn sản phẩm.
+
+## Phạm vi và kết quả
+
+Người dùng yêu cầu tiếp tục Phase 2 từ bản khung Phase 1: giữ navy/xanh, làm frontend đẹp và có tổ chức, nối base backend hiện có. Đã tách discovery thành pages/components/hooks/services/types, scoped CSS, shared public HTTP và format; thêm router public, server search/time filter và detail endpoints từ view allowlist.
+
+Giữ auth/onboarding và meeting. Hash quản lý CLB/admin dùng legacy adapter trong thời gian chuyển phase. Không thực thi SQL, mutation Supabase, seed --apply, commit hay push. Không ghi đè thay đổi tài liệu Phase 1.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| npm run typecheck | Passed |
+| npm run build | Passed; cảnh báo chunk LiveKit/meeting lớn |
+| npm test | Passed: backend 40, frontend 60 |
+| Read-only HTTP Supabase qua NestJS list/detail | 200 cho ba collection |
+| Browser flows 1440/768/390 | 34 checks, no failures |
+| Inspector home ba viewport | 0 FAIL, 2 WARN typography/video |
+| Dataset seed dry-run | 3 CLB/3 hoạt động/3 bài; không ghi live |
+
+## Quyết định và giới hạn
+
+Chi tiết và ảnh có fallback, không tự coi bản ghi thiếu ảnh là lỗi DB. Home preview ưu tiên có ảnh nhưng full list giữ toàn bộ dữ liệu. Không thay ngày hoạt động cũ để giả vờ upcoming. Hero tái dùng ảnh minh họa AI từ concept cũ; ảnh CLB có nguồn trong manifest, cần kiểm tra quyền trước phát hành.
+
+Follow/đăng ký, taxonomy, upload ảnh, shell cá nhân/CLB/admin mới chưa thuộc phần code hoàn tất. Không test đăng ký/duyệt live hay cuộc gọi thật hai thiết bị. Quyền chủ nhiệm và trạng thái rejected/changes_requested vẫn cần đối chiếu khi xử lý phase workspace.
+
+## Bước tiếp theo
+
+Nhóm review diện mạo và navigation public trước khi Phase 3 làm không gian cá nhân. Xem [báo cáo Phase 2](/design/phase-02-public-experience) để biết route/API, cấu trúc module, visual critique và phần chưa có.

@@ -1,0 +1,29 @@
+---
+title: Discovery landing search underline
+description: Remove the gray focus line from the landing search field.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-34
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+Removed the inset shadow that drew the gray focus line in `frontend/src/features/discovery/discovery-home.css`. The existing focus background remains. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| Frontend test suite | Skipped | The change removes one CSS declaration. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the search appearance on the landing page and continue the page-by-page update with the public club list.

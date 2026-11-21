@@ -1,0 +1,55 @@
+---
+title: Phase 04 - Realtime chat and meeting overview cleanup
+description: Socket.IO channel delivery, meeting send acknowledgement and removal of the duplicate meeting overview.
+---
+
+## Scope and final decisions
+
+Date: 2026-11-20 (Asia/Saigon). Phase 04 remains In Progress. No commit/push or live DB/schema writes in this change.
+
+- Club-channel chat now uses Socket.IO instead of polling every three seconds.
+- Meeting chat keeps its existing Socket.IO implementation; acknowledgement no longer waits for every recipient's access check.
+- Final user clarification: a meeting still opens in the separate full-page meeting view. Do not embed it into the club workspace shell. Only remove the duplicate overview with the welcome headline and create/join forms, plus its internal “Tổng quan” back button.
+- Creation remains in workspace. Public-home navigation in the full-page header remains; it does not reopen the removed meeting overview. Opening the generic meeting shortcut without a room code takes the user to workspace.
+- Shared `/api/meetings` APIs remain: workspace already calls these for creation, scheduling, admission and LiveKit credentials. They are not duplicate APIs that can safely be deleted with the overview UI.
+
+## Channel transport
+
+Socket.IO namespace: `/workspace-chat`, WebSocket transport through the existing `/socket.io` proxy.
+
+- Handshake: `{ token, clubId, channelId }`. JWT signature/expiry, account, complete profile and current channel access are checked. IDs are validated; the client cannot set the sender or subscribe to an arbitrary room after connection.
+- `channel:send`: `{ client_message_id, content }`. Acknowledgement is `{ ok: true, data: { item } }` or `{ ok: false, code, message }`. Existing persistence and duplicate-send UUID checks remain in `WorkspaceChannels.send`.
+- `channel:message`: saved message, pushed only to currently authorized recipients in the matching club/channel. `mine` is computed per recipient; retry keys are omitted for other senders.
+- `channel:revoked`: access ended; disconnect and clear the local channel messages. Idle access is rechecked every 30 seconds, JWT expiry has a timer, and delivery checks access before pushing content.
+- Socket text sends are limited per user (30 attempts/minute). Failed sends retain the draft and retry UUID. Pending rows are not marked delivered until the server confirms them.
+- Images/files still upload over the authenticated HTTP multipart endpoint. Both HTTP and socket persistence paths publish a saved-message event so attachments appear immediately for connected recipients.
+- History and older pages remain authenticated HTTP reads. They run on connection/reconnection or explicit pagination, not on a three-second timer. Reconnection walks backwards until previously known history is reached, including gaps longer than 50 messages. Incoming live messages and history responses merge by message ID.
+- Socket disconnection disables sending and retains the draft. The client reconnects automatically; the existing retry button can recreate a failed connection.
+
+## Meeting transport
+
+Existing namespace `/chat` still authenticates the JWT, meeting/session admission and LiveKit presence. Existing cursor catch-up and retry outbox remain. A saved send returns acknowledgement before broadcasting finishes; recipients still pass current-access checks before content delivery. A slow recipient no longer delays the sender's saved acknowledgement.
+
+## Files
+
+- `backend/src/workspace/workspace-channel.gateway.ts`: namespace authentication, validation, send acknowledgements, limits and recipient checks.
+- `backend/src/workspace/workspace-channel-events.ts`: in-process saved-message notification bus; `WorkspaceChannels` publishes after persistence.
+- `frontend/src/features/club-workspace/services/channel-socket.ts` and `pages/WorkspaceChat.tsx`: socket lifecycle, sends, live messages, history catch-up, pending state and draft preservation.
+- `backend/src/chat/chat.gateway.ts`: meeting delivery separated from saved acknowledgement.
+- `frontend/src/features/meeting/MeetingPage.tsx`: retained full-page room/session view; removed duplicate creation handler and welcome/create/join overview. Creator-only temporary role map was no longer needed and removed.
+- `frontend/src/features/auth/AuthApp.tsx`: generic meeting shortcut goes to workspace; room links still open the full-page view.
+- `workspace-theme.css`: Messenger-style composer retained: emoji/file controls and send icon outside the text input. `meeting-theme.css`: full-page room uses workspace blue/navy colors.
+
+## Verification
+
+- Backend: 67 tests passed, including real Socket.IO connections against an ephemeral Nest application with mocked persistence: authentication rejection, channel isolation, recipient revocation, sender-specific retry keys, duplicate send and slow meeting-recipient acknowledgement.
+- Frontend: 116 tests passed across 20 files, including pushed messages without polling, retained disconnected drafts, multi-page catch-up, revocation, pending send confirmation and direct meeting navigation.
+- Production build and typecheck passed. Existing chunk-size warnings remain.
+- Browser read-only review on the user's already-running servers: club channel connected to the real socket; composer usable. An existing room opened as a full-page view with no removed overview/back button. Desktop 1440px and mobile 390px had no horizontal document overflow.
+- No real message was sent, no real attachment uploaded, and no room joined during this browser review. Multi-user media over a public tunnel remains outside this validation.
+
+## Deployment and follow-up
+
+Restart an already-running production backend to register the new namespace, then reload frontend clients. Vite/tunnel already forwards WebSocket upgrades for `/socket.io`; no proxy route or database migration is required. Servers were not started or restarted by this task.
+
+The saved-message bus and Socket.IO adapter are currently process-local. Run one backend instance for delivery; multiple backend instances would need shared pub/sub and the appropriate Socket.IO adapter. Direct SQL/Supabase-dashboard writes do not publish application events. Durable history allows recovery after disconnection, but live delivery is not guaranteed while a client is disconnected.

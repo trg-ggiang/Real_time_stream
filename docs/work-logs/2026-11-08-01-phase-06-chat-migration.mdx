@@ -1,0 +1,46 @@
+---
+title: 2026-11-08-01 — Thiết kế migration chat
+description: Migration meeting_messages để người dùng tự áp dụng trong Supabase.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-08-01
+- Thời gian: 2026-11-08, Asia/Saigon; không lưu giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 06 — Chat, In Progress
+- Kết quả phiên: Completed trong phạm vi soạn migration; chưa áp dụng DB.
+
+## Mục tiêu và phạm vi được giao
+
+Thiết kế migration meeting_messages để người dùng import vào Supabase. Không tự chạy SQL hay thay đổi dữ liệu/schema remote.
+
+## Công việc hoàn thành
+
+Tạo migration gồm bảng, PK/FK RESTRICT, unique chống gửi trùng, CHECK content 1–2000 ký tự và không chỉ whitespace, history index, sender index, RLS và SELECT/INSERT cho service_role. Tạo phase 06 và cập nhật master plan/navigation/changelog/session log.
+
+## Kiểm tra
+
+- Đối chiếu kiểu UUID, khóa tham chiếu và tên bảng theo DDL người dùng: hoàn thành.
+- Review transaction, constraints, index và quyền backend-only: hoàn thành bằng đọc SQL.
+- git diff --check và JSON/navigation: kiểm tra trước bàn giao.
+- Thực thi PostgreSQL và kiểm thử ghi dữ liệu: Skipped, chưa được phép áp dụng remote và không có PostgreSQL thử nghiệm/parser trong workspace.
+- App tests: Skipped, không đổi application code.
+
+## Quyết định và lý do
+
+Backend dùng JWT ứng dụng và secret key, nên không tạo policy dựa trên Supabase Auth. Không sửa bảng hiện có, không thêm seed, trigger hay chức năng chat. Bảng mới append-only cho backend, không cấp UPDATE/DELETE. Trùng client ID phải đọc lại tin cũ, không ghi đè.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh runtime migration, RLS hoặc grants thực tế. Chat chưa được triển khai. Phase 06 In Progress, không phải Done.
+
+## Bước tiếp theo
+
+Người dùng chạy toàn bộ migration một lần trong Supabase SQL Editor rồi xác nhận để kiểm tra chỉ đọc. Cần nối session/membership trước khi phát triển gateway.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan và changelog/session log
+- [x] Đăng ký trang tài liệu
+- [x] Ghi giới hạn xác minh

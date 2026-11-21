@@ -1,0 +1,40 @@
+﻿---
+title: Profile before call
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-15-19
+- Thời gian: 2026-11-15 (Asia/Saigon); không có dữ liệu giờ bắt đầu
+- Agent: Codex
+- Phase: 03 — Auth và Supabase
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu
+
+Sửa điều hướng tự động vào call sau đăng ký/đăng nhập và cải thiện UI/UX form hồ sơ sinh viên.
+
+## Công việc hoàn thành
+
+- Bỏ tự động chuyển sang call từ kết quả GET hồ sơ. Người dùng luôn thấy trang hồ sơ và chủ động bấm tiếp tục.
+- Tài khoản chưa hoàn thiện phải lưu đủ trường bắt buộc trước khi có thể tiếp tục; tài khoản đã hoàn thiện thấy dữ liệu và có thể tiếp tục.
+- Thiết kế lại form hồ sơ theo màu xanh navy, nền sáng, header UniCircle, tiêu đề và layout responsive.
+- Cập nhật kiểm thử Auth UI theo luồng điều hướng mới.
+
+## File thay đổi
+
+`frontend/src/features/auth/AuthApp.tsx`, `frontend/src/features/auth/PersonalProfile.tsx`, `frontend/src/features/auth/auth.css`, `frontend/src/features/auth/AuthApp.test.tsx`, tài liệu phase/master/session/changelog và work log.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm.cmd --workspace frontend test` | Passed: 55 tests |
+| `npm.cmd --workspace frontend run typecheck` | Passed |
+| `npm.cmd run build` | Passed; cảnh báo chunk LiveKit lớn |
+| Browser visual QA | Skipped: browser access host không khả dụng trong phiên trước; chưa có xác minh ảnh thực tế |
+
+## Bước tiếp theo
+
+Nghiệm thu đăng ký → form hồ sơ → lưu → tiếp tục vào meeting trên Supabase development; xác nhận schema/RLS. Phase 03 vẫn In Progress.

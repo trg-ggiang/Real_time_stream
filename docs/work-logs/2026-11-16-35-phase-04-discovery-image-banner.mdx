@@ -1,0 +1,30 @@
+---
+title: Discovery landing image and banner
+description: Separate the hero caption from its photo and style the responsive discovery banner.
+---
+
+## Session details
+
+- Session ID: 2026-11-16-35
+- Date: 2026-11-16 (Asia/Saigon)
+- Agent: Codex
+- Phase: 04 - Application foundation
+- Outcome: Completed
+- Phase status: In Progress
+
+## Objective and completed work
+
+Added a photo wrapper in `frontend/src/features/discovery/pages/DiscoveryHome.tsx`. Updated `frontend/src/features/discovery/discovery-home.css` to give the photo and its caption distinct frames, set the caption to 16–20 px, and style the introductory banner. Banner content is capped at 1200 px, with 32–40 px vertical padding and a 24–28 px navy title. The dark blue CTA spans the content width on small screens, and its arrow respects the existing reduced-motion preference. Updated the phase and master plans, session log, changelog and documentation navigation.
+
+## Verification
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript and Vite passed. Vite reported a bundle-size warning. |
+| `npm.cmd --workspace frontend run test` | Passed | All 59 frontend tests passed. |
+| CSS and text contrast | Passed | Checked the image frame, banner width, mobile stretching and default text color pairs. Caption and banner text measured 12.00:1 and CTA text measured 9.21:1. |
+| Browser visual check | Skipped | Loopback was blocked during preceding landing checks. |
+
+## Next step
+
+Review the image and banner at desktop and mobile widths before continuing the page-by-page update.

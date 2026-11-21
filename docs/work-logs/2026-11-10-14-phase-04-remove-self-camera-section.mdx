@@ -1,0 +1,22 @@
+---
+title: Remove self camera section during presentation
+description: Simplify the sidebar next to a shared screen.
+---
+
+## Session
+
+2026-11-10-14 Asia/Saigon. Codex. Exact timestamps not captured. Completed. Phase 04/05 In Progress.
+
+## Objective and completed code
+
+Removed the dedicated self-camera section from MeetingMediaLayout.tsx while a screen is shared. Remote camera sidebar remains; if no remote cameras exist the screen uses the available width via join-lobby.css modifier. Normal no-share camera grid and camera publication unchanged.
+
+## Checks
+
+Frontend typecheck passed. Source inspection and git diff --check. No new tests or browser visual run for this targeted layout removal. No BE/DB changes. Navigation JSON parsed; new target exists.
+
+## Next step and checklist
+
+Reload room and share a screen. Phases remain In Progress pending physical media acceptance.
+
+- [x] Phase/master/session/changelog/module and navigation updated.

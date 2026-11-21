@@ -1,0 +1,53 @@
+---
+title: 2026-11-07-01 — Phân tích cách chạy project
+description: Xác định entrypoint, cấu hình và giới hạn chạy auth cùng LiveKit.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-07-01
+- Thời gian: 2026-11-07, Asia/Saigon; không ghi nhận chính xác bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed trong phạm vi phân tích
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Phân tích cách chạy project hiện tại; không triển khai gom backend hoặc thay đổi mã ứng dụng.
+
+## Công việc hoàn thành
+
+Đối chiếu scripts, entrypoint, Vite proxy và auth controller. Root chạy backend/src và frontend; backend/my-api là ứng dụng auth độc lập, chưa nằm trong workspace root. Hai backend mặc định cổng 3000; có thể chạy auth riêng cổng 3001 để kiểm tra bằng HTTP client. Auth hiện dùng /auth, không có prefix /api hoặc CORS trong bootstrap; frontend hiện chưa tích hợp auth.
+
+Đã kiểm tra sự hiện diện của biến env bằng trạng thái set/empty, không in giá trị. Các biến LiveKit backend và Supabase/JWT của my-api đã có giá trị; chưa kiểm chứng credentials với dịch vụ.
+
+File thay đổi: work log này, quickstart, phase-05, master-plan, session-log, CHANGELOG, docs.json. Giữ nguyên thay đổi ứng dụng và docs có sẵn.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Đọc mã nguồn, scripts và git status | Passed | Hai ứng dụng NestJS vẫn riêng biệt |
+| Node/npm và env presence | Passed | Node v24.12.0, npm 11.6.2; dependencies root và auth tồn tại |
+| JSON/navigation và diff docs | Passed | Kiểm tra khi đóng phiên |
+| Khởi động/build/test/Cloud/database | Skipped | Chỉ phân tích cách chạy; chưa xác nhận runtime |
+
+## Quyết định và lý do
+
+Hướng dẫn chạy media bằng hai terminal root; hướng dẫn auth độc lập cổng 3001. Không coi npm test root là kiểm thử my-api. Không cài dependencies hoặc sửa mã ứng dụng trong phiên.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa gom backend hoặc tích hợp auth vào frontend/LiveKit. Chưa xác minh schema users và credentials thực tế. Không có blocker cho phân tích.
+
+## Bước tiếp theo
+
+Chạy hai terminal Module 1 và kiểm tra health/Join; nếu kiểm tra auth riêng, chạy my-api cổng 3001 và gọi /auth/register, /auth/login, /auth/me. Gom backend khi triển khai được yêu cầu.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

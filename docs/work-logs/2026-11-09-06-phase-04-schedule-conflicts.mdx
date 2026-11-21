@@ -1,0 +1,38 @@
+---
+title: Actionable scheduling conflicts
+description: Preserve scheduling rules and expose metadata needed by the frontend.
+---
+
+## Session
+
+- Session ID: 2026-11-09-06. Agent Codex. Asia/Saigon; start/end timestamps not captured.
+- Phase 04/05. Outcome Completed code. Phases remain In Progress.
+
+## Objective and findings
+
+User reported the generic 409 text while scheduling. The supplied text alone cannot distinguish server conditions. Source inspection found two paths: invalid/past start or end-before-start, and attempting another session on a nonrecurring meeting which already has one. listSessions omitted recurrenceRule, so after reload the frontend treated it as unknown and offered scheduling even for a single-session meeting already in use.
+
+## Completed changes
+
+MeetingsService.listSessions now returns existing recurrence_rule and waiting_room_enabled as API metadata. The current frontend schedule visibility rule can therefore hide adding sessions when recurrenceRule is null and a session exists. No schema changes or relaxed scheduling limits.
+
+createSession returns stable INVALID_SCHEDULE_TIME and SINGLE_SESSION_EXISTS codes for the two 409 cases. meetings-api.ts translates those codes to specific Vietnamese instructions rather than displaying the unrelated generic join-time/conflict message. Unknown errors keep the existing safe fallback.
+
+Files: backend meetings.service.ts, new meeting-schedule.test.cjs; frontend meetings-api.ts and meetings-api.test.ts.
+
+## Checks
+
+- Backend build/typecheck passed; 18 scheduling/admission/role tests passed.
+- Frontend build/typecheck passed; 40 frontend tests passed.
+- New regressions verify a valid first future appointment, no inserts on invalid times/existing single session, metadata after reload, and both localized conflict reasons.
+- Tests mock DB/HTTP. No real database writes, migrations or live scheduling API mutation were performed; the user's exact failing response body was not available.
+- git diff --check run. Existing media bundle-size warning remains. Navigation targets exist; full docs.json JSON validation remains limited by preexisting merge markers.
+
+## Decisions and next step
+
+Nonrecurring meetings still support one session; use a new meeting for another independent appointment, or configure recurrence during creation for a series. Restart backend if not running watch and retry; a remaining 409 will identify its cause. Phases stay In Progress pending end-to-end acceptance.
+
+## Checklist
+
+- [x] Phase/master/session/changelog/module updates and navigation registration.
+- [x] Actual checks, limits and next step recorded.

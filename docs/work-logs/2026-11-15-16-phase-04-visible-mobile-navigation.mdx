@@ -1,0 +1,24 @@
+---
+title: Verify scroll navigation and expose mobile links
+description: Reproduce real scrolling and fix hidden navigation below 768px.
+---
+
+## Session information
+
+2026-11-15-16, Codex, Asia/Saigon; exact times not recorded. Completed; Phase 04 In Progress.
+
+## Investigation and code
+
+User requested thorough investigation because scroll-based header effects were not visible. Real wheel scrolling on desktop confirmed correct active sections and sticky header. Width sweep revealed all section navigation was display:none below 768px. Added a mobile two-row header in guest.css: brand/auth first row and visible section links second row. Preserved existing active blue/bold/underline/1.15-scale rules and scroll tracking. No claim that desktop tracking was broken; the reproduced defect was hidden mobile navigation. No backend/DB changes.
+
+## Checks
+
+Verified dev servers at 5173 and 5174 serve current guest source; preview at 4173 serves build. Browser test ran on 5173 at 1440 and 390px, scrolling clubs, activities, stories and back to activities with wheel input. All eight checks confirmed correct href, visible nav, sticky header top 0, blue rgb(40,95,186), weight 700, underline, 1.15 scale and no overflow. Captured desktop/mobile header screenshots; mobile screenshot reviewed. Build/typecheck passed with existing media chunk warning. No new unit tests for responsive CSS; real layout/scroll checks used. JSON/new navigation target verified; prior historical missing targets remain unrelated.
+
+## Next step and checklist
+
+Phase 04 remains In Progress. If user still observes a desktop mismatch, reproduce their exact URL and viewport; desktop problem was not reproduced in this session.
+
+- [x] Updated phase/master plan, session log, changelog and guest guide.
+- [x] Registered log and checked JSON/new target.
+- [x] Recorded evidence and limitations.

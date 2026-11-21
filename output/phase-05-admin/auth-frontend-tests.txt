@@ -1,0 +1,16 @@
+
+> @real-time-stream/frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.5 D:/Project/Livekit project/Real_time_stream/frontend
+
+
+ Test Files  19 passed (19)
+      Tests  77 passed (77)
+   Start at  13:39:55
+   Duration  11.29s (environment 67%, import 20%, tests 10%, transform 3%)
+
+    Isolate  19 workers spawned · ~4.84s startup each (spawn + environment, per file)
+             at least ~1.29s faster with isolate: false — reuses workers across files instead of one per file
+

@@ -1,0 +1,22 @@
+﻿---
+title: Căn phân trang và sửa theme tối trang họp CLB
+description: Cân các nút hành động và đưa số trang vào giữa danh sách họp.
+---
+
+## Thông tin phiên
+
+Session 2026-11-20-04, Codex. Hoàn thành chỉnh giao diện, Phase 04 vẫn In Progress.
+
+## Công việc hoàn thành
+
+- WorkspaceMeetings dùng nav riêng cho Trang trước, Trang hiện tại và Trang sau. Tách Tải lại ra ngoài nav, đặt bên phải khi đủ chỗ và xuống dưới khi khung hẹp.
+- workspace-theme.css căn số trang chính giữa, giữ hai nút chuyển trang cùng chiều cao và chỉnh màu chế độ tối cho các nút trong màn họp, mã họp và ô nhập trên form tạo họp.
+
+## Kiểm tra
+
+- 9 test Workspace đạt. Frontend build gồm TypeScript đạt.
+- Browser dùng API mô phỏng ở 1440 px tối, 768 px sáng và 320 px tối. Kiểm tra căn giữa số trang, chiều cao nút, màu nền các nút/ô nhập, không tràn ngang và chuyển qua lại Trang 1 / Trang 2.
+
+## Tiếp tục
+
+Nghiệm thu quyền vào buổi họp và LiveKit trên thiết bị thật theo hướng dẫn tunnel.

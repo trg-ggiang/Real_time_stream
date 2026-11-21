@@ -1,0 +1,25 @@
+flowchart LR
+    USER["Người dùng - Guest, sinh viên, chủ nhiệm hoặc admin"] --> WEB["React và Vite - public, personal, workspace, admin, meeting"]
+    WEB -->|"HTTP API qua HTTPS tunnel khi chia sẻ link"| API["NestJS Backend"]
+    API --> PUBLIC["Public content - chỉ đọc các view published"]
+    API --> AUTH["Auth và Users - mật khẩu, JWT, profile"]
+    API --> PERSONAL["Personal - follows, registrations, club requests"]
+    API --> WORKSPACE["Workspace - membership, ban, bài viết và hoạt động"]
+    API --> ADMIN["Admin - role nền tảng và xét duyệt CLB"]
+    API --> MEETING["Meetings - phòng, session, quyền, admission và attendance"]
+    PUBLIC --> DB[("Supabase PostgreSQL")]
+    AUTH --> DB
+    PERSONAL --> DB
+    WORKSPACE --> DB
+    ADMIN --> DB
+    MEETING --> DB
+    WEB -->|"Socket.IO qua HTTPS tunnel"| CHAT["NestJS Chat Gateway - xác thực và kiểm tra quyền session"]
+    CHAT -->|"Lưu và đọc meeting_messages"| DB
+    CHAT -->|"Phát tin đến đúng người còn quyền"| WEB
+    MEETING --> LK_SERVICE["LiveKit Service - tạo token và thao tác quyền phòng"]
+    LK_SERVICE -->|"Token và địa chỉ LiveKit trả qua API"| WEB
+    LK_SERVICE -->|"Server API quản lý phòng"| LK["LiveKit Cloud - truyền media"]
+    WEB <-->|"WebRTC - audio, video, screen share"| LK
+    NOTE["Supabase không truyền video. HTTPS tunnel mở đường vào ứng dụng local; media đi qua LiveKit Cloud."]
+    DB -.-> NOTE
+    LK -.-> NOTE

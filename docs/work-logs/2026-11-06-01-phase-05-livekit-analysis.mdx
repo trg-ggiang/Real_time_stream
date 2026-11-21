@@ -1,0 +1,50 @@
+---
+title: 2026-11-06-01 — Phân tích LiveKit
+description: Đối chiếu luồng token và media với mã nguồn hiện tại.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-06-01
+- Thời gian: 2026-11-06T16:02:28+07:00, Asia/Saigon; không ghi nhận chính xác bắt đầu.
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed trong phạm vi phân tích
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Phân tích cách project sử dụng LiveKit; không thay đổi mã ứng dụng.
+
+## Công việc hoàn thành
+
+Đọc backend token service/controller/config, frontend token API/session hook/meeting UI và test hiện có. Xác định backend chỉ ký JWT; browser kết nối Cloud, publish camera/microphone và subscribe media. Token giới hạn room cố định, identity UUID, TTL và nguồn publish. Đối chiếu lifecycle, lỗi thiết bị, proxy và giới hạn PoC. Cập nhật work log, phase page, master plan, session log, changelog và docs.json.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Đọc mã nguồn, rg, git status --short | Passed | Ban đầu working tree sạch; không đọc env secrets |
+| Đọc test hiện có | Passed | Chỉ đọc, không chạy test; glob PowerShell ban đầu sai đuôi .ts, sau đó đọc đúng .cjs |
+| JSON/navigation và diff docs | Passed | JSON hợp lệ, 20 navigation targets tồn tại; diff docs không có lỗi whitespace |
+| Build/test/browser/Cloud | Skipped | Phiên phân tích và docs; không thay đổi ứng dụng, chưa có kiểm chứng media mới |
+
+## Quyết định và lý do
+
+Giữ Phase 05 In Progress. Token HTTP 200 trong log trước không chứng minh Cloud chấp nhận credentials hoặc media hai chiều. Ghi chú “chưa có credentials thật” trong Module 1 đã cũ so với log điền env; chưa kiểm tra lại credentials trong phiên này.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho phân tích. Chưa nghiệm thu browser và media hai thiết bị. Không commit/push. Cuối phiên xuất hiện thay đổi ngoài phạm vi tại backend/my-api/tsconfig.json; giữ nguyên. git diff --check toàn repo báo trailing whitespace ở file đó, không phải docs của phiên.
+
+## Bước tiếp theo
+
+Thực hiện checklist hai thiết bị trong Module 1, ghi bằng chứng Join/Leave, audio/video, permission và reconnect trước khi đóng phase.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh
+

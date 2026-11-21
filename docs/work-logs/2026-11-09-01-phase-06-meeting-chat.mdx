@@ -1,0 +1,64 @@
+---
+title: 2026-11-09-01 — Chat trong phiên họp
+description: Chat Socket.IO, session access, Supabase repository và UI meeting.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-09-01
+- Thời gian: 2026-11-09, Asia/Saigon; không ghi chính xác thời điểm bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 06 — Chat, In Progress
+- Kết quả phiên: Completed trong phạm vi application code; còn nghiệm thu DB write và thiết bị thực.
+
+## Mục tiêu và phạm vi được giao
+
+Triển khai chat giữa thành viên cùng room meeting, tổ chức code hợp lý, kiểm thử và báo cáo giới hạn. Giữ thay đổi trước phiên, không tự sửa schema/dữ liệu database và không commit/push.
+
+## Công việc hoàn thành
+
+- Backend thêm meeting-sessions module/controller/service, GET danh sách ongoing session admitted, token endpoint query sessionId và mapping đúng LiveKit room. Legacy PoC media giữ riêng, không chat.
+- ChatModule gồm gateway/auth+presence/service/repository/DTO/types; handshake JWT, user/identity/session/member/presence, expiry timer và sweep; recheck mỗi recipient trước delivery; rate limit per user; insert trước broadcast, duplicate đọc lại, không update.
+- Frontend chọn session, hook/socket client, outbox/retry, cursor history/older/catch-up và checkpoint giữ khi trang giữa chừng lỗi; panel responsive, unread, composer, cleanup. Proxy /socket.io ws ở cả dev/preview.
+- Cập nhật README, module guide, phase/master plan, changelog/session log/navigation. SQL migration từ phiên trước giữ nguyên, không chạy lại.
+
+## File thay đổi
+
+backend/src/chat/*, backend/src/meeting-sessions/*, backend/src/app.module.ts, backend/src/livekit/livekit.controller.ts/livekit.module.ts/livekit.service.ts; frontend/src/features/meeting/chat/*, MeetingPage.tsx, components/MeetingRoom.tsx, hooks/use-meeting-session.ts, services/token-api.ts, types.ts, frontend/src/styles.css, frontend/vite.config.ts; backend/test/chat.test.cjs và frontend hook tests. Các thay đổi test livekit/screen-share trước phiên được giữ nguyên.
+
+## Kiểm tra
+
+| Lệnh/kiểm tra | Kết quả | Giới hạn |
+| --- | --- | --- |
+| npm run typecheck | Passed | Hai workspace |
+| npm test | Passed | Backend 14 tests kể cả subtests; frontend 26 tests |
+| npm run build | Passed | Còn warning chunk LiveKit lớn |
+| Nest + Socket.IO TCP integration | Passed | Database/presence fixtures; JWT, sai identity/session, chưa online, spoof sender, blank/oversized/cursor, microseconds, DB failure, retry, reconnect, removal, rate limit, JWT expiry |
+| Hook tests | Passed | History/live race, ACK/echo, retry giữ ID, tải bù nhiều trang và checkpoint sau lỗi, older và cleanup |
+| Supabase thật | Read-only passed | Table messages tồn tại; query session/member/history với join sender đúng. Không INSERT/UPDATE/DELETE/DDL/RPC |
+| Browser UI dev proxy | Passed | Ba tài khoản/session fixtures, backend thật, LiveKit Cloud thật, video/audio giả lập |
+| Cloudflare HTTPS + Vite preview + WS | Passed | Login/session/join, send/receive, isolation, plain-text HTML, failed send retry, reconnect và removed recipient; không pageerror |
+| 1440/1024/768/390px | Passed | Ảnh đã quan sát; không tràn ngang, self camera còn hiện; desktop có composer, tablet/mobile chat xếp dưới media |
+| Ghi DB nhóm/hai thiết bị/media thật | Skipped | Không tự ghi dữ liệu thử lên DB; chưa có nghiệm thu thiết bị thực |
+| JSON/navigation và git diff --check | Passed | 31 navigation targets, frontmatter hợp lệ; MDX không chạy Mintlify renderer |
+
+## Quyết định và lý do
+
+Lịch sử theo session_id, sender từ JWT, không tin sender/room client. Membership admitted và removed_at NULL; presence kiểm tra LiveKit thay vì tự tạo/update attendance khi thiếu lifecycle. Status ongoing là điều kiện truy cập, không tự mở/đóng phiên. Giữ microseconds trong cursor; unique chống duplicate bản ghi, không hứa exactly-once delivery.
+
+Chạy browser fixtures trên backend 3198/frontend 5189; DB/user/session/message fixtures chỉ trong memory, LiveKit dùng room test riêng. HTTPS test dùng pinned cloudflared tới Vite preview với rewrite Host giống runner. Sau kiểm thử đã rời phòng, dừng server/tunnel/browser tạm; không dừng dịch vụ người dùng. Artifacts/scripts trong output/playwright bị Git ignore, không có credentials ghi vào source/log output.
+
+## Blocker và việc chưa hoàn thành
+
+Không blocker code. Chưa chứng minh INSERT thật Supabase, lifecycle attendance, quản trị session/member, file/DM/edit/delete/read receipt hoặc nhiều backend/Redis/outbox. Presence mỗi message/recipient tốn network cho phòng lớn; rate limit bộ nhớ chỉ dùng một process. Session hết hạn/removed/presence lỗi thì fail closed; JWT ứng dụng chưa refresh token. Legacy PoC vẫn là phòng thử chung. Phase 06 In Progress.
+
+## Bước tiếp theo
+
+Restart backend/frontend hoặc tunnel với build mới. Hai user admitted chọn cùng ongoing session trong DB, gửi tin thật rồi reload/join lại kiểm chứng persistence; thử offline/removed/ended và hai thiết bị. Không tự chỉnh member/status hoặc schema nếu chưa được ủy quyền.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase/master plan
+- [x] Cập nhật README, module docs, changelog/session log
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả và giới hạn
