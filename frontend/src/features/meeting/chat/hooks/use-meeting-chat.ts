@@ -21,12 +21,17 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
   const synchronizing = useRef(true);
   const openRef = useRef(open);
   const mounted = useRef(true);
-  const sending = useRef(new Set<string>());
+  const sending = useRef(new Map<string, symbol>());
   const olderBusy = useRef(false);
   openRef.current = open;
 
   useEffect(() => { if (open) setUnread(0); }, [open]);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  useEffect(() => {
+    messageRef.current = []; checkpoint.current = undefined; initialized.current = false;
+    synchronizing.current = true; sending.current.clear(); olderBusy.current = false;
+    setMessages([]); setOutbox([]); setUnread(0); setHasOlder(false); setLoadingOlder(false); setError(null);
+  }, [accessToken, sessionId, ownUserId]);
 
   const accept = useCallback((incoming: ChatMessage[], live = false) => {
     const known = new Set(messageRef.current.map(message => message.id));
@@ -35,6 +40,7 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
     const merged = mergeMessages(messageRef.current, incoming);
     messageRef.current = merged; setMessages(merged);
     const confirmed = new Set(incoming.filter(message => message.senderId === ownUserId).map(message => message.clientMessageId));
+    for (const id of confirmed) sending.current.delete(id);
     setOutbox(current => current.filter(message => !confirmed.has(message.clientMessageId)));
   }, [ownUserId]);
 
@@ -83,20 +89,26 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
     }
 
     socket.on('chat:message', (message: ChatMessage) => {
-      if (message.sessionId === sessionId) {
+      if (!disposed && socket.connected && message.sessionId === sessionId) {
         accept([message], true);
         if (!synchronizing.current && messageRef.current.length) checkpoint.current = messageCursor(messageRef.current[messageRef.current.length - 1]);
       }
     });
     socket.on('connect', () => { void synchronize(); });
     socket.on('disconnect', () => {
+      sending.current.clear();
       generation++; setStatus('offline'); setSyncing(false);
       setOutbox(current => current.map(message => ({ ...message, status: 'failed' })));
     });
     socket.on('connect_error', (cause: Error) => { setStatus('offline'); setError(cause.message || 'Không kết nối được chat.'); });
-    socket.on('chat:revoked', () => { setError('Quyền chat đã kết thúc. Kiểm tra phiên họp hoặc đăng nhập lại.'); });
+    socket.on('chat:revoked', () => {
+      messageRef.current = []; checkpoint.current = undefined; initialized.current = false;
+      setMessages([]); setUnread(0); setHasOlder(false);
+      setError('Quyền chat đã kết thúc. Kiểm tra phiên họp hoặc đăng nhập lại.');
+      socket.disconnect();
+    });
     setStatus('connecting'); socket.connect();
-    return () => { disposed = true; generation++; socket.removeAllListeners(); socket.disconnect(); socketRef.current = null; };
+    return () => { disposed = true; generation++; olderBusy.current = false; setLoadingOlder(false); socket.removeAllListeners(); socket.disconnect(); socketRef.current = null; };
   }, [accessToken, sessionId, participantIdentity, active, accept]);
 
   const send = useCallback(async (content: string, clientMessageId: string = crypto.randomUUID()): Promise<boolean> => {
@@ -105,19 +117,20 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
     if (sending.current.size > 0) return false;
     const text = content.trim();
     if (!text || Array.from(text).length > 2000) { setError('Tin nhắn cần có nội dung và tối đa 2.000 ký tự.'); return false; }
-    sending.current.add(clientMessageId); setError(null);
+    const attempt = Symbol(clientMessageId);
+    sending.current.set(clientMessageId, attempt); setError(null);
     setOutbox(current => [...current.filter(message => message.clientMessageId !== clientMessageId), { content: text, clientMessageId, status: 'sending' }]);
     try {
       const message = await chatRequest<ChatMessage>(socket, 'chat:send', { content: text, clientMessageId });
-      if (mounted.current && socketRef.current === socket) accept([message]);
+      if (mounted.current && socketRef.current === socket && socket.connected) accept([message]);
     } catch (cause) {
-      if (mounted.current && socketRef.current === socket) {
+      if (mounted.current && socketRef.current === socket && sending.current.get(clientMessageId) === attempt && !messageRef.current.some(message => message.senderId === ownUserId && message.clientMessageId === clientMessageId)) {
         setOutbox(current => current.map(message => message.clientMessageId === clientMessageId ? { ...message, status: 'failed' } : message));
         setError(cause instanceof Error ? cause.message : 'Chưa xác nhận được tin nhắn. Hãy thử lại.');
       }
-    } finally { sending.current.delete(clientMessageId); }
-    return true; // Content is kept in the outbox even if its acknowledgement times out.
-  }, [accept]);
+    } finally { if (sending.current.get(clientMessageId) === attempt) sending.current.delete(clientMessageId); }
+    return mounted.current && socketRef.current === socket; // Keep content in the outbox on acknowledgement timeout; don't clear a different room's draft.
+  }, [accept, ownUserId]);
 
   const loadOlder = useCallback(async () => {
     const socket = socketRef.current;
@@ -125,9 +138,9 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
     olderBusy.current = true; setLoadingOlder(true);
     try {
       const page = await chatRequest<HistoryPage>(socket, 'chat:history', { before: messageCursor(messageRef.current[0]) });
-      if (mounted.current && socketRef.current === socket) { accept(page.messages); setHasOlder(page.hasMore); }
-    } catch (cause) { if (mounted.current) setError(cause instanceof Error ? cause.message : 'Không tải được tin cũ.'); }
-    finally { olderBusy.current = false; if (mounted.current) setLoadingOlder(false); }
+      if (mounted.current && socketRef.current === socket && socket.connected) { accept(page.messages); setHasOlder(page.hasMore); }
+    } catch (cause) { if (mounted.current && socketRef.current === socket) setError(cause instanceof Error ? cause.message : 'Không tải được tin cũ.'); }
+    finally { if (mounted.current && socketRef.current === socket) { olderBusy.current = false; setLoadingOlder(false); } }
   }, [accept]);
 
   const reconnect = () => {

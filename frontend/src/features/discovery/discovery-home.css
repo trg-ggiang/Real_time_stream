@@ -290,6 +290,27 @@
   background: var(--dc-home-container);
 }
 
+.dc-home .guest-hero-carousel {
+  --guest-bg: var(--dc-home-surface);
+  --guest-muted: var(--dc-muted);
+  --guest-accent: var(--dc-blue);
+  align-self: center;
+  width: 100%;
+  overflow: clip;
+}
+
+.dc-home .guest-hero-slides {
+  height: clamp(300px, 29vw, 430px);
+}
+
+.dc-home .guest-hero-slide {
+  height: calc(100% - 25px);
+}
+
+.dc-home .guest-hero-slide-tabs button:hover {
+  background: var(--dc-home-primary-container);
+}
+
 .dc-home .dc-hero-image-frame > :is(img, .dc-image-fallback) {
   position: absolute;
   inset: 0;

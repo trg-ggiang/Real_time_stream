@@ -407,6 +407,38 @@ it('switches and restores the workspace theme while the information panel is col
   expect(restored.closest('.cw-app')?.getAttribute('data-theme')).toBe('light');
 });
 
+it.each(['/workspace/alpha/meetings', '/workspace/alpha/recurring-meetings'])('opens a pasted invite on %s using the existing meeting view', async path => {
+  const { fetcher } = fixture();
+  history.replaceState(null, '', path);
+  const onMeeting = vi.fn();
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
+  fireEvent.change(input, { target: { value: ' https://other.example/?view=meeting&meeting=abcd123456&session=invited-session ' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
+  expect(onMeeting).toHaveBeenCalledOnce();
+  expect(location.origin).not.toContain('other.example');
+  expect(new URLSearchParams(location.search).get('meeting')).toBe('ABCD123456');
+  expect(new URLSearchParams(location.search).get('session')).toBe('invited-session');
+  expect(fetcher.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+});
+
+it('rejects invalid meeting links and clears a previous session when opening a code', async () => {
+  fixture();
+  history.replaceState(null, '', '/workspace/alpha/meetings?session=old-session');
+  const onMeeting = vi.fn();
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
+  fireEvent.change(input, { target: { value: 'https://example.com/no-meeting' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
+  expect(screen.getByRole('alert').textContent).toContain('10 chữ/số');
+  expect(onMeeting).not.toHaveBeenCalled();
+  fireEvent.change(input, { target: { value: 'abcd123456' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
+  expect(onMeeting).toHaveBeenCalledOnce();
+  expect(new URLSearchParams(location.search).get('meeting')).toBe('ABCD123456');
+  expect(new URLSearchParams(location.search).has('session')).toBe(false);
+});
+
 it('copies the exact workspace session and keeps direct room navigation', async () => {
   fixture([{
     meeting_id: 'meeting', meeting_code: 'ABCDEFGHIJ', title: 'Họp CLB',

@@ -3,7 +3,7 @@ import { useClub } from '../workspace-context';
 import { usePersonalQuery } from '../../personal/use-personal-query';
 import { PersonalState } from '../../personal/components/PersonalState';
 import { CreateMeetingForm, type CreateValues } from '../../meeting/components/MeetingForms';
-import { copyMeetingInvite, meetingRequest } from '../../meeting/services/meetings-api';
+import { copyMeetingInvite, meetingRequest, parseMeetingInvite } from '../../meeting/services/meetings-api';
 import { type ClubMeeting, type WorkspaceList } from '../services/workspace-api';
 
 export function openClubMeeting(code: string, session: string | undefined, onMeeting?: () => void) {
@@ -13,6 +13,29 @@ export function openClubMeeting(code: string, session: string | undefined, onMee
   if (session) url.searchParams.set('session', session); else url.searchParams.delete('session');
   window.history.replaceState(null, '', url);
   onMeeting();
+}
+
+function JoinMeetingByInvite({ onMeeting }: { onMeeting?: () => void }) {
+  const [error, setError] = useState('');
+  return <section className="cw-panel" aria-labelledby="join-meeting-title">
+    <h2 id="join-meeting-title">Tham gia bằng link mời</h2>
+    <form className="workspace-form" onSubmit={event => {
+      event.preventDefault();
+      if (!onMeeting) return;
+      try {
+        const value = String(new FormData(event.currentTarget).get('invite') || '');
+        const { code, sessionId } = parseMeetingInvite(value);
+        setError('');
+        openClubMeeting(code, sessionId || undefined, onMeeting);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : 'Kiểm tra lại mã hoặc đường dẫn mời.');
+      }
+    }}>
+      <label>Mã hoặc đường dẫn mời<input name="invite" type="text" required maxLength={2048} placeholder="Dán link mời hoặc nhập mã cuộc họp" autoComplete="off" onChange={() => setError('')} aria-invalid={!!error} aria-describedby={error ? 'join-meeting-error' : undefined} /></label>
+      {error && <p id="join-meeting-error" role="alert" className="cw-error">{error}</p>}
+      <div><button type="submit" disabled={!onMeeting}>Mở cuộc họp</button></div>
+    </form>
+  </section>;
 }
 
 export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }) {
@@ -59,6 +82,7 @@ export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }
   }
   return <div className="cw-meetings">
     <div className="cw-heading"><div><h1>{recurring ? 'Họp theo lịch' : 'Phòng họp CLB'}</h1><p>Tạo và tham gia cuộc họp của {club.name}. Quyền host và duyệt người vào phòng vẫn áp dụng trong từng cuộc họp.</p></div></div>
+    <JoinMeetingByInvite onMeeting={onMeeting} />
     <section className="cw-panel">
       <CreateMeetingForm busy={busy || !!pending.current} initialKind={recurring ? 'scheduled' : 'quick'} onCreate={create} />
       {notice && <p role="status">{notice}</p>}

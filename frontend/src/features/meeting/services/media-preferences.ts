@@ -1,4 +1,11 @@
 const key = 'rts.meeting-devices.v1';
+const speakerKey = 'rts.meeting-speaker.v1';
+export function readSpeakerPreference(): boolean {
+  try { return sessionStorage.getItem(speakerKey) !== 'off'; } catch { return true; }
+}
+export function saveSpeakerPreference(enabled: boolean) {
+  try { sessionStorage.setItem(speakerKey, enabled ? 'on' : 'off'); } catch { /* Optional preference. */ }
+}
 export function readMediaPreferences(): { audio: boolean; video: boolean } {
   try {
     const value = JSON.parse(sessionStorage.getItem(key) || 'null');

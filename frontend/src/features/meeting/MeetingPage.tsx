@@ -10,7 +10,9 @@ import './meeting.css';
 import './workspace.css';
 import { UnauthorizedError } from './services/token-api';
 import { useMeetingTheme } from './hooks/use-meeting-theme';
-import { AccountSettings } from './components/AccountSettings';
+import { MeetingThemeToggle } from './components/MeetingThemeToggle';
+import { PreJoinAudio, type AudioSelection } from './components/PreJoinAudio';
+import { saveMediaPreference, saveSpeakerPreference } from './services/media-preferences';
 import './meeting-theme.css';
 import './join-lobby.css';
 
@@ -22,6 +24,8 @@ const statusLabels = { scheduled: 'Đã lên lịch', ongoing: 'Đang diễn ra'
 export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { accessToken: string; displayName: string; onLogout: () => void; onBack?: () => void }) {
   const flow = useSessionFlow(accessToken, onLogout);
   const { theme, setTheme } = useMeetingTheme();
+  const [pendingJoin, setPendingJoin] = useState<{ code: string; meetingId: string; sessionId: string } | null>(null);
+  const [audioSelection, setAudioSelection] = useState<AudioSelection | undefined>(undefined);
   const [code, setCode] = useState(codeFromUrl), [selectedId, setSelectedId] = useState(sessionFromUrl);
   const [overview, setOverview] = useState<MeetingOverview | null>(null);
   const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState('');
@@ -121,14 +125,23 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     <a className="meeting-skip" href="#meeting-main">Đến nội dung chính</a>
     <header className="meeting-topbar"><div className="meeting-brand"><UniCircleLogo /></div>
       {onBack && <button className="meeting-home-link" type="button" onClick={() => { void flow.leave(); onBack(); }}><ArrowLeft size={17} aria-hidden="true" />Trang chủ</button>}
-      <div className="meeting-account"><span className="meeting-account-name" title={name}>{name}</span><span className="meeting-avatar-small" aria-hidden="true">{initials}</span><AccountSettings theme={theme} onThemeChange={setTheme} onLogout={async () => { await flow.leave(); onLogout(); }} /></div>
+      <div className="meeting-account"><span className="meeting-account-name" title={name}>{name}</span><span className="meeting-avatar-small" aria-hidden="true">{initials}</span><MeetingThemeToggle theme={theme} onChange={setTheme} /></div>
     </header>
+    {pendingJoin && <PreJoinAudio title={overview?.meeting.title || 'Cuộc họp'} onCancel={() => setPendingJoin(null)} onConfirm={selection => {
+      saveMediaPreference('audioinput', selection.microphone);
+      if (selection.camera !== undefined) saveMediaPreference('videoinput', selection.camera);
+      saveSpeakerPreference(selection.speaker);
+      setAudioSelection(selection);
+      setSelectedId(pendingJoin.sessionId);
+      const url = new URL(window.location.href); url.searchParams.set('session', pendingJoin.sessionId); history.replaceState(null, '', url);
+      void flow.join(pendingJoin.code, pendingJoin.meetingId, pendingJoin.sessionId);
+      setPendingJoin(null);
+    }} />}
     <main id="meeting-main" className="meeting-main" tabIndex={-1}>
       {pageError && (code || !error) ? <p role="alert" className="notice error workspace-error">{pageError}</p> : null}
       <p role="status" className="workspace-feedback">{notice}</p>
       {flow.active && overview ? <>
-        <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><button type="button" className="workspace-icon meeting-share-button" onClick={() => void copyLink(flow.active?.sessionId)} title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button></div>
-        <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} accessToken={accessToken} onLeave={() => void flow.leave()} onEnded={flow.ended}
+        <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom audioSelection={audioSelection} onShare={() => void copyLink(flow.active?.sessionId)} credentials={flow.active} accessToken={accessToken} onLeave={() => void flow.leave()} onEnded={flow.ended}
           management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} /></Suspense>
       </> : code ? <>
         {loading ? <p role="status" className="meeting-loading">Đang tải cuộc họp…</p> : overview ? <>
@@ -139,7 +152,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
             <h2 id="waiting-title">{waiting.status === 'pending' ? 'Đang chờ duyệt' : waiting.status === 'denied' ? 'Yêu cầu đã bị từ chối' : waiting.status === 'session_ended' ? 'Buổi họp đã kết thúc' : 'Yêu cầu không còn hiệu lực'}</h2>
             {waiting.remainingAttempts !== undefined ? <p>Còn {waiting.remainingAttempts} lượt gửi yêu cầu trong khoảng giới hạn.</p> : null}
             {cooldown ? <p role="status">Có thể thử lại lúc {formatMeetingDate(waiting.retryAt)}.</p> : null}
-            {waiting.status === 'denied' || waiting.status === 'not_requested' ? <button type="button" disabled={!!cooldown || flow.busy} onClick={() => void flow.join(waiting.code, waiting.meetingId, waiting.sessionId)}>Gửi lại yêu cầu</button> : null}
+            {waiting.status === 'denied' || waiting.status === 'not_requested' ? <button type="button" disabled={!!cooldown || flow.busy} onClick={() => setPendingJoin({ code: waiting.code, meetingId: waiting.meetingId, sessionId: waiting.sessionId })}>Gửi lại yêu cầu</button> : null}
             <button type="button" className="workspace-text-button" onClick={() => void flow.leave()}>Quay lại danh sách</button>
           </section> : null}
           <div className="workspace-detail-grid"><section className="workspace-sessions" aria-labelledby="sessions-title"><div className="workspace-section-title"><h2 id="sessions-title">Các buổi họp</h2><button type="button" disabled={busy} onClick={() => void refresh()}>Tải lại</button></div>
@@ -150,7 +163,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
               const future = session.status === 'scheduled' && !!session.scheduled_start_at && Date.parse(session.scheduled_start_at) > now;
               return <article className="workspace-session" data-selected={selected?.session_id === session.session_id} key={session.session_id}>
                 <div><span className={`workspace-session-status workspace-session-status--${session.status}`}>{statusLabels[session.status]}</span><h3>Buổi {sessionPage * 10 + index + 1}</h3><time dateTime={session.scheduled_start_at || undefined}>{formatMeetingDate(session.scheduled_start_at || session.started_at)}</time>{session.scheduled_end_at ? <p>Kết thúc: {formatMeetingDate(session.scheduled_end_at)}</p> : null}</div>
-                <div className="workspace-session-actions"><button type="button" disabled={flow.busy || !!waiting || future || session.status === 'ended'} onClick={() => { setSelectedId(session.session_id); const url = new URL(window.location.href); url.searchParams.set('session', session.session_id); history.replaceState(null, '', url); void flow.join(code, overview.meeting.meetingId, session.session_id); }}>{flow.busy && selectedId === session.session_id ? 'Đang tham gia…' : future ? 'Chưa đến giờ' : session.status === 'ended' ? 'Đã kết thúc' : 'Tham gia'}</button>
+                <div className="workspace-session-actions"><button type="button" disabled={flow.busy || !!waiting || future || session.status === 'ended'} onClick={() => setPendingJoin({ code, meetingId: overview.meeting.meetingId, sessionId: session.session_id })}>{flow.busy && selectedId === session.session_id ? 'Đang tham gia…' : future ? 'Chưa đến giờ' : session.status === 'ended' ? 'Đã kết thúc' : 'Tham gia'}</button>
                 {session.status !== 'ended' ? <button type="button" className="workspace-text-button" onClick={() => void copyLink(session.session_id)}>Sao chép link buổi</button> : null}
                 {canManageSessions(overview.membership) && selected?.session_id !== session.session_id ? <button type="button" className="workspace-text-button" onClick={() => setSelectedId(session.session_id)}>Chọn quản lý</button> : null}</div>
               </article>;

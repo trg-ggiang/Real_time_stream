@@ -13,8 +13,11 @@ export function MeetingChat({ credentials, accessToken, children, open, onUnread
   const listRef = useRef<HTMLDivElement>(null);
   const nearBottom = useRef(true);
   const firstPosition = useRef(true);
-  const previousCount = useRef(0);
+  const previousLastId = useRef<string | undefined>(undefined);
   const chat = useMeetingChat(accessToken, credentials.sessionId, credentials.participantIdentity, connected, open);
+  useEffect(() => {
+    setDraft(''); setNewBelow(false); nearBottom.current = true; firstPosition.current = true; previousLastId.current = undefined;
+  }, [accessToken, credentials.sessionId, chat.ownUserId]);
   useEffect(() => { onUnreadChange(chat.unread); }, [chat.unread, onUnreadChange]);
 
   function scrollToBottom() {
@@ -26,8 +29,8 @@ export function MeetingChat({ credentials, accessToken, children, open, onUnread
   useEffect(() => {
     if (!open) { firstPosition.current = true; return; }
     if (nearBottom.current || firstPosition.current) { scrollToBottom(); firstPosition.current = false; }
-    else if (chat.messages.length > previousCount.current) setNewBelow(true);
-    previousCount.current = chat.messages.length;
+    else if (chat.messages.at(-1)?.id !== previousLastId.current) setNewBelow(true);
+    previousLastId.current = chat.messages.at(-1)?.id;
   }, [open, chat.messages, chat.outbox]);
 
   async function submit(event: FormEvent) {
@@ -57,6 +60,7 @@ export function MeetingChat({ credentials, accessToken, children, open, onUnread
       {open && <section id="meeting-chat-panel" className="meeting-chat-panel" aria-label="Chat trong phiên họp">
         <div className="chat-panel-heading"><strong>Chat trong phiên họp</strong><span className="chat-connection-status" role="status">{chat.status === 'connected' ? chat.syncing ? 'Đang đồng bộ tin nhắn…' : 'Chat đã kết nối' : chat.status === 'connecting' ? 'Đang kết nối chat…' : 'Chat chưa kết nối'}</span></div>
         {chat.error && <p className="notice error" role="alert">{chat.error}</p>}
+        {(chat.status === 'offline' || (chat.error && !chat.syncing)) && <button type="button" className="secondary chat-reconnect" disabled={!connected || chat.status === 'connecting'} onClick={chat.reconnect}>Kết nối lại chat</button>}
         <div ref={listRef} className="chat-message-list" onScroll={() => {
           const list = listRef.current;
           if (list) nearBottom.current = list.scrollHeight - list.scrollTop - list.clientHeight < 64;

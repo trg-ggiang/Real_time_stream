@@ -12,7 +12,10 @@ export function createChatSocket(accessToken: string, sessionId: string, partici
 
 export async function chatRequest<T>(socket: Socket, event: string, payload: unknown): Promise<T> {
   if (!socket.connected) throw new Error('Chat chưa kết nối. Vui lòng thử lại khi có mạng.');
-  const result = await socket.timeout(10_000).emitWithAck(event, payload) as ChatResult<T>;
+  let response: unknown;
+  try { response = await socket.timeout(10_000).emitWithAck(event, payload); }
+  catch { throw new Error('Chat phản hồi chậm hoặc mất kết nối. Tin đang gửi được giữ lại; hãy thử kết nối lại.'); }
+  const result = response as ChatResult<T>;
   if (!result || typeof result.ok !== 'boolean') throw new Error('Phản hồi chat không hợp lệ.');
   if (!result.ok) throw new Error(result.message);
   return result.data;

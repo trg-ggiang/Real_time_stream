@@ -16,11 +16,26 @@ it('opens an existing room directly without the removed overview and joins with 
   vi.stubGlobal('fetch',fetch);
   history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
   render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
+  expect(screen.queryByRole('button', { name: /Đăng xuất|Cài đặt tài khoản/ })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Giao diện tối' }));
+  expect(screen.getByRole('button', { name: 'Giao diện tối' }).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'Giao diện sáng' }));
+  expect(screen.getByRole('button', { name: 'Giao diện sáng' }).getAttribute('aria-pressed')).toBe('true');
   const join = await screen.findByRole('button',{name:/^Tham gia$/});
   await act(async()=>fireEvent.click(join));
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/join'))).toBe(false);
+  fireEvent.click(screen.getByRole('button', { name: 'Hủy' }));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/join'))).toBe(false);
+  fireEvent.click(join);
+  fireEvent.click(screen.getByRole('button', { name: 'Micro trước khi vào phòng' }));
+  expect(screen.queryByRole('button', { name: 'Loa trước khi vào phòng' })).toBeNull();
+  await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' })));
   const room=await screen.findByTestId('joined-room');
   expect(room.getAttribute('data-session')).toBe('s');
   expect(room.getAttribute('data-auth')).toBe('app-jwt');
+  expect(JSON.parse(sessionStorage.getItem('rts.meeting-devices.v1') || '{}').audio).toBe(false);
+  expect(sessionStorage.getItem('rts.meeting-speaker.v1')).toBe('on');
   expect(fetch.mock.calls.some(([url])=>url.includes('/meeting-sessions')||url.includes('/livekit/token'))).toBe(false);
 });
 
