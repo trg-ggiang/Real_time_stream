@@ -7,11 +7,18 @@ import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
 import { SquaresFour } from "@phosphor-icons/react/dist/csr/SquaresFour";
 import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
 import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
+import { Users } from '@phosphor-icons/react/dist/csr/Users';
+import { Newspaper } from '@phosphor-icons/react/dist/csr/Newspaper';
+import { Sun } from '@phosphor-icons/react/dist/csr/Sun';
+import { Moon } from '@phosphor-icons/react/dist/csr/Moon';
+import { ArrowSquareOut } from '@phosphor-icons/react/dist/csr/ArrowSquareOut';
 
 const navigation = [
   { to: "/admin", label: "Tổng quan", Icon: SquaresFour },
   { to: "/admin/club-requests", label: "Đề nghị thành lập CLB", Icon: ClipboardText },
   { to: "/admin/clubs", label: "Danh sách CLB", Icon: UsersThree },
+  { to: '/admin/users', label: 'Tài khoản', Icon: Users },
+  { to: '/admin/content', label: 'Nội dung cộng đồng', Icon: Newspaper },
 ] as const;
 
 export function AdminLayout({
@@ -22,6 +29,10 @@ export function AdminLayout({
   onLogout?: () => void;
 }) {
   const location = useLocation();
+  const [theme, setTheme] = useState(() => {
+    try { const saved = localStorage.getItem('unicircle.admin-theme'); return saved === 'dark' || saved === 'light' ? saved : (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch { return 'light'; }
+  });
+  useEffect(() => { try { localStorage.setItem('unicircle.admin-theme', theme); } catch { /* Optional preference. */ } }, [theme]);
   const [open, setOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const main = useRef<HTMLElement>(null);
@@ -83,7 +94,7 @@ export function AdminLayout({
   }
 
   return (
-    <div className="ad-app ad-shell">
+    <div className="ad-app ad-shell" data-theme={theme}>
       <a className="ad-skip" href="#admin-content">
         Đến nội dung
       </a>
@@ -102,6 +113,7 @@ export function AdminLayout({
             </NavLink>
           ))}
         </nav>
+        <div className="ad-sidebar-bottom"><Link to="/"><ArrowSquareOut size={18} aria-hidden="true" /> Xem website</Link><span>Quản trị hệ thống</span></div>
       </aside>
       <div className="ad-workspace">
         <header className="ad-topbar">
@@ -113,6 +125,7 @@ export function AdminLayout({
               <Link to="/admin">Quản trị</Link><span aria-hidden="true">/</span>
               <Link to={section.to} aria-current={location.pathname === section.to ? "page" : undefined}>{section.label}</Link>
             </nav>
+            <button type="button" className="ad-theme-toggle" aria-label={theme === 'light' ? 'Chuyển giao diện tối' : 'Chuyển giao diện sáng'} onClick={() => setTheme(value => value === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}</button>
             <div className="ad-account" ref={account} onBlur={(event) => {
               if (!event.currentTarget.contains(event.relatedTarget)) setAccountOpen(false);
             }}>

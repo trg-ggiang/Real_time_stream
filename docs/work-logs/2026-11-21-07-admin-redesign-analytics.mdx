@@ -1,0 +1,55 @@
+---
+title: Thiết kế lại admin và bổ sung biểu đồ, tài khoản, nội dung
+description: Tổng quan dùng dữ liệu thực, các màn hình tra cứu toàn hệ thống và giao diện sáng/tối.
+---
+
+## Yêu cầu và phạm vi
+
+Thiết kế lại admin, bổ sung chức năng thực tế. Điều chỉnh tiếp của người dùng: bỏ ba thẻ số liệu đầu tổng quan, thay bằng biểu đồ. Giữ database ở chế độ chỉ đọc khi kiểm tra; không sửa schema, dữ liệu hoặc quyền tài khoản, không tự khởi động lại server.
+
+## Rà soát và hướng thiết kế
+
+- Trước thay đổi: ba trang tổng quan, đề nghị thành lập CLB, danh sách CLB; API chỉ có summary/list/detail/decision cho CLB. CSS cũ có nhiều lớp ghi đè và tổng quan có ba thẻ số liệu.
+- Áp dụng frontend-design và phần nguyên tắc phù hợp của design-taste-frontend. Admin/data table ngoài phạm vi landing của design-taste, nên không dùng hero, ảnh trang trí hay hiệu ứng marketing.
+- Giữ logo, Be Vietnam Pro và xanh/navy của uniCircle. Bảng dữ liệu và hàng chờ xử lý là trọng tâm; nền #f3f6fa, bề mặt #ffffff, chữ #14284a, màu chính #245dc1, viền #d6e0ed. Dials: variance 4, motion 2, density 6.
+- Thay CSS admin cũ bằng bộ token và selector riêng; menu mobile, focus bàn phím, sáng/tối lưu lựa chọn. Giữ các route và nhãn điều hướng cũ, bổ sung hai route mới.
+
+## Đã hoàn thành
+
+| Khu vực | Chức năng |
+| --- | --- |
+| Tổng quan | Bỏ ba stat cards; biểu đồ tài khoản mới trong 7 ngày, donut trạng thái CLB, thanh so sánh số bài viết/hoạt động; tải lại số liệu; danh sách hồ sơ đang chờ |
+| CLB / đề nghị | Giữ lọc, tìm kiếm, phân trang, xem hồ sơ và quyết định duyệt/từ chối có xác nhận; thêm CSV của trang hiện tại; ngày dạng dd/mm/yyyy |
+| Tài khoản | Tìm theo tên/email, lọc admin/người dùng, phân trang, xuất trang CSV; popup xem hồ sơ sinh viên và vai trò tại CLB |
+| Nội dung | Tab bài viết/hoạt động; tìm theo tiêu đề, lọc trạng thái, phân trang; đọc cả nội dung chưa công khai và phản hồi xét duyệt; link công khai khi phù hợp |
+| Giao diện | Sidebar, topbar, sáng/tối; popup đóng bằng bàn phím; bảng cuộn trong vùng riêng trên mobile; skeleton khi tải biểu đồ |
+
+Tài khoản và nội dung mới là các chức năng **tra cứu**, không có nút đổi quyền/khóa tài khoản hay duyệt nội dung thay chủ nhiệm. Luồng quyết định CLB hiện có được giữ nguyên. Không thêm thao tác giả hoặc cập nhật DB ngoài phạm vi này.
+
+## API và an toàn dữ liệu
+
+- Mở rộng `GET /api/admin/summary`: tổng số users/clubs/posts/activities, năm trạng thái CLB, registrations theo bảy ngày. Biên ngày theo UTC+7, dùng count exact, không đếm từ một trang dữ liệu hay số ngẫu nhiên.
+- Thêm `GET /api/admin/users`, `/users/:id`, `/content`, `/content/:kind/:id`.
+- Giữ JwtAuthGuard, CompleteProfileGuard và kiểm tra role admin trong service trước truy vấn. Kind/status/role/page/limit được validate; tên bảng content chỉ chọn từ whitelist.
+- Các API tài khoản select danh sách cột cụ thể, không lấy hoặc trả password hash. Search loại bỏ ký tự điều khiển filter PostgREST. Nội dung chỉ được xem bởi admin; không mở rộng API public.
+- CSV chỉ xuất trang đang xem, có BOM UTF-8, escape dấu ngoặc kép và vô hiệu hóa giá trị có thể trở thành công thức bảng tính.
+- Sửa tiêu đề trình duyệt cho route admin trong DiscoveryApp để không bị ghi đè thành Khám phá.
+
+## Kiểm tra
+
+- Toàn bộ: **85 backend tests, 155 frontend tests** đạt; root build/typecheck đạt. Sau các chỉnh sửa giao diện cuối, sáu tests admin và frontend build tiếp tục đạt.
+- Backend mới: kiểm tra từ chối user thường trước truy vấn, whitelist cột, lọc và phân trang, dữ liệu hồ sơ, whitelist nguồn nội dung, biên ngày Việt Nam, DTO không hợp lệ.
+- Frontend mới: biểu đồ thay stat cards, dữ liệu chart có nhãn truy cập, theme switching, tìm/lọc tài khoản, popup hồ sơ, đọc bản nháp và đổi tab nội dung.
+- Kiểm tra read-only trên DB thật: các cột và toàn bộ bộ lọc trạng thái hợp lệ. Login admin và gọi API hiện hành: summary trả 7 ngày, users 30 bản ghi tổng, posts 10, activities 10 tại thời điểm kiểm tra. Không lưu mật khẩu/token vào log.
+- Browser: mở admin bằng tài khoản thật, chặn mọi API write trừ login; mở hồ sơ tài khoản và chi tiết bài viết, đổi tab hoạt động, sáng/tối, menu mobile. Không tràn ngang tổng quan và tài khoản ở 390px sau bản sửa containing block của nội dung screen-reader trong bảng.
+- Đã xem screenshot thật: `output/playwright/admin-overview-light.png`, `admin-overview-dark.png`, `admin-overview-mobile.png`, `admin-users.png`, `admin-users-mobile.png`, `admin-activities.png`.
+- Build vẫn có cảnh báo chunk trên 500KB hiện hữu. Chưa đo Lighthouse; không báo cáo chỉ số hiệu năng chưa đo. Không thử mutation duyệt/từ chối trên DB thật.
+- Không commit/push. Phiên đăng nhập trong browser kiểm tra đã được xóa; browser do agent mở được đóng sau kiểm tra.
+
+## Điều chỉnh sau phản hồi
+
+- Dark mode đổi từ nền xanh navy phủ toàn trang sang xám than #17191e, sidebar/topbar #1c1f25, panel #22252c. Chữ, nút, input, badge và biểu đồ có palette tối riêng; giảm độ phủ xanh. Đã xem screenshot thực tế sau đổi màu, kiểm tra lại responsive và typecheck.
+- Sửa thiếu ánh xạ `pending_review` trong nội dung admin: hiển thị “Chờ duyệt”, badge vàng trong cả hai theme; bộ lọc và DTO dùng đúng `pending_review`. CLB vẫn dùng `pending` theo workflow riêng. Không đổi dữ liệu hoặc trạng thái trong DB.
+- Trạng thái nội dung: Bản nháp, Chờ duyệt, Đã đăng, Đã từ chối, Cần chỉnh sửa, Đã lưu trữ. Giá trị lạ hiển thị “Chưa xác định” thay vì in mã kỹ thuật.
+- Sau sửa trạng thái: bảy frontend tests admin, sáu backend tests directory, backend build và frontend typecheck đạt.
+- Theo yêu cầu giới hạn danh sách: CLB/đề nghị, tài khoản, bài viết và hoạt động dùng tối đa 8 mục mỗi trang; DTO admin mặc định và giới hạn tối đa 8. Trang tổng quan vẫn xem trước 5 hồ sơ. Phân trang giữ nguyên, không cắt bỏ dữ liệu. Sáu backend tests và bảy frontend tests admin, build backend và frontend typecheck đạt.

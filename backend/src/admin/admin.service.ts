@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { SupabaseService } from "../supabase/supabase.service";
 import { User } from "../users/entities/user.entity";
-import { AdminDecisionDto, AdminListQuery } from "./admin.dto";
+import { AdminDecisionDto, AdminListQuery, AdminDirectoryQuery } from "./admin.dto";
 const listFields =
   "club_id,name,summary,logo_url,cover_url,status,created_by,created_at,updated_at,reviewed_at,published_at";
 const detailFields =
@@ -62,7 +62,7 @@ export class AdminService {
   }
   async summary(user: User) {
     this.require(user);
-    const statuses = ["pending", "published", "rejected"] as const;
+    const statuses = ["pending", "published", "rejected", "suspended", "archived"] as const;
     const rows = await Promise.all(
       statuses.map((status) =>
         this.db
@@ -72,7 +72,81 @@ export class AdminService {
       ),
     );
     rows.forEach((r) => this.check(r.error));
-    return Object.fromEntries(statuses.map((s, i) => [s, rows[i].count ?? 0]));
+    const totals = await Promise.all(['users', 'clubs', 'club_posts', 'club_activities'].map(table =>
+      this.db.from(table).select('*', { count: 'exact', head: true })));
+    totals.forEach(r => this.check(r.error));
+    const today = new Date(Date.now() + 7 * 3600_000); today.setUTCHours(0, 0, 0, 0);
+    const days = Array.from({ length: 7 }, (_, index) => {
+      const start = new Date(today.getTime() - (6 - index) * 86400_000 - 7 * 3600_000);
+      return { date: new Date(start.getTime() + 7 * 3600_000).toISOString().slice(0, 10), start: start.toISOString(), end: new Date(start.getTime() + 86400_000).toISOString() };
+    });
+    const daily = await Promise.all(days.map(day => this.db.from('users').select('user_id', { count: 'exact', head: true }).gte('created_at', day.start).lt('created_at', day.end)));
+    daily.forEach(r => this.check(r.error));
+    return { ...Object.fromEntries(statuses.map((s, i) => [s, rows[i].count ?? 0])),
+      users: totals[0].count ?? 0, clubs: totals[1].count ?? 0,
+      posts: totals[2].count ?? 0, activities: totals[3].count ?? 0,
+      registrations: days.map((day, index) => ({ date: day.date, count: daily[index].count ?? 0 })) };
+  }
+
+  private search(value: string) {
+    // Remove PostgREST filter delimiters before composing an OR expression.
+    return value.replace(/[^\p{L}\p{N}\s@.\-]/gu, ' ').replace(/\s+/g, ' ').trim();
+  }
+  async users(user: User, input: AdminDirectoryQuery) {
+    this.require(user);
+    const query = this.db.from('users').select('user_id,email,display_name,avatar_url,role,created_at', { count: 'exact' });
+    if (input.role === 'admin') query.eq('role', 'admin');
+    if (input.role === 'user') query.or('role.is.null,role.eq.user');
+    const search = this.search(input.q);
+    if (search) query.or(`display_name.ilike.%${search}%,email.ilike.%${search}%`);
+    const r = await query.order('created_at', { ascending: false }).order('user_id').range((input.page - 1) * input.limit, input.page * input.limit - 1);
+    this.check(r.error);
+    return { items: r.data ?? [], total: r.count ?? 0, page: input.page, limit: input.limit, hasMore: input.page * input.limit < (r.count ?? 0) };
+  }
+  async userDetail(user: User, id: string) {
+    this.require(user);
+    const [account, profile, memberships] = await Promise.all([
+      this.db.from('users').select('user_id,email,display_name,avatar_url,role,created_at').eq('user_id', id).maybeSingle(),
+      this.db.from('student_profiles').select('full_name,student_code,school_or_faculty,major,cohort,phone').eq('user_id', id).maybeSingle(),
+      this.db.from('club_memberships').select('membership_id,club_id,role,status').eq('user_id', id).order('created_at').limit(100),
+    ]);
+    [account, profile, memberships].forEach(r => this.check(r.error));
+    if (!account.data) throw new NotFoundException('Không tìm thấy tài khoản.');
+    const ids = [...new Set((memberships.data ?? []).map(item => item.club_id))];
+    const clubs = ids.length ? await this.db.from('clubs').select('club_id,name').in('club_id', ids) : { data: [], error: null };
+    this.check(clubs.error);
+    return { account: account.data, profile: profile.data, memberships: (memberships.data ?? []).map(item => ({ ...item,
+      club_name: clubs.data?.find(club => club.club_id === item.club_id)?.name ?? 'CLB' })) };
+  }
+  private contentSource(kind: string) {
+    if (kind !== 'posts' && kind !== 'activities') throw new BadRequestException('Loại nội dung không hợp lệ.');
+    return kind === 'posts' ? { table: 'club_posts', id: 'post_id', body: 'content', extra: 'visibility' }
+      : { table: 'club_activities', id: 'activity_id', body: 'description', extra: 'starts_at,ends_at,location_name' };
+  }
+  async content(user: User, input: AdminDirectoryQuery) {
+    this.require(user);
+    const source = this.contentSource(input.kind);
+    const query = this.db.from(source.table).select(`${source.id},club_id,title,summary,cover_url,publication_status,updated_at,${source.extra}`, { count: 'exact' });
+    if (input.status !== 'all') query.eq('publication_status', input.status);
+    const search = this.search(input.q);
+    if (search) query.ilike('title', `%${search}%`);
+    const r = await query.order('updated_at', { ascending: false }).order(source.id).range((input.page - 1) * input.limit, input.page * input.limit - 1);
+    this.check(r.error);
+    const items = (r.data ?? []) as unknown as (Record<string, unknown> & { club_id: string })[];
+    const ids = [...new Set(items.map(item => item.club_id))];
+    const clubs = ids.length ? await this.db.from('clubs').select('club_id,name,status').in('club_id', ids) : { data: [], error: null };
+    this.check(clubs.error);
+    return { items: items.map(item => ({ ...item, id: item[source.id], club: clubs.data?.find(club => club.club_id === item.club_id) ?? null })),
+      total: r.count ?? 0, page: input.page, limit: input.limit, hasMore: input.page * input.limit < (r.count ?? 0) };
+  }
+  async contentDetail(user: User, kind: string, id: string) {
+    this.require(user);
+    const source = this.contentSource(kind);
+    const r = await this.db.from(source.table).select(`${source.id},club_id,title,summary,cover_url,publication_status,updated_at,review_note,${source.body},${source.extra}`).eq(source.id, id).maybeSingle();
+    this.check(r.error);
+    if (!r.data) throw new NotFoundException('Không tìm thấy nội dung.');
+    const item = r.data as unknown as Record<string, unknown>;
+    return { item: { ...item, id: item[source.id], body: item[source.body] } };
   }
   async detail(user: User, id: string) {
     this.require(user);
