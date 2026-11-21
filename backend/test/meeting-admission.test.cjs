@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 require('reflect-metadata');
+const { ServerError } = require('livekit-server-sdk');
 const { MeetingsService } = require('../dist/meetings/meetings.service');
 
 const sessionId = 'session-a';
@@ -24,6 +25,7 @@ function fixture(options={}) {
       if(table==='clubs')return {data:{club_id:'club'},error:null};
       if(table==='meeting_members' && call.mode==='insert')return {data:{...member(call.values.admission_status),...call.values},error:null};
       if(table==='attendances' && call.mode==='insert')return {data:{attendance_id:'actual-attendance'},error:null};
+      if(table==='attendances' && call.mode==='select')return {data:options.attendances??[],error:null};
       return {data:call.mode==='update'?{meeting_member_id:'guest-member'}:[],error:null};
     };
     query.single=async()=>execute();query.maybeSingle=async()=>execute();
@@ -146,7 +148,7 @@ test('parallel club sessions issue tokens scoped to distinct LiveKit rooms', asy
     assert.equal(claims.video.room, 'room-' + sessions[index]);
     assert.equal(joined.sessionId, sessions[index]);
   }
-  assert.deepEqual(calls.filter(call => call.table === 'attendances').map(call => call.values.session_id).sort(), sessions);
+  assert.deepEqual(calls.filter(call => call.table === 'attendances' && call.mode === 'insert').map(call => call.values.session_id).sort(), sessions);
 });
 
 test('club meeting outsiders cannot list sessions, join or read admission status', async () => {
@@ -158,4 +160,74 @@ test('club meeting outsiders cannot list sessions, join or read admission status
   await assert.rejects(service.join(user, 'CODE', sessionId), forbidden);
   await assert.rejects(service.joinStatus(user, 'meeting', sessionId), forbidden);
   assert.ok(calls.every(call => call.mode === 'select' && ['club_memberships', 'clubs'].includes(call.table)));
+});
+
+function deviceFixture() {
+  const attendances = ['old', 'current', 'newer'].map((id, index) => ({
+    attendance_id: id,
+    livekit_identity: `guest-user:${id}`,
+    joined_at: new Date(Date.UTC(2026, 10, 21, 8, index)).toISOString(),
+  }));
+  const { service, calls } = fixture({ member: member('admitted'), attendances });
+  const connected = new Set([attendances[0].livekit_identity, 'another-user:connection']);
+  const removals = [];
+  service.livekitRoomService = {
+    async listParticipants(roomName) {
+      assert.equal(roomName, 'room-' + sessionId);
+      return Array.from(connected, identity => ({ identity }));
+    },
+    async removeParticipant(roomName, identity) {
+      assert.equal(roomName, 'room-' + sessionId);
+      removals.push(identity);
+      if (!connected.delete(identity)) throw new ServerError('Not Found', 'Missing participant', 404, 'not_found');
+    },
+  };
+  return { service, calls, connected, removals };
+}
+
+test('another connected device prompts before issuing a token; add keeps both connections', async () => {
+  const { service, calls, removals } = deviceFixture();
+  assert.deepEqual(await service.join(user, 'CODE', sessionId), {
+    status: 'device_choice_required', meetingId: 'meeting', sessionId,
+  });
+  assert.ok(calls[0].filters.some(([op, key, value]) => op === 'eq' && key === 'meeting_member_id' && value === 'guest-member'));
+  assert.ok(calls[0].filters.some(([op, key, value]) => op === 'eq' && key === 'session_id' && value === sessionId));
+  assert.equal(calls.some(call => call.mode === 'insert'), false);
+
+  const joined = await service.join(user, 'CODE', sessionId, 'add');
+  assert.equal(joined.status, 'admitted');
+  assert.equal(joined.transferAfterConnect, undefined);
+  assert.notEqual(joined.participantIdentity, 'guest-user:old');
+  assert.deepEqual(removals, []);
+});
+
+test('stale open attendance and a room that no longer exists do not prompt', async () => {
+  const { service, connected } = deviceFixture();
+  connected.delete('guest-user:old');
+  assert.equal((await service.join(user, 'CODE', sessionId)).status, 'admitted');
+  service.livekitRoomService.listParticipants = async () => { throw new ServerError('Not Found', 'Missing room', 404, 'not_found'); };
+  assert.equal((await service.join(user, 'CODE', sessionId)).status, 'admitted');
+});
+
+test('transfer waits for the new owned connection and closes only older attendances in the session', async () => {
+  const { service, calls, connected, removals } = deviceFixture();
+  const joined = await service.join(user, 'CODE', sessionId, 'transfer');
+  assert.equal(joined.transferAfterConnect, true);
+  assert.equal(joined.role, 'participant');
+  assert.deepEqual(removals, []);
+
+  const conflict = error => error.getStatus() === 409;
+  await assert.rejects(service.transferDevice(user, 'meeting', sessionId, 'other-user'), conflict);
+  await assert.rejects(service.transferDevice(user, 'meeting', sessionId, 'current'), conflict);
+  assert.deepEqual(removals, []);
+
+  connected.add('guest-user:current');
+  connected.add('guest-user:newer');
+  assert.deepEqual(await service.transferDevice(user, 'meeting', sessionId, 'current'), { transferred: true });
+  assert.deepEqual(removals, ['guest-user:old']);
+  assert.deepEqual([...connected], ['another-user:connection', 'guest-user:current', 'guest-user:newer']);
+  const writes = calls.filter(call => call.mode === 'update');
+  assert.equal(writes.length, 1);
+  assert.equal(writes[0].values.leave_reason, 'device_transferred');
+  assert.ok(writes[0].filters.some(([op, key, value]) => op === 'eq' && key === 'attendance_id' && value === 'old'));
 });

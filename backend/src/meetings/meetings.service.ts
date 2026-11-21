@@ -13,6 +13,7 @@ import { randomUUID } from 'node:crypto';
 import { AccessToken, RoomServiceClient, ServerError, TrackSource } from 'livekit-server-sdk';
 import { SupabaseService } from '../supabase/supabase.service';
 import { User } from '../users/entities/user.entity';
+import type { DeviceJoinMode } from './dto/join-session.dto';
 
 type Meeting = {
   meeting_id: string;
@@ -230,6 +231,23 @@ export class MeetingsService {
       // Either the room or participant already being absent satisfies this cleanup.
       if (error instanceof ServerError && error.status === 404 && error.code === 'not_found') return;
       throw error;
+    }
+  }
+
+  private async openAttendances(memberId: string, sessionId: string) {
+    const { data, error } = await this.supabase.from('attendances')
+      .select('attendance_id,livekit_identity,joined_at')
+      .eq('meeting_member_id', memberId).eq('session_id', sessionId).is('left_at', null);
+    if (error) throw new ServiceUnavailableException('Could not load active attendances.');
+    return data ?? [];
+  }
+
+  private async connectedIdentities(roomName: string): Promise<Set<string>> {
+    try {
+      return new Set((await this.roomService.listParticipants(roomName)).map(participant => participant.identity));
+    } catch (cause) {
+      if (cause instanceof ServerError && cause.status === 404 && cause.code === 'not_found') return new Set();
+      throw new ServiceUnavailableException('Could not check connected devices.');
     }
   }
 
@@ -485,7 +503,7 @@ export class MeetingsService {
     return latest;
   }
 
-  async join(user: User, code: string, sessionId: string) {
+  async join(user: User, code: string, sessionId: string, deviceMode?: DeviceJoinMode) {
     const meeting = await this.getMeetingByCode(code);
     await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     let session = await this.getSession(meeting.meeting_id, sessionId);
@@ -496,12 +514,22 @@ export class MeetingsService {
       await this.checkAdmissionRetryLimit(meeting.meeting_id, user.userId);
       const admissionStatus = meeting.waiting_room_enabled ? 'pending' : 'admitted';
       member = await this.createGuestMember(meeting.meeting_id, user, admissionStatus);
-      if (admissionStatus === 'pending') return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id };
+      if (admissionStatus === 'pending') return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id } as const;
     } else if (member.admission_status === 'pending') {
-      return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id };
+      return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id } as const;
     }
 
     if (member.admission_status !== 'admitted') throw new ForbiddenException('Meeting admission was denied.');
+
+    if (!deviceMode) {
+      const attendances = await this.openAttendances(member.meeting_member_id, sessionId);
+      if (attendances.length) {
+        const identities = await this.connectedIdentities(session.livekit_room_name);
+        if (attendances.some(attendance => identities.has(attendance.livekit_identity))) {
+          return { status: 'device_choice_required', meetingId: meeting.meeting_id, sessionId: session.session_id } as const;
+        }
+      }
+    }
 
     const livekitIdentity = `${user.userId}:${randomUUID()}`;
     const serverUrl = this.config.get<string>('LIVEKIT_URL')?.trim();
@@ -534,7 +562,7 @@ export class MeetingsService {
     const attendanceId = data.attendance_id;
 
     return {
-      status: 'admitted',
+      status: 'admitted' as const,
       role: member.role,
       meetingId: meeting.meeting_id,
       sessionId: session.session_id,
@@ -543,7 +571,40 @@ export class MeetingsService {
       serverUrl,
       participantIdentity: livekitIdentity,
       token: accessToken,
+      ...(deviceMode === 'transfer' ? { transferAfterConnect: true } : {}),
     };
+  }
+
+  async transferDevice(user: User, meetingId: string, sessionId: string, attendanceId: string) {
+    const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
+    const member = await this.requireMember(meetingId, user.userId);
+    const session = await this.getSession(meetingId, sessionId);
+    if (session.status !== 'ongoing') throw new ConflictException('The session is not ongoing.');
+
+    const attendances = await this.openAttendances(member.meeting_member_id, sessionId);
+    const destination = attendances.find(attendance => attendance.attendance_id === attendanceId);
+    if (!destination) throw new ConflictException('The new device must be connected before transfer.');
+    const identities = await this.connectedIdentities(session.livekit_room_name);
+    if (!identities.has(destination.livekit_identity)) throw new ConflictException('The new device must be connected before transfer.');
+
+    // A delayed transfer must leave any connection that joined after its destination alone.
+    const joinedAt = Date.parse(destination.joined_at);
+    for (const source of attendances) {
+      if (Date.parse(source.joined_at) >= joinedAt) continue;
+      try {
+        // A prior attempt may have removed this identity before its attendance update failed.
+        await this.disconnectIfPresent(session.livekit_room_name, source.livekit_identity);
+      } catch {
+        throw new ServiceUnavailableException('Could not disconnect the previous device.');
+      }
+      const { error } = await this.supabase.from('attendances')
+        .update({ left_at: new Date().toISOString(), leave_reason: 'device_transferred' })
+        .eq('attendance_id', source.attendance_id).eq('meeting_member_id', member.meeting_member_id)
+        .eq('session_id', sessionId).is('left_at', null);
+      if (error) throw new ServiceUnavailableException('Could not record device transfer.');
+    }
+    return { transferred: true };
   }
 
   async decideScreenShare(user: User, meetingId: string, sessionId: string, identity: string, approved: boolean) {

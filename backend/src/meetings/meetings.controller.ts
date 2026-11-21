@@ -53,7 +53,18 @@ export class MeetingsController {
   @Post(':code/join')
   @UseGuards(CompleteProfileGuard)
   join(@CurrentUser() user: User, @Param('code') code: string, @Body() body: JoinSessionDto) {
-    return this.meetings.join(user, code, body.sessionId);
+    return this.meetings.join(user, code, body.sessionId, body.deviceMode);
+  }
+
+  @Post(':meetingId/sessions/:sessionId/device-transfer')
+  @UseGuards(CompleteProfileGuard)
+  transferDevice(
+    @CurrentUser() user: User,
+    @Param('meetingId', new ParseUUIDPipe()) meetingId: string,
+    @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
+    @Body() body: LeaveSessionDto,
+  ) {
+    return this.meetings.transferDevice(user, meetingId, sessionId, body.attendanceId);
   }
 
   @Get(':meetingId/sessions/:sessionId/join-status')

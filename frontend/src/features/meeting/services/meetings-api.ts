@@ -9,7 +9,11 @@ export type MeetingSession = {
   scheduled_start_at: string | null; scheduled_end_at: string | null; started_at?: string | null; ended_at?: string | null;
 };
 export type MeetingOverview = { meeting: MeetingInfo; membership?: Membership | null; sessions: MeetingSession[] };
-export type JoinedSession = JoinCredentials & { status: 'admitted'; meetingId: string; sessionId: string; attendanceId: string };
+export type DeviceJoinMode = 'add' | 'transfer';
+export type JoinedSession = JoinCredentials & {
+  status: 'admitted'; meetingId: string; sessionId: string; attendanceId: string; transferAfterConnect?: boolean;
+};
+type JoinResult = JoinedSession | { status: 'pending' | 'device_choice_required'; meetingId: string; sessionId: string };
 export type Admission = { status: 'pending' | 'admitted' | 'denied' | 'not_requested' | 'session_ended'; meetingMemberId?: string; remainingAttempts?: number; retryAt?: string | null };
 export type Member = {
   meeting_member_id: string; user_id: string; role: Role; invited_at: string | null;
@@ -106,12 +110,14 @@ export function formatMeetingDate(value: string | null | undefined): string {
   return value && Number.isFinite(Date.parse(value)) ? dateFormatter.format(new Date(value)) : 'Không giới hạn thời gian';
 }
 
-export async function joinMeeting(accessToken: string, code: string, sessionId: string, signal: AbortSignal) {
-  const result = await meetingRequest<JoinedSession | { status: 'pending'; meetingId: string; sessionId: string }>(accessToken,
-    `/${encodeURIComponent(code)}/join`, { method: 'POST', body: { sessionId }, signal });
+export async function joinMeeting(accessToken: string, code: string, sessionId: string, signal: AbortSignal, deviceMode?: DeviceJoinMode) {
+  const result = await meetingRequest<JoinResult>(accessToken,
+    `/${encodeURIComponent(code)}/join`, { method: 'POST', body: { sessionId, deviceMode }, signal });
   if (result.status === 'admitted' && (!result.token || !result.serverUrl?.startsWith('wss://') || !result.attendanceId || !result.participantIdentity || !result.roomName)) {
     throw new Error('Thông tin vào phòng không hợp lệ. Hãy tải lại cuộc họp.');
   }
-  if (result.status !== 'pending' && result.status !== 'admitted') throw new Error('Trạng thái tham gia không hợp lệ.');
+  if (result.status !== 'pending' && result.status !== 'admitted' && result.status !== 'device_choice_required') {
+    throw new Error('Trạng thái tham gia không hợp lệ.');
+  }
   return result;
 }

@@ -12,7 +12,7 @@ beforeEach(() => {
   vi.stubGlobal('isSecureContext', true);
   Object.defineProperty(navigator, 'mediaDevices', { value: {}, configurable: true });
 });
-afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 it('polls admission without submitting duplicate join requests, then joins once on approval', async () => {
   vi.useFakeTimers();
@@ -86,6 +86,7 @@ it('logs out on expired JWT and does not open malformed room credentials', async
 
 it('reload resumes the same session with fresh credentials after closing old attendance', async () => {
   vi.useFakeTimers();
+  vi.spyOn(window.performance, 'getEntriesByType').mockReturnValue([{ type: 'reload' } as PerformanceNavigationTiming]);
   const jwt = `header.${btoa(JSON.stringify({sub:'user'}))}.signature`;
   window.history.replaceState(null, '', '/?meeting=ABCDEFGHIJ&session=session');
   const fetch = vi.fn().mockResolvedValue(response(credentials));
@@ -103,6 +104,49 @@ it('reload resumes the same session with fresh credentials after closing old att
   expect(second.result.current.active?.sessionId).toBe('session');
   await act(async () => { await second.result.current.leave(); });
   expect(sessionStorage.getItem('rts.active-meeting.v1')).toBeNull();
+});
+
+it('a copied resume record does not kick the original tab', async () => {
+  vi.useFakeTimers();
+  vi.spyOn(window.performance, 'getEntriesByType').mockReturnValue([{ type: 'navigate' } as PerformanceNavigationTiming]);
+  const jwt = `header.${btoa(JSON.stringify({ sub: 'user' }))}.signature`;
+  window.history.replaceState(null, '', '/?meeting=ABCDEFGHIJ&session=session');
+  sessionStorage.setItem('rts.active-meeting.v1', JSON.stringify({
+    owner: 'user', code: 'ABCDEFGHIJ', meetingId: 'meeting', sessionId: 'session', attendanceId: 'original', savedAt: Date.now(),
+  }));
+  const fetch = vi.fn().mockResolvedValue(response({ status: 'device_choice_required', meetingId: 'meeting', sessionId: 'session' }));
+  vi.stubGlobal('fetch', fetch);
+  const { result } = renderHook(() => useSessionFlow(jwt, vi.fn()));
+  await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(fetch.mock.calls[0][0]).toContain('/join');
+  expect(result.current.deviceChoice?.sessionId).toBe('session');
+  expect(result.current.active).toBeNull();
+});
+
+it('confirms the transfer only after LiveKit connects and can retry a transient failure', async () => {
+  const fetch = vi.fn().mockResolvedValueOnce(response({ status: 'device_choice_required', meetingId: 'meeting', sessionId: 'session' }))
+    .mockResolvedValueOnce(response({ ...credentials, transferAfterConnect: true }))
+    .mockResolvedValueOnce(response({}, 503))
+    .mockResolvedValue(response({ transferred: true }));
+  vi.stubGlobal('fetch', fetch);
+  const { result } = renderHook(() => useSessionFlow('jwt', vi.fn()));
+  await act(async () => result.current.join('ABCDEFGHIJ', 'meeting', 'session'));
+  expect(result.current.deviceChoice?.sessionId).toBe('session');
+  expect(result.current.active).toBeNull();
+  await act(async () => result.current.join('ABCDEFGHIJ', 'meeting', 'session', 'transfer'));
+  expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual({ sessionId: 'session', deviceMode: 'transfer' });
+  expect(result.current.deviceChoice).toBeNull();
+  expect(fetch).toHaveBeenCalledTimes(2);
+  await act(async () => result.current.transferDevice());
+  expect(fetch.mock.calls[2][0]).toContain('/sessions/session/device-transfer');
+  expect(JSON.parse(fetch.mock.calls[2][1].body)).toEqual({ attendanceId: 'attendance' });
+  expect(result.current.transferStatus).toBe('failed');
+  expect(result.current.active?.attendanceId).toBe('attendance');
+  await act(async () => result.current.transferDevice());
+  expect(result.current.transferStatus).toBeNull();
+  await act(async () => result.current.transferDevice());
+  expect(fetch).toHaveBeenCalledTimes(4);
 });
 
 it('never resumes another user or another meeting URL', async () => {

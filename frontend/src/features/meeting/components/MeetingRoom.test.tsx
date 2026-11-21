@@ -1,17 +1,24 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import { MediaDeviceFailure } from 'livekit-client';
+import { DisconnectReason, MediaDeviceFailure } from 'livekit-client';
 import { MeetingRoom } from './MeetingRoom';
 
+const localParticipant = vi.hoisted(() => ({
+  setMicrophoneEnabled: vi.fn().mockResolvedValue(undefined),
+  setCameraEnabled: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('@livekit/components-react', () => ({
-  LiveKitRoom: ({children,onMediaDeviceFailure}: any) => <div>{children}
+  LiveKitRoom: ({children,onMediaDeviceFailure,onConnected,onDisconnected,audio,video}: any) => <div data-testid="livekit" data-audio={audio} data-video={video}>{children}
+    <button onClick={() => onConnected?.()}>Connected</button>
+    <button onClick={() => onDisconnected?.(DisconnectReason.PARTICIPANT_REMOVED)}>Removed by LiveKit</button>
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.PermissionDenied, undefined)}>Screen cancelled</button>
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.DeviceInUse, 'videoinput')}>Camera busy</button>
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.PermissionDenied, 'audioinput')}>Mic denied</button>
   </div>,
   useConnectionState: () => 'connected', useParticipants: () => [],
-  useLocalParticipant: () => ({localParticipant:{},isCameraEnabled:false,isMicrophoneEnabled:false}),
+  useLocalParticipant: () => ({localParticipant,isCameraEnabled:false,isMicrophoneEnabled:false}),
   useLocalParticipantPermissions: () => ({canUpdateMetadata:true}), useParticipantAttribute: () => '',
   TrackToggle: ({source,onChange,children}: any) => <button onClick={() => onChange(true,true)} aria-label={`enable-${source}`}>{children}</button>,
   MediaDeviceMenu: ({kind,children,...props}: any) => <button {...props} data-kind={kind}>{children}</button>,
@@ -62,4 +69,27 @@ it('ignores screen picker cancellation and isolates camera/mic failures, clearin
   expect(screen.getByText(/Microphone đang bị chặn/)).toBeTruthy();
   fireEvent.click(screen.getByLabelText('enable-microphone'));
   expect(screen.queryByRole('alert')).toBeNull();
+});
+
+it('holds local capture and received audio until a transfer has completed', async () => {
+  const onConnected = vi.fn(), onEnded = vi.fn();
+  const props = {
+    accessToken: 'test',
+    credentials: { token: 'room', serverUrl: 'wss://unit.invalid', roomName: 'test', participantIdentity: 'u', transferAfterConnect: true },
+    onConnected, onLeave: vi.fn(), onEnded,
+  };
+  const { rerender } = render(<MeetingRoom {...props} transferStatus="pending" />);
+  expect(screen.getByTestId('livekit').getAttribute('data-audio')).toBe('false');
+  expect(screen.getByTestId('livekit').getAttribute('data-video')).toBe('false');
+  expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('0');
+  fireEvent.click(screen.getByText('Connected'));
+  expect(onConnected).toHaveBeenCalledOnce();
+  expect(localParticipant.setMicrophoneEnabled).not.toHaveBeenCalled();
+  expect(localParticipant.setCameraEnabled).not.toHaveBeenCalled();
+  rerender(<MeetingRoom {...props} transferStatus={null} />);
+  await waitFor(() => expect(localParticipant.setMicrophoneEnabled).toHaveBeenCalledWith(true));
+  expect(localParticipant.setCameraEnabled).toHaveBeenCalledWith(true);
+  expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('1');
+  fireEvent.click(screen.getByText('Removed by LiveKit'));
+  expect(onEnded).toHaveBeenCalledWith('Thiết bị này đã bị ngắt khỏi phòng họp.', true);
 });

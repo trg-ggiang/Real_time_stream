@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Hand } from '@phosphor-icons/react/dist/csr/Hand';
 import { Users } from '@phosphor-icons/react/dist/csr/Users';
 import { ChatCircleText } from '@phosphor-icons/react/dist/csr/ChatCircleText';
@@ -113,16 +113,38 @@ function MeetingParticipantTile() {
   );
 }
 
-function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHost, credentials, accessToken }: { credentials: JoinCredentials; accessToken: string; onDeviceError: (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => void; onDeviceEnabled: (kind: MediaDeviceKind) => void; onLeave: () => void; management?: ManagementProps; isHost: boolean }) {
+function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHost, credentials, accessToken, transferPending, restoreTransferMedia }: {
+  credentials: JoinCredentials;
+  accessToken: string;
+  onDeviceError: (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => void;
+  onDeviceEnabled: (kind: MediaDeviceKind) => void;
+  onLeave: () => void;
+  management?: ManagementProps;
+  isHost: boolean;
+  transferPending: boolean;
+  restoreTransferMedia: boolean;
+}) {
   const state = useConnectionState();
   const participants = useParticipants();
-  const { isMicrophoneEnabled, isCameraEnabled, microphoneTrack } = useLocalParticipant();
+  const { localParticipant, isMicrophoneEnabled, isCameraEnabled, microphoneTrack } = useLocalParticipant();
   const [audioMuted, setAudioMuted] = useState(false);
   const canSelectOutput = typeof HTMLMediaElement !== 'undefined' && 'setSinkId' in HTMLMediaElement.prototype;
   const [showManagement, setShowManagement] = useState(false);
   const [chatOpen, setChatOpen] = useState(false), [chatUnread, setChatUnread] = useState(0);
   const onlineUsers = useMemo(() => new Set(participants.map(participant => participant.identity.split(':')[0])), [participants]);
   const connected = state === ConnectionState.Connected;
+  const canUseDevices = connected && !transferPending;
+  const restoredMedia = useRef(false);
+  useEffect(() => {
+    if (!connected || !restoreTransferMedia || restoredMedia.current) return;
+    restoredMedia.current = true;
+    const preferences = readMediaPreferences();
+    // The old device has released the mic and camera before we request capture.
+    if (preferences.audio) void localParticipant.setMicrophoneEnabled(true).catch(error =>
+      onDeviceError(MediaDeviceFailure.getFailure(error), 'audioinput'));
+    if (preferences.video) void localParticipant.setCameraEnabled(true).catch(error =>
+      onDeviceError(MediaDeviceFailure.getFailure(error), 'videoinput'));
+  }, [connected, localParticipant, onDeviceError, restoreTransferMedia]);
   const microphoneLabel = isMicrophoneEnabled ? 'Tắt microphone' : 'Bật microphone';
   const cameraLabel = isCameraEnabled ? 'Tắt camera' : 'Bật camera';
   return (
@@ -135,10 +157,10 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHo
         <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
       </MeetingChat>
       {isHost && management?.sessionId ? <ScreenShareRequests accessToken={management.accessToken} meetingId={management.overview.meeting.meetingId} sessionId={management.sessionId} /> : null}
-      <RoomAudioRenderer volume={audioMuted ? 0 : 1} />
+      <RoomAudioRenderer volume={audioMuted || transferPending ? 0 : 1} />
       <StartAudio label="Bật âm thanh từ phòng" />
       <div className="meeting-controls">
-        <fieldset className="meeting-device-controls" disabled={!connected} aria-label="Thiết bị">
+        <fieldset className="meeting-device-controls" disabled={!canUseDevices} aria-label="Thiết bị">
         <div className="meeting-device-group">
         <TrackToggle source={Track.Source.Microphone} showIcon={false} onDeviceError={error => onDeviceError(MediaDeviceFailure.getFailure(error), 'audioinput')} onChange={(enabled, userInitiated) => { if (enabled) onDeviceEnabled('audioinput'); if (userInitiated) saveMediaPreference('audioinput', enabled); }} disabled={!connected}
           className="lk-button meeting-control-icon" aria-label={microphoneLabel} title={microphoneLabel}>
@@ -174,18 +196,23 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onLeave, management, isHo
 export function MeetingRoom({
   credentials,
   accessToken,
+  transferStatus = null,
+  onConnected,
   onLeave,
   onEnded,
   management,
 }: {
-  credentials: JoinCredentials;
+  credentials: JoinCredentials & { transferAfterConnect?: boolean };
   accessToken: string;
+  transferStatus?: 'pending' | 'failed' | null;
+  onConnected?: () => void;
   onLeave: () => void;
-  onEnded: (message?: string) => void;
+  onEnded: (message?: string, removedByServer?: boolean) => void;
   management?: ManagementProps;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [initialMedia] = useState(readMediaPreferences);
+  const waitForTransfer = transferStatus !== null;
   const [deviceErrors, setDeviceErrors] = useState<Partial<Record<MediaDeviceKind, string>>>({});
   // Stable callbacks prevent the SDK connection effect restarting on UI updates.
   const handleConnectionError = useCallback((cause: Error) => {
@@ -205,6 +232,10 @@ export function MeetingRoom({
   }, []);
   const handleDisconnected = useCallback(
     (reason?: DisconnectReason) => {
+      if (reason === DisconnectReason.PARTICIPANT_REMOVED) {
+        onEnded('Thiết bị này đã bị ngắt khỏi phòng họp.', true);
+        return;
+      }
       onEnded(
         reason === DisconnectReason.CLIENT_INITIATED
           ? undefined
@@ -219,9 +250,10 @@ export function MeetingRoom({
         token={credentials.token}
         serverUrl={credentials.serverUrl}
         connect
-        audio={initialMedia.audio}
-        video={initialMedia.video}
+        audio={!waitForTransfer && initialMedia.audio}
+        video={!waitForTransfer && initialMedia.video}
         options={roomOptions}
+        onConnected={onConnected}
         onDisconnected={handleDisconnected}
         onError={handleConnectionError}
         onMediaDeviceFailure={handleDeviceError}
@@ -233,7 +265,8 @@ export function MeetingRoom({
           </p>
         )}
         {Object.entries(deviceErrors).map(([kind, message]) => message ? <p className="notice error" role="alert" key={kind}>{message}</p> : null)}
-        <RoomContent credentials={credentials} accessToken={accessToken} onDeviceError={handleDeviceError} onDeviceEnabled={handleDeviceEnabled} onLeave={onLeave} management={management} isHost={credentials.role === 'host'} />
+        <RoomContent credentials={credentials} accessToken={accessToken} onDeviceError={handleDeviceError} onDeviceEnabled={handleDeviceEnabled} onLeave={onLeave} management={management} isHost={credentials.role === 'host'}
+          transferPending={transferStatus === 'pending'} restoreTransferMedia={transferStatus === null && credentials.transferAfterConnect === true} />
       </LiveKitRoom>
     </section>
   );

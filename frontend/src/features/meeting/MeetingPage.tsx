@@ -4,6 +4,7 @@ import { ArrowLeft } from '@phosphor-icons/react/dist/csr/ArrowLeft';
 import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { ScheduleSessionForm } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
+import { MeetingDeviceChoice } from './components/MeetingDeviceChoice';
 import { useSessionFlow } from './hooks/use-session-flow';
 import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, parseMeetingCode, roleLabels, type Member, type MeetingOverview } from './services/meetings-api';
 import './meeting.css';
@@ -110,6 +111,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     if (overview) setNotice(await copyMeetingInvite(overview.meeting.meetingCode, sessionId));
   }
   const waiting = flow.waiting;
+  const deviceChoice = flow.deviceChoice;
   const cooldown = waiting?.retryAt && Date.parse(waiting.retryAt) > now;
   const pageError = error || flow.error;
   const onSessionEnded = useCallback(() => { flow.sessionEnded(); void refresh(); }, [flow.sessionEnded, refresh]);
@@ -124,11 +126,19 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
       <div className="meeting-account"><span className="meeting-account-name" title={name}>{name}</span><span className="meeting-avatar-small" aria-hidden="true">{initials}</span><AccountSettings theme={theme} onThemeChange={setTheme} onLogout={async () => { await flow.leave(); onLogout(); }} /></div>
     </header>
     <main id="meeting-main" className="meeting-main" tabIndex={-1}>
-      {pageError && (code || !error) ? <p role="alert" className="notice error workspace-error">{pageError}</p> : null}
+      {pageError && !deviceChoice && (code || !error) ? <p role="alert" className="notice error workspace-error">{pageError}</p> : null}
       <p role="status" className="workspace-feedback">{notice}</p>
+      {deviceChoice ? <MeetingDeviceChoice busy={flow.busy} error={flow.error} onCancel={flow.cancelDeviceChoice}
+        onChoose={mode => void flow.join(deviceChoice.code, deviceChoice.meetingId, deviceChoice.sessionId, mode)} /> : null}
       {flow.active && overview ? <>
         <div className="meeting-call-intro"><h1>{overview.meeting.title}</h1><button type="button" className="workspace-icon meeting-share-button" onClick={() => void copyLink(flow.active?.sessionId)} title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button></div>
+        {flow.transferStatus === 'pending' ? <p role="status">Đang chuyển cuộc họp…</p> : null}
+        {flow.transferStatus === 'failed' ? <div className="meeting-transfer-error">
+          <p className="notice error" role="alert">Chưa hoàn tất chuyển thiết bị. Bạn vẫn có thể họp trên thiết bị này.</p>
+          <button type="button" className="workspace-text-button" onClick={() => void flow.transferDevice()}>Thử chuyển lại</button>
+        </div> : null}
         <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}><MeetingRoom credentials={flow.active} accessToken={accessToken} onLeave={() => void flow.leave()} onEnded={flow.ended}
+          onConnected={flow.active.transferAfterConnect ? flow.transferDevice : undefined} transferStatus={flow.transferStatus}
           management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} /></Suspense>
       </> : code ? <>
         {loading ? <p role="status" className="meeting-loading">Đang tải cuộc họp…</p> : overview ? <>
