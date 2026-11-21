@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../../shared/components/PaginationButton";
 import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { Users } from "@phosphor-icons/react/dist/csr/Users";
@@ -143,9 +144,9 @@ export function PersonalActivitiesPage({ token }: { token: string }) {
       ) : registrations.loading || clubs.loading ? <p className="ps-activity-empty">Đang tải hoạt động…</p> : <PersonalEmpty><p>{tab === "clubs" ? "Chưa có hoạt động từ các CLB bạn tham gia." : tab === "completed" ? "Chưa có hoạt động nào đã hoàn thành." : "Bạn chưa đăng ký hoạt động nào."}</p></PersonalEmpty>}
       {registrations.data && registrations.data.total > registrations.data.limit && (
         <nav className="ps-pagination" aria-label="Phân trang hoạt động">
-          <button disabled={page <= 1 || registrations.loading} onClick={() => setParams({ page: String(page - 1) })}>← Trang trước</button>
+          <PaginationButton direction="previous" disabled={page <= 1 || registrations.loading} onClick={() => setParams({ page: String(page - 1) })} />
           <span>Trang {page}</span>
-          <button disabled={!registrations.data?.hasMore || registrations.loading} onClick={() => setParams({ page: String(page + 1) })}>Trang sau →</button>
+          <PaginationButton direction="next" disabled={!registrations.data?.hasMore || registrations.loading} onClick={() => setParams({ page: String(page + 1) })} />
         </nav>
       )}
     </section>
@@ -308,19 +309,11 @@ export function PersonalLists({
       )}
       {state.data && state.data.total > state.data.limit && (
         <nav className="ps-pagination" aria-label="Phân trang cá nhân">
-          <button
-            disabled={page <= 1 || state.loading}
-            onClick={() => setParams({ page: String(page - 1) })}
-          >
-            ← Trang trước
-          </button>
+          <PaginationButton direction="previous" disabled={page <= 1 || state.loading}
+            onClick={() => setParams({ page: String(page - 1) })} />
           <span>Trang {page}</span>
-          <button
-            disabled={!state.data?.hasMore || state.loading}
-            onClick={() => setParams({ page: String(page + 1) })}
-          >
-            Trang sau →
-          </button>
+          <PaginationButton direction="next" disabled={!state.data?.hasMore || state.loading}
+            onClick={() => setParams({ page: String(page + 1) })} />
         </nav>
       )}
     </>

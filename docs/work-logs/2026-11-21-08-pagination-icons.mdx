@@ -1,0 +1,11 @@
+---
+title: Đồng nhất nút phân trang bằng icon trên toàn ứng dụng
+description: Dùng chung PaginationButton, giữ nguyên logic phân trang và nhãn truy cập.
+---
+
+- Theo yêu cầu, thay toàn bộ chữ Trang trước/Trang sau/Trước/Sau tại các nút phân trang bằng icon CaretLeft/CaretRight của Phosphor.
+- Component chung: `frontend/src/shared/components/PaginationButton.tsx`. Giữ tooltip, aria-label tiếng Việt, type button, disabled, callback và các class hiện có; kích thước nút tối thiểu 40px.
+- Áp dụng cho admin, danh sách khám phá, hoạt động guest, trang cá nhân, thành viên/nội dung/cuộc họp workspace, tuyển thành viên và danh sách buổi họp.
+- Không thay số mục mỗi trang, dữ liệu hoặc API. Số trang hiện tại vẫn hiển thị giữa hai nút.
+- Rà soát source: chữ Trang trước/Trang sau chỉ còn ở nhãn trong component chung.
+- Toàn bộ 156 frontend tests, production build/typecheck và diff check đạt; build còn cảnh báo kích thước chunk hiện hữu. Không tạo test riêng cho thay đổi hình thức này.

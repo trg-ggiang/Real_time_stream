@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../shared/components/PaginationButton";
 import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from '@phosphor-icons/react/dist/csr/ArrowLeft';
@@ -191,7 +192,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
                 {canManageSessions(overview.membership) && selected?.session_id !== session.session_id ? <button type="button" className="workspace-text-button" onClick={() => setSelectedId(session.session_id)}>Chọn quản lý</button> : null}</div>
               </article>;
             })}
-            {overview.sessions.length > 10 ? <div className="workspace-pagination"><button type="button" disabled={sessionPage === 0} onClick={() => setSessionPage(page => page - 1)}>Trang trước</button><span>Trang {sessionPage + 1}</span><button type="button" disabled={(sessionPage + 1) * 10 >= overview.sessions.length} onClick={() => setSessionPage(page => page + 1)}>Trang sau</button></div> : null}
+            {overview.sessions.length > 10 ? <div className="workspace-pagination"><PaginationButton direction="previous" type="button" disabled={sessionPage === 0} onClick={() => setSessionPage(page => page - 1)} /><span>Trang {sessionPage + 1}</span><PaginationButton direction="next" type="button" disabled={(sessionPage + 1) * 10 >= overview.sessions.length} onClick={() => setSessionPage(page => page + 1)} /></div> : null}
           </section>
           {canManageSessions(overview.membership) ? <details className="lobby-management"><summary>Quản lý cuộc họp</summary><MeetingManagement key={`${code}:${selected?.session_id || ''}`} accessToken={accessToken} overview={overview} sessionId={selected?.session_id} knownMembers={people[overview.meeting.meetingId] || []} onMembersChanged={onMembersChanged} onChanged={refresh} onError={reportAdmin} onSessionEnded={onSessionEnded} /></details> : null}
           </div>

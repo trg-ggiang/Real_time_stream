@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../../shared/components/PaginationButton";
 import { useRef, useState } from 'react';
 import { useClub } from '../workspace-context';
 import { usePersonalQuery } from '../../personal/use-personal-query';
@@ -106,9 +107,9 @@ export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }
       </article>)}</div>}
       <div className="cw-meeting-list-controls">
         <nav className="cw-meeting-pagination" aria-label="Phân trang cuộc họp">
-          <button type="button" className="cw-link" disabled={page === 1 || state.loading} onClick={() => setPage(value => value - 1)}>Trang trước</button>
+          <PaginationButton direction="previous" type="button" className="cw-link" disabled={page === 1 || state.loading} onClick={() => setPage(value => value - 1)} />
           <span aria-current="page" aria-live="polite">Trang {page}</span>
-          <button type="button" className="cw-link" disabled={!state.data?.hasMore || state.loading} onClick={() => setPage(value => value + 1)}>Trang sau</button>
+          <PaginationButton direction="next" type="button" className="cw-link" disabled={!state.data?.hasMore || state.loading} onClick={() => setPage(value => value + 1)} />
         </nav>
         <button type="button" className="cw-link cw-meeting-refresh" onClick={state.retry}>Tải lại</button>
       </div>

@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../../shared/components/PaginationButton";
 import { confirmAction } from '../../../shared/lib/confirm-action';
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -135,19 +136,11 @@ export function MembersPage() {
         )}
       </section>
       <nav className="cw-pagination" aria-label="Phân trang thành viên">
-        <button
-          disabled={page === 1 || state.loading}
-          onClick={() => setParams({ page: String(page - 1) })}
-        >
-          ← Trước
-        </button>
+        <PaginationButton direction="previous" disabled={page === 1 || state.loading}
+          onClick={() => setParams({ page: String(page - 1) })} />
         <span>Trang {page}</span>
-        <button
-          disabled={!state.data?.hasMore || state.loading}
-          onClick={() => setParams({ page: String(page + 1) })}
-        >
-          Sau →
-        </button>
+        <PaginationButton direction="next" disabled={!state.data?.hasMore || state.loading}
+          onClick={() => setParams({ page: String(page + 1) })} />
       </nav>
     </>
   );

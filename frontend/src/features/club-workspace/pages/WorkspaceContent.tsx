@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../../shared/components/PaginationButton";
 import { confirmAction } from '../../../shared/lib/confirm-action';
 import { ImageUpload } from '../../../shared/components/ImageUpload';
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -100,19 +101,11 @@ export function ContentList({ kind }: { kind: ContentKind }) {
         <PersonalState {...result} empty="Chưa có nội dung trong mục này." />
       )}
       <nav className="cw-pagination" aria-label="Phân trang nội dung">
-        <button
-          disabled={page === 1 || result.loading}
-          onClick={() => setParams({ list, page: String(page - 1) })}
-        >
-          ← Trước
-        </button>
+        <PaginationButton direction="previous" disabled={page === 1 || result.loading}
+          onClick={() => setParams({ list, page: String(page - 1) })} />
         <span>Trang {page}</span>
-        <button
-          disabled={!result.data?.hasMore || result.loading}
-          onClick={() => setParams({ list, page: String(page + 1) })}
-        >
-          Sau →
-        </button>
+        <PaginationButton direction="next" disabled={!result.data?.hasMore || result.loading}
+          onClick={() => setParams({ list, page: String(page + 1) })} />
       </nav>
     </>
   );
