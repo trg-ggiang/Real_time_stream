@@ -381,3 +381,8 @@ Head chỉ duyệt ban mình; chair duyệt toàn CLB; không chuyển quyền c
 Dùng chung chuông landing của luồng trưởng ban, thêm loại recruitment.application,
 recruitment.accepted/rejected. Mở chuông lưu mốc đã xem. File riêng tư chỉ tải
 qua API kiểm quyền và signed URL. [Hướng dẫn](docs/modules/club-recruitment.mdx).
+
+
+## Đăng xuất và đổi tài khoản — 21/11/2026
+
+`AuthApp.logout` xóa session và thay URL hiện tại bằng `/?mode=login`. Tài khoản mới đi tới trang mặc định theo role, không kế thừa URL riêng của tài khoản cũ. Đăng nhập trực tiếp từ link có returnTo hợp lệ vẫn giữ đích; nút quay lại từ cuộc họp dùng luồng riêng. [Work log](docs/work-logs/2026-11-21-04-phase-04-logout-account-url.mdx).
