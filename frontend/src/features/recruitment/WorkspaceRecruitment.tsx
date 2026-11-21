@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../shared/components/PaginationButton";
 import { confirmAction } from '../../shared/lib/confirm-action';
 import { useState,type FormEvent } from 'react';
 import { Link,useNavigate,useParams,useSearchParams } from 'react-router-dom';
@@ -8,7 +9,7 @@ import { FormBuilder,AnswerSummary } from './RecruitmentForm';
 import { dateLabel,downloadFile,newQuestion,serialize,statusLabel,upload,useRecruitment,useWrite,write,type Application,type ApplicationDetail,type Campaign,type Detail,type Page,type RecruitingDepartment } from './recruitment-api';
 import './recruitment.css';
 export function State({data,error,retry}:{data?:unknown;error?:string;retry:()=>void}){return data?null:error?<div role="alert"><p>{error}</p><button type="button" onClick={retry}>Thử lại</button></div>:<p role="status">Đang tải…</p>;}
-export function Pager({page,more,onPage}:{page:number;more?:boolean;onPage:(page:number)=>void}){return <nav className="recruit-toolbar" aria-label="Phân trang"><button disabled={page<=1} onClick={()=>onPage(page-1)}>← Trang trước</button><span>Trang {page}</span><button disabled={!more} onClick={()=>onPage(page+1)}>Trang sau →</button></nav>;}
+export function Pager({page,more,onPage}:{page:number;more?:boolean;onPage:(page:number)=>void}){return <nav className="recruit-toolbar" aria-label="Phân trang"><PaginationButton direction="previous" disabled={page<=1} onClick={()=>onPage(page-1)} /><span>Trang {page}</span><PaginationButton direction="next" disabled={!more} onClick={()=>onPage(page+1)} /></nav>;}
 export function WorkspaceRecruitment(){
  const {token,clubId,membership}=useClub(),[p,setP]=useSearchParams(),page=Math.max(1,Number(p.get('page'))||1),base=`/workspace/${clubId}/recruitments`;
  const s=useRecruitment<Page<Campaign>>(`workspace/${clubId}/recruitments?page=${page}`,token);

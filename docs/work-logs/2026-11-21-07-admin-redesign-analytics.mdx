@@ -53,3 +53,9 @@ Tài khoản và nội dung mới là các chức năng **tra cứu**, không c�
 - Trạng thái nội dung: Bản nháp, Chờ duyệt, Đã đăng, Đã từ chối, Cần chỉnh sửa, Đã lưu trữ. Giá trị lạ hiển thị “Chưa xác định” thay vì in mã kỹ thuật.
 - Sau sửa trạng thái: bảy frontend tests admin, sáu backend tests directory, backend build và frontend typecheck đạt.
 - Theo yêu cầu giới hạn danh sách: CLB/đề nghị, tài khoản, bài viết và hoạt động dùng tối đa 8 mục mỗi trang; DTO admin mặc định và giới hạn tối đa 8. Trang tổng quan vẫn xem trước 5 hồ sơ. Phân trang giữ nguyên, không cắt bỏ dữ liệu. Sáu backend tests và bảy frontend tests admin, build backend và frontend typecheck đạt.
+
+## Rà soát admin sau cùng
+
+- Full test: 85 backend và 156 frontend đạt; root build/typecheck đạt. Vẫn có cảnh báo chunk lớn, không phải lỗi chạy.
+- Read-only smoke test API thật xác nhận mỗi trang tối đa 8 mục cho CLB/tài khoản/bài viết/hoạt động; hai trang tài khoản không trùng nhau; pending_review trả đúng hàng chờ; limit=9 bị từ chối 400; người dùng thường gọi admin/users bị từ chối 403.
+- Phát hiện bộ lọc người dùng chỉ nhận user/null trong khi DB hiện lưu student. Đã thêm student vào bộ lọc và cập nhật regression test, không sửa role trong DB. Backend build và sáu tests directory sau bản sửa đạt.

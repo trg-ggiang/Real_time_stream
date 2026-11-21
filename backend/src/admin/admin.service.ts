@@ -96,7 +96,7 @@ export class AdminService {
     this.require(user);
     const query = this.db.from('users').select('user_id,email,display_name,avatar_url,role,created_at', { count: 'exact' });
     if (input.role === 'admin') query.eq('role', 'admin');
-    if (input.role === 'user') query.or('role.is.null,role.eq.user');
+    if (input.role === 'user') query.or('role.is.null,role.eq.user,role.eq.student');
     const search = this.search(input.q);
     if (search) query.or(`display_name.ilike.%${search}%,email.ilike.%${search}%`);
     const r = await query.order('created_at', { ascending: false }).order('user_id').range((input.page - 1) * input.limit, input.page * input.limit - 1);

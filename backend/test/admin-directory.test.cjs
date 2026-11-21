@@ -37,7 +37,7 @@ test('account search is paginated, filters roles and never selects credential fi
   const fields = calls[0].operations.find(([name]) => name === 'select')[1];
   assert.equal(fields.includes('password'), false); assert.equal(fields.includes('*'), false);
   const filters = calls[0].operations.filter(([name]) => name === 'or');
-  assert.equal(filters[0][1], 'role.is.null,role.eq.user');
+  assert.equal(filters[0][1], 'role.is.null,role.eq.user,role.eq.student');
   assert.equal(filters[1][1].includes(')'), false);
 });
 

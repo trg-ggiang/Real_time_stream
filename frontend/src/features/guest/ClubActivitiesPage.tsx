@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../shared/components/PaginationButton";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { publicDate, safePublicUrl } from './public-content';
 import './club-activities.css';
@@ -209,8 +210,8 @@ function ClubActivityWorkspace({ club, token, onPublished }: { club: Club; token
           <span className="club-activity-status">{statusNames[item.publication_status]}</span>
         </article>)}</div>
         {(page > 1 || hasMore) && <div className="club-activity-actions">
-          <button className="guest-secondary" disabled={page === 1} onClick={() => setPage(value => value - 1)}>Trang trước</button>
-          <button className="guest-secondary" disabled={!hasMore} onClick={() => setPage(value => value + 1)}>Trang sau</button>
+          <PaginationButton direction="previous" className="guest-secondary" disabled={page === 1} onClick={() => setPage(value => value - 1)} />
+          <PaginationButton direction="next" className="guest-secondary" disabled={!hasMore} onClick={() => setPage(value => value + 1)} />
         </div>}
       </>}
     {creating && <CreateActivityDialog club={club} token={token} close={() => setCreating(false)} done={item => {

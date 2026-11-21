@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { X } from '@phosphor-icons/react/dist/csr/X';
+import { PaginationButton } from '../../../shared/components/PaginationButton';
 
 export const adminDate = (value?: string | null) => value && Number.isFinite(Date.parse(value))
   ? new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date(value)) : 'Chưa có';
@@ -17,7 +18,7 @@ export function AdminDialog({ title, children, onClose }: { title: string; child
 }
 
 export function AdminPagination({ page, hasMore, loading, onPage }: { page: number; hasMore?: boolean; loading: boolean; onPage: (page: number) => void }) {
-  return <nav className="ad-pagination" aria-label="Phân trang"><button disabled={page <= 1 || loading} onClick={() => onPage(page - 1)}>Trang trước</button><span>Trang {page}</span><button disabled={!hasMore || loading} onClick={() => onPage(page + 1)}>Trang sau</button></nav>;
+  return <nav className="ad-pagination" aria-label="Phân trang"><PaginationButton direction="previous" disabled={page <= 1 || loading} onClick={() => onPage(page - 1)} /><span>Trang {page}</span><PaginationButton direction="next" disabled={!hasMore || loading} onClick={() => onPage(page + 1)} /></nav>;
 }
 
 export function exportAdminCsv(filename: string, rows: (string | number | null | undefined)[][]) {

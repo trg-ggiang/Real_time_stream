@@ -5,7 +5,7 @@ import { ContentImage } from "../../discovery/components/PublicContent";
 import type { FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { clubStatus, type AdminPage } from "../admin-model";
-import { adminDate, exportAdminCsv } from '../components/AdminTools';
+import { AdminPagination, adminDate, exportAdminCsv } from '../components/AdminTools';
 export function ClubList({
   token,
   directory = false,
@@ -125,21 +125,7 @@ export function ClubList({
           />
         )}
       </section>
-      <nav className="ad-pagination" aria-label="Phân trang">
-        <button
-          disabled={page === 1 || result.loading}
-          onClick={() => setParams({ status, q, page: String(page - 1) })}
-        >
-          ← Trước
-        </button>
-        <span>Trang {page}</span>
-        <button
-          disabled={!result.data?.hasMore || result.loading}
-          onClick={() => setParams({ status, q, page: String(page + 1) })}
-        >
-          Sau →
-        </button>
-      </nav>
+      <AdminPagination page={page} hasMore={result.data?.hasMore} loading={result.loading} onPage={value => setParams({ status, q, page: String(value) })} />
     </>
   );
 }
