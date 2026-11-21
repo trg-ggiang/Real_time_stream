@@ -142,3 +142,8 @@ Cần migration 202611200002 và restart backend; xem
 [hướng dẫn](../modules/club-recruitment.mdx) và
 [work log](../work-logs/2026-11-20-02-phase-04-recruitment-workflow.mdx).
 Chưa nghiệm thu Supabase thật; Phase 04 vẫn In Progress.
+
+
+## Chuyển CLB — 21/11/2026
+
+Giữ khung workspace và theme khi đổi CLB; tải context/nội dung mới trong vùng chính và không hiển thị công cụ của CLB cũ khi chờ. Xem [work log](../work-logs/2026-11-21-03-phase-04-club-switch-flicker.mdx).

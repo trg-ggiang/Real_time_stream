@@ -51,7 +51,7 @@ export function WorkspaceApp(props: DiscoveryViewer) {
   );
   return (
     <WorkspaceScope
-      key={`${props.accessToken}:${clubId}`}
+      key={props.accessToken}
       {...props}
       clubId={clubId}
       clubs={clubs.data?.items}
@@ -111,33 +111,21 @@ function WorkspaceScope({
   useEffect(() => {
     document.title = `${state.data?.club.name || "Không gian CLB"} · uniCircle`;
   }, [state.data?.club.name]);
-  if (!state.data)
-    return (
-      <div className="cw-app cw-loading-page" data-theme={darkTheme ? "dark" : "light"}>
-        <Link className="cw-brand" to="/workspace">
-          uni<span>circle</span>.
-        </Link>
-        <main>
-          <h1>Không gian CLB</h1>
-          <PersonalState {...state} />
-          <Link to="/workspace">← Không gian sinh hoạt</Link>
-        </main>
-      </div>
-    );
   const ctx = state.data,
-    chair = ctx.membership.role === "chairperson",
+    chair = ctx?.membership.role === "chairperson",
     base = `/workspace/${clubId}`;
+  const clubName = ctx?.club.name || clubs?.find(item => item.club.club_id === clubId)?.club.name || "Không gian CLB";
   const inChannel = location.pathname.startsWith(`${base}/channels/`);
   const inInformation = location.pathname === `${base}/information`;
   return (
     <ClubContext.Provider
-      value={{
+      value={ctx ? {
         ...ctx,
         token: accessToken,
         clubId,
         reload: state.retry,
         onMeeting,
-      }}
+      } : null}
     >
       <div data-theme={darkTheme ? "dark" : "light"} className={`cw-app ${inChannel ? "cw-app--channel" : ""}${inInformation ? " cw-app--information" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
         <a className="cw-skip" href="#workspace-content">
@@ -145,13 +133,13 @@ function WorkspaceScope({
         </a>
         <WorkspaceRail viewer={viewer} currentId={clubId} onLogout={onLogout} clubs={clubs ? [
           ...clubs.map(item => ({ id: item.club.club_id, name: item.club.name, logoUrl: item.club.logo_url })),
-          ...(!clubs.some(item => item.club.club_id === clubId) ? [{ id: clubId, name: ctx.club.name, logoUrl: ctx.club.logo_url }] : []),
+          ...(ctx && !clubs.some(item => item.club.club_id === clubId) ? [{ id: clubId, name: ctx.club.name, logoUrl: ctx.club.logo_url }] : []),
         ] : []} />
         <aside className="cw-sidebar">
           <div className="cw-club-identity">
             <div>
-              <strong>{ctx.club.name}</strong>
-              <small>{chair ? "Chủ nhiệm" : "Thành viên"}</small>
+              <strong>{clubName}</strong>
+              <small>{ctx ? chair ? "Chủ nhiệm" : ctx.membership.role === "head" ? "Trưởng ban" : "Thành viên" : "Đang kiểm tra quyền…"}</small>
             </div>
           </div>
           <button
@@ -160,14 +148,14 @@ function WorkspaceScope({
             aria-controls="workspace-navigation"
             onClick={() => setOpen((v) => !v)}
           >
-            {ctx.club.name} · {open ? "Ẩn menu" : "Mở menu"}
+            {clubName} · {open ? "Ẩn menu" : "Mở menu"}
           </button>
           <nav
             className={open ? "is-open" : ""}
             id="workspace-navigation"
             aria-label="Điều hướng CLB"
           >
-            <NavLink to={base} end className="cw-overview-link">Tổng quan CLB</NavLink>
+            {ctx && <><NavLink to={base} end className="cw-overview-link">Tổng quan CLB</NavLink>
             <div className="cw-channel-scroll" role="group" aria-label="Danh sách kênh">
             <ChannelNavigation channels={channels} clubId={clubId} chair={chair} />
             </div>
@@ -177,13 +165,13 @@ function WorkspaceScope({
               <NavLink to={`${base}/activities`} end><CalendarBlank size={17} aria-hidden="true" />Hoạt động</NavLink>
               {(chair||ctx.membership.role==='head')&&<NavLink to={`${base}/recruitments`}><UserPlus size={17} aria-hidden="true" />Tuyển thành viên</NavLink>}
               {chair && <NavLink to={`${base}/review`}><ClipboardText size={17} aria-hidden="true" />Duyệt nội dung</NavLink>}
-            </div></details>
+            </div></details></>}
           </nav>
         </aside>
         <div className="cw-workspace">
-          {!inChannel && <header className="cw-topbar"><span>{ctx.club.name}</span><span>{viewer?.displayName} · {chair ? "Chủ nhiệm" : ctx.membership.role === "head" ? "Trưởng ban" : "Thành viên"}</span></header>}
+          {!inChannel && <header className="cw-topbar"><span>{clubName}</span><span>{viewer?.displayName}{ctx && ` · ${chair ? "Chủ nhiệm" : ctx.membership.role === "head" ? "Trưởng ban" : "Thành viên"}`}</span></header>}
           <main id="workspace-content" ref={main} tabIndex={-1} className={inChannel ? "cw-channel-main" : undefined}>
-            <Routes>
+            {ctx ? <Routes>
               <Route path={`${base}/recruitments`} element={chair||ctx.membership.role==='head'?<WorkspaceRecruitment />:<Denied />} />
               <Route path={`${base}/recruitments/new`} element={chair?<RecruitmentEditor />:<Denied />} />
               <Route path={`${base}/recruitments/:campaignId/edit`} element={chair||ctx.membership.role==='head'?<RecruitmentEditor />:<Denied />} />
@@ -239,10 +227,10 @@ function WorkspaceScope({
                   </>
                 }
               />
-            </Routes>
+            </Routes> : <><h1>{clubName}</h1><PersonalState {...state} /><Link to="/workspace">← Không gian sinh hoạt</Link></>}
           </main>
         </div>
-        <WorkspaceQuickPanel club={ctx.club} token={accessToken} chair={chair} collapsed={infoCollapsed} darkTheme={darkTheme} onThemeToggle={() => setDarkTheme(value => !value)} onToggle={() => setInfoCollapsed(value => !value)} />
+        {ctx ? <WorkspaceQuickPanel key={clubId} club={ctx.club} token={accessToken} chair={chair} collapsed={infoCollapsed} darkTheme={darkTheme} onThemeToggle={() => setDarkTheme(value => !value)} onToggle={() => setInfoCollapsed(value => !value)} /> : <aside className="cw-quick-panel" aria-label="Xem nhanh CLB" aria-busy={state.loading} />}
 
       </div>
     </ClubContext.Provider>

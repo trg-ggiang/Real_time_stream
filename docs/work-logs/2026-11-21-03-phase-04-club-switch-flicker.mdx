@@ -1,0 +1,54 @@
+---
+title: Giữ khung workspace khi chuyển CLB
+description: Sửa nháy toàn màn hình khi chuyển giữa hai CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-21-03; ngày Asia/Saigon, không có mốc bắt đầu/kết thúc chính xác.
+- Agent: Codex.
+- Phase: 04 — Application foundation.
+- Kết quả phiên: Completed.
+- Trạng thái phase sau phiên: In Progress.
+- Nhánh: final; working tree sạch lúc bắt đầu, không commit/push.
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng xác nhận workspace nháy khi chuyển giữa hai CLB. Chỉ sửa vòng đời giao diện chuyển CLB.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/club-workspace/WorkspaceApp.tsx`: bỏ remount toàn scope theo clubId; giữ rail, sidebar, main và theme trong khi context CLB đích đang tải. Tên CLB đích lấy từ membership list nếu có. Loading/error nằm trong vùng nội dung, không thay toàn trang bằng màn hình loading.
+- Context provider trả null khi chưa có dữ liệu đúng CLB; unmount các trang/nút quản lý và chat cũ ngay khi chuyển. Chỉ dựng nội dung sau khi nhận context CLB mới. Query vẫn có identity theo token/path và hủy request cũ.
+- Quick panel dựng mới theo clubId để không dùng lại dữ liệu/state của CLB trước nếu request hoàn tất nhanh.
+- `frontend/src/features/club-workspace/Workspace.test.tsx`: thêm regression trì hoãn response CLB đích, xác nhận rail/shell/main giữ cùng DOM node, theme không đổi, công cụ chủ nhiệm/chat cũ biến mất, CLB đích nhận đúng vai trò.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run test -- Workspace` | Passed | 19 tests, 3 files; API và socket mô phỏng |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; cảnh báo bundle lớn hơn 500 kB |
+| `git diff --check` | Passed | Kiểm tra whitespace |
+| JSON/navigation trang mới | Passed | Parse docs.json và xác nhận target tồn tại |
+| Browser với tài khoản thật, desktop/mobile | Skipped | Chưa kiểm tra trực quan; DOM regression không xác nhận pixel/paint |
+| Backend, Supabase, LiveKit | Skipped | Không thay đổi backend/database/media |
+
+## Quyết định và lý do
+
+Giữ khung ổn định nhưng không giữ dữ liệu và quyền thao tác của CLB cũ trong lúc tải CLB khác. Không đổi thiết kế hoặc luồng thông báo.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho thay đổi code. Phase 04 vẫn In Progress; còn nghiệm thu trực quan trên trình duyệt thật.
+
+## Bước tiếp theo
+
+Chuyển qua lại hai CLB có vai trò khác nhau trên desktop/mobile; xác nhận không nháy toàn trang và quyền hiển thị theo CLB đang chọn.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và handoff
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

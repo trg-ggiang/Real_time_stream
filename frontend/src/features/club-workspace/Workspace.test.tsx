@@ -120,6 +120,38 @@ it('keeps club order and the channel list stable while switching channels', asyn
   expect(channelRequests()).toBe(1);
 });
 
+it('keeps the workspace shell mounted while another club loads without exposing the old club tools', async () => {
+  const { fetcher } = fixture();
+  history.replaceState(null, '', '/workspace/beta/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  await screen.findByRole('heading', { name: 'Chung' });
+  await screen.findByRole('link', { name: 'Duyệt nội dung' });
+  fireEvent.click(screen.getByRole('button', { name: 'Chế độ tối' }));
+  const rail = screen.getByRole('complementary', { name: 'CLB đã tham gia' });
+  const shell = rail.closest('.cw-app');
+  const main = document.getElementById('workspace-content');
+  const respond = fetcher.getMockImplementation()!;
+  let release!: () => void;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  fetcher.mockImplementation(async (url, options) => {
+    if (url === '/api/workspace/alpha') await pending;
+    return respond(url, options);
+  });
+  fireEvent.click(within(rail).getByRole('link', { name: 'Mở CLB Alpha' }));
+  await screen.findByText('Đang kiểm tra quyền…');
+  expect(screen.getByRole('complementary', { name: 'CLB đã tham gia' })).toBe(rail);
+  expect(rail.closest('.cw-app')).toBe(shell);
+  expect(document.getElementById('workspace-content')).toBe(main);
+  expect(shell?.getAttribute('data-theme')).toBe('dark');
+  expect(screen.queryByRole('link', { name: 'Duyệt nội dung' })).toBeNull();
+  expect(screen.queryByRole('textbox', { name: 'Nhắn tin trong Chung' })).toBeNull();
+  await act(async () => { release(); });
+  await screen.findByRole('heading', { name: 'Chung' });
+  expect(screen.getByRole('complementary', { name: 'CLB đã tham gia' })).toBe(rail);
+  expect(screen.queryByRole('link', { name: 'Duyệt nội dung' })).toBeNull();
+  expect(screen.getByRole('link', { name: 'Mở CLB Alpha' }).getAttribute('aria-current')).toBe('page');
+});
+
 it('links meeting invites and external URLs without swallowing adjacent message text', async () => {
   const invite = location.origin + '/?view=meeting&meeting=ABCDEFGHIJ&session=buoi-1';
   const website = 'https://example.test/Buoi_(1)?a=one&b=two#note';
