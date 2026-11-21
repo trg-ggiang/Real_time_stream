@@ -6,7 +6,7 @@ import "./head-notifications.css";
 import { sanitizeReturnTo } from '../../auth/redirect';
 export function notificationTarget(data:{club_id?:string;href?:string}){
  const href=sanitizeReturnTo(data?.href);
- return href&&/^\/(?:workspace\/|me\/recruitment-applications(?:\/|$))/.test(href)?href:data?.club_id?`/workspace/${encodeURIComponent(data.club_id)}`:'/me/recruitment-applications';
+ return href&&/^\/(?:workspace\/|me\/recruitment-applications(?:\/|$)|(?:posts|activities|recruitments)\/[^/?#]+(?:[?#].*)?$)/.test(href)?href:data?.club_id?`/workspace/${encodeURIComponent(data.club_id)}`:'/me/recruitment-applications';
 }
 interface Inbox {
   items: { notification_id: string; title: string; body: string; created_at: string; data: { club_id?: string;href?:string } }[];

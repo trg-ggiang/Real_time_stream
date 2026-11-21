@@ -127,3 +127,8 @@ trên landing. Chạy migration `supabase/migrations/202611200002_recruitment_wo
 rồi restart backend trước khi test. Xem [hướng dẫn tuyển thành viên](docs/modules/club-recruitment.mdx).
 Build đạt; 60 test backend, 106 test frontend và regression SQL tạm đạt.
 Chưa áp dụng migration hoặc nghiệm thu ghi trên DB development thật.
+
+
+## Thông báo CLB đã quan tâm — 21/11/2026
+
+Chạy migration `supabase/migrations/202611210001_followed_club_notifications.sql` sau các migration trưởng ban/tuyển thành viên, rồi restart backend. Người đã quan tâm nhận thông báo khi CLB đăng bài viết công khai, hoạt động hoặc đợt tuyển; bấm chuông để xem và mở chi tiết. Không gửi bù bài cũ. Migration chưa áp dụng lên Supabase thật; xem [work log](docs/work-logs/2026-11-21-02-phase-04-followed-club-notifications.mdx).

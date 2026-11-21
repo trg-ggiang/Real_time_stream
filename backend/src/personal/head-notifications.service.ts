@@ -2,7 +2,7 @@ import { Injectable, ServiceUnavailableException } from "@nestjs/common";
 import { SupabaseService } from "../supabase/supabase.service";
 @Injectable()
 export class HeadNotifications {
-  private readonly types = ['department.head_assigned','recruitment.application','recruitment.accepted','recruitment.rejected'];
+  private readonly types = ['department.head_assigned','recruitment.application','recruitment.accepted','recruitment.rejected','post.published','activity.published','recruitment.published'];
   constructor(private readonly supabase: SupabaseService) {}
   async list(actor: string) {
     const through = new Date().toISOString();
