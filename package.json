@@ -17,6 +17,7 @@
     "build": "npm --workspaces run build",
     "test": "npm --workspaces run test",
     "tunnel": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/https-tunnel.ps1",
-    "tunnel:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/https-tunnel.ps1 -Stop"
+    "tunnel:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/https-tunnel.ps1 -Stop",
+    "seed:club-types": "node scripts/seed-club-types.mjs"
   }
 }

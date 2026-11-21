@@ -3,8 +3,12 @@ import { createRef } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import { HeadNotifications } from "./HeadNotifications";
+import { HeadNotifications, notificationTarget } from "./HeadNotifications";
 afterEach(()=>{cleanup();vi.unstubAllGlobals();});
+it('opens followed club publications at their public detail pages',()=>{
+ for(const kind of ['posts','activities','recruitments']) expect(notificationTarget({club_id:'club',href:`/${kind}/content-id`})).toBe(`/${kind}/content-id`);
+ for(const href of ['https://example.com/posts/id','//example.com/posts/id','/admin']) expect(notificationTarget({club_id:'club',href})).toBe('/workspace/club');
+});
 it("opening the bell marks the snapshot read and clears the persisted unread badge",async()=>{
  const fetcher=vi.fn(async()=>({ok:true,json:async()=>({items:[{notification_id:'n',title:'Trưởng ban mới',body:'Bạn được bổ nhiệm',created_at:'2026-11-20T00:00:00Z',data:{club_id:'club'}}],unread_count:1,read_through:'2026-11-20T01:00:00Z'})}));vi.stubGlobal('fetch',fetcher);
  render(<MemoryRouter><HeadNotifications token="token" panelRef={createRef()} /></MemoryRouter>);

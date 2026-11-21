@@ -141,12 +141,13 @@ Sau profile, đích mặc định của sinh viên là `/`, của admin là `/ad
 
 | Frontend | API | Nguồn Supabase |
 | --- | --- | --- |
-| Câu lạc bộ | `GET /api/public/clubs?page=&limit=` | `public_clubs` |
+| Câu lạc bộ | `GET /api/public/clubs?page=&limit=&q=&category=` | `public_clubs`; `club_category_links` khi lọc loại |
+| Loại CLB | `GET /api/public/club-categories` | `club_categories` |
 | Hoạt động | `GET /api/public/activities?page=&limit=` | `public_club_activities` |
 | Bài viết | `GET /api/public/posts?page=&limit=` | `public_club_posts` |
 
-`PublicContentController` giới hạn pagination và rate limit. Service chỉ đọc
-các public view được allowlist, chọn cột công khai, sắp xếp theo thời gian
+`PublicContentController` giới hạn pagination và rate limit. Service đọc
+các public view được allowlist; bộ lọc CLB đọc thêm danh mục/liên kết loại nhưng chỉ trả CLB từ `public_clubs`. Service chọn cột công khai, sắp xếp theo thời gian
 publish và trả `{items, page, limit, total, hasMore}`. Không có fallback sang
 bảng riêng tư hay dữ liệu mẫu khi API lỗi. Frontend hỗ trợ retry, tải trang
 tiếp, tìm CLB, chi tiết nội dung và chỉ cho phép URL ảnh/link HTTP(S).
@@ -189,8 +190,10 @@ refresh định kỳ để cập nhật trạng thái.
 
 ### Quyền vào phiên (admission)
 
-Khi nhấn **Tham gia**, `useSessionFlow` gọi
-`POST /api/meetings/:code/join` với `sessionId`:
+Khi nhấn **Tham gia**, người dùng chọn camera và mic trong **Chuẩn bị vào phòng**.
+Khi xác nhận, `useSessionFlow` gọi `POST /api/meetings/:code/join` với `sessionId`.
+Nếu tab khôi phục phiên và gặp lựa chọn thiết bị trước, app mở bước chuẩn bị khi
+người dùng chọn tiếp tục mà chưa có cấu hình media cho lượt vào này.
 
 1. Backend tìm meeting/session, từ chối session đã kết thúc. Session scheduled
    chỉ được kích hoạt khi đã tới giờ; session ongoing tiếp tục nhận người vào.
@@ -230,8 +233,8 @@ không relay audio/video. SDK quản lý signaling, track và participant state.
   `POST /api/meetings/:meetingId/sessions/:sessionId/device-transfer` với
   `attendanceId` của nó. Backend kiểm tra thiết bị mới đã kết nối, ngắt các
   lượt vào cũ của cùng thành viên trong buổi này và ghi `left_at` cùng
-  `leave_reason = 'device_transferred'`. Thiết bị mới khôi phục tùy chọn
-  camera/mic sau khi hoàn tất.
+  `leave_reason = 'device_transferred'`. Thiết bị mới áp lại lựa chọn camera/mic
+  của bước chuẩn bị sau khi hoàn tất.
 - Audio nhận từ phòng có thể mute riêng. Một số trình duyệt cho chọn output.
 - Camera dùng grid khi không có người share. Khi có screen share, `ScreenShareStage`
   hiển thị màn hình, camera thành viên nằm ở sidebar; có thể chọn giữa nhiều
@@ -394,3 +397,8 @@ Head chỉ duyệt ban mình; chair duyệt toàn CLB; không chuyển quyền c
 Dùng chung chuông landing của luồng trưởng ban, thêm loại recruitment.application,
 recruitment.accepted/rejected. Mở chuông lưu mốc đã xem. File riêng tư chỉ tải
 qua API kiểm quyền và signed URL. [Hướng dẫn](docs/modules/club-recruitment.mdx).
+
+
+## Đăng xuất và đổi tài khoản — 21/11/2026
+
+`AuthApp.logout` xóa session và thay URL hiện tại bằng `/?mode=login`. Tài khoản mới đi tới trang mặc định theo role, không kế thừa URL riêng của tài khoản cũ. Đăng nhập trực tiếp từ link có returnTo hợp lệ vẫn giữ đích; nút quay lại từ cuộc họp dùng luồng riêng. [Work log](docs/work-logs/2026-11-21-04-phase-04-logout-account-url.mdx).

@@ -689,6 +689,18 @@
 .dc-period select {
   padding: 12px;
 }
+.dc-category-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dc-category-filter select {
+  max-width: min(280px, 60vw);
+}
+.dc-app .dc-category-filter button {
+  padding: 8px 10px;
+  font-size: 13px;
+}
 .dc-result-count {
   font-size: 14px;
   color: var(--dc-muted);

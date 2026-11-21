@@ -84,3 +84,26 @@ it('links public HTTP URLs without executing HTML or script schemes', async () =
   expect(document.querySelector('a[href^="javascript:"]')).toBeNull();
   expect(document.querySelector('img[onerror]')).toBeNull();
 });
+
+it('filters clubs by database interest and keeps the selection in the URL', async () => {
+  history.pushState(null, '', '/clubs');
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+  const fetchMock = vi.fn(async (url: string) => ({ ok: true, json: async () =>
+    url === '/api/public/club-categories'
+      ? { items: [{ category_id: 'art-id', name: 'Nghệ thuật' }] }
+      : url.includes('category=art-id')
+        ? { items: [{ club_id: 'one', name: 'CLB Nghệ thuật' }], total: 1, hasMore: false }
+        : { items: [{ club_id: 'one', name: 'CLB Nghệ thuật' }, { club_id: 'two', name: 'CLB Thể thao' }], total: 2, hasMore: false },
+  }));
+  vi.stubGlobal('fetch', fetchMock);
+  render(<GuestLanding />);
+  const category = await screen.findByLabelText('Loại CLB');
+  await waitFor(() => expect((category as HTMLSelectElement).disabled).toBe(false));
+  fireEvent.change(category, { target: { value: 'art-id' } });
+  await waitFor(() => expect(location.search).toContain('category=art-id'));
+  expect(await screen.findByRole('link', { name: 'CLB Nghệ thuật' })).toBeTruthy();
+  expect(screen.queryByRole('link', { name: 'CLB Thể thao' })).toBeNull();
+  expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/clubs?page=1&limit=12&category=art-id'))).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: 'Xóa bộ lọc' }));
+  await waitFor(() => expect(location.search).toBe(''));
+});

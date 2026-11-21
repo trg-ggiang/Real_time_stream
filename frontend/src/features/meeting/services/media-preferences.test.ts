@@ -1,7 +1,18 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it } from 'vitest';
-import { readMediaPreferences, saveMediaPreference } from './media-preferences';
+import { readMediaPreferences, saveMediaPreference, readSpeakerPreference, saveSpeakerPreference } from './media-preferences';
 afterEach(() => sessionStorage.clear());
+
+it('stores speaker preference independently of microphone and camera', () => {
+  expect(readSpeakerPreference()).toBe(true);
+  saveSpeakerPreference(false);
+  expect(readSpeakerPreference()).toBe(false);
+  expect(readMediaPreferences()).toEqual({ audio: true, video: true });
+  saveMediaPreference('audioinput', false);
+  expect(readSpeakerPreference()).toBe(false);
+  saveSpeakerPreference(true);
+  expect(readSpeakerPreference()).toBe(true);
+});
 
 it('preserves muted camera and microphone across reload without changing the other device', () => {
   saveMediaPreference('audioinput', false);

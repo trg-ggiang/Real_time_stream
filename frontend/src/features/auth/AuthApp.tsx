@@ -102,7 +102,8 @@ export function AuthApp() {
   function logout() {
     submittedAuth.current = false;
     saveSession(null);
-    returnToLanding();
+    // The next account must not inherit the previous account's private route.
+    window.history.replaceState(null, "", "/?mode=login");
     setTheme(savedTheme());
     setSession(null);
     setEnterMeeting(false);

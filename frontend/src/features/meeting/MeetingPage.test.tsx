@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MeetingPage } from './MeetingPage';
 
-vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken }: any) =>
-  <div data-testid="joined-room" data-session={credentials.sessionId} data-auth={accessToken}>Joined</div> }));
+vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected }: any) =>
+  <div data-testid="joined-room" data-session={credentials.sessionId} data-auth={accessToken}
+    data-microphone={audioSelection?.microphone} data-camera={audioSelection?.camera}>
+    <button onClick={() => onConnected?.()}>Connected</button>
+  </div> }));
 afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); window.history.replaceState(null,'','/'); vi.unstubAllGlobals(); });
 
 it('opens an existing room directly without the removed overview and joins with chat authentication', async () => {
@@ -16,11 +19,26 @@ it('opens an existing room directly without the removed overview and joins with 
   vi.stubGlobal('fetch',fetch);
   history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
   render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
+  expect(screen.queryByRole('button', { name: /Đăng xuất|Cài đặt tài khoản/ })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Giao diện tối' }));
+  expect(screen.getByRole('button', { name: 'Giao diện tối' }).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'Giao diện sáng' }));
+  expect(screen.getByRole('button', { name: 'Giao diện sáng' }).getAttribute('aria-pressed')).toBe('true');
   const join = await screen.findByRole('button',{name:/^Tham gia$/});
   await act(async()=>fireEvent.click(join));
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/join'))).toBe(false);
+  fireEvent.click(screen.getByRole('button', { name: 'Hủy' }));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/join'))).toBe(false);
+  fireEvent.click(join);
+  fireEvent.click(screen.getByRole('button', { name: 'Micro trước khi vào phòng' }));
+  expect(screen.queryByRole('button', { name: 'Loa trước khi vào phòng' })).toBeNull();
+  await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' })));
   const room=await screen.findByTestId('joined-room');
   expect(room.getAttribute('data-session')).toBe('s');
   expect(room.getAttribute('data-auth')).toBe('app-jwt');
+  expect(JSON.parse(sessionStorage.getItem('rts.meeting-devices.v1') || '{}').audio).toBe(false);
+  expect(sessionStorage.getItem('rts.meeting-speaker.v1')).toBe('on');
   expect(fetch.mock.calls.some(([url])=>url.includes('/meeting-sessions')||url.includes('/livekit/token'))).toBe(false);
 });
 
@@ -48,4 +66,76 @@ it('keeps the invited session and copies a canonical link for the chosen row', a
     if (clipboard) Object.defineProperty(navigator, 'clipboard', clipboard);
     else Reflect.deleteProperty(navigator, 'clipboard');
   }
+});
+
+it.each([
+  { choice: 'Chuyển sang thiết bị này', mode: 'transfer', resumed: false },
+  { choice: 'Dùng cả hai thiết bị', mode: 'add', resumed: false },
+  { choice: 'Hủy', mode: undefined, resumed: false },
+  { choice: 'Chuyển sang thiết bị này', mode: 'transfer', resumed: true },
+])('keeps media choices for "$choice" (resumed: $resumed)', async ({ choice, mode, resumed }) => {
+  vi.stubGlobal('isSecureContext', true);
+  const getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => [] });
+  Object.defineProperty(navigator, 'mediaDevices', { value: { getUserMedia }, configurable: true });
+  const joinBodies: Array<{ sessionId: string; deviceMode?: string }> = [];
+  const fetch = vi.fn(async (url: string, options?: RequestInit) => ({
+    ok: true,
+    json: async () => {
+      if (url.endsWith('/join')) {
+        const body = JSON.parse(String(options?.body));
+        joinBodies.push(body);
+        if (!body.deviceMode) return { status: 'device_choice_required', meetingId: 'm', sessionId: 's' };
+        return {
+          status: 'admitted', meetingId: 'm', sessionId: 's', attendanceId: 'a', token: 'room-jwt',
+          serverUrl: 'wss://unit.invalid', participantIdentity: 'user:connection', roomName: 'room',
+          transferAfterConnect: body.deviceMode === 'transfer',
+        };
+      }
+      if (url.endsWith('/device-transfer')) return { transferred: true };
+      if (url.endsWith('/leave')) return { status: 'left' };
+      return {
+        meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Team' },
+        membership: { role: 'participant', invitedAt: null },
+        sessions: [{ session_id: 's', status: 'ongoing' }],
+      };
+    },
+  }));
+  vi.stubGlobal('fetch', fetch);
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
+  const accessToken = resumed ? `header.${btoa(JSON.stringify({ sub: 'user' }))}.signature` : 'app-jwt';
+  if (resumed) sessionStorage.setItem('rts.active-meeting.v1', JSON.stringify({
+    owner: 'user', code: 'ABCDEFGHIJ', meetingId: 'm', sessionId: 's', attendanceId: 'other-device', savedAt: Date.now(),
+  }));
+  render(<MeetingPage accessToken={accessToken} displayName="Tester" onLogout={vi.fn()} />);
+  async function continueWithMicOff() {
+    fireEvent.click(screen.getByRole('button', { name: 'Micro trước khi vào phòng' }));
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Tiếp tục tham gia' }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' }));
+  }
+  if (!resumed) {
+    fireEvent.click(await screen.findByRole('button', { name: 'Tham gia' }));
+    await continueWithMicOff();
+  }
+  await screen.findByRole('dialog', { name: 'Bạn đang họp trên thiết bị khác' });
+  expect(joinBodies).toEqual([{ sessionId: 's' }]);
+  fireEvent.click(screen.getByRole('button', { name: choice }));
+  if (resumed) {
+    expect(joinBodies).toHaveLength(1);
+    await continueWithMicOff();
+  }
+  if (!mode) {
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByTestId('joined-room')).toBeNull();
+    expect(joinBodies).toHaveLength(1);
+    return;
+  }
+  const room = await screen.findByTestId('joined-room');
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(room.getAttribute('data-microphone')).toBe('false');
+  expect(room.getAttribute('data-camera')).toBe('true');
+  expect(joinBodies).toEqual([{ sessionId: 's' }, { sessionId: 's', deviceMode: mode }]);
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/device-transfer'))).toBe(false);
+  await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Connected' })));
+  const transfers = fetch.mock.calls.filter(([url]) => url.endsWith('/device-transfer'));
+  expect(transfers).toHaveLength(mode === 'transfer' ? 1 : 0);
 });

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { meetingRequest, MeetingApiError, roleLabels, type JoinRequest, type Member, type MeetingOverview } from '../services/meetings-api';
 import { ConfirmAction } from './ConfirmAction';
 
-export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded }: {
+export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
+  onPendingCountChange?: (count: number) => void;
   accessToken: string; overview: MeetingOverview; sessionId?: string; onlineUsers?: ReadonlySet<string>;
   knownMembers: Member[]; onMembersChanged: (meetingId: string, members: Member[]) => void;
   onChanged: () => Promise<void>; onError: (cause: unknown) => void; onSessionEnded: () => void;
@@ -14,13 +15,14 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
   const [error, setError] = useState('');
   const [waitingEnabled, setWaitingEnabled] = useState<boolean | undefined>(overview.meeting.waitingRoomEnabled);
   const [confirmation, setConfirmation] = useState<{ title: string; path: string; end?: boolean; memberId?: string; request?: JoinRequest } | null>(null);
+  useEffect(() => { onPendingCountChange?.(canModerate ? requests.length : 0); }, [canModerate, requests.length, onPendingCountChange]);
   const locked = useRef(false), mutation = useRef<AbortController | null>(null);
   const meetingId = overview.meeting.meetingId;
   const session = overview.sessions.find(s => s.session_id === sessionId);
   const durable = member ? member.role !== 'participant' || member.invitedAt !== null : true;
 
   const load = useCallback(async (signal: AbortSignal) => {
-    if (!sessionId || session?.status === 'ended') { setLoading(false); return; }
+    if (!sessionId || session?.status === 'ended') { setRequests([]); setLoading(false); return; }
     try {
       const pending = await meetingRequest<JoinRequest[]>(accessToken, `/${meetingId}/sessions/${sessionId}/join-requests`, { signal });
       if (!signal.aborted) { setRequests(pending); setCanModerate(true); setLoading(false); }
@@ -93,7 +95,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
     {loading ? <p role="status">Đang kiểm tra yêu cầu vào phòng…</p> : null}
     {canModerate && sessionId && session?.status !== 'ended' ? <section className="workspace-requests" aria-labelledby="requests-title"><h3 id="requests-title">Đang chờ duyệt ({requests.length})</h3>
       {!loading && requests.length === 0 ? <p className="workspace-empty">Chưa có yêu cầu tham gia buổi này.</p> : null}
-      {requests.map(request => <div className="workspace-person" key={request.requestId}><span>{request.meeting_members?.users?.display_name || 'Thành viên'}</span><div className="workspace-person-actions"><button type="button" disabled={!!busy} onClick={() => approve(request)}>Cho vào</button><button type="button" className="workspace-text-button" disabled={!!busy} onClick={() => setConfirmation({ title: 'Từ chối yêu cầu tham gia này?', path: `/${meetingId}/sessions/${sessionId}/join-requests/${request.meeting_member_id}/deny` })}>Từ chối</button></div></div>)}
+      {requests.map(request => <div className="workspace-person" key={request.requestId}><span>{request.meeting_members?.users?.display_name || 'Thành viên'}</span><div className="workspace-person-actions"><button type="button" disabled={!!busy} onClick={() => approve(request)}>Duyệt</button><button type="button" className="workspace-text-button" disabled={!!busy} onClick={() => setConfirmation({ title: 'Từ chối yêu cầu tham gia này?', path: `/${meetingId}/sessions/${sessionId}/join-requests/${request.meeting_member_id}/deny` })}>Từ chối</button></div></div>)}
     </section> : null}
     {knownMembers.length ? <section aria-labelledby="members-title"><h3 id="members-title">Thành viên đã xử lý trong phiên này</h3>
       {knownMembers.map(target => {

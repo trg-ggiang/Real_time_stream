@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import {
   getCollection,
+  getClubCategories,
   getDetail,
   type Collection,
   type PublicItem,
   type PublicPage,
+  type ClubCategory,
 } from "../services/discovery-api";
 import { PublicApiError } from "../../../shared/api/public-http";
 
@@ -54,6 +56,9 @@ export function useCollection(kind: Collection, params = "page=1&limit=6") {
   return useQuery<PublicPage>(`${kind}?${params}`, (signal) =>
     getCollection(kind, params, signal),
   );
+}
+export function useClubCategories() {
+  return useQuery<ClubCategory[]>("club-categories", getClubCategories);
 }
 export function usePublicDetail(kind: Collection, id: string) {
   return useQuery<PublicItem>(`${kind}/${id}`, (signal) =>

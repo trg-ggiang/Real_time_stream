@@ -40,6 +40,42 @@ it.each([
   await waitFor(() => expect(`${location.pathname}${location.search}${location.hash}`).toBe(expected));
 });
 
+it.each([
+  ['/workspace/club/channels/general', 'student', 'admin', '/admin'],
+  ['/me/clubs?page=2#list', 'student', 'admin', '/admin'],
+  ['/admin/clubs', 'admin', 'student', '/'],
+] as const)('clears the previous account URL on logout from %s before switching accounts', async (path, oldRole, nextRole, expected) => {
+  history.replaceState(null, '', path);
+  const oldUser = { userId: 'old', email: 'old@test.dev', displayName: 'Old User', role: oldRole };
+  const nextUser = { userId: 'next', email: 'next@test.dev', displayName: 'Next User', role: nextRole };
+  vi.stubGlobal('fetch', vi.fn(async (url: string, options?: RequestInit) => {
+    if (url.endsWith('/profile')) return { ok: true, json: async () => completedProfile };
+    if (url.endsWith('/auth/me')) {
+      const user = (options?.headers as Record<string, string>)?.Authorization?.includes('next-token') ? nextUser : oldUser;
+      return { ok: true, json: async () => user };
+    }
+    const user = JSON.parse(String(options?.body)).email === nextUser.email ? nextUser : oldUser;
+    return { ok: true, json: async () => ({ access_token: user === nextUser ? 'next-token' : 'old-token', user }) };
+  }));
+  const first = render(<AuthApp />);
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: oldUser.email } });
+  fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+  fireEvent.submit(screen.getByLabelText('Email').closest('form')!);
+  await screen.findByText('Trang chủ Old User');
+  fireEvent.click(screen.getByRole('button', { name: 'Đăng xuất' }));
+  expect(location.pathname + location.search + location.hash).toBe('/?mode=login');
+  expect(sessionStorage.getItem('rts.auth-session.v1')).toBeNull();
+  first.unmount();
+  // A refresh must still open the login form, including at the App entry point.
+  render(<App />);
+  const email = await screen.findByLabelText('Email');
+  fireEvent.change(email, { target: { value: nextUser.email } });
+  fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+  fireEvent.submit(email.closest('form')!);
+  await screen.findByText('Trang chủ Next User');
+  expect(location.pathname + location.search + location.hash).toBe(expected);
+});
+
 it('restores and persists the shared theme preference on the login screen', () => {
   localStorage.setItem('rts.meeting-theme.v1', 'dark');
   const first = render(<AuthApp />);

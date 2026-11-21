@@ -256,6 +256,21 @@ export class PersonalService {
       .maybeSingle();
     this.unavailable(error);
     if (!data) throw new NotFoundException("Không tìm thấy đề nghị của bạn.");
-    return { item: data };
+    const { data: links, error: linkError } = await this.supabase.client
+      .from("club_category_links")
+      .select("category_id")
+      .eq("club_id", clubId);
+    this.unavailable(linkError);
+    let categoryNames: string[] = [];
+    if (links?.length) {
+      const { data: categories, error: categoryError } = await this.supabase.client
+        .from("club_categories")
+        .select("category_id,name")
+        .in("category_id", links.map((link) => link.category_id))
+        .order("name");
+      this.unavailable(categoryError);
+      categoryNames = (categories ?? []).map((category) => category.name);
+    }
+    return { item: { ...data, category_names: categoryNames } };
   }
 }

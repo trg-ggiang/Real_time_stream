@@ -574,3 +574,38 @@ Gỡ dòng `uniCircle · tên CLB` khỏi shell chung và CSS liên quan. Fronte
 ## 20/11/2026 — Cuộn trang Thông tin CLB
 
 Cho nội dung trang Khác → Thông tin CLB cuộn riêng ở desktop/tablet và theo trang trên mobile. Frontend build, 13 workspace tests đạt; chưa xác minh browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-10-phase-04-club-information-scroll).
+
+## 20/11/2026 — Header công khai thống nhất
+
+Header trên trang chủ, CLB, hoạt động và bài viết dùng cùng giao diện/trạng thái tài khoản, bám mép trên khi cuộn. Frontend build và 27 test liên quan đạt; chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-11-phase-04-public-header).
+
+## 20/11/2026 — Lọc CLB theo sở thích
+
+Trang `/clubs` có bộ lọc sở thích theo `club_categories`/`club_category_links`, chỉ hiện CLB từ view công khai và giữ bộ lọc trong URL. Backend build/68 test, frontend build/114 test đạt; chưa thử DB/browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-12-phase-04-club-interest-filter).
+
+## 20/11/2026 — Loại CLB và dữ liệu phân loại
+
+Người dùng chốt sáu loại CLB. Đổi nhãn bộ lọc, thêm script seed chỉ thêm bản ghi thiếu và áp dụng trên Supabase development; 3 CLB học thuật/công nghệ, 2 CLB thể thao. API thật và build/test đạt; chưa rà browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-13-phase-04-club-types).
+
+## 20/11/2026 — Phân loại đủ 10 CLB
+
+Đưa năm CLB thử nghiệm/mô tả chưa rõ vào `Khác`, API development xác nhận 10/10 CLB có loại và không trùng ID. Form tạo CLB chưa lưu loại; Phase 04 In Progress. [Work log](/work-logs/2026-11-20-14-phase-04-classify-all-clubs).
+
+## 21/11/2026 — Chọn nhiều loại khi tạo CLB
+
+Hai form tạo CLB gửi mảng loại; backend kiểm tra và ghi liên kết, chi tiết người gửi/admin hiển thị loại. Backend build/72 test, frontend build/116 test đạt; chưa thử ghi DB thật hoặc rà browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-01-phase-04-club-types-on-create).
+
+
+## 21/11/2026 — Thông báo CLB đã quan tâm
+
+Bổ sung thông báo bài viết công khai, hoạt động và đợt tuyển mới cho người đã quan tâm CLB; link mở chi tiết và đánh dấu đã đọc. Build backend, typecheck, 5 backend tests và 3 frontend tests đạt. SQL runner chưa chạy được do thiếu PostgreSQL; cần áp dụng migration mới và nghiệm thu thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-02-phase-04-followed-club-notifications).
+
+
+## 21/11/2026 — Giữ khung khi chuyển CLB
+
+Sửa nháy toàn màn hình khi chuyển CLB: giữ rail/sidebar/main và theme, chỉ tải lại nội dung và quyền CLB đích. Ẩn công cụ/chat cũ ngay khi chuyển. Frontend build và 19 workspace tests đạt; chưa rà trực quan browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-03-phase-04-club-switch-flicker).
+
+
+## 21/11/2026 — Xóa URL cũ khi đăng xuất
+
+Logout đưa về `/?mode=login` và xóa session; đăng nhập tài khoản khác không giữ workspace/trang cá nhân cũ, admin về `/admin`. Refresh sau logout vẫn mở form. Ba regression tái hiện trước sửa, 43 auth/redirect tests và frontend build đạt; chưa thử tài khoản thật trên browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-04-phase-04-logout-account-url).

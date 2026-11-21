@@ -11,7 +11,7 @@
 .guest-hero-slide-footer>p{font-size:12px;color:var(--guest-muted);margin:0;max-width:240px}
 .guest-hero-slide-number{font-size:10px;letter-spacing:1px;color:var(--guest-muted);font-variant-numeric:tabular-nums}
 .guest-hero-slide-tabs{display:flex;justify-content:center;gap:2px;margin-top:10px}
-.guest-landing .guest-hero-slide-tabs button{display:grid;place-items:center;width:30px;min-height:30px;padding:0;background:transparent;border:0;border-radius:50%}
+.guest-hero-carousel .guest-hero-slide-tabs button{display:grid;place-items:center;width:30px;min-height:30px;padding:0;background:transparent;border:0;border-radius:50%}
 .guest-hero-slide-tabs button>span{display:block;width:7px;height:7px;background:#c3d1e6;border-radius:50%;transition:background 200ms ease,transform 200ms ease}
 .guest-hero-slide-tabs button[aria-pressed="true"]>span{background:var(--guest-accent);transform:scale(1.25)}
 .guest-landing .guest-toolbar>label{margin-left:auto}

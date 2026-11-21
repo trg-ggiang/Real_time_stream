@@ -119,6 +119,9 @@ function RequestDetail({
           />
           <h2>Giới thiệu CLB</h2>
           {item.description}
+          {!!item.category_names?.length && (
+            <p><strong>Loại CLB:</strong> {item.category_names.join(", ")}</p>
+          )}
           {item.mission && (
             <>
               <h2>Sứ mệnh</h2>

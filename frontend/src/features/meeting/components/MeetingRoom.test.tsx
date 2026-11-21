@@ -10,7 +10,7 @@ const localParticipant = vi.hoisted(() => ({
 }));
 
 vi.mock('@livekit/components-react', () => ({
-  LiveKitRoom: ({children,onMediaDeviceFailure,onConnected,onDisconnected,audio,video}: any) => <div data-testid="livekit" data-audio={audio} data-video={video}>{children}
+  LiveKitRoom: ({children,onMediaDeviceFailure,onConnected,onDisconnected,audio,video}: any) => <div data-testid="livekit-room" data-audio={String(audio)} data-video={String(video)}>{children}
     <button onClick={() => onConnected?.()}>Connected</button>
     <button onClick={() => onDisconnected?.(DisconnectReason.PARTICIPANT_REMOVED)}>Removed by LiveKit</button>
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.PermissionDenied, undefined)}>Screen cancelled</button>
@@ -27,9 +27,46 @@ vi.mock('@livekit/components-react', () => ({
 vi.mock('./MeetingMediaLayout', () => ({MeetingMediaLayout: () => <div>Media</div>}));
 vi.mock('./ScreenShareButton', () => ({ScreenShareButton: () => null}));
 vi.mock('./ScreenShareRequests', () => ({ScreenShareRequests: () => null}));
-vi.mock('./MeetingManagement', () => ({MeetingManagement: () => null}));
+vi.mock('./MeetingManagement', async () => {
+  const { useEffect } = await import('react');
+  return { MeetingManagement: ({ onPendingCountChange }: any) => {
+    useEffect(() => { onPendingCountChange?.(2); }, [onPendingCountChange]);
+    return <div>Management content</div>;
+  } };
+});
 vi.mock('../chat/components/MeetingChat', () => ({MeetingChat: ({credentials,accessToken,children,open}: any) => <div data-testid="chat-wrapper" data-session={credentials.sessionId} data-auth={accessToken} data-open={String(open)}>{children}</div>}));
-afterEach(() => { cleanup(); sessionStorage.clear(); });
+afterEach(() => {
+  cleanup();
+  sessionStorage.clear();
+  localParticipant.setMicrophoneEnabled.mockClear();
+  localParticipant.setCameraEnabled.mockClear();
+});
+
+it('applies muted microphone and speakers from the pre-join selection', () => {
+  render(<MeetingRoom accessToken="test" credentials={{token:'test',serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u'}} audioSelection={{microphone:false,speaker:false}} onLeave={vi.fn()} onEnded={vi.fn()} />);
+  expect(screen.getByTestId('livekit-room').getAttribute('data-audio')).toBe('false');
+  expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('0');
+  fireEvent.click(screen.getByLabelText('Bật âm thanh phòng'));
+  expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('1');
+  expect(sessionStorage.getItem('rts.meeting-speaker.v1')).toBe('on');
+});
+it('places the meeting title inside the room and shows pending approvals while management is closed', () => {
+  const onShare = vi.fn();
+  render(<MeetingRoom accessToken="test" credentials={{token:'test',serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u'}}
+    onLeave={vi.fn()} onEnded={vi.fn()} onShare={onShare} management={{
+      accessToken: 'test', overview: { meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Sinh hoạt CLB' }, sessions: [] },
+      knownMembers: [], onMembersChanged: vi.fn(), onChanged: vi.fn(), onError: vi.fn(), onSessionEnded: vi.fn(),
+    }} />);
+  expect(screen.getByRole('heading', { name: 'Sinh hoạt CLB' }).closest('.meeting-room')).toBeTruthy();
+  expect(screen.queryByText('Đã kết nối')).toBeNull();
+  const control = screen.getByRole('button', { name: 'Quản lý cuộc họp, 2 người chờ duyệt' });
+  expect(control.getAttribute('aria-expanded')).toBe('false');
+  expect(screen.getByText('Management content').parentElement?.hidden).toBe(true);
+  fireEvent.click(control);
+  expect(screen.getByText('Management content').parentElement?.hidden).toBe(false);
+  fireEvent.click(screen.getByRole('button', { name: 'Chia sẻ đường dẫn' }));
+  expect(onShare).toHaveBeenCalledOnce();
+});
 
 it('provides separate input/output pickers and lets headphones mute received audio', () => {
   render(<MeetingRoom accessToken="test" credentials={{token:'test',serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u'}} onLeave={vi.fn()} onEnded={vi.fn()} />);
@@ -79,8 +116,8 @@ it('holds local capture and received audio until a transfer has completed', asyn
     onConnected, onLeave: vi.fn(), onEnded,
   };
   const { rerender } = render(<MeetingRoom {...props} transferStatus="pending" />);
-  expect(screen.getByTestId('livekit').getAttribute('data-audio')).toBe('false');
-  expect(screen.getByTestId('livekit').getAttribute('data-video')).toBe('false');
+  expect(screen.getByTestId('livekit-room').getAttribute('data-audio')).toBe('false');
+  expect(screen.getByTestId('livekit-room').getAttribute('data-video')).toBe('false');
   expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('0');
   fireEvent.click(screen.getByText('Connected'));
   expect(onConnected).toHaveBeenCalledOnce();
@@ -92,4 +129,21 @@ it('holds local capture and received audio until a transfer has completed', asyn
   expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('1');
   fireEvent.click(screen.getByText('Removed by LiveKit'));
   expect(onEnded).toHaveBeenCalledWith('Thiết bị này đã bị ngắt khỏi phòng họp.', true);
+});
+
+it('restores the selected camera after transfer while keeping the selected mic and speaker off', async () => {
+  const props = {
+    accessToken: 'test',
+    credentials: { token: 'room', serverUrl: 'wss://unit.invalid', roomName: 'test', participantIdentity: 'u', transferAfterConnect: true },
+    audioSelection: { microphone: false, camera: true, speaker: false },
+    onLeave: vi.fn(), onEnded: vi.fn(),
+  };
+  const { rerender } = render(<MeetingRoom {...props} transferStatus="pending" />);
+  expect(screen.getByTestId('livekit-room').getAttribute('data-video')).toBe('false');
+  expect(localParticipant.setCameraEnabled).not.toHaveBeenCalled();
+  rerender(<MeetingRoom {...props} transferStatus={null} />);
+  await waitFor(() => expect(localParticipant.setCameraEnabled).toHaveBeenCalledWith(true));
+  expect(screen.getByTestId('livekit-room').getAttribute('data-audio')).toBe('false');
+  expect(localParticipant.setMicrophoneEnabled).not.toHaveBeenCalled();
+  expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('0');
 });

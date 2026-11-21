@@ -14,9 +14,10 @@ export function MeetingDeviceChoice({ busy, error, onChoose, onCancel }: {
 
   useEffect(() => {
     const element = dialog.current;
-    element?.showModal();
+    if (typeof element?.showModal === 'function') element.showModal();
+    else if (element) element.open = true;
     cancelButton.current?.focus();
-    return () => element?.close();
+    return () => { if (typeof element?.close === 'function') element.close(); };
   }, []);
 
   return (

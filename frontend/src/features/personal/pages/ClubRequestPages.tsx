@@ -8,6 +8,7 @@ import {
   LinkedText,
 } from "../../discovery/components/PublicContent";
 import { usePersonalQuery } from "../use-personal-query";
+import { ClubCategoryPicker } from "../../discovery/components/ClubCategoryPicker";
 import { type ClubRequest } from "../services/personal-api";
 import { PersonalState } from "../components/PersonalState";
 import { requestStatus } from "./PersonalLists";
@@ -37,6 +38,7 @@ const requestFields = [
 export function NewClubRequest({ token }: { token: string }) {
   const navigate = useNavigate();
   const [values, setValues] = useState<Record<string, string>>({});
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -44,7 +46,7 @@ export function NewClubRequest({ token }: { token: string }) {
   const [uncertain, setUncertain] = useState(false);
   const mutation = useRef<AbortController | null>(null);
   useEffect(() => () => mutation.current?.abort(), []);
-  useUnsavedChanges(!sent && Object.values(values).some((v) => Boolean(v)));
+  useUnsavedChanges(!sent && (categoryIds.length > 0 || Object.values(values).some((v) => Boolean(v))));
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (busy || uploading || uncertain || mutation.current) return;
@@ -70,6 +72,10 @@ export function NewClubRequest({ token }: { token: string }) {
       setError("URL ảnh phải bắt đầu bằng http:// hoặc https://.");
       return;
     }
+    if (!categoryIds.length) {
+      setError("Chọn ít nhất một loại CLB.");
+      return;
+    }
     setBusy(true);
     const controller = new AbortController();
     mutation.current = controller;
@@ -79,7 +85,7 @@ export function NewClubRequest({ token }: { token: string }) {
         "public/clubs",
         {
           method: "POST",
-          body: JSON.stringify(body),
+          body: JSON.stringify({ ...body, category_ids: categoryIds }),
           signal: controller.signal,
         },
       );
@@ -156,6 +162,7 @@ export function NewClubRequest({ token }: { token: string }) {
             </label>
           ))}
         </div>
+        <ClubCategoryPicker selected={categoryIds} onChange={setCategoryIds} disabled={busy || uncertain} />
         <p className="ps-small">
           Chọn logo và ảnh bìa từ thiết bị. Hệ thống tải ảnh lên và tự lưu đường dẫn.
         </p>
@@ -227,6 +234,9 @@ export function ClubRequestDetail({ token }: { token: string }) {
             <h2>Thông tin đã gửi</h2>
             <p className="ps-small">Gửi lúc {publicDate(item.created_at)}</p>
             <p>{item.summary}</p>
+            {!!item.category_names?.length && (
+              <p><strong>Loại CLB:</strong> {item.category_names.join(", ")}</p>
+            )}
             <div className="ps-long-text">
               <LinkedText text={item.description} />
             </div>

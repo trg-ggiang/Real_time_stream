@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/csr/MagnifyingGlass";
 import { useCollection } from "../hooks/use-public-query";
 import { ContentCards, QueryState } from "../components/PublicContent";
+import { ClubCategoryFilter } from "../components/ClubCategoryFilter";
 import type { Collection } from "../services/discovery-api";
 const titles = {
   clubs: [
@@ -29,12 +30,14 @@ export function CollectionPage({ kind }: { kind: Collection }) {
   const period = ["upcoming", "past"].includes(params.get("period") || "")
     ? params.get("period")!
     : "all";
+  const category = kind === "clubs" ? params.get("category") || "" : "";
   const [draft, setDraft] = useState(q);
   useEffect(() => setDraft(q), [q]);
   const query = new URLSearchParams({
     page: String(page),
     limit: "12",
     ...(q && { q }),
+    ...(category && { category }),
     ...(kind === "activities" && { period }),
   });
   const result = useCollection(kind, query.toString());
@@ -76,6 +79,12 @@ export function CollectionPage({ kind }: { kind: Collection }) {
           />
           <button type="submit">Tìm kiếm</button>
         </form>
+        {kind === "clubs" && (
+          <ClubCategoryFilter
+            value={category}
+            onChange={(value) => update({ category: value, page: "" })}
+          />
+        )}
         {kind === "activities" && (
           <label className="dc-period">
             Thời gian
@@ -108,10 +117,12 @@ export function CollectionPage({ kind }: { kind: Collection }) {
       ) : (
         <QueryState
           {...result}
-          empty="Chưa có nội dung phù hợp. Thử từ khóa hoặc khoảng thời gian khác."
+          empty={kind === "clubs"
+            ? "Chưa có câu lạc bộ phù hợp. Thử loại CLB hoặc từ khóa khác."
+            : "Chưa có nội dung phù hợp. Thử từ khóa hoặc khoảng thời gian khác."}
         />
       )}
-      {(q || period !== "all") && !result.loading && (
+      {(q || category || (kind === "activities" && period !== "all")) && !result.loading && (
         <button
           className="dc-clear"
           onClick={() => {

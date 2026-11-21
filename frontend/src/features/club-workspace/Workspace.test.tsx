@@ -120,6 +120,38 @@ it('keeps club order and the channel list stable while switching channels', asyn
   expect(channelRequests()).toBe(1);
 });
 
+it('keeps the workspace shell mounted while another club loads without exposing the old club tools', async () => {
+  const { fetcher } = fixture();
+  history.replaceState(null, '', '/workspace/beta/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  await screen.findByRole('heading', { name: 'Chung' });
+  await screen.findByRole('link', { name: 'Duyệt nội dung' });
+  fireEvent.click(screen.getByRole('button', { name: 'Chế độ tối' }));
+  const rail = screen.getByRole('complementary', { name: 'CLB đã tham gia' });
+  const shell = rail.closest('.cw-app');
+  const main = document.getElementById('workspace-content');
+  const respond = fetcher.getMockImplementation()!;
+  let release!: () => void;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  fetcher.mockImplementation(async (url, options) => {
+    if (url === '/api/workspace/alpha') await pending;
+    return respond(url, options);
+  });
+  fireEvent.click(within(rail).getByRole('link', { name: 'Mở CLB Alpha' }));
+  await screen.findByText('Đang kiểm tra quyền…');
+  expect(screen.getByRole('complementary', { name: 'CLB đã tham gia' })).toBe(rail);
+  expect(rail.closest('.cw-app')).toBe(shell);
+  expect(document.getElementById('workspace-content')).toBe(main);
+  expect(shell?.getAttribute('data-theme')).toBe('dark');
+  expect(screen.queryByRole('link', { name: 'Duyệt nội dung' })).toBeNull();
+  expect(screen.queryByRole('textbox', { name: 'Nhắn tin trong Chung' })).toBeNull();
+  await act(async () => { release(); });
+  await screen.findByRole('heading', { name: 'Chung' });
+  expect(screen.getByRole('complementary', { name: 'CLB đã tham gia' })).toBe(rail);
+  expect(screen.queryByRole('link', { name: 'Duyệt nội dung' })).toBeNull();
+  expect(screen.getByRole('link', { name: 'Mở CLB Alpha' }).getAttribute('aria-current')).toBe('page');
+});
+
 it('links meeting invites and external URLs without swallowing adjacent message text', async () => {
   const invite = location.origin + '/?view=meeting&meeting=ABCDEFGHIJ&session=buoi-1';
   const website = 'https://example.test/Buoi_(1)?a=one&b=two#note';
@@ -373,6 +405,38 @@ it('switches and restores the workspace theme while the information panel is col
   expect(restored.getAttribute('aria-pressed')).toBe('true');
   fireEvent.click(restored);
   expect(restored.closest('.cw-app')?.getAttribute('data-theme')).toBe('light');
+});
+
+it.each(['/workspace/alpha/meetings', '/workspace/alpha/recurring-meetings'])('opens a pasted invite on %s using the existing meeting view', async path => {
+  const { fetcher } = fixture();
+  history.replaceState(null, '', path);
+  const onMeeting = vi.fn();
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
+  fireEvent.change(input, { target: { value: ' https://other.example/?view=meeting&meeting=abcd123456&session=invited-session ' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
+  expect(onMeeting).toHaveBeenCalledOnce();
+  expect(location.origin).not.toContain('other.example');
+  expect(new URLSearchParams(location.search).get('meeting')).toBe('ABCD123456');
+  expect(new URLSearchParams(location.search).get('session')).toBe('invited-session');
+  expect(fetcher.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+});
+
+it('rejects invalid meeting links and clears a previous session when opening a code', async () => {
+  fixture();
+  history.replaceState(null, '', '/workspace/alpha/meetings?session=old-session');
+  const onMeeting = vi.fn();
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
+  fireEvent.change(input, { target: { value: 'https://example.com/no-meeting' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
+  expect(screen.getByRole('alert').textContent).toContain('10 chữ/số');
+  expect(onMeeting).not.toHaveBeenCalled();
+  fireEvent.change(input, { target: { value: 'abcd123456' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
+  expect(onMeeting).toHaveBeenCalledOnce();
+  expect(new URLSearchParams(location.search).get('meeting')).toBe('ABCD123456');
+  expect(new URLSearchParams(location.search).has('session')).toBe(false);
 });
 
 it('copies the exact workspace session and keeps direct room navigation', async () => {

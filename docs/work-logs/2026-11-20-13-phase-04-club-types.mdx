@@ -1,0 +1,59 @@
+---
+title: Phase 04 — Loại câu lạc bộ
+description: Đổi bộ lọc thành loại CLB và bổ sung dữ liệu phân loại development.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-13
+- Thời gian: 20/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Người dùng làm rõ bộ lọc cần chọn CLB theo loại, không phải sở thích cá nhân; chọn sáu loại: Học thuật & công nghệ, Thể thao, Văn hóa & nghệ thuật, Tình nguyện, Kỹ năng, Khác.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/discovery/components/ClubCategoryFilter.tsx`, `pages/CollectionPage.tsx`, `services/discovery-api.ts`: đổi nhãn và thông báo thành “Loại CLB”. Backend service dùng thông báo lỗi cùng thuật ngữ.
+- `scripts/seed-club-types.mjs`, `package.json`: thêm script xem trước mặc định và chế độ `--apply` chỉ thêm loại/liên kết còn thiếu. Gắn HUROS, SINNO, HBAC với Học thuật & công nghệ; Đá bóng, AE siêu nhân với Thể thao. Không phân loại năm CLB có nội dung thử hoặc quá chung.
+- Áp dụng lên Supabase development: thêm sáu loại và năm liên kết. Không đổi schema hay RLS.
+- Cập nhật README, CODE_FLOW và tài liệu thiết kế công khai.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run seed:club-types` | Passed | Dry-run in đúng sáu loại và năm liên kết dự kiến; không ghi DB |
+| `npm.cmd run seed:club-types -- --apply` | Passed | Supabase development tạo sáu loại và năm liên kết |
+| Chạy lại `npm.cmd run seed:club-types -- --apply` | Passed | Không thêm bản ghi trùng |
+| `GET /api/public/club-categories` qua Vite proxy | Passed | Trả sáu loại |
+| `GET /api/public/clubs?category=...` qua Vite proxy | Passed | Học thuật & công nghệ: 3 CLB; Thể thao: 2; bốn loại còn lại: 0 |
+| Kết hợp `category=Thể thao` và `q=Đá` qua Vite proxy | Passed | Trả đúng Đá bóng, tổng 1 |
+| `npm.cmd --workspace frontend run test -- GuestLanding` | Passed | 7 test |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; còn cảnh báo chunk lớn |
+| `npm.cmd --workspace backend run test` | Passed | Build và 68 test |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser / trực quan | Skipped | Chưa kiểm tra tương tác qua trình duyệt thật |
+
+## Quyết định và lý do
+
+Phân loại chỉ các CLB có tên/mô tả đủ rõ. Sáu loại được tạo theo lựa chọn của người dùng; loại chưa có CLB được giữ để dùng khi có nội dung phù hợp. Script không cập nhật hoặc xóa phân loại đã có.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho thay đổi đã giao. Năm CLB còn lại chưa phân loại; cần chủ CLB hoặc quản trị viên xác nhận loại phù hợp. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Rà UI `/clubs` trên desktop/mobile; khi có dữ liệu CLB mới, gắn loại phù hợp trong `club_category_links` hoặc mở rộng công cụ quản trị phân loại.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

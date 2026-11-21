@@ -29,7 +29,7 @@ test('chairperson, missing target and unauthorized actors cannot be changed',asy
 });
 test('notification list filters recipient, event type and read snapshot',async()=>{
  const f=fixture(); const service=new HeadNotifications({client:f.client}); const data=await service.list('recipient');
- for(const c of f.calls){assert.equal(c.query.get('recipient_id'),'eq.recipient');assert.equal(c.query.get('type'),'in.(department.head_assigned,recruitment.application,recruitment.accepted,recruitment.rejected)');assert.equal(c.query.get('created_at'),'lte.'+data.read_through);}
+ for(const c of f.calls){assert.equal(c.query.get('recipient_id'),'eq.recipient');assert.equal(c.query.get('type'),'in.(department.head_assigned,recruitment.application,recruitment.accepted,recruitment.rejected,post.published,activity.published,recruitment.published)');assert.equal(c.query.get('created_at'),'lte.'+data.read_through);}
 });
 test('mark viewed uses only authenticated recipient and snapshot cutoff',async()=>{
  const f=fixture(); await new HeadNotifications({client:f.client}).read('recipient','snapshot');

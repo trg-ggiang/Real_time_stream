@@ -1,3 +1,4 @@
+import { GuestHeroCarousel } from "../../guest/GuestHero";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/csr/MagnifyingGlass";
@@ -75,13 +76,7 @@ export function DiscoveryHome() {
           </div>
         </div>
         <figure className="dc-hero-figure">
-          <div className="dc-hero-image-frame">
-            <ContentImage
-              src="/images/guest/campus-bright-1000.jpg"
-              alt="Ảnh minh họa sinh viên cùng học tập và kết nối"
-              eager
-            />
-          </div>
+          <GuestHeroCarousel />
           <figcaption>
             <span>Những cuộc gặp tạo nên cộng đồng.</span>
             <Link to="/clubs" aria-label="Khám phá cộng đồng Bách khoa">

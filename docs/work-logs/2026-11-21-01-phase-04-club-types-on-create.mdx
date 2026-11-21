@@ -1,0 +1,55 @@
+---
+title: Phase 04 — Chọn nhiều loại khi tạo CLB
+description: Lưu loại CLB cùng đề nghị thành lập và hiển thị trong chi tiết xét duyệt.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-21-01
+- Thời gian: 21/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Hiển thị loại CLB khi tạo đề nghị thành lập và cho chọn nhiều loại cho một CLB.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/discovery/components/ClubCategoryPicker.tsx`, `club-category-picker.css`: tải các loại hiện có và hiển thị checkbox chọn nhiều loại.
+- `frontend/src/features/personal/pages/ClubRequestPages.tsx`, `frontend/src/features/guest/ClubApplicationDialog.tsx`: yêu cầu chọn ít nhất một loại trên hai form tạo CLB và gửi mảng `category_ids`.
+- `backend/src/public-content/create-club.dto.ts`, `public-content.service.ts`: kiểm tra mảng UUID không trùng, đối chiếu ID loại trong DB trước khi tạo, thêm nhiều liên kết `club_category_links`; nếu ghi liên kết lỗi, thử xóa đúng đề nghị vừa tạo và trả lỗi yêu cầu kiểm tra lịch sử.
+- `backend/src/personal/personal.service.ts`, `backend/src/admin/admin.service.ts` cùng các kiểu/giao diện liên quan: hiển thị tên loại trong chi tiết đề nghị của người tạo và admin.
+- Bổ sung test backend cho nhiều loại, ID sai, xử lý lỗi liên kết và hai trang chi tiết; test frontend cho cả form chính và dialog cũ. Cập nhật README, CODE_FLOW và tài liệu thiết kế.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace backend run test` | Passed | Build và 72 test backend |
+| `npm.cmd --workspace frontend run test` | Passed | 116 test frontend; jsdom in cảnh báo `scrollTo` chưa triển khai |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; còn cảnh báo chunk lớn |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser / trực quan | Skipped | Chưa kiểm tra trực quan form đăng nhập trên browser thật |
+| Dịch vụ thật / end-to-end | Skipped | Chưa tạo đề nghị thật để tránh để lại dữ liệu thử trên Supabase development |
+
+## Quyết định và lý do
+
+Giữ `category_ids` tùy chọn ở API để không phá các client cũ; hai form hiện tại yêu cầu chọn ít nhất một loại. Luồng hiện tại chưa có RPC giao dịch chung nên ghi liên kết sau khi tạo CLB; lỗi ghi liên kết kích hoạt thao tác bù cho đúng đề nghị mới. Nếu thao tác bù cũng lỗi, người dùng cần kiểm tra lịch sử trước khi gửi lại.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker cho thay đổi code. Chưa xác minh ghi thật và thao tác trực quan trên browser. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Trên Supabase development, dùng tài khoản test tạo một đề nghị với hai loại; kiểm tra bảng `club_category_links`, trang chi tiết người gửi/admin và bộ lọc sau khi admin duyệt. Xóa dữ liệu thử theo quy trình của nhóm.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

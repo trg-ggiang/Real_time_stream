@@ -9,12 +9,6 @@ const slides = [
 ];
 
 export function GuestHero() {
-  const [current, setCurrent] = useState(0);
-  useEffect(() => {
-    const timer = window.setTimeout(() => setCurrent(index => (index + 1) % slides.length), 5000);
-    return () => window.clearTimeout(timer);
-  }, [current]);
-
   return <section className="guest-hero guest-hero-panel" aria-labelledby="guest-title">
     <div className="guest-hero-copy">
       <p className="guest-overline">Cộng đồng sinh viên</p>
@@ -22,7 +16,19 @@ export function GuestHero() {
       <p>Khám phá câu lạc bộ, tham gia hoạt động và gặp những người cùng sở thích.</p>
       <div className="guest-hero-actions"><a className="guest-primary" href="#guest-clubs">Khám phá CLB</a><a href="#guest-activities">Xem hoạt động</a></div>
     </div>
-    <div className="guest-hero-carousel" role="region" aria-roledescription="trình chiếu" aria-label="Cộng đồng sinh viên Bách khoa">
+    <GuestHeroCarousel />
+    <div className="guest-hero-bottom-effect" aria-hidden="true"><span /><span /><span /></div>
+  </section>;
+}
+
+export function GuestHeroCarousel() {
+  const [current, setCurrent] = useState(0);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setCurrent(index => (index + 1) % slides.length), 5000);
+    return () => window.clearTimeout(timer);
+  }, [current]);
+
+  return <div className="guest-hero-carousel" role="region" aria-roledescription="trình chiếu" aria-label="Cộng đồng sinh viên Bách khoa">
       <div className="guest-hero-slides">
         {slides.map((slide, index) => <div key={slide.src} className={`guest-hero-slide${current === index ? ' is-current' : index === (current + slides.length - 1) % slides.length ? ' is-previous' : ''}`} aria-hidden={current !== index && index !== (current + slides.length - 1) % slides.length}>
           <img src={slide.src} alt={slide.alt} width="1200" height="900" fetchPriority={index === 0 ? 'high' : 'auto'} loading={index === 0 ? 'eager' : 'lazy'} />
@@ -37,7 +43,5 @@ export function GuestHero() {
           <span />
         </button>)}
       </div>
-    </div>
-    <div className="guest-hero-bottom-effect" aria-hidden="true"><span /><span /><span /></div>
-  </section>;
+    </div>;
 }

@@ -1,0 +1,51 @@
+---
+title: Thông báo CLB đã quan tâm
+description: Gửi thông báo khi CLB đăng bài viết, hoạt động và đợt tuyển.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-21-02; không có mốc bắt đầu/kết thúc chính xác.
+- Agent: Codex; Phase: 04; Kết quả phiên: Completed (source).
+- Trạng thái phase: In Progress. Nhánh: final; chưa commit/push.
+
+## Mục tiêu và phạm vi được giao
+
+Chỉ bổ sung thông báo khi CLB người dùng đã quan tâm đăng hoạt động, bài viết hoặc đợt tuyển thành viên.
+
+## Công việc hoàn thành
+
+- Migration `supabase/migrations/202611210001_followed_club_notifications.sql`: trigger tạo inbox trong transaction đăng nội dung; lấy người nhận từ `club_follows`, kiểm tra CLB published, bài viết public, hoạt động scheduled/ongoing, đợt tuyển open và chưa xóa. Không gửi cho draft/nội dung nội bộ. Khóa theo người nhận/nội dung chống trùng khi sửa hoặc đăng lại; không gửi bù nội dung cũ.
+- `backend/src/personal/head-notifications.service.ts`: thêm ba loại sự kiện vào danh sách và số chưa đọc; RPC đánh dấu đã đọc được mở rộng trong migration.
+- `frontend/src/features/discovery/components/HeadNotifications.tsx`: chấp nhận link public chi tiết posts/activities/recruitments qua bộ lọc URL nội bộ hiện có.
+- Cập nhật tests backend/frontend; thêm runner `backend/test/followed-club-db.cjs` và hai fixtures SQL để kiểm tra migration chạy lại, người nhận, trạng thái, chống trùng, link, đã đọc, bỏ quan tâm và CLB ẩn.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace backend run build` | Passed | TypeScript backend |
+| `node --test backend/test/department-head.test.cjs` | Passed | 5 tests API mô phỏng |
+| `npm.cmd --workspace frontend run test -- HeadNotifications` | Passed | 3 tests DOM/URL |
+| `npm.cmd run typecheck` | Passed | Cả hai workspace |
+| `node backend/test/followed-club-db.cjs` | Blocked | ENOENT: thiếu PostgreSQL 17/initdb tại đường dẫn mặc định |
+| Supabase thật, browser và end-to-end nhiều tài khoản | Skipped | Chưa áp dụng migration hoặc chạy nghiệm thu thật |
+
+## Quyết định và lý do
+
+Gửi ngay trong transaction đăng nội dung để tránh trạng thái đăng thành công nhưng chưa tạo thông báo. Giữ chuông và nhịp tải hiện có. Không đổi schema bảng hoặc RLS. Không tìm thấy skill Supabase Postgres trong các skill cài đặt; đối chiếu cách bảo vệ hàm với [PostgreSQL CREATE FUNCTION](https://www.postgresql.org/docs/current/sql-createfunction.html).
+
+## Blocker và việc chưa hoàn thành
+
+Migration chưa được thực thi/kiểm chứng trên PostgreSQL hoặc Supabase thật. Phase 04 chưa đủ điều kiện Done.
+
+## Bước tiếp theo
+
+Chạy runner với PostgreSQL 17 (hoặc đặt `RECRUITMENT_TEST_PG_BIN`), áp dụng migration sau các migration 202611200001/202611200002, restart backend và dùng tài khoản đã quan tâm CLB để kiểm tra ba loại nội dung cùng đánh dấu đã đọc.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và hướng dẫn setup
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

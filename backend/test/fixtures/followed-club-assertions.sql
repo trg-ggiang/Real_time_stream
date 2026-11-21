@@ -1,0 +1,36 @@
+DO $$
+DECLARE c uuid:=gen_random_uuid(); follower uuid:=gen_random_uuid(); other_user uuid:=gen_random_uuid(); p uuid:=gen_random_uuid(); a uuid:=gen_random_uuid(); r uuid:=gen_random_uuid(); n integer;
+BEGIN
+ INSERT INTO public.clubs VALUES(c,'Test club','published');
+ INSERT INTO public.club_follows VALUES(c,follower),(gen_random_uuid(),other_user);
+ INSERT INTO public.club_posts VALUES(p,c,'Post','draft','public',NULL,follower);
+ IF EXISTS(SELECT FROM public.notifications) THEN RAISE EXCEPTION 'Draft notification'; END IF;
+ UPDATE public.club_posts SET publication_status='published' WHERE post_id=p;
+ UPDATE public.club_posts SET title='Edited' WHERE post_id=p;
+ UPDATE public.club_posts SET publication_status='draft' WHERE post_id=p;
+ UPDATE public.club_posts SET publication_status='published' WHERE post_id=p;
+ SELECT count(*) INTO n FROM public.notifications;
+ IF n<>1 THEN RAISE EXCEPTION 'Expected one post notification, got %',n; END IF;
+ INSERT INTO public.club_posts VALUES(gen_random_uuid(),c,'Internal','published','internal',NULL,follower);
+ INSERT INTO public.club_activities VALUES(a,c,'Activity','draft','scheduled',NULL,follower);
+ UPDATE public.club_activities SET publication_status='published' WHERE activity_id=a;
+ INSERT INTO public.club_activities VALUES(gen_random_uuid(),c,'Cancelled','published','cancelled',NULL,follower);
+ INSERT INTO public.recruitment_campaigns VALUES(r,c,'Recruitment','draft',NULL,follower);
+ UPDATE public.recruitment_campaigns SET status='open' WHERE campaign_id=r;
+ UPDATE public.recruitment_campaigns SET title='Edited' WHERE campaign_id=r;
+ UPDATE public.recruitment_campaigns SET status='closed' WHERE campaign_id=r;
+ SELECT count(*) INTO n FROM public.notifications;
+ IF n<>3 OR EXISTS(SELECT FROM public.notifications WHERE recipient_id<>follower) THEN RAISE EXCEPTION 'Wrong audience or publication count: %',n; END IF;
+ IF NOT EXISTS(SELECT FROM public.notifications WHERE type='post.published' AND data->>'href'='/posts/'||p) OR NOT EXISTS(SELECT FROM public.notifications WHERE type='activity.published' AND data->>'href'='/activities/'||a) OR NOT EXISTS(SELECT FROM public.notifications WHERE type='recruitment.published' AND data->>'href'='/recruitments/'||r) THEN RAISE EXCEPTION 'Wrong public link'; END IF;
+ IF public.clubspace_read_head_notifications(other_user,clock_timestamp())<>0 THEN RAISE EXCEPTION 'Read another recipient'; END IF;
+ IF public.clubspace_read_head_notifications(follower,clock_timestamp())<>3 THEN RAISE EXCEPTION 'Read count'; END IF;
+ DELETE FROM public.club_follows WHERE user_id=follower;
+ INSERT INTO public.club_posts VALUES(gen_random_uuid(),c,'After unfollow','published','public',NULL,follower);
+ SELECT count(*) INTO n FROM public.notifications;
+ IF n<>3 THEN RAISE EXCEPTION 'Notification after unfollow'; END IF;
+ INSERT INTO public.club_follows VALUES(c,follower);
+ UPDATE public.clubs SET status='archived' WHERE club_id=c;
+ INSERT INTO public.club_posts VALUES(gen_random_uuid(),c,'Hidden club','published','public',NULL,follower);
+ SELECT count(*) INTO n FROM public.notifications;
+ IF n<>3 THEN RAISE EXCEPTION 'Hidden club notification'; END IF;
+END $$;

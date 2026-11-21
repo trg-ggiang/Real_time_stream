@@ -146,3 +146,70 @@
 .meeting-room-page[data-theme] .workspace-detail-heading{margin-bottom:24px}
 .meeting-room-page[data-theme] .workspace-feedback:empty{display:none}
 @media(max-width:640px){.meeting-room-page[data-theme] .meeting-main{padding:18px 14px}.meeting-room-page[data-theme] .workspace-session{padding:16px}}
+
+/* Give the active call every available pixel; keep pre-join screens unchanged. */
+.meeting-room-page.meeting-app--incall {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.meeting-room-page.meeting-app--incall .meeting-topbar { flex: 0 0 64px; height: 64px; }
+.meeting-room-page.meeting-app--incall .meeting-main {
+  flex: 1;
+  min-height: 0;
+  max-width: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.meeting-room-page.meeting-app--incall .meeting-room {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  border: 0;
+  border-radius: 0;
+}
+.meeting-room-page.meeting-app--incall .meeting-room [data-lk-theme] {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 16px 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.meeting-room-page.meeting-app--incall .room-status { display: flex; align-items: center; flex: 0 0 auto; padding: 12px 0; }
+.meeting-room-name { flex: 1; min-width: 0; }
+.meeting-room-page .meeting-room-name h1 { margin: 0; font-size: clamp(16px, 1.6vw, 22px); line-height: 1.4; overflow-wrap: anywhere; }
+.meeting-room-page.meeting-app--incall .meeting-workspace { flex: 1; min-height: 180px; }
+.meeting-room-page.meeting-app--incall .meeting-workspace.has-chat { align-items: stretch; }
+.meeting-room-page.meeting-app--incall .meeting-workspace-media { height: 100%; min-height: 0; }
+.meeting-room-page.meeting-app--incall :is(.video-grid, .meeting-workspace .meeting-media-layout, .meeting-chat-panel) { height: 100%; min-height: 0; }
+.meeting-room-page.meeting-app--incall .meeting-controls { flex: 0 0 auto; margin-top: 10px; padding-top: 10px; }
+.meeting-room-page .meeting-management-panel:not([hidden]) { flex: 0 0 auto; }
+.meeting-room-page .meeting-controls .meeting-control-icon { position: relative; }
+.meeting-pending-badge { position: absolute; top: -5px; right: -5px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: #b62437; color: #fff; font-size: 11px; font-weight: 700; border: 2px solid var(--meeting-surface); }
+.meeting-app .meeting-prejoin { width: min(760px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 28px; border: 1px solid var(--meeting-line); border-radius: 18px; background: var(--meeting-surface); color: var(--meeting-text); box-shadow: 0 24px 80px #14284a40; }
+.meeting-prejoin::backdrop { background: #101b32a6; }
+.meeting-app .meeting-prejoin h2 { margin: 0 0 8px; font-size: 22px; }
+.meeting-prejoin > p { color: var(--meeting-muted); overflow-wrap: anywhere; }
+.meeting-prejoin-preview { position: relative; aspect-ratio: 16 / 9; margin-top: 20px; overflow: hidden; border-radius: 14px; background: #17202e; color: #fff; }
+.meeting-prejoin-preview video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+.meeting-prejoin-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.meeting-prejoin-self { position: absolute; bottom: 14px; left: 16px; padding: 4px 10px; border-radius: 6px; background: #0008; }
+.meeting-prejoin-devices { display: flex; justify-content: center; gap: 14px; margin-block: 20px; }
+.meeting-app .meeting-prejoin-devices button { display: grid; place-items: center; width: 52px; min-width: 52px; height: 52px; padding: 0; background: var(--theme-control); color: var(--meeting-text); border: 1px solid var(--meeting-line); border-radius: 50%; }
+.meeting-app .meeting-prejoin-devices button[aria-pressed='true'] { border-color: var(--meeting-accent); color: var(--meeting-accent); }
+.meeting-app .meeting-prejoin-devices button[aria-pressed='false'] { background: #b62437; border-color: #b62437; color: #fff; }
+.meeting-prejoin-hint { font-size: 12px; line-height: 1.7; }
+.meeting-prejoin-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.meeting-app .meeting-prejoin-actions button { background: var(--theme-control); color: var(--meeting-text); border: 1px solid var(--meeting-line); border-radius: 8px; padding: 12px 16px; }
+.meeting-app .meeting-prejoin-actions button:last-child { background: var(--theme-button); color: #fff; border-color: var(--theme-button); }
+@media(max-width:900px) {
+  .meeting-room-page.meeting-app--incall .meeting-workspace.has-chat { grid-template-rows: minmax(160px, 1fr) minmax(200px, 1fr); min-height: 380px; }
+  .meeting-room-page.meeting-app--incall .meeting-room [data-lk-theme] { padding-inline: 8px; }
+  .meeting-room-page .meeting-participant-count { font-size: 10px; }
+}

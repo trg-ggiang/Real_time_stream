@@ -12,7 +12,6 @@ import {
 import { List } from "@phosphor-icons/react/dist/csr/List";
 import { X } from "@phosphor-icons/react/dist/csr/X";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
-import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
 import { HeadNotifications } from "./components/HeadNotifications";
 import { UserRectangle } from "@phosphor-icons/react/dist/csr/UserRectangle";
 import { Users } from "@phosphor-icons/react/dist/csr/Users";
@@ -63,7 +62,7 @@ export function DiscoveryApp({
       setMenu(false);
       for (const panel of [accountMenu.current, notifications.current]) {
         if (!panel?.open) continue;
-        const restoreFocus = isHome && panel.contains(document.activeElement);
+        const restoreFocus = panel.contains(document.activeElement);
         panel.open = false;
         if (restoreFocus) panel.querySelector("summary")?.focus();
       }
@@ -75,12 +74,12 @@ export function DiscoveryApp({
       }
     };
     document.addEventListener("keydown", closeOnEscape);
-    if (isHome) document.addEventListener("click", closeOnOutsideClick, true);
+    document.addEventListener("click", closeOnOutsideClick, true);
     return () => {
       document.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("click", closeOnOutsideClick, true);
     };
-  }, [isHome]);
+  }, []);
   useEffect(() => {
     setMenu(false);
     window.scrollTo(0, 0);
@@ -175,7 +174,7 @@ export function DiscoveryApp({
       <a className="dc-skip" href="#public-content">
         Đến nội dung
       </a>
-      <header className={viewer && isHome ? "dc-header dc-header-signed-in" : "dc-header"}>
+      <header className={viewer ? "dc-header dc-header-signed-in" : "dc-header"}>
         <div className="dc-container dc-header-inner">
           <Link className="dc-brand" to="/" aria-label="uniCircle — Khám phá">
             <UniCircleLogo />
@@ -190,14 +189,13 @@ export function DiscoveryApp({
             {viewer && <NavLink to="/workspace">Không gian sinh hoạt</NavLink>}
           </nav>
           <div className="dc-account">
-            {viewer && isHome && (
+            {viewer && (
               <HeadNotifications key={accessToken || "guest"} token={accessToken} panelRef={notifications} />
             )}
             {viewer ? (
               <details ref={accountMenu}>
                 <summary aria-label={`Menu tài khoản của ${viewer.displayName}`}>
                   <span className="dc-account-avatar" aria-hidden="true">{initials || "U"}</span>
-                  {!isHome && <CaretDown size={16} aria-hidden="true" />}
                 </summary>
                 <div className="dc-account-menu">
                   <p className="dc-account-heading">Sinh viên · {viewer.displayName}</p>

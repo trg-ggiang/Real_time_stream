@@ -1,6 +1,26 @@
 ## 2026-11-21 - Chuyển thiết bị trong buổi họp
 
-Khi cùng tài khoản đã kết nối vào một buổi họp, thiết bị mới có thể chuyển cuộc họp sang thiết bị này hoặc dùng cả hai. Chuyển thiết bị giữ nguyên vai trò của thành viên và ghi lý do kết thúc lượt vào cũ. [Work log](/work-logs/2026-11-21-01-phase-05-meeting-device-transfer).
+Khi cùng tài khoản đã kết nối vào một buổi họp, người dùng chọn chuyển sang thiết bị mới hoặc dùng cả hai. Nếu chuyển, thiết bị mới áp lựa chọn camera/mic trước khi vào phòng sau khi thiết bị cũ đã ngắt. [Work log](/work-logs/2026-11-21-01-phase-05-meeting-device-transfer).
+
+## Chọn nhiều loại khi tạo CLB — 2026-11-21
+
+Thêm checkbox loại CLB ở cả hai form tạo, lưu nhiều liên kết và hiển thị lại cho người gửi/admin. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-01-phase-04-club-types-on-create).
+
+## Phân loại đủ 10 CLB — 2026-11-20
+
+Xếp tạm năm CLB thiếu mô tả rõ vào `Khác`; bộ lọc nay bao phủ cả 10 CLB công khai trên Supabase development. [Work log](/work-logs/2026-11-20-14-phase-04-classify-all-clubs).
+
+## Loại CLB — 2026-11-20
+
+Đổi bộ lọc thành Loại CLB, thêm sáu loại và phân loại năm CLB có nội dung rõ trên Supabase development. [Work log](/work-logs/2026-11-20-13-phase-04-club-types).
+
+## Lọc CLB theo sở thích — 2026-11-20
+
+Thêm chọn sở thích ở `/clubs`, kết hợp tìm tên và phân trang từ dữ liệu CLB công khai. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-12-phase-04-club-interest-filter).
+
+## Header công khai thống nhất — 2026-11-20
+
+Cố định header khi cuộn và đồng bộ giao diện, menu tài khoản, thông báo trên trang chủ, CLB, hoạt động và bài viết. Phase 04 In Progress. [Work log](/work-logs/2026-11-20-11-phase-04-public-header).
 
 ## 2026-11-20 - App audit and content detail cards
 
@@ -819,3 +839,18 @@ với đơn đã xử lý. Typecheck đạt. Phase 04 In Progress. [Work log](/w
 
 Giữ nút chi tiết ở hàng dưới bên phải sau duyệt/từ chối, chỉ có trạng thái bên
 trái. Typecheck đạt; Phase 04 In Progress. [Work log](/work-logs/2026-11-20-06-phase-04-application-detail-position).
+
+
+## 21/11/2026 — Thông báo CLB đã quan tâm
+
+Bổ sung thông báo bài viết công khai, hoạt động và đợt tuyển mới cho người đã quan tâm CLB; link mở chi tiết và đánh dấu đã đọc. Build backend, typecheck, 5 backend tests và 3 frontend tests đạt. SQL runner chưa chạy được do thiếu PostgreSQL; cần áp dụng migration mới và nghiệm thu thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-02-phase-04-followed-club-notifications).
+
+
+## 21/11/2026 — Giữ khung khi chuyển CLB
+
+Sửa nháy toàn màn hình khi chuyển CLB: giữ rail/sidebar/main và theme, chỉ tải lại nội dung và quyền CLB đích. Ẩn công cụ/chat cũ ngay khi chuyển. Frontend build và 19 workspace tests đạt; chưa rà trực quan browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-03-phase-04-club-switch-flicker).
+
+
+## 21/11/2026 — Xóa URL cũ khi đăng xuất
+
+Logout đưa về `/?mode=login` và xóa session; đăng nhập tài khoản khác không giữ workspace/trang cá nhân cũ, admin về `/admin`. Refresh sau logout vẫn mở form. Ba regression tái hiện trước sửa, 43 auth/redirect tests và frontend build đạt; chưa thử tài khoản thật trên browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-04-phase-04-logout-account-url).

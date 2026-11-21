@@ -1,0 +1,51 @@
+---
+title: Phase 04 — Header công khai thống nhất
+description: Cố định header và dùng cùng giao diện ở trang chủ, CLB, hoạt động và bài viết.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-20-11
+- Thời gian: 20/11/2026 (Asia/Saigon); không có mốc bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Cố định header và đồng bộ header trang chủ với `/clubs`, `/activities`, `/posts`.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/discovery/DiscoveryApp.tsx`: dùng cùng biến thể header cho tài khoản đăng nhập trên mọi trang công khai; giữ thông báo, menu tài khoản và cách đóng menu nhất quán.
+- `frontend/src/features/discovery/discovery-home.css`: dùng thiết kế header trang chủ trên các trang công khai, giữ header ở mép trên khi cuộn, đồng bộ điều hướng mobile và đánh dấu mục đang mở.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run build` | Passed | Bao gồm TypeScript; Vite còn cảnh báo chunk lớn |
+| `npm.cmd --workspace frontend run test -- App HeadNotifications` | Passed | 4 file, 27 test |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Browser / trực quan | Skipped | Chưa kiểm tra trên trình duyệt thật |
+| Dịch vụ thật / end-to-end | Skipped | Thay đổi chỉ ở frontend |
+
+## Quyết định và lý do
+
+Header công khai đã nằm trong một component; mở rộng style và trạng thái của trang chủ cho các route liên quan giúp chuyển trang không đổi giao diện. Dùng `position: sticky` để header luôn hiện khi cuộn mà không cần bù khoảng trống nội dung.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker code. Cần rà giao diện desktop/mobile và thao tác cuộn trên browser thật. Phase 04 vẫn In Progress.
+
+## Bước tiếp theo
+
+Mở `/`, `/clubs`, `/activities`, `/posts` ở desktop và mobile, cuộn từng trang và kiểm tra menu tài khoản, thông báo và điều hướng mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log và changelog
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kiểm tra và giới hạn xác minh

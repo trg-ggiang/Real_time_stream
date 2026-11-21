@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { CloudArrowUp } from '@phosphor-icons/react/dist/csr/CloudArrowUp';
 import { ImageSquare } from '@phosphor-icons/react/dist/csr/ImageSquare';
+import { ClubCategoryPicker } from '../discovery/components/ClubCategoryPicker';
 import './club-application.css';
 
 export function ClubApplicationDialog({ token, onClose, onSubmitted }: { token: string; onClose: () => void; onSubmitted: () => void }) {
@@ -9,15 +10,18 @@ export function ClubApplicationDialog({ token, onClose, onSubmitted }: { token: 
   const [error, setError] = useState('');
   const [logoName, setLogoName] = useState('');
   const [coverName, setCoverName] = useState('');
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   useEffect(() => { dialog.current?.showModal(); return () => dialog.current?.close(); }, []);
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError('');
+    event.preventDefault(); setError('');
+    if (!categoryIds.length) { setError('Chọn ít nhất một loại CLB.'); return; }
+    setBusy(true);
     const values = new FormData(event.currentTarget);
     const body = Object.fromEntries(['name', 'summary', 'description', 'contact_email', 'contact_phone']
       .map(key => [key, String(values.get(key) ?? '')]));
     const base = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/$/, '');
     try {
-      const response = await fetch(`${base}/api/public/clubs`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+      const response = await fetch(`${base}/api/public/clubs`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ ...body, category_ids: categoryIds }) });
       const result = await response.json().catch(() => null);
       if (!response.ok) throw new Error(result?.message || 'Không gửi được đăng ký. Vui lòng thử lại.');
       onSubmitted();
@@ -35,6 +39,7 @@ export function ClubApplicationDialog({ token, onClose, onSubmitted }: { token: 
         <label>Mô tả chi tiết *<textarea name="description" required minLength={20} maxLength={5000} rows={3} placeholder="Mục đích, hoạt động và định hướng của CLB..." /></label>
         <label>Sứ mệnh *<input name="mission" required minLength={10} maxLength={2000} placeholder="Sứ mệnh của câu lạc bộ" /></label>
       </section>
+      <ClubCategoryPicker selected={categoryIds} onChange={setCategoryIds} disabled={busy} />
       <section className="club-application-section"><h3>2. Hình ảnh</h3>
         <label>Logo CLB<span className="club-upload-box"><CloudArrowUp size={19} aria-hidden="true" /><span>{logoName || 'Tải logo lên (không bắt buộc)'}</span><input type="file" accept="image/*" aria-label="Tải logo CLB lên" onChange={event => setLogoName(event.currentTarget.files?.[0]?.name || '')} /></span></label>
         <label>Ảnh bìa CLB<span className="club-upload-box"><ImageSquare size={19} aria-hidden="true" /><span>{coverName || 'Tải ảnh bìa lên (không bắt buộc)'}</span><input type="file" accept="image/*" aria-label="Tải ảnh bìa CLB lên" onChange={event => setCoverName(event.currentTarget.files?.[0]?.name || '')} /></span></label>
