@@ -3,7 +3,7 @@ import './confirm-action.css';
 let showing = false;
 
 /** User-facing confirmation; text stays plain and no action runs before acceptance. */
-export function confirmAction(message: string): Promise<boolean> {
+export function confirmAction(message: string, danger = false): Promise<boolean> {
   if (showing) return Promise.resolve(false);
   showing = true;
   return new Promise(resolve => {
@@ -13,17 +13,15 @@ export function confirmAction(message: string): Promise<boolean> {
     dialog.setAttribute('role', 'alertdialog');
     dialog.setAttribute('aria-modal', 'true');
     dialog.setAttribute('aria-labelledby', 'uc-confirm-title');
-    dialog.setAttribute('aria-describedby', 'uc-confirm-message');
     const scope = previous?.closest('[data-theme]');
     dialog.dataset.theme = scope?.getAttribute('data-theme') || 'light';
     const title = document.createElement('h2');
-    title.id = 'uc-confirm-title'; title.textContent = 'Xác nhận thao tác';
-    const body = document.createElement('p');
-    body.id = 'uc-confirm-message'; body.textContent = message;
+    title.id = 'uc-confirm-title'; title.textContent = message;
     const actions = document.createElement('div'); actions.className = 'uc-confirm-actions';
     const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Hủy';
     const accept = document.createElement('button'); accept.type = 'button'; accept.textContent = 'Xác nhận'; accept.className = 'uc-confirm-accept';
-    actions.append(cancel, accept); dialog.append(title, body, actions);
+    if (danger) accept.dataset.danger = 'true';
+    actions.append(cancel, accept); dialog.append(title, actions);
     let settled = false;
     const finish = (accepted: boolean) => {
       if (settled) return;

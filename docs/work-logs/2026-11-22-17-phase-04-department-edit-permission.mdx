@@ -1,0 +1,17 @@
+---
+title: Sửa lỗi lưu thông tin ban
+description: Tách quyền riêng tư khỏi dữ liệu chỉnh sửa ban.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-17
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 04
+- Kết quả: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi và xác minh
+
+Mô phỏng cập nhật Supabase trên ID không tồn tại xác nhận `is_private` gây lỗi quyền 42501, còn PATCH chỉ chứa tên, mô tả và trạng thái được DB chấp nhận. Backend bỏ cột được bảo vệ khỏi PATCH và trả 403 nếu gửi giá trị riêng tư khác. Form hiển thị quyền hiện tại ở chế độ chỉ đọc khi sửa. Backend build và 3 test hồi quy đạt. Chưa ghi thử lên ban thật.

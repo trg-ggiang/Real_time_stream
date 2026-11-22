@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { meetingRequest, MeetingApiError, roleLabels, type JoinRequest, type Member, type MeetingOverview } from '../services/meetings-api';
-import { ConfirmAction } from './ConfirmAction';
+import { ConfirmationDialog } from '../../../shared/components/ConfirmationDialog';
 import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
 
 export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, inCallHost = false, showSessionMembers = false, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
@@ -126,7 +126,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
       })}
     </section> : null}
     {isHost && sessionId && session?.status !== 'ended' ? <button type="button" className="workspace-danger" disabled={!!busy} onClick={() => setConfirmation({ title: 'Kết thúc buổi họp cho tất cả mọi người?', path: `/${meetingId}/sessions/${sessionId}/end`, end: true })}>Kết thúc buổi họp</button> : null}
-    {confirmation ? <ConfirmAction title={confirmation.title} busy={!!busy} onConfirm={() => void act(confirmation.path, undefined, 'POST', confirmation.end, () => {
+    {confirmation ? <ConfirmationDialog danger title={confirmation.title} busy={!!busy} onConfirm={() => void act(confirmation.path, undefined, 'POST', confirmation.end, () => {
       if (confirmation.memberId) onMembersChanged(meetingId, knownMembers.filter(target => target.meeting_member_id !== confirmation.memberId));
     })} onCancel={() => setConfirmation(null)} /> : null}
   </section>;
