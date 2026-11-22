@@ -5,6 +5,7 @@ export interface WorkspaceSession extends WorkspaceContext {
   clubId: string;
   reload: () => void;
   onMeeting?: () => void;
+  notify: (message: string) => void;
 }
 export const ClubContext = createContext<WorkspaceSession | null>(null);
 export function useClub() {

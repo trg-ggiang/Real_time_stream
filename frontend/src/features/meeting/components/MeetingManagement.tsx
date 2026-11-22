@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { meetingRequest, MeetingApiError, roleLabels, type JoinRequest, type Member, type MeetingOverview } from '../services/meetings-api';
 import { ConfirmAction } from './ConfirmAction';
+import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
 
 export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, inCallHost = false, showSessionMembers = false, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
   inCallHost?: boolean; showSessionMembers?: boolean;
@@ -14,6 +15,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
   const [canModerate, setCanModerate] = useState(inCallHost || member?.role === 'host' || member?.role === 'moderator');
   const [loading, setLoading] = useState(true), [busy, setBusy] = useState(''), [notice, setNotice] = useState('');
   const [error, setError] = useState('');
+  useAutoDismiss(notice, () => setNotice(''));
   const [waitingEnabled, setWaitingEnabled] = useState<boolean | undefined>(overview.meeting.waitingRoomEnabled);
   const [confirmation, setConfirmation] = useState<{ title: string; path: string; end?: boolean; memberId?: string; request?: JoinRequest } | null>(null);
   useEffect(() => { onPendingCountChange?.(canModerate ? requests.length : 0); }, [canModerate, requests.length, onPendingCountChange]);

@@ -13,6 +13,7 @@ import {
 import { usePersonalQuery } from "../../personal/use-personal-query";
 import { PersonalState } from "../../personal/components/PersonalState";
 import { ContentImage } from "../../discovery/components/PublicContent";
+import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
 export function MembersPage() {
   const { token, clubId, membership, reload } = useClub();
   const [params, setParams] = useSearchParams();
@@ -30,6 +31,7 @@ export function MembersPage() {
   const [email, setEmail] = useState("");
   const [department, setDepartment] = useState("");
   const [message, setMessage] = useState("");
+  useAutoDismiss(message, () => setMessage(''));
   const chair = membership.role === "chairperson";
   async function add(event: FormEvent) {
     event.preventDefault();
@@ -160,6 +162,7 @@ function MemberRow({
   const mutation = useWorkspaceMutation();
   const [department, setDepartment] = useState(member.department_id);
   const [message, setMessage] = useState("");
+  useAutoDismiss(message, () => setMessage(''));
   async function action(kind: "move" | "remove" | "transfer" | "head" | "unhead") {
     if (
       kind !== "move" &&

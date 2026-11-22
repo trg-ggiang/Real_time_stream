@@ -686,3 +686,31 @@ Căn gọn số ở góc icon CLB; trong Kênh sinh hoạt, bỏ số cạnh tê
 ## Tinh chỉnh badge CLB và mục họp (2026-11-22)
 
 Badge CLB sát góc ngoài và có khoảng đệm khi cuộn rail. Menu Gọi và gặp mặt dùng icon camera/lịch, số họp là nhãn xanh nhẹ thay cho badge đỏ. Typecheck, 19 test workspace và frontend build đạt; chưa rà trực quan browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-15-phase-04-attention-icon-meeting-polish).
+
+## Tự ẩn thông báo thao tác workspace và phòng họp (2026-11-22)
+
+Thông báo thành công trong workspace, gọi nhóm và phòng họp tự ẩn sau khoảng 4,5 giây; lỗi cần xử lý vẫn hiển thị. Typecheck và 19 test workspace đạt. Chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-16-phase-04-transient-workspace-feedback).
+
+## Sửa thông báo bị mất sau thao tác workspace (2026-11-22)
+
+Đưa phản hồi thành công lên toast ở lớp workspace để không bị mất khi `reload()` tải lại context; áp dụng cho cập nhật CLB và tạo/lên lịch họp. Typecheck và 19 test workspace đạt. [Work log](/work-logs/2026-11-22-17-phase-04-workspace-feedback-toast).
+
+## Tối ưu bố cục phòng họp CLB (2026-11-22)
+
+Gom khu tham gia và tạo/lên lịch thành hai cột, rút gọn tiêu đề và cho danh sách họp vùng cuộn riêng trên desktop; mobile dùng một cột. Frontend typecheck, 18 test workspace và build đạt. [Work log](/work-logs/2026-11-22-18-phase-04-meeting-page-compact-layout).
+
+## Giảm thông tin thừa ở trang phòng họp (2026-11-22)
+
+Ẩn tiêu đề form lặp, rút gọn dòng thông tin cuộc họp và bỏ nút quản lý trùng khi đã có session mở trực tiếp. Frontend typecheck, 18 test và build đạt. [Work log](/work-logs/2026-11-22-19-phase-04-meeting-page-information-reduction).
+
+## Bố cục hai cột cho phòng họp CLB (2026-11-22)
+
+Mã/link mời chuyển thành popover ở góc phải; phần chính tách cột tạo mới và thông tin các cuộc họp. Frontend typecheck, 18 test và build đạt. [Work log](/work-logs/2026-11-22-20-phase-04-meeting-two-column-actions).
+
+## Lịch họp CLB hai cột (2026-11-22)
+
+Popup mời có nút đóng; cột tạo mới/lịch tỉ lệ 3:7. Lịch tháng đánh dấu buổi họp, chọn ngày xem chi tiết, bên dưới có danh sách tuần/tháng. Typecheck, 18 test workspace và frontend build đạt. Lịch hiện lấy tối đa 24 cuộc họp mỗi trang; chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-21-phase-04-meeting-calendar).
+
+## Tinh chỉnh nền và vùng cuộn lịch họp (2026-11-22)
+
+Bỏ topbar riêng ở trang họp, nền trung tính, lịch tháng nhỏ hơn; tuần/tháng là tab lựa chọn và chỉ danh sách tab cuộn. Typecheck, 18 test workspace và frontend build đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-22-phase-04-meeting-calendar-layout-refine).

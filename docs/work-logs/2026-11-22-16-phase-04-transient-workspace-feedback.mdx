@@ -1,0 +1,47 @@
+---
+title: Tự ẩn thông báo thao tác workspace và phòng họp
+description: Các trạng thái hoàn thành tự biến mất sau khi hiển thị.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-16
+- Thời gian: 2026-11-22 14:47 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thông báo cảnh báo/trạng thái hoàn thành của thao tác workspace, gọi nhóm và phòng họp phải tự tắt thay vì nằm cố định trên giao diện.
+
+## Công việc hoàn thành
+
+- Thêm `useAutoDismiss` dùng chung cho thông báo ngắn.
+- Áp dụng cho tạo/lên lịch họp, quản lý phòng, cập nhật thông tin CLB, cập nhật thành viên, duyệt nội dung và các thao tác lịch trong màn phòng họp.
+- Giữ lỗi `role="alert"` và trạng thái đang tải; chỉ tự tắt thông báo thành công/trạng thái sau khoảng 4,5 giây.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx WorkspaceRail.test.tsx` | Passed | 19 test |
+| `git diff --check` | Passed | Không có whitespace lỗi |
+| Browser/live end-to-end | Skipped | Chưa có phiên fixture cho toàn bộ thao tác |
+
+## Blocker và việc chưa hoàn thành
+
+Chưa rà trực quan từng popup/trạng thái trên browser thật.
+
+## Bước tiếp theo
+
+Kiểm tra tạo họp, lưu lịch, duyệt nội dung và cập nhật thành viên trên desktop/mobile để xác nhận thông báo biến mất đúng thời điểm.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

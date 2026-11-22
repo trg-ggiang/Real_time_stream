@@ -1,0 +1,44 @@
+---
+title: Bố cục hai cột cho phòng họp CLB
+description: Đưa mã mời lên góc phải và tách tạo mới khỏi danh sách họp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-20
+- Thời gian: 2026-11-22 15:10 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đưa khối mã/link mời lên góc phải và bố trí trang thành cột tạo mới cùng cột thông tin cuộc họp.
+
+## Công việc hoàn thành
+
+- Nút “Mã hoặc đường dẫn mời” ở góc phải mở/đóng popover nhập mã; popover tự focus ô nhập.
+- Khu nội dung chính desktop dùng hai cột: tạo mới bên trái, danh sách cuộc họp bên phải.
+- Mobile tự chuyển về một cột; danh sách vẫn dùng cuộn trang tự nhiên.
+- Giữ nguyên các thao tác tạo nhanh, lên lịch, lặp lại, mở phòng, chia sẻ link và phân trang.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 18 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite còn cảnh báo chunk lớn hiện có |
+| Browser fixture | Skipped | Chưa rà trực quan hai cột với dữ liệu thật |
+
+## Bước tiếp theo
+
+Rà trực quan desktop/mobile và cân lại chiều rộng hai cột theo kích thước màn hình thật.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

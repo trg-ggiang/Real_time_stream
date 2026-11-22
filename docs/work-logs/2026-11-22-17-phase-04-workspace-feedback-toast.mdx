@@ -1,0 +1,44 @@
+---
+title: Sửa thông báo bị mất sau thao tác workspace
+description: Hiển thị toast ở lớp workspace để không mất khi tải lại context.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-17
+- Thời gian: 2026-11-22 14:53 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Kiểm tra vì sao lưu số điện thoại CLB, lên lịch phòng họp và thao tác tương tự không thấy thông báo.
+
+## Công việc hoàn thành
+
+- Xác định `reload()` sau khi lưu thông tin CLB làm form unmount ngay sau khi set message.
+- Thêm toast phản hồi ở `WorkspaceScope`, tự ẩn sau khoảng 4,5 giây; thông báo vẫn tồn tại qua lần tải lại context.
+- Nối toast cho cập nhật số điện thoại/thông tin CLB, mở phòng nhanh và tạo lịch họp.
+- Bỏ bản thông báo inline trùng ở màn danh sách họp; giữ `role=status` và hỗ trợ `aria-live` trên toast.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx WorkspaceRail.test.tsx` | Passed | 19 test |
+| `git diff --check` | Passed | Không có whitespace lỗi |
+| Browser/live end-to-end | Skipped | Chưa có tài khoản/fixture thật |
+
+## Bước tiếp theo
+
+Thử trực tiếp lưu số điện thoại và tạo lịch họp để xác nhận toast xuất hiện ở góc dưới, tự biến mất sau vài giây.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

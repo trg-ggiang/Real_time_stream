@@ -1,0 +1,44 @@
+---
+title: Tinh chỉnh nền và vùng cuộn lịch họp
+description: Thu lịch tháng, chọn tuần/tháng và cuộn riêng danh sách.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-22
+- Thời gian: 2026-11-22 15:28 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chỉnh màu nền hai trang họp, thu gọn lịch tháng; tuần/tháng là lựa chọn, chỉ danh sách lựa chọn được cuộn; bỏ header tên CLB/tài khoản để tăng diện tích.
+
+## Công việc hoàn thành
+
+- Ẩn topbar riêng trên hai route họp, giữ tiêu đề và nút mời trong nội dung.
+- Nền họp chuyển sang màu sáng trung tính; theme tối giữ nền tối tương ứng.
+- Lịch tháng nhỏ hơn. Danh sách Tuần này/Tháng này chuyển sang tab, chỉ hiển thị một danh sách tại một thời điểm.
+- Vùng danh sách tab cuộn riêng; lịch tháng và chi tiết ngày đứng yên trên desktop. Mobile vẫn dùng cuộn trang và vùng danh sách giới hạn chiều cao.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 18 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite còn cảnh báo chunk lớn hiện có |
+| Browser/live end-to-end | Skipped | Chưa rà trực quan viewport/dữ liệu thật |
+
+## Bước tiếp theo
+
+Rà hai trang họp trên desktop/mobile với dữ liệu nhiều buổi để tinh chỉnh chiều cao vùng agenda nếu cần.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

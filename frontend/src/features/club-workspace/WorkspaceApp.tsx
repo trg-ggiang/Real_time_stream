@@ -44,6 +44,7 @@ import './workspace-polish.css';
 import './workspace-theme.css';
 import { channelLabel } from './channel-label';
 import { useWorkspaceAttention } from './use-workspace-attention';
+import { useAutoDismiss } from '../../shared/lib/use-auto-dismiss';
 export function WorkspaceApp(props: DiscoveryViewer) {
   const match = useMatch("/workspace/:clubId/*");
   const clubId = match?.params.clubId || "";
@@ -89,6 +90,8 @@ function WorkspaceScope({
   const [open, setOpen] = useState(false);
   const [workOpen, setWorkOpen] = useState(true);
   const [infoCollapsed, setInfoCollapsed] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  useAutoDismiss(feedback, () => setFeedback(''));
   const [darkTheme, setDarkTheme] = useState(() => {
     try { return localStorage.getItem("unicircle.workspace-theme") === "dark"; }
     catch { return false; }
@@ -120,6 +123,8 @@ function WorkspaceScope({
   const clubName = ctx?.club.name || clubs?.find(item => item.club.club_id === clubId)?.club.name || "Không gian CLB";
   const inChannel = location.pathname.startsWith(`${base}/channels/`);
   const inInformation = location.pathname === `${base}/information`;
+  const inMeetings = location.pathname === `${base}/meetings` || location.pathname === `${base}/recurring-meetings`;
+  const notify = (message: string) => setFeedback(message);
   return (
     <ClubContext.Provider
       value={ctx ? {
@@ -128,9 +133,11 @@ function WorkspaceScope({
         clubId,
         reload: state.retry,
         onMeeting,
+        notify,
       } : null}
     >
-      <div data-theme={darkTheme ? "dark" : "light"} className={`cw-app ${inChannel ? "cw-app--channel" : ""}${inInformation ? " cw-app--information" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
+      <div data-theme={darkTheme ? "dark" : "light"} className={`cw-app ${inChannel ? "cw-app--channel" : ""}${inInformation ? " cw-app--information" : ""}${inMeetings ? " cw-app--meetings" : ""}${infoCollapsed ? " cw-app--info-collapsed" : ""}`}>
+        {feedback && <div className="cw-feedback-toast" role="status" aria-live="polite">{feedback}</div>}
         <a className="cw-skip" href="#workspace-content">
           Đến nội dung
         </a>
@@ -172,7 +179,7 @@ function WorkspaceScope({
           </nav>
         </aside>
         <div className="cw-workspace">
-          {!inChannel && <header className="cw-topbar"><span>{clubName}</span><span>{viewer?.displayName}{ctx && ` · ${chair ? "Chủ nhiệm" : ctx.membership.role === "head" ? "Trưởng ban" : "Thành viên"}`}</span></header>}
+          {!inChannel && !inMeetings && <header className="cw-topbar"><span>{clubName}</span><span>{viewer?.displayName}{ctx && ` · ${chair ? "Chủ nhiệm" : ctx.membership.role === "head" ? "Trưởng ban" : "Thành viên"}`}</span></header>}
           <main id="workspace-content" ref={main} tabIndex={-1} className={inChannel ? "cw-channel-main" : undefined}>
             {ctx ? <Routes>
               <Route path={`${base}/recruitments`} element={chair||ctx.membership.role==='head'?<WorkspaceRecruitment />:<Denied />} />

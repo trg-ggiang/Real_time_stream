@@ -427,6 +427,7 @@ it.each(['/workspace/alpha/meetings', '/workspace/alpha/recurring-meetings'])('o
   history.replaceState(null, '', path);
   const onMeeting = vi.fn();
   render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Mã hoặc đường dẫn mời' }));
   const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
   fireEvent.change(input, { target: { value: ' https://other.example/?view=meeting&meeting=abcd123456&session=invited-session ' } });
   fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
@@ -442,6 +443,7 @@ it('rejects invalid meeting links and clears a previous session when opening a c
   history.replaceState(null, '', '/workspace/alpha/meetings?session=old-session');
   const onMeeting = vi.fn();
   render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Mã hoặc đường dẫn mời' }));
   const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
   fireEvent.change(input, { target: { value: 'https://example.com/no-meeting' } });
   fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));

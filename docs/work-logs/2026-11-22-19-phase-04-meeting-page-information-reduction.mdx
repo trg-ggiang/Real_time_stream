@@ -1,0 +1,44 @@
+---
+title: Giảm thông tin thừa ở trang phòng họp
+description: Rút gọn form và danh sách họp để tăng khả năng quét nhanh.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-19
+- Thời gian: 2026-11-22 15:02 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Giảm thông tin thừa và cải thiện mức độ dễ chịu khi dùng hai trang Phòng họp CLB và Họp theo lịch.
+
+## Công việc hoàn thành
+
+- Ẩn tiêu đề lặp trong form tạo họp vì tiêu đề trang đã nêu rõ ngữ cảnh.
+- Gộp tên cuộc họp, loại, mã và trạng thái thành các dòng ngắn, giảm chiều cao từng mục.
+- Bỏ nút quản lý trùng khi cuộc họp đã có buổi để người dùng dùng trực tiếp nút mở buổi; chỉ giữ lối vào khi chưa có session.
+- Giữ nguyên tạo nhanh, lên lịch, lặp lại, phòng chờ, chia sẻ link, phân trang và xử lý pending schedule.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 18 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite còn cảnh báo chunk lớn hiện có |
+| Browser fixture | Skipped | Chưa rà trực quan với danh sách dài trên browser thật |
+
+## Bước tiếp theo
+
+Rà lại desktop/mobile với dữ liệu nhiều session; nếu cần, tiếp tục chuyển danh sách sang dạng bảng compact ở desktop.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

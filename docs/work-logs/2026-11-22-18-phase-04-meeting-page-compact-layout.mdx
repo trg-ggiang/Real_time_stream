@@ -1,0 +1,44 @@
+---
+title: Tối ưu bố cục phòng họp CLB
+description: Gom thao tác họp và giảm cuộn trong hai màn phòng họp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-18
+- Thời gian: 2026-11-22 14:59 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Giảm cuộn và cải thiện UI/UX cho Phòng họp CLB và Họp theo lịch.
+
+## Công việc hoàn thành
+
+- Rút gọn phần đầu trang thành tiêu đề, mô tả ngắn và ngữ cảnh loại họp.
+- Gom tham gia bằng link và tạo/lên lịch vào hai cột trên desktop.
+- Danh sách cuộc họp có vùng cuộn riêng trên màn hình lớn; mobile chuyển một cột và dùng cuộn trang tự nhiên.
+- Giảm padding/khoảng cách của thẻ cuộc họp, vẫn giữ phân trang, chia sẻ link và các thao tác quản lý.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 18 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite còn cảnh báo chunk lớn hiện có |
+| Browser fixture | Skipped | Chưa rà trực quan desktop/mobile với dữ liệu thật |
+
+## Bước tiếp theo
+
+Mở cả hai route trên desktop và mobile để tinh chỉnh thêm theo chiều cao viewport thực tế nếu cần.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

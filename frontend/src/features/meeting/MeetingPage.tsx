@@ -18,6 +18,7 @@ import { PreJoinAudio, type AudioSelection } from './components/PreJoinAudio';
 import { saveMediaPreference, saveSpeakerPreference } from './services/media-preferences';
 import './meeting-theme.css';
 import './join-lobby.css';
+import { useAutoDismiss } from '../../shared/lib/use-auto-dismiss';
 
 const MeetingRoom = lazy(() => import('./components/MeetingRoom').then(module => ({ default: module.MeetingRoom })));
 function codeFromUrl() { return new URLSearchParams(window.location.search).get('meeting') || ''; }
@@ -38,6 +39,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
   const onMembersChanged = useCallback((meetingId: string, members: Member[]) => setPeople(previous => ({ ...previous, [meetingId]: members })), []);
   const [showSchedule, setShowSchedule] = useState(false), [now, setNow] = useState(Date.now);
   const lock = useRef(false), revision = useRef(0);
+  useAutoDismiss(notice, () => setNotice(''));
   const name = displayName.trim() || 'Bạn';
   const initials = Array.from(name)[0]?.toLocaleUpperCase('vi') || 'B';
   const requestedSessionId = flow.active?.sessionId || selectedId;

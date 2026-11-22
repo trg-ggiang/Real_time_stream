@@ -155,3 +155,17 @@ Biểu tượng từng CLB có số thông báo; kênh có tin mới được l�
 Badge tổng được căn trong góc icon CLB. Danh sách kênh dùng tên đậm và dấu `#` đổi màu khi có tin mới, không hiện số ở từng hàng kênh. [Work log chỉnh giao diện](../work-logs/2026-11-22-14-phase-04-attention-visual-polish.mdx).
 
 Badge CLB sau đó được đưa sát góc ngoài, với khoảng đệm khi rail cuộn. Mục Gọi và gặp mặt dùng icon camera/lịch và nhãn số họp xanh nhẹ. [Work log tinh chỉnh](../work-logs/2026-11-22-15-phase-04-attention-icon-meeting-polish.mdx).
+
+Thông báo hoàn thành thao tác trong workspace và phòng họp tự ẩn sau khoảng 4,5 giây; lỗi và cảnh báo cần xử lý vẫn giữ lại. [Work log](../work-logs/2026-11-22-16-phase-04-transient-workspace-feedback.mdx).
+
+Phản hồi thành công của cập nhật CLB và tạo/lên lịch họp hiển thị ở toast lớp workspace, nên không mất khi context được tải lại. [Work log](../work-logs/2026-11-22-17-phase-04-workspace-feedback-toast.mdx).
+
+Hai màn phòng họp dùng header gọn, hai cột thao tác trên desktop và vùng danh sách cuộn riêng; mobile trở về một cột. [Work log](../work-logs/2026-11-22-18-phase-04-meeting-page-compact-layout.mdx).
+
+Thông tin thừa trong form và card họp được rút gọn; nút quản lý trùng được ẩn khi đã có session mở trực tiếp. [Work log](../work-logs/2026-11-22-19-phase-04-meeting-page-information-reduction.mdx).
+
+Khối mã/link mời nằm trong popover ở góc phải; desktop dùng hai cột tạo mới và danh sách họp, mobile một cột. [Work log](../work-logs/2026-11-22-20-phase-04-meeting-two-column-actions.mdx).
+
+Popup mời có nút đóng. Cột tạo mới và lịch tháng tỉ lệ 3:7; chọn ngày xem buổi họp, dưới lịch có danh sách tuần/tháng. Lịch hiện dùng trang API tối đa 24 cuộc họp. [Work log](../work-logs/2026-11-22-21-phase-04-meeting-calendar.mdx).
+
+Hai trang họp bỏ topbar riêng, nền trung tính; lịch tháng nhỏ và tuần/tháng là tab, chỉ vùng danh sách tab cuộn. [Work log](../work-logs/2026-11-22-22-phase-04-meeting-calendar-layout-refine.mdx).
