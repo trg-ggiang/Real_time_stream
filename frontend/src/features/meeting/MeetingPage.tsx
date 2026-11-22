@@ -7,7 +7,7 @@ import { ScheduleSessionForm } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
 import { MeetingDeviceChoice } from './components/MeetingDeviceChoice';
 import { useSessionFlow } from './hooks/use-session-flow';
-import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, parseMeetingCode, roleLabels, type DeviceJoinMode, type Member, type MeetingOverview } from './services/meetings-api';
+import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, MeetingApiError, parseMeetingCode, roleLabels, type DeviceJoinMode, type Member, type MeetingOverview } from './services/meetings-api';
 import './meeting.css';
 import './workspace.css';
 import { UnauthorizedError } from './services/token-api';
@@ -66,8 +66,16 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     try {
       const data = await meetingRequest<MeetingOverview>(accessToken, `/${encodeURIComponent(parseMeetingCode(code))}/sessions`);
       if (sequence === revision.current) { setOverview(data); setError(''); }
-    } catch (cause) { if (sequence === revision.current) { setError(cause instanceof Error ? cause.message : 'Không tải được cuộc họp.'); report(cause); } }
-  }, [code, accessToken, report]);
+    } catch (cause) {
+      if (sequence !== revision.current) return;
+      if (cause instanceof MeetingApiError && cause.status === 403) {
+        const message = 'Quyền tham gia cuộc họp đã kết thúc. Bạn có thể đã bị gỡ khỏi CLB.';
+        setOverview(null); setError(message); flow.ended(message, true);
+        return;
+      }
+      setError(cause instanceof Error ? cause.message : 'Không tải được cuộc họp.'); report(cause);
+    }
+  }, [code, accessToken, report, flow.ended]);
 
   useEffect(() => {
     const controller = new AbortController(); const sequence = ++revision.current;
@@ -124,6 +132,10 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
   const cooldown = waiting?.retryAt && Date.parse(waiting.retryAt) > now;
   const pageError = error || flow.error;
   const onSessionEnded = useCallback(() => { flow.sessionEnded(); void refresh(); }, [flow.sessionEnded, refresh]);
+  const onRoomEnded = useCallback((message?: string, removedByServer?: boolean) => {
+    flow.ended(message, removedByServer);
+    if (removedByServer) void refresh();
+  }, [flow.ended, refresh]);
   useEffect(() => {
     if (flow.active && overview?.sessions.find(session => session.session_id === flow.active?.sessionId)?.status === 'ended') flow.sessionEnded();
   }, [flow.active, overview, flow.sessionEnded]);
@@ -163,7 +175,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
         </div> : null}
         <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}>
           <MeetingRoom credentials={flow.active} accessToken={accessToken} audioSelection={audioSelection}
-            onShare={() => void copyLink(flow.active?.sessionId)} onLeave={() => void flow.leave()} onEnded={flow.ended}
+            onShare={() => void copyLink(flow.active?.sessionId)} onLeave={() => void flow.leave()} onEnded={onRoomEnded}
             onConnected={flow.active.transferAfterConnect ? flow.transferDevice : undefined} transferStatus={flow.transferStatus}
             management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} />
         </Suspense>

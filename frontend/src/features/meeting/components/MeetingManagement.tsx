@@ -19,7 +19,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
   const locked = useRef(false), mutation = useRef<AbortController | null>(null);
   const meetingId = overview.meeting.meetingId;
   const session = overview.sessions.find(s => s.session_id === sessionId);
-  const durable = member ? member.role !== 'participant' || member.invitedAt !== null : true;
+  const canEndSession = member?.role === 'host' || member?.role === 'moderator';
 
   const load = useCallback(async (signal: AbortSignal) => {
     if (!sessionId || session?.status === 'ended') { setRequests([]); setLoading(false); return; }
@@ -109,7 +109,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
         </div></div>;
       })}
     </section> : null}
-    {durable && sessionId && session?.status !== 'ended' ? <button type="button" className="workspace-danger" disabled={!!busy} onClick={() => setConfirmation({ title: 'Kết thúc buổi họp cho tất cả mọi người?', path: `/${meetingId}/sessions/${sessionId}/end`, end: true })}>Kết thúc buổi họp</button> : null}
+    {canEndSession && sessionId && session?.status !== 'ended' ? <button type="button" className="workspace-danger" disabled={!!busy} onClick={() => setConfirmation({ title: 'Kết thúc buổi họp cho tất cả mọi người?', path: `/${meetingId}/sessions/${sessionId}/end`, end: true })}>Kết thúc buổi họp</button> : null}
     {confirmation ? <ConfirmAction title={confirmation.title} busy={!!busy} onConfirm={() => void act(confirmation.path, undefined, 'POST', confirmation.end, () => {
       if (confirmation.memberId) onMembersChanged(meetingId, knownMembers.filter(target => target.meeting_member_id !== confirmation.memberId));
     })} onCancel={() => setConfirmation(null)} /> : null}

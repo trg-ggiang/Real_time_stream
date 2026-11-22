@@ -231,3 +231,16 @@ test('transfer waits for the new owned connection and closes only older attendan
   assert.equal(writes[0].values.leave_reason, 'device_transferred');
   assert.ok(writes[0].filters.some(([op, key, value]) => op === 'eq' && key === 'attendance_id' && value === 'old'));
 });
+
+test('club membership removed during join never returns the newly signed token', async () => {
+  const { service, calls } = fixture({ member: member('admitted') });
+  service.getMeetingByCode = async () => ({ meeting_id: 'meeting', club_id: 'club', waiting_room_enabled: true });
+  let checks = 0;
+  service.requireClubMeetingAccess = async () => {
+    if (++checks === 2) { const error = new Error('club access revoked'); error.status = 403; throw error; }
+  };
+  await assert.rejects(service.join(user, 'CODE', sessionId, 'add'), /club access revoked/);
+  const closed = calls.find(call => call.table === 'attendances' && call.mode === 'update');
+  assert.equal(closed.values.leave_reason, 'club_membership_removed');
+  assert.ok(closed.filters.some(([op, key, value]) => op === 'eq' && key === 'attendance_id' && value === 'actual-attendance'));
+});

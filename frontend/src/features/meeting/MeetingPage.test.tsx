@@ -3,10 +3,11 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { afterEach, expect, it, vi } from 'vitest';
 import { MeetingPage } from './MeetingPage';
 
-vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected }: any) =>
+vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected, onEnded }: any) =>
   <div data-testid="joined-room" data-session={credentials.sessionId} data-auth={accessToken}
     data-microphone={audioSelection?.microphone} data-camera={audioSelection?.camera}>
     <button onClick={() => onConnected?.()}>Connected</button>
+    <button onClick={() => onEnded?.('Thiết bị này đã bị ngắt khỏi phòng họp.', true)}>Server removed</button>
   </div> }));
 afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); window.history.replaceState(null,'','/'); vi.unstubAllGlobals(); });
 
@@ -138,4 +139,48 @@ it.each([
   await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Connected' })));
   const transfers = fetch.mock.calls.filter(([url]) => url.endsWith('/device-transfer'));
   expect(transfers).toHaveLength(mode === 'transfer' ? 1 : 0);
+});
+
+it.each([{ status: 403, removed: false }, { status: 403, removed: true }, { status: 503, removed: false }])('handles revoked overview access and server removal, but not transient errors ($status, $removed)', async ({ status, removed }) => {
+  vi.useFakeTimers();
+  const hidden = Object.getOwnPropertyDescriptor(document, 'hidden');
+  Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+  let rejected = false;
+  const fetch = vi.fn().mockImplementation(async (url: string) => {
+    if (url.endsWith('/join')) return { ok: true, status: 200, json: async () => ({
+      status: 'admitted', meetingId: 'm', sessionId: 's', attendanceId: 'a', role: 'participant',
+      token: 'room-jwt', serverUrl: 'wss://unit.invalid', participantIdentity: 'user:connection', roomName: 'room',
+    }) };
+    if (rejected) return { ok: false, status, json: async () => ({ message: 'Access failed' }) };
+    return { ok: true, status: 200, json: async () => ({
+      meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Team' },
+      membership: { userId: 'user', role: 'participant', invitedAt: null },
+      sessions: [{ session_id: 's', meeting_id: 'm', status: 'ongoing' }],
+    }) };
+  });
+  vi.stubGlobal('fetch', fetch); vi.stubGlobal('isSecureContext', true);
+  Object.defineProperty(navigator, 'mediaDevices', { value: {}, configurable: true });
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
+  try {
+    render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
+    await act(async () => {});
+    fireEvent.click(screen.getByRole('button', { name: /^Tham gia$/ }));
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' })));
+    expect(screen.queryByTestId('joined-room')).not.toBeNull();
+    rejected = true;
+    await act(async () => {
+      if (removed) fireEvent.click(screen.getByRole('button', { name: 'Server removed' }));
+      else await vi.advanceTimersByTimeAsync(6000);
+    });
+    expect(screen.queryByTestId('joined-room') === null).toBe(status === 403);
+    if (status === 403) {
+      expect(screen.getByRole('alert').textContent).toContain('Quyền tham gia cuộc họp đã kết thúc');
+      expect(sessionStorage.getItem('rts.active-meeting.v1')).toBeNull();
+      expect(fetch.mock.calls.some(([url]) => url.endsWith('/leave'))).toBe(false);
+    }
+  } finally {
+    cleanup(); vi.useRealTimers();
+    if (hidden) Object.defineProperty(document, 'hidden', hidden);
+    else Reflect.deleteProperty(document, 'hidden');
+  }
 });

@@ -561,6 +561,19 @@ export class MeetingsService {
     if (error || !data) throw new ServiceUnavailableException('Could not record meeting attendance.');
     const attendanceId = data.attendance_id;
 
+    if (meeting.club_id) {
+      try {
+        // Membership can be removed while token/attendance creation is in flight.
+        await this.requireClubMeetingAccess(user.userId, meeting.club_id);
+      } catch (cause) {
+        const closed = await this.supabase.from('attendances')
+          .update({ left_at: new Date().toISOString(), leave_reason: 'club_membership_removed' })
+          .eq('attendance_id', attendanceId).eq('meeting_member_id', member.meeting_member_id).is('left_at', null);
+        if (closed.error) throw new ServiceUnavailableException('Could not close revoked meeting attendance.');
+        throw cause;
+      }
+    }
+
     return {
       status: 'admitted' as const,
       role: member.role,
@@ -724,6 +737,7 @@ export class MeetingsService {
 
   async setModerator(user: User, meetingId: string, memberId: string, enabled: boolean) {
     const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     if (meeting.created_by !== user.userId) throw new ForbiddenException('Only the meeting owner can change moderator roles.');
     const target = await this.getMemberById(meetingId, memberId);
     if (target.role === 'host') throw new ForbiddenException('Owner role cannot be changed.');
@@ -767,6 +781,7 @@ export class MeetingsService {
 
   async updateSettings(user: User, meetingId: string, body: { waitingRoomEnabled: boolean }) {
     const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     if (meeting.created_by !== user.userId) throw new ForbiddenException('Only the meeting owner can update meeting settings.');
     const { data, error } = await this.supabase.from('meetings').update({ waiting_room_enabled: body.waitingRoomEnabled })
       .eq('meeting_id', meetingId).select('meeting_id,waiting_room_enabled').single();
@@ -848,8 +863,48 @@ export class MeetingsService {
     return { status: 'left', sessionId, attendanceId };
   }
 
+  async revokeClubMember(clubId: string, userId: string) {
+    const meetings = await this.supabase.from('meetings').select('meeting_id').eq('club_id', clubId);
+    if (meetings.error) throw new ServiceUnavailableException('Could not load club meetings for access revocation.');
+    const meetingIds = (meetings.data ?? []).map(row => row.meeting_id);
+    if (!meetingIds.length) return;
+    // Include previously removed memberships so retries can finish partial cleanup.
+    const members = await this.supabase.from('meeting_members').select('meeting_member_id')
+      .in('meeting_id', meetingIds).eq('user_id', userId);
+    if (members.error) throw new ServiceUnavailableException('Could not load club meeting memberships.');
+    const memberIds = (members.data ?? []).map(row => row.meeting_member_id);
+    if (!memberIds.length) return;
+    const removedAt = new Date().toISOString();
+    const revoked = await this.supabase.from('meeting_members').update({ removed_at: removedAt })
+      .in('meeting_id', meetingIds).in('meeting_member_id', memberIds).eq('user_id', userId).is('removed_at', null);
+    if (revoked.error) throw new ServiceUnavailableException('Could not revoke club meeting memberships.');
+    const attendances = await this.supabase.from('attendances')
+      .select('attendance_id,meeting_member_id,session_id,livekit_identity')
+      .in('meeting_member_id', memberIds).is('left_at', null);
+    if (attendances.error) throw new ServiceUnavailableException('Could not load club meeting connections.');
+    if (!attendances.data?.length) return;
+    const sessionIds = [...new Set(attendances.data.map(row => row.session_id))];
+    const sessions = await this.supabase.from('meeting_sessions').select('session_id,livekit_room_name')
+      .in('meeting_id', meetingIds).in('session_id', sessionIds);
+    if (sessions.error) throw new ServiceUnavailableException('Could not load club meeting rooms.');
+    const rooms = new Map((sessions.data ?? []).map(row => [row.session_id, row.livekit_room_name]));
+    const results = await Promise.allSettled(attendances.data.map(async attendance => {
+      const room = rooms.get(attendance.session_id);
+      if (!room) throw new ServiceUnavailableException('Could not find club meeting room.');
+      if (attendance.livekit_identity) await this.disconnectIfPresent(room, attendance.livekit_identity);
+      const closed = await this.supabase.from('attendances')
+        .update({ left_at: new Date().toISOString(), leave_reason: 'club_membership_removed' })
+        .eq('attendance_id', attendance.attendance_id).eq('meeting_member_id', attendance.meeting_member_id).is('left_at', null);
+      if (closed.error) throw new ServiceUnavailableException('Could not close club meeting attendance.');
+    }));
+    if (results.some(result => result.status === 'rejected'))
+      throw new ServiceUnavailableException('Club membership removed, but some meeting connections could not be closed. Retry removal.');
+  }
+
   async endSession(user: User, meetingId: string, sessionId: string) {
-    await this.requireMeetingMember(meetingId, user.userId);
+    const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
+    await this.requireModerator(meetingId, user.userId);
     const session = await this.getSession(meetingId, sessionId);
     if (session.status === 'ended') return { status: 'ended', sessionId, endedAt: session.ended_at };
     const { data: active, error: readError } = await this.supabase.from('attendances')

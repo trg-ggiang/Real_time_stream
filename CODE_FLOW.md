@@ -257,11 +257,15 @@ không relay audio/video. SDK quản lý signaling, track và participant state.
   Trước join mới, hook thử hoàn tất departure cũ.
 - Phiên đang tham gia có thể được nhớ trong `sessionStorage`; khi tải lại đúng
   user, meeting và session, frontend xin credentials mới thay vì dùng token cũ.
-- Thành viên dài hạn có thể gọi `POST .../end`. Backend đóng attendance đang mở,
+- Chỉ host/moderator có thể gọi `POST .../end`; lời mời dài hạn không tự cấp quyền kết thúc. Backend đóng attendance đang mở,
   ngắt participant, hết hạn quyền guest chỉ dùng cho session đó và chuyển session
   sang `ended`.
 - Khi host/moderator loại thành viên, backend ngắt các identity đang hoạt động,
   đóng attendance và đánh dấu membership đã bị loại.
+- Khi chủ nhiệm gỡ một thành viên khỏi CLB, `WorkspacePeople.remove` thu hồi
+  meeting membership và ngắt mọi thiết bị của người đó trong các cuộc họp thuộc
+  CLB. Không ảnh hưởng phòng cá nhân hoặc CLB khác. Frontend thoát cuộc gọi khi
+  overview trả 403; sau LiveKit removal, tải lại quyền ngay để cập nhật thông báo.
 
 `GET /api/meeting-sessions` là endpoint phụ liệt kê session ongoing mà user đã
 được admitted; meeting UI hiện tại tập trung gọi `/api/meetings/*`.
@@ -282,7 +286,7 @@ MeetingChat
 
 `ChatAccessService` xác minh application JWT, kiểm tra identity bắt đầu bằng
 user ID trong token, xác nhận user còn tồn tại, session ongoing, membership
-admitted/chưa bị loại và participant identity thực sự đang kết nối trong room
+admitted/chưa bị loại, membership CLB còn active nếu là họp CLB và participant identity thực sự đang kết nối trong room
 LiveKit. Backend kiểm tra lại quyền khi gửi/đọc lịch sử, định kỳ mỗi 30 giây
 và trước khi phát tin cho từng người nhận.
 

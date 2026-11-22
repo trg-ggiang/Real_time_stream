@@ -10,9 +10,10 @@ import {
   workspaceClubFields,
 } from "./workspace-access.service";
 import { ContactDto, DepartmentDto } from "./workspace.dto";
+import { MeetingsService } from "../meetings/meetings.service";
 @Injectable()
 export class WorkspacePeople {
-  constructor(private readonly access: WorkspaceAccess) {}
+  constructor(private readonly access: WorkspaceAccess, private readonly meetings: MeetingsService) {}
   private get db() {
     return this.access.supabase.client;
   }
@@ -168,10 +169,21 @@ export class WorkspacePeople {
   }
   async remove(userId: string, clubId: string, id: string) {
     await this.access.require(userId, clubId, true);
-    if ((await this.target(clubId, id)).role === "chairperson")
+    const target = await this.db.from("club_memberships")
+      .select("membership_id,user_id,role,status").eq("club_id", clubId)
+      .eq("membership_id", id).maybeSingle();
+    this.access.check(target.error);
+    if (!target.data || !["active", "removed"].includes(target.data.status))
+      throw new NotFoundException("Thành viên không còn hoạt động.");
+    if (target.data.role === "chairperson")
       throw new ForbiddenException(
         "Chuyển chủ nhiệm trước khi gỡ thành viên này.",
       );
+    // Retrying a partial removal must still finish disconnecting meeting devices.
+    if (target.data.status === "removed") {
+      await this.meetings.revokeClubMember(clubId, target.data.user_id);
+      return { item: { membership_id: id } };
+    }
     const r = await this.db
       .from("club_memberships")
       .update({ status: "removed", left_at: new Date().toISOString() })
@@ -183,6 +195,7 @@ export class WorkspacePeople {
       .maybeSingle();
     this.access.check(r.error);
     if (!r.data) throw new NotFoundException("Thành viên đã thay đổi.");
+    await this.meetings.revokeClubMember(clubId, target.data.user_id);
     return { item: r.data };
   }
   async transfer(userId: string, clubId: string, id: string) {

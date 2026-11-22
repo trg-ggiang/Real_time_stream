@@ -34,3 +34,15 @@ it('reports pending requests while hidden, polls for new arrivals and updates th
   await act(async () => { fireEvent.click(screen.getAllByRole('button', { name: 'Duyệt', hidden: true })[0]); });
   expect(onPendingCountChange).toHaveBeenLastCalledWith(1);
 });
+
+it.each(['host', 'moderator', 'participant', undefined] as const)('shows session end only for an explicit host or moderator (%s)', async role => {
+  vi.mocked(meetingRequest).mockResolvedValue([]);
+  render(<MeetingManagement accessToken="token" overview={{
+    meeting: { meetingId: 'meeting', meetingCode: 'ABCDEFGHIJ', title: 'CLB' },
+    membership: role ? { role, userId: 'viewer', invitedAt: '2026-11-21T00:00:00Z' } : undefined,
+    sessions: [{ session_id: 'session', meeting_id: 'meeting', status: 'ongoing', scheduled_start_at: null, scheduled_end_at: null }],
+  }} sessionId="session" knownMembers={[]} onMembersChanged={vi.fn()} onChanged={async () => {}}
+    onError={vi.fn()} onSessionEnded={vi.fn()} />);
+  await act(async () => {});
+  expect(!!screen.queryByRole('button', { name: 'Kết thúc buổi họp' })).toBe(role === 'host' || role === 'moderator');
+});
