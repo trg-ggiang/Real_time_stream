@@ -372,8 +372,8 @@ function DepartmentForm({
   }
   return (
     <form className="cw-panel cw-department-form" onSubmit={save}>
-      <h2>{department ? "Chỉnh sửa ban" : "Tạo ban mới"}</h2>
-      <div className="cw-form-grid">
+      <header className="cw-department-form-heading"><h2>{department ? "Chỉnh sửa ban" : "Tạo ban mới"}</h2></header>
+      <div className="cw-department-fields">
         <label>
           Tên ban
           <input
@@ -396,32 +396,46 @@ function DepartmentForm({
             <option value="inactive">Ngừng hoạt động</option>
           </select>
         </label>
-        <label>
+        <label className="cw-department-description">
           Mô tả
           <textarea
+            rows={4}
             maxLength={5000}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={mutation.busy}
           />
         </label>
-        <fieldset className="cw-department-visibility"><legend>Quyền truy cập kênh</legend><label><input type="radio" name="department-visibility" checked={!privateBan} onChange={() => setPrivate(false)} disabled={mutation.busy} />Công khai</label><label><input type="radio" name="department-visibility" checked={privateBan} onChange={() => setPrivate(true)} disabled={mutation.busy} />Riêng tư</label><p className="cw-muted">Công khai trong CLB, không hiển thị cho khách bên ngoài.</p></fieldset>
+        <fieldset className="cw-department-visibility">
+          <legend>Quyền truy cập kênh</legend>
+          <div className="cw-department-options">
+            <label>
+              <input type="radio" name="department-visibility" checked={!privateBan}
+                onChange={() => setPrivate(false)} disabled={mutation.busy} />
+              <span><strong>Công khai</strong><small>Thành viên CLB có thể vào kênh.</small></span>
+            </label>
+            <label>
+              <input type="radio" name="department-visibility" checked={privateBan}
+                onChange={() => setPrivate(true)} disabled={mutation.busy} />
+              <span><strong>Riêng tư</strong><small>Quyền truy cập giới hạn theo ban.</small></span>
+            </label>
+          </div>
+        </fieldset>
       </div>
-      <p className="cw-muted">
-        Chuyển hết thành viên đang hoạt động trước khi ngừng một ban. Ban quản
-        trị không được ngừng.
-      </p>
+      {department && status === 'inactive' && <p className="cw-muted">
+        Chuyển thành viên đang hoạt động sang ban khác trước khi ngừng ban này.
+      </p>}
       {mutation.error && (
         <p role="alert" className="cw-error">
           {mutation.error}
         </p>
       )}
-      <div className="cw-actions">
+      <div className="cw-actions cw-department-form-actions">
         <button type="button" disabled={mutation.busy} onClick={close}>
           Đóng
         </button>
-        <button className="cw-primary" disabled={mutation.busy}>
-          {department ? 'Lưu thay đổi' : 'Tạo ban'}
+        <button type="submit" className="cw-primary" disabled={mutation.busy}>
+          {mutation.busy ? 'Đang lưu…' : department ? 'Lưu thay đổi' : 'Tạo ban'}
         </button>
       </div>
     </form>

@@ -1,3 +1,4 @@
+import { MeetingSharePopup } from './components/MeetingSharePopup';
 import { PaginationButton } from "../../shared/components/PaginationButton";
 import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
@@ -7,7 +8,7 @@ import { ScheduleSessionForm } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
 import { MeetingDeviceChoice } from './components/MeetingDeviceChoice';
 import { useSessionFlow } from './hooks/use-session-flow';
-import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, MeetingApiError, parseMeetingCode, roleLabels, type DeviceJoinMode, type Member, type MeetingOverview } from './services/meetings-api';
+import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, MeetingApiError, parseMeetingCode, roleLabels, type DeviceJoinMode, type Member, type MeetingOverview, type MeetingShareResult } from './services/meetings-api';
 import './meeting.css';
 import './workspace.css';
 import { UnauthorizedError } from './services/token-api';
@@ -31,6 +32,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
   const [code, setCode] = useState(codeFromUrl), [selectedId, setSelectedId] = useState(sessionFromUrl);
   const [overview, setOverview] = useState<MeetingOverview | null>(null);
   const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState('');
+  const [shareResult, setShareResult] = useState<MeetingShareResult | null>(null);
   const [sessionPage, setSessionPage] = useState(0);
   const [people, setPeople] = useState<Record<string, Member[]>>({});
   const onMembersChanged = useCallback((meetingId: string, members: Member[]) => setPeople(previous => ({ ...previous, [meetingId]: members })), []);
@@ -125,8 +127,9 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     finally { lock.current = false; setBusy(false); }
   }
   async function copyLink(sessionId?: string) {
-    if (overview) setNotice(await copyMeetingInvite(overview.meeting.meetingCode, sessionId));
+    if (overview) setShareResult(await copyMeetingInvite(overview.meeting.meetingCode, sessionId));
   }
+  const canModerate = overview?.membership?.role === 'host' || overview?.membership?.role === 'moderator';
   const waiting = flow.waiting;
   const deviceChoice = flow.deviceChoice;
   const cooldown = waiting?.retryAt && Date.parse(waiting.retryAt) > now;
@@ -159,6 +162,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     <main id="meeting-main" className="meeting-main" tabIndex={-1}>
       {pageError && !deviceChoice && (code || !error) ? <p role="alert" className="notice error workspace-error">{pageError}</p> : null}
       <p role="status" className="workspace-feedback">{notice}</p>
+      <MeetingSharePopup result={shareResult} dismiss={setShareResult} />
       {deviceChoice && !pendingJoin ? <MeetingDeviceChoice busy={flow.busy} error={flow.error} onCancel={flow.cancelDeviceChoice}
         onChoose={mode => {
           if (audioSelection === undefined) {
@@ -174,9 +178,10 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
           <button type="button" className="workspace-text-button" onClick={() => void flow.transferDevice()}>Thử chuyển lại</button>
         </div> : null}
         <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}>
-          <MeetingRoom credentials={flow.active} accessToken={accessToken} audioSelection={audioSelection}
+          <MeetingRoom key={flow.active.attendanceId} credentials={flow.active} accessToken={accessToken} audioSelection={audioSelection}
             onShare={() => void copyLink(flow.active?.sessionId)} onLeave={() => void flow.leave()} onEnded={onRoomEnded}
-            onConnected={flow.active.transferAfterConnect ? flow.transferDevice : undefined} transferStatus={flow.transferStatus}
+            onReconnect={() => { if (code && flow.active) void flow.reconnect(code, flow.active.attendanceId); }}
+            onConnected={flow.onConnected} transferStatus={flow.transferStatus}
             management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} />
         </Suspense>
       </> : code ? <>
@@ -206,7 +211,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
             })}
             {overview.sessions.length > 10 ? <div className="workspace-pagination"><PaginationButton direction="previous" type="button" disabled={sessionPage === 0} onClick={() => setSessionPage(page => page - 1)} /><span>Trang {sessionPage + 1}</span><PaginationButton direction="next" type="button" disabled={(sessionPage + 1) * 10 >= overview.sessions.length} onClick={() => setSessionPage(page => page + 1)} /></div> : null}
           </section>
-          {canManageSessions(overview.membership) ? <details className="lobby-management"><summary>Quản lý cuộc họp</summary><MeetingManagement key={`${code}:${selected?.session_id || ''}`} accessToken={accessToken} overview={overview} sessionId={selected?.session_id} knownMembers={people[overview.meeting.meetingId] || []} onMembersChanged={onMembersChanged} onChanged={refresh} onError={reportAdmin} onSessionEnded={onSessionEnded} /></details> : null}
+          {canModerate ? <details className="lobby-management"><summary>Quản lý cuộc họp</summary><MeetingManagement key={`${code}:${selected?.session_id || ''}`} accessToken={accessToken} overview={overview} sessionId={selected?.session_id} knownMembers={people[overview.meeting.meetingId] || []} onMembersChanged={onMembersChanged} onChanged={refresh} onError={reportAdmin} onSessionEnded={onSessionEnded} /></details> : null}
           </div>
         </> : <button type="button" onClick={() => void refresh()}>Thử tải lại</button>}
       </> : null}

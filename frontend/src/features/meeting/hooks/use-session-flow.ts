@@ -15,6 +15,8 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
   const [error, setError] = useState('');
   const current = useRef<JoinedSession | null>(null);
   const departure = useRef<Pick<JoinedSession, 'meetingId' | 'sessionId' | 'attendanceId'> | null>(null);
+  const reloadDeparture = useRef<typeof departure.current>(null);
+  const reloadCleanupPending = useRef(false);
   const request = useRef<AbortController | null>(null);
   const pendingTransfer = useRef<JoinedSession | null>(null);
   const completedTransfer = useRef<JoinedSession | null>(null);
@@ -105,6 +107,42 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
     }
   }, [accessToken, onUnauthorized]);
 
+  const recoveryUsed = useRef(false);
+  const onConnected = useCallback(() => {
+    recoveryUsed.current = false;
+    const previous = reloadDeparture.current;
+    const session = current.current;
+    if (session?.transferAfterConnect) void transferDevice();
+    if (!previous || !session || reloadCleanupPending.current ||
+        previous.sessionId !== session.sessionId || previous.meetingId !== session.meetingId ||
+        previous.attendanceId === session.attendanceId) return;
+    reloadCleanupPending.current = true;
+    // Cleanup is scoped to the replaced attendance and stays off the join path.
+    void meetingRequest(accessToken, `/${previous.meetingId}/sessions/${previous.sessionId}/leave`, {
+      method: 'POST', body: { attendanceId: previous.attendanceId }, keepalive: true,
+    }).then(() => {
+      if (reloadDeparture.current === previous) reloadDeparture.current = null;
+    }).catch(() => {
+      // A slow or failed cleanup must not interrupt the new connection.
+    }).finally(() => { reloadCleanupPending.current = false; });
+  }, [accessToken, transferDevice]);
+
+  const reconnect = useCallback(async (code: string, attendanceId: string) => {
+    const session = current.current;
+    if (!session || session.attendanceId !== attendanceId || request.current) return;
+    if (recoveryUsed.current) {
+      await leave('Không thể khôi phục kết nối. Hãy thử tham gia lại.');
+      return;
+    }
+    recoveryUsed.current = true;
+    reloadDeparture.current = session;
+    current.current = null;
+    forgetMeeting();
+    setActive(null);
+    setTransferStatus(null);
+    await join(code, session.meetingId, session.sessionId, 'add');
+  }, [join, leave]);
+
   const resumed = useRef(false);
   useEffect(() => {
     if (resumed.current) return;
@@ -116,8 +154,9 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
       if (!saved) return;
       // A duplicated tab can inherit sessionStorage. Only a reload replaces the saved attendance.
       const navigation = window.performance.getEntriesByType?.('navigation')[0] as PerformanceNavigationTiming | undefined;
-      if (navigation?.type === 'reload') departure.current = saved;
-      void join(saved.code, saved.meetingId, saved.sessionId);
+      const isReload = navigation?.type === 'reload';
+      if (isReload) reloadDeparture.current = saved;
+      void join(saved.code, saved.meetingId, saved.sessionId, isReload ? 'add' : undefined);
     }, 0);
     return () => window.clearTimeout(timer);
   }, [accessToken, join]);
@@ -149,7 +188,16 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
       void recordDeparture().catch(() => {});
     };
     window.addEventListener('pagehide', depart);
-    return () => { mounted.current = false; request.current?.abort(); window.removeEventListener('pagehide', depart); depart(); };
+    return () => {
+      mounted.current = false;
+      window.removeEventListener('pagehide', depart);
+      // React can immediately rerun this effect while the same attendance remains active.
+      queueMicrotask(() => {
+        if (mounted.current) return;
+        request.current?.abort();
+        depart();
+      });
+    };
   }, [recordDeparture]);
 
   const ended = useCallback((message?: string, removedByServer?: boolean) => {
@@ -157,10 +205,12 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
     void leave(message);
   }, [leave]);
   const sessionEnded = useCallback(() => {
+    request.current?.abort(); request.current = null;
+    setBusy(false);
     forgetMeeting();
     current.current = null; departure.current = null;
     setActive(null); setWaiting(null); setDeviceChoice(null); setTransferStatus(null); setError('Buổi họp đã kết thúc.');
   }, []);
   const cancelDeviceChoice = useCallback(() => { setDeviceChoice(null); setError(''); }, []);
-  return { active, waiting, deviceChoice, transferStatus, busy, error, join, leave, ended, sessionEnded, report, cancelDeviceChoice, transferDevice };
+  return { active, waiting, deviceChoice, transferStatus, busy, error, join, leave, ended, sessionEnded, report, cancelDeviceChoice, transferDevice, onConnected, reconnect };
 }

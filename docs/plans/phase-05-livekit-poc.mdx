@@ -151,3 +151,31 @@ Replaced standalone gear with microphone/headphone caret menus, added receive-au
 ## Link buổi họp CLB qua HTTPS tunnel — 2026-11-19
 
 Đã thêm link theo buổi họp CLB qua HTTPS, giữ phiên sau đăng nhập và kiểm tra membership ở API. Quick Tunnel đã thử HTTP và WSS với backend mô phỏng. Phase 04/05 vẫn In Progress, chờ thử media và chat với thiết bị thật. [Work log](/work-logs/2026-11-19-08-phase-05-club-meeting-tunnel).
+
+## Căn tin nhắn phòng họp (2026-11-22)
+
+Tin nhắn của mình nằm bên phải, tin của người khác nằm bên trái. Tin đang gửi và tin chờ gửi lại dùng cùng vị trí với tin đã gửi. 7 test chat đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-02-phase-05-meeting-chat-alignment).
+
+## Khôi phục kết nối phòng họp (2026-11-22)
+
+Phòng họp thử xin lại kết nối một lần sau khi mất tín hiệu hoặc hết thời gian kết nối. Dùng API vào lại cùng buổi, giữ kiểm tra quyền và phòng chờ. Frontend typecheck và 78 test phòng họp đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-03-phase-05-meeting-reconnect).
+
+## Popup chia sẻ đường dẫn họp (2026-11-22)
+
+Sảnh, phòng họp và workspace báo kết quả sao chép bằng popup. Thành công tự đóng sau 5 giây, lỗi cung cấp link để sao chép thủ công. Frontend typecheck và 101 test liên quan đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-04-phase-05-meeting-share-popup).
+
+## Căn giữa popup chia sẻ (2026-11-22)
+
+Popup sao chép link họp nằm giữa màn hình. 13 test MeetingPage đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-05-phase-05-center-share-popup).
+
+## Popup sao chép xanh nhạt (2026-11-22)
+
+Popup thành công hiện “Đã sao chép” trên nền xanh nhạt. 13 test MeetingPage đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-06-phase-05-light-share-popup).
+
+## Khôi phục token LiveKit bị từ chối (2026-11-22)
+
+Xin token mới một lần khi LiveKit từ chối bắt tay. Sảnh chỉ gọi API duyệt khi máy chủ xác nhận vai trò quản lý phòng. Typecheck, 105 test backend và 190 test frontend đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-07-phase-05-livekit-revoked-token).
+
+## Thông báo token LiveKit (2026-11-22)
+
+Phòng họp báo ở góc dưới bên phải trong 60 giây cuối hạn token vào phòng ban đầu. Typecheck và 12 test MeetingRoom đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-08-phase-05-livekit-expiry-notice).

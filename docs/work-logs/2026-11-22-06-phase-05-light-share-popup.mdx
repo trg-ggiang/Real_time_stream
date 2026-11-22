@@ -1,0 +1,17 @@
+---
+title: Popup sao chép xanh nhạt
+description: Rút gọn thông báo sao chép đường dẫn họp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-06
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi và kiểm tra
+
+Khi clipboard ghi thành công, `meetings-api.ts` trả “Đã sao chép”. `meeting-share-popup.css` dùng nền xanh nhạt, chữ xanh đậm. Test kiểm tra đúng nội dung và vẫn bao phủ trường hợp clipboard bị chặn. 13 test MeetingPage đạt. Chưa rà trực quan trên trình duyệt.

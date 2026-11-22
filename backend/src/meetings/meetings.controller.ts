@@ -121,6 +121,15 @@ export class MeetingsController {
     return this.meetings.updateSettings(user, meetingId, body);
   }
 
+  @Get(':meetingId/sessions/:sessionId/members')
+  sessionMembers(
+    @CurrentUser() user: User,
+    @Param('meetingId', new ParseUUIDPipe()) meetingId: string,
+    @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
+  ) {
+    return this.meetings.sessionMembers(user, meetingId, sessionId);
+  }
+
   @Post(':meetingId/sessions/:sessionId/members/:memberId/mute')
   mute(
     @CurrentUser() user: User,
@@ -131,9 +140,9 @@ export class MeetingsController {
     return this.meetings.mute(user, meetingId, sessionId, memberId);
   }
 
-  @Post(':meetingId/members/:memberId/remove')
-  remove(@CurrentUser() user: User, @Param('meetingId', new ParseUUIDPipe()) meetingId: string, @Param('memberId', new ParseUUIDPipe()) memberId: string) {
-    return this.meetings.removeMember(user, meetingId, memberId);
+  @Post(':meetingId/sessions/:sessionId/members/:memberId/remove')
+  remove(@CurrentUser() user: User, @Param('meetingId', new ParseUUIDPipe()) meetingId: string, @Param('sessionId', new ParseUUIDPipe()) sessionId: string, @Param('memberId', new ParseUUIDPipe()) memberId: string) {
+    return this.meetings.removeMember(user, meetingId, memberId, sessionId);
   }
 
   @Post(':meetingId/sessions/:sessionId/leave')

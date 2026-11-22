@@ -1,3 +1,4 @@
+import { LiveKitExpiryNotice } from './LiveKitExpiryNotice';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { Hand } from '@phosphor-icons/react/dist/csr/Hand';
@@ -135,6 +136,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled, microphoneTrack } = useLocalParticipant();
   const [audioMuted, setAudioMuted] = useState(() => !initialSpeaker);
   const canSelectOutput = typeof HTMLMediaElement !== 'undefined' && 'setSinkId' in HTMLMediaElement.prototype;
+  const hostManagement = isHost ? management : undefined;
   const [showManagement, setShowManagement] = useState(false);
   const [chatOpen, setChatOpen] = useState(false), [chatUnread, setChatUnread] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
@@ -193,10 +195,21 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
           <ChatCircleText size={23} weight={chatOpen ? 'fill' : 'regular'} aria-hidden="true" />
           {!chatOpen && chatUnread > 0 ? <span className="meeting-chat-unread" aria-hidden="true">{chatUnread > 99 ? '99+' : chatUnread}</span> : null}
         </button> : null}
-        {management ? <button type="button" className="lk-button meeting-control-icon" aria-label={`Quản lý cuộc họp${pendingCount ? `, ${pendingCount} người chờ duyệt` : ''}`} title="Quản lý cuộc họp" aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => setShowManagement(value => !value)}><Users size={23} aria-hidden="true" />{pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button> : null}
+        <button type="button" className="lk-button meeting-control-icon" aria-label={`Mọi người${pendingCount ? `, ${pendingCount} người chờ duyệt` : ''}`} title="Mọi người" aria-controls="meeting-people" aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => setShowManagement(value => !value)}><Users size={23} aria-hidden="true" />{hostManagement && pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button>
         <button type="button" className="lk-button meeting-control-icon meeting-control-leave" aria-label="Rời phòng" title="Rời phòng" onClick={onLeave}><SignOut size={23} aria-hidden="true" /></button>
       </div>
-      {management ? <div className="meeting-management-panel" hidden={!showManagement}><MeetingManagement {...management} onlineUsers={onlineUsers} onPendingCountChange={setPendingCount} /></div> : null}
+      <div id="meeting-people" className="meeting-management-panel" hidden={!showManagement}>
+        {showManagement && <section className="workspace-management meeting-people-list" aria-label="Mọi người">
+          <h2>Mọi người ({participants.length})</h2>
+          <ul>
+            {participants.map(participant => <li key={participant.identity}>
+              {participant.name || 'Thành viên'}{participant.identity === credentials.participantIdentity ? ' (Bạn)' : ''}
+            </li>)}
+          </ul>
+        </section>}
+        {hostManagement && <MeetingManagement {...hostManagement} inCallHost onlineUsers={onlineUsers}
+          showSessionMembers={showManagement} onPendingCountChange={setPendingCount} />}
+      </div>
     </>
   );
 }
@@ -208,6 +221,7 @@ export function MeetingRoom({
   onConnected,
   onLeave,
   onEnded,
+  onReconnect,
   management,
   onShare,
   audioSelection,
@@ -217,6 +231,7 @@ export function MeetingRoom({
   transferStatus?: 'pending' | 'failed' | null;
   onConnected?: () => void;
   onLeave: () => void;
+  onReconnect?: () => void;
   onEnded: (message?: string, removedByServer?: boolean) => void;
   management?: ManagementProps;
   onShare?: () => void;
@@ -256,16 +271,21 @@ export function MeetingRoom({
         onEnded('Thiết bị này đã bị ngắt khỏi phòng họp.', true);
         return;
       }
-      onEnded(
-        reason === DisconnectReason.CLIENT_INITIATED
-          ? undefined
-          : 'Kết nối phòng đã kết thúc. Hãy kiểm tra mạng và thử tham gia lại.',
-      );
+      if (reason === DisconnectReason.CLIENT_INITIATED) return;
+      if (onReconnect && (reason === undefined || reason === DisconnectReason.UNKNOWN_REASON ||
+          reason === DisconnectReason.SIGNAL_CLOSE || reason === DisconnectReason.CONNECTION_TIMEOUT ||
+          reason === DisconnectReason.STATE_MISMATCH || reason === DisconnectReason.ROOM_CLOSED ||
+          reason === DisconnectReason.USER_REJECTED)) {
+        onReconnect();
+        return;
+      }
+      onEnded('Kết nối phòng đã kết thúc. Hãy kiểm tra mạng và thử tham gia lại.');
     },
-    [onEnded],
+    [onEnded, onReconnect],
   );
   return (
     <section aria-label="Phòng họp" className="meeting-room">
+      <LiveKitExpiryNotice key={credentials.token} token={credentials.token} />
       <LiveKitRoom
         token={credentials.token}
         serverUrl={credentials.serverUrl}

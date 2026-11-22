@@ -34,7 +34,9 @@ test('existing single session and invalid times produce distinct actionable code
 
 test('session overview exposes recurrence and waiting settings after reload', async () => {
   const { service } = fixture({count:1});
+  service.getMember = async () => ({ meeting_member_id: 'member', user_id: 'host', role: 'host', admission_status: 'admitted', invited_at: null });
   const result = await service.listSessions({userId:'host'}, 'ABCDEFGHIJ');
+  assert.deepEqual(result.membership, { meetingMemberId: 'member', userId: 'host', role: 'host', invitedAt: null });
   assert.equal(result.meeting.recurrenceRule,null);
   assert.equal(result.meeting.waitingRoomEnabled,true);
 });

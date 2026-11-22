@@ -213,3 +213,22 @@
   .meeting-room-page.meeting-app--incall .meeting-room [data-lk-theme] { padding-inline: 8px; }
   .meeting-room-page .meeting-participant-count { font-size: 10px; }
 }
+
+.meeting-people-list ul { margin: 0; padding: 0; list-style: none; max-height: 180px; overflow-y: auto; }
+.meeting-people-list li { padding: 8px 0; overflow-wrap: anywhere; }
+
+.meeting-livekit-expiry {
+  position: fixed;
+  inset: auto 16px 16px auto;
+  z-index: 1000;
+  max-width: min(340px, calc(100vw - 32px));
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid #bed4ee;
+  border-radius: 10px;
+  background: #eaf3ff;
+  color: #1b3c63;
+  box-shadow: 0 6px 20px #10243e30;
+  font-size: .875rem;
+}

@@ -232,10 +232,11 @@ main:has(.meeting-room) > header .subtitle { display: none; }
 .chat-panel-heading button, .chat-message button { padding: 6px 10px; font-size: .8rem; }
 .meeting-chat-panel > .notice { margin: 8px; font-size: .85rem; }
 .chat-message-list { flex: 1; min-height: 100px; overflow-y: auto; padding: 12px; overflow-anchor: none; }
-.chat-message-list ol { list-style: none; padding: 0; margin: 0; }
-.chat-message { margin: 0 0 16px; padding-left: 8px; border-left: 2px solid #52627a; overflow-wrap: anywhere; }
-.chat-message.own { border-color: #9ce6ce; }
+.chat-message-list ol { display: flex; flex-direction: column; align-items: flex-start; list-style: none; padding: 0; margin: 0; }
+.chat-message { box-sizing: border-box; max-width: 88%; margin: 0 0 16px; padding-inline-start: 8px; border-inline-start: 2px solid #52627a; overflow-wrap: anywhere; }
+.chat-message.own { align-self: flex-end; padding-inline: 0 8px; border-inline-start: 0; border-inline-end: 2px solid #9ce6ce; text-align: end; }
 .chat-message-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.chat-message.own .chat-message-meta { justify-content: flex-end; }
 .chat-message-meta time, .chat-message > span { font-size: .75rem; color: #b6c5d8; }
 .chat-message p { margin: 4px 0; white-space: pre-wrap; font-size: .9rem; }
 .chat-load-older { width: 100%; margin-bottom: 16px; padding: 8px; }

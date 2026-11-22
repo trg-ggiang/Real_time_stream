@@ -630,3 +630,47 @@ Sửa nháy toàn màn hình khi chuyển CLB: giữ rail/sidebar/main và theme
 ## 21/11/2026 — Xóa URL cũ khi đăng xuất
 
 Logout đưa về `/?mode=login` và xóa session; đăng nhập tài khoản khác không giữ workspace/trang cá nhân cũ, admin về `/admin`. Refresh sau logout vẫn mở form. Ba regression tái hiện trước sửa, 43 auth/redirect tests và frontend build đạt; chưa thử tài khoản thật trên browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-04-phase-04-logout-account-url).
+
+## Căn tin nhắn phòng họp (2026-11-22)
+
+Tin nhắn của mình nằm bên phải, tin của người khác nằm bên trái. Tin đang gửi và tin chờ gửi lại dùng cùng vị trí với tin đã gửi. 7 test chat đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-02-phase-05-meeting-chat-alignment).
+
+## Khôi phục kết nối phòng họp (2026-11-22)
+
+Phòng họp thử xin lại kết nối một lần sau khi mất tín hiệu hoặc hết thời gian kết nối. Dùng API vào lại cùng buổi, giữ kiểm tra quyền và phòng chờ. Frontend typecheck và 78 test phòng họp đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-03-phase-05-meeting-reconnect).
+
+## Popup chia sẻ đường dẫn họp (2026-11-22)
+
+Sảnh, phòng họp và workspace báo kết quả sao chép bằng popup. Thành công tự đóng sau 5 giây, lỗi cung cấp link để sao chép thủ công. Frontend typecheck và 101 test liên quan đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-04-phase-05-meeting-share-popup).
+
+## Căn giữa popup chia sẻ (2026-11-22)
+
+Popup sao chép link họp nằm giữa màn hình. 13 test MeetingPage đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-05-phase-05-center-share-popup).
+
+## Popup sao chép xanh nhạt (2026-11-22)
+
+Popup thành công hiện “Đã sao chép” trên nền xanh nhạt. 13 test MeetingPage đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-06-phase-05-light-share-popup).
+
+## Khôi phục token LiveKit bị từ chối (2026-11-22)
+
+Xin token mới một lần khi LiveKit từ chối bắt tay. Sảnh chỉ gọi API duyệt khi máy chủ xác nhận vai trò quản lý phòng. Typecheck, 105 test backend và 190 test frontend đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-07-phase-05-livekit-revoked-token).
+
+## Thông báo token LiveKit (2026-11-22)
+
+Phòng họp báo ở góc dưới bên phải trong 60 giây cuối hạn token vào phòng ban đầu. Typecheck và 12 test MeetingRoom đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-08-phase-05-livekit-expiry-notice).
+
+## Giao diện ứng tuyển thành viên (2026-11-22)
+
+Sinh viên điền đơn, xem lại và nộp theo hai bước. Chủ nhiệm mở hàng đợi chờ duyệt, lọc theo trạng thái và xem hồ sơ mà vẫn giữ bộ lọc khi quay lại. Frontend build, 32 test và kiểm tra Chromium mô phỏng đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-09-phase-04-recruitment-ux).
+
+## Thiết kế khu tuyển thành viên trong workspace (2026-11-22)
+
+Danh sách tập trung lịch nhận đơn, trạng thái và lối vào hồ sơ. Màn tạo đợt và xét duyệt dùng chung bố cục và màu workspace. Frontend build, 32 test liên quan và Chromium sáng/tối với dữ liệu mô phỏng đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-10-phase-04-workspace-recruitment).
+
+## Bộ lọc đợt tuyển trong workspace (2026-11-22)
+
+Thanh tab và thẻ theo mẫu nội dung CLB. API lọc theo thời gian nhận đơn trước khi phân trang. Typecheck và 21 test liên quan đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-11-phase-04-recruitment-filters).
+
+## Bố cục tuyển thành viên theo trang bài viết (2026-11-22)
+
+Danh sách đợt tuyển dùng chung mẫu tiêu đề, thẻ, phân trang và trạng thái tải của Bài viết CLB. Frontend typecheck và 32 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-12-phase-04-recruitment-post-layout).

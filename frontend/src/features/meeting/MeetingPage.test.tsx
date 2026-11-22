@@ -11,6 +11,25 @@ vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, access
   </div> }));
 afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); window.history.replaceState(null,'','/'); vi.unstubAllGlobals(); });
 
+it.each([401, 403, 404, 503])('calls the meeting details API and only signs out on HTTP 401 (status %s)', async status => {
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
+  const onLogout = vi.fn();
+  const fetcher = vi.fn(async (_url: string, _options?: RequestInit) => ({
+    ok: false, status, json: async () => ({}),
+  }));
+  vi.stubGlobal('fetch', fetcher);
+  render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={onLogout} />);
+  if (status === 401) await waitFor(() => expect(onLogout).toHaveBeenCalledOnce());
+  else {
+    await screen.findByRole('alert');
+    expect(onLogout).not.toHaveBeenCalled();
+  }
+  expect(fetcher).toHaveBeenCalledExactlyOnceWith(
+    expect.stringMatching(/\/api\/meetings\/ABCDEFGHIJ\/sessions$/),
+    expect.objectContaining({ method: 'GET', headers: { Authorization: 'Bearer app-jwt' } }),
+  );
+});
+
 it('opens an existing room directly without the removed overview and joins with chat authentication', async () => {
   vi.stubGlobal('isSecureContext',true);
   Object.defineProperty(navigator,'mediaDevices',{value:{},configurable:true});
@@ -38,6 +57,9 @@ it('opens an existing room directly without the removed overview and joins with 
   const room=await screen.findByTestId('joined-room');
   expect(room.getAttribute('data-session')).toBe('s');
   expect(room.getAttribute('data-auth')).toBe('app-jwt');
+  expect(fetch).toHaveBeenCalledWith(expect.stringMatching(/\/api\/meetings\/ABCDEFGHIJ\/join$/),
+    expect.objectContaining({ method: 'POST', headers: expect.objectContaining({ Authorization: 'Bearer app-jwt' }) }));
+  expect(fetch.mock.calls.some(([url]) => url.includes('/api/auth/login'))).toBe(false);
   expect(JSON.parse(sessionStorage.getItem('rts.meeting-devices.v1') || '{}').audio).toBe(false);
   expect(sessionStorage.getItem('rts.meeting-speaker.v1')).toBe('on');
   expect(fetch.mock.calls.some(([url])=>url.includes('/meeting-sessions')||url.includes('/livekit/token'))).toBe(false);
@@ -63,6 +85,16 @@ it('keeps the invited session and copies a canonical link for the chosen row', a
     expect(copyButtons[1].closest('article')?.getAttribute('data-selected')).toBe('true');
     await act(async () => fireEvent.click(copyButtons[0]));
     expect(writeText).toHaveBeenCalledWith(origin + '/?view=meeting&meeting=ABCDEFGHIJ&session=a');
+    expect(screen.getByText('Đã sao chép', { exact: true }).closest('.meeting-share-popup')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng thông báo chia sẻ' }));
+    expect(screen.queryByText(/Đã sao chép/)).toBeNull();
+
+    writeText.mockRejectedValueOnce(new Error('Clipboard denied'));
+    await act(async () => fireEvent.click(copyButtons[1]));
+    expect(screen.getByRole('alert').textContent).toContain('Không thể sao chép tự động');
+    expect((screen.getByRole('textbox', { name: 'Đường dẫn cuộc họp' }) as HTMLInputElement).value)
+      .toBe(origin + '/?view=meeting&meeting=ABCDEFGHIJ&session=b');
+
   } finally {
     if (clipboard) Object.defineProperty(navigator, 'clipboard', clipboard);
     else Reflect.deleteProperty(navigator, 'clipboard');
@@ -183,4 +215,16 @@ it.each([{ status: 403, removed: false }, { status: 403, removed: true }, { stat
     if (hidden) Object.defineProperty(document, 'hidden', hidden);
     else Reflect.deleteProperty(document, 'hidden');
   }
+});
+
+it.each([null, { role: 'participant', invitedAt: '2026-11-22' }])('does not poll the waiting room without a moderation role (%j)', async membership => {
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ');
+  const fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
+    meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Team' },
+    membership, sessions: [{ session_id: 's', status: 'ongoing' }],
+  }) });
+  vi.stubGlobal('fetch', fetch);
+  render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
+  await screen.findByRole('heading', { name: 'Team' });
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/join-requests'))).toBe(false);
 });

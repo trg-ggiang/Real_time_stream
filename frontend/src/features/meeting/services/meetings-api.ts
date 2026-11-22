@@ -71,15 +71,17 @@ export function meetingInviteUrl(origin: string, code: string, sessionId?: strin
   return url;
 }
 
-export async function copyMeetingInvite(code: string, sessionId?: string) {
+export type MeetingShareResult = { message: string; manualLink?: string };
+
+export async function copyMeetingInvite(code: string, sessionId?: string): Promise<MeetingShareResult> {
   const link = meetingInviteUrl(window.location.origin, code, sessionId);
   const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(link.hostname);
   const hint = loopback ? ' Mở ứng dụng bằng URL HTTPS của tunnel để chia sẻ ra ngoài.' : '';
   try {
     await navigator.clipboard.writeText(link.href);
-    return (loopback ? 'Đã sao chép link cục bộ.' : 'Đã sao chép đường dẫn.') + hint;
+    return { message: 'Đã sao chép' };
   } catch {
-    return link.href + hint;
+    return { message: 'Không thể sao chép tự động. Hãy sao chép đường dẫn bên dưới.' + hint, manualLink: link.href };
   }
 }
 
@@ -99,10 +101,9 @@ export function parseMeetingCode(value: string): string {
   return code;
 }
 
-// Existing read API does not expose the viewer's role. Unknown permissions must
-// be checked by the existing mutation endpoints, never inferred from a JWT or UI input.
+// A null membership explicitly means the viewer has no admitted membership.
 export function canManageSessions(member: Membership | null | undefined): boolean {
-  return member ? member.role !== 'participant' || member.invitedAt !== null : true;
+  return !!member && (member.role !== 'participant' || member.invitedAt !== null);
 }
 export const roleLabels: Record<Role, string> = { host: 'Chủ phòng', moderator: 'Điều hành', participant: 'Thành viên' };
 const dateFormatter = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium', timeStyle: 'short' });

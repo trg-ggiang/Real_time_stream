@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { DisconnectReason, MediaDeviceFailure } from 'livekit-client';
 import { MeetingRoom } from './MeetingRoom';
 
+const roster = vi.hoisted(() => ({ people: [] as { identity: string; name?: string }[] }));
 const localParticipant = vi.hoisted(() => ({
   setMicrophoneEnabled: vi.fn().mockResolvedValue(undefined),
   setCameraEnabled: vi.fn().mockResolvedValue(undefined),
@@ -12,12 +13,15 @@ const localParticipant = vi.hoisted(() => ({
 vi.mock('@livekit/components-react', () => ({
   LiveKitRoom: ({children,onMediaDeviceFailure,onConnected,onDisconnected,audio,video}: any) => <div data-testid="livekit-room" data-audio={String(audio)} data-video={String(video)}>{children}
     <button onClick={() => onConnected?.()}>Connected</button>
+    <button onClick={() => onDisconnected?.(DisconnectReason.SIGNAL_CLOSE)}>Signaling lost</button>
+    <button onClick={() => onDisconnected?.(DisconnectReason.USER_REJECTED)}>Signal rejected</button>
+    <button onClick={() => onDisconnected?.(DisconnectReason.ROOM_DELETED)}>Room deleted</button>
     <button onClick={() => onDisconnected?.(DisconnectReason.PARTICIPANT_REMOVED)}>Removed by LiveKit</button>
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.PermissionDenied, undefined)}>Screen cancelled</button>
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.DeviceInUse, 'videoinput')}>Camera busy</button>
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.PermissionDenied, 'audioinput')}>Mic denied</button>
   </div>,
-  useConnectionState: () => 'connected', useParticipants: () => [],
+  useConnectionState: () => 'connected', useParticipants: () => roster.people,
   useLocalParticipant: () => ({localParticipant,isCameraEnabled:false,isMicrophoneEnabled:false}),
   useLocalParticipantPermissions: () => ({canUpdateMetadata:true}), useParticipantAttribute: () => '',
   TrackToggle: ({source,onChange,children}: any) => <button onClick={() => onChange(true,true)} aria-label={`enable-${source}`}>{children}</button>,
@@ -37,6 +41,8 @@ vi.mock('./MeetingManagement', async () => {
 vi.mock('../chat/components/MeetingChat', () => ({MeetingChat: ({credentials,accessToken,children,open}: any) => <div data-testid="chat-wrapper" data-session={credentials.sessionId} data-auth={accessToken} data-open={String(open)}>{children}</div>}));
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
+  roster.people = [];
   sessionStorage.clear();
   localParticipant.setMicrophoneEnabled.mockClear();
   localParticipant.setCameraEnabled.mockClear();
@@ -52,14 +58,14 @@ it('applies muted microphone and speakers from the pre-join selection', () => {
 });
 it('places the meeting title inside the room and shows pending approvals while management is closed', () => {
   const onShare = vi.fn();
-  render(<MeetingRoom accessToken="test" credentials={{token:'test',serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u'}}
+  render(<MeetingRoom accessToken="test" credentials={{token:'test',serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u',role:'host'}}
     onLeave={vi.fn()} onEnded={vi.fn()} onShare={onShare} management={{
       accessToken: 'test', overview: { meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Sinh hoạt CLB' }, sessions: [] },
       knownMembers: [], onMembersChanged: vi.fn(), onChanged: vi.fn(), onError: vi.fn(), onSessionEnded: vi.fn(),
     }} />);
   expect(screen.getByRole('heading', { name: 'Sinh hoạt CLB' }).closest('.meeting-room')).toBeTruthy();
   expect(screen.queryByText('Đã kết nối')).toBeNull();
-  const control = screen.getByRole('button', { name: 'Quản lý cuộc họp, 2 người chờ duyệt' });
+  const control = screen.getByRole('button', { name: 'Mọi người, 2 người chờ duyệt' });
   expect(control.getAttribute('aria-expanded')).toBe('false');
   expect(screen.getByText('Management content').parentElement?.hidden).toBe(true);
   fireEvent.click(control);
@@ -146,4 +152,59 @@ it('restores the selected camera after transfer while keeping the selected mic a
   expect(screen.getByTestId('livekit-room').getAttribute('data-audio')).toBe('false');
   expect(localParticipant.setMicrophoneEnabled).not.toHaveBeenCalled();
   expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('0');
+});
+
+it.each(['participant', 'moderator', undefined] as const)('shows a live, read-only roster for role %s', role => {
+  roster.people = Array.from({ length: 10 }, (_, index) => ({ identity: `u${index}:device`, name: `Person ${index}` }));
+  const props = {
+    accessToken: 'test', credentials: { token: 'test', serverUrl: 'wss://unit.invalid', roomName: 'test', participantIdentity: 'u1:device', role },
+    onLeave: vi.fn(), onEnded: vi.fn(), management: {
+      accessToken: 'test', overview: { meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Meeting' }, sessions: [] },
+      knownMembers: [], onMembersChanged: vi.fn(), onChanged: vi.fn(), onError: vi.fn(), onSessionEnded: vi.fn(),
+    },
+  };
+  const { rerender } = render(<MeetingRoom {...props} />);
+  const control = screen.getByRole('button', { name: 'Mọi người' });
+  expect(control.getAttribute('aria-expanded')).toBe('false');
+  fireEvent.click(control);
+  expect(screen.getAllByRole('listitem')).toHaveLength(10);
+  expect(screen.getByText('Person 9')).toBeTruthy();
+  expect(screen.queryByText('Management content')).toBeNull();
+  roster.people = [...roster.people.slice(0, 9), { identity: 'new:device', name: 'New arrival' }];
+  rerender(<MeetingRoom {...props} />);
+  expect(screen.queryByText('Person 9')).toBeNull();
+  expect(screen.getByText('New arrival')).toBeTruthy();
+  fireEvent.click(control);
+  expect(screen.queryByRole('list')).toBeNull();
+});
+
+it('requests reconnection after signaling loss and ends the call after server removal or room deletion', () => {
+  const onEnded = vi.fn(), onReconnect = vi.fn();
+  render(<MeetingRoom accessToken="test" credentials={{token:'test',serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u'}}
+    onLeave={vi.fn()} onEnded={onEnded} onReconnect={onReconnect} />);
+  fireEvent.click(screen.getByText('Signaling lost'));
+  expect(onReconnect).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByText('Signal rejected'));
+  expect(onReconnect).toHaveBeenCalledTimes(2);
+  expect(onEnded).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByText('Removed by LiveKit'));
+  expect(onEnded).toHaveBeenLastCalledWith(expect.any(String), true);
+  fireEvent.click(screen.getByText('Room deleted'));
+  expect(onEnded).toHaveBeenCalledTimes(2);
+  expect(onReconnect).toHaveBeenCalledTimes(2);
+});
+
+it('shows the original LiveKit token warning only during its last minute', () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-11-22T05:00:00Z'));
+  const token = `header.${btoa(JSON.stringify({ exp: Date.now() / 1000 + 120 }))}.signature`;
+  render(<MeetingRoom accessToken="test" credentials={{token,serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u'}}
+    onLeave={vi.fn()} onEnded={vi.fn()} />);
+  const warning = 'Token vào phòng LiveKit ban đầu sắp hết hạn.';
+  act(() => { vi.advanceTimersByTime(59_999); });
+  expect(screen.queryByText(warning)).toBeNull();
+  act(() => { vi.advanceTimersByTime(1); });
+  expect(screen.getByText(warning).getAttribute('role')).toBe('status');
+  act(() => { vi.advanceTimersByTime(60_000); });
+  expect(screen.queryByText(warning)).toBeNull();
 });

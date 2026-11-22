@@ -1,0 +1,17 @@
+---
+title: Thông báo token LiveKit sắp hết hạn
+description: Cảnh báo ở góc dưới bên phải của phòng họp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-08
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi và kiểm tra
+
+`LiveKitExpiryNotice.tsx` đọc trường `exp` của token vào phòng ban đầu để hiển thị trong 60 giây cuối. Thời điểm này độc lập với token được SDK làm mới và với thời lượng buổi họp. `MeetingRoom` hiển thị thông báo và `meeting-theme.css` đặt ở góc dưới bên phải. Frontend typecheck và 12 test MeetingRoom đạt. Chưa rà trực quan trên trình duyệt thật.

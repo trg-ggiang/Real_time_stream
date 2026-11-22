@@ -84,7 +84,7 @@ it('logs out on expired JWT and does not open malformed room credentials', async
   expect(result.current.error).toContain('không hợp lệ');
 });
 
-it('reload resumes the same session with fresh credentials after closing old attendance', async () => {
+it.each(['slow', 'failed'])('reload rejoins the same session with %s old attendance cleanup', async cleanup => {
   vi.useFakeTimers();
   vi.spyOn(window.performance, 'getEntriesByType').mockReturnValue([{ type: 'reload' } as PerformanceNavigationTiming]);
   const jwt = `header.${btoa(JSON.stringify({sub:'user'}))}.signature`;
@@ -96,14 +96,24 @@ it('reload resumes the same session with fresh credentials after closing old att
   const saved = sessionStorage.getItem('rts.active-meeting.v1')!;
   expect(saved).not.toContain('synthetic-token');
   first.unmount();
+  await act(async () => {});
   fetch.mockClear();
+  fetch.mockImplementation(async (url: string) => {
+    if (url.endsWith('/leave')) return cleanup === 'failed' ? response({}, 503) : new Promise(() => {});
+    return response({ ...credentials, attendanceId: 'replacement' });
+  });
   const second = renderHook(() => useSessionFlow(jwt, vi.fn()));
   await act(async () => { await vi.advanceTimersByTimeAsync(0); });
-  expect(fetch.mock.calls[0][0]).toContain('/sessions/session/leave');
-  expect(fetch.mock.calls[1][0]).toContain('/ABCDEFGHIJ/join');
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(fetch.mock.calls[0][0]).toContain('/ABCDEFGHIJ/join');
+  expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ sessionId: 'session', deviceMode: 'add' });
   expect(second.result.current.active?.sessionId).toBe('session');
-  await act(async () => { await second.result.current.leave(); });
-  expect(sessionStorage.getItem('rts.active-meeting.v1')).toBeNull();
+  await act(async () => { second.result.current.onConnected(); });
+  expect(fetch.mock.calls[1][0]).toContain('/sessions/session/leave');
+  expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual({ attendanceId: credentials.attendanceId });
+  expect(second.result.current.active?.attendanceId).toBe('replacement');
+  expect(second.result.current.busy).toBe(false);
+  expect(second.result.current.error).toBe('');
 });
 
 it('a copied resume record does not kick the original tab', async () => {
@@ -174,4 +184,50 @@ it('resumes only once under StrictMode and does not revive a session after expli
   renderHook(()=>useSessionFlow(jwt,vi.fn()));
   await act(async()=>{await vi.advanceTimersByTimeAsync(0);});
   expect(fetch).not.toHaveBeenCalled();
+});
+
+it('rejoins the same meeting once after losing the connection and closes only the former attendance', async () => {
+  const fetch = vi.fn().mockResolvedValueOnce(response(credentials))
+    .mockResolvedValueOnce(response({ ...credentials, attendanceId: 'replacement' }))
+    .mockResolvedValueOnce(response({ status: 'left' }));
+  vi.stubGlobal('fetch', fetch);
+  const { result } = renderHook(() => useSessionFlow('jwt', vi.fn()));
+  await act(async () => { await result.current.join('ABCDEFGHIJ', 'meeting', 'session'); });
+  await act(async () => {
+    await Promise.all([
+      result.current.reconnect('ABCDEFGHIJ', 'attendance'),
+      result.current.reconnect('ABCDEFGHIJ', 'attendance'),
+    ]);
+  });
+  expect(result.current.active?.attendanceId).toBe('replacement');
+  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(JSON.parse(fetch.mock.calls[1][1].body)).toMatchObject({ sessionId: 'session', deviceMode: 'add' });
+  await act(async () => { result.current.onConnected(); });
+  expect(JSON.parse(fetch.mock.calls[2][1].body)).toEqual({ attendanceId: 'attendance' });
+});
+
+it('stops automatic recovery when the replacement connection fails before connecting', async () => {
+  const fetch = vi.fn().mockResolvedValueOnce(response(credentials))
+    .mockResolvedValueOnce(response({ ...credentials, attendanceId: 'replacement' }))
+    .mockResolvedValueOnce(response({ status: 'left' }));
+  vi.stubGlobal('fetch', fetch);
+  const { result } = renderHook(() => useSessionFlow('jwt', vi.fn()));
+  await act(async () => { await result.current.join('ABCDEFGHIJ', 'meeting', 'session'); });
+  await act(async () => { await result.current.reconnect('ABCDEFGHIJ', 'attendance'); });
+  await act(async () => { await result.current.reconnect('ABCDEFGHIJ', 'replacement'); });
+  expect(result.current.active).toBeNull();
+  expect(fetch.mock.calls.filter(([url]) => url.endsWith('/join'))).toHaveLength(2);
+});
+
+it('keeps the active attendance when the departure effect restarts', async () => {
+  const fetch = vi.fn().mockResolvedValue(response(credentials));
+  vi.stubGlobal('fetch', fetch);
+  const onUnauthorized = vi.fn();
+  const { result, rerender } = renderHook(({ token }) => useSessionFlow(token, onUnauthorized),
+    { initialProps: { token: 'old-jwt' } });
+  await act(async () => { await result.current.join('ABCDEFGHIJ', 'meeting', 'session'); });
+  rerender({ token: 'new-jwt' });
+  await act(async () => {});
+  expect(result.current.active?.attendanceId).toBe('attendance');
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/leave'))).toBe(false);
 });

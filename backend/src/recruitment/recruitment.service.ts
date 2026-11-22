@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { SupabaseService } from '../supabase/supabase.service';
 import { UsersService } from '../users/users.service';
 import { WorkspaceAccess } from '../workspace/workspace-access.service';
-import { ApplicationInput, CampaignInput, DecisionInput, RecruitmentQuery } from './recruitment.dto';
+import { ApplicationInput, CampaignInput, DecisionInput, ManagedRecruitmentQuery, RecruitmentQuery } from './recruitment.dto';
 import { validateAnswers,validateQuestions } from './recruitment.validation';
 @Injectable()
 export class RecruitmentService {
@@ -28,7 +28,16 @@ export class RecruitmentService {
   const r=await this.db.from('recruitment_departments').select('recruitment_department_id,department_id,description,current_form_version_id,club_departments(name)').eq('campaign_id',id).order('created_at');this.check(r.error);
   return {item,departments:await Promise.all((r.data||[]).map(async d=>({...d,questions:await this.questions(d.current_form_version_id)})))};
  }
- async managed(actor:string,club:string,q:RecruitmentQuery){const ctx=await this.access.require(actor,club);if(!['chairperson','head'].includes(ctx.membership.role))throw new ForbiddenException();return this.page(await this.db.from('recruitment_campaigns').select('*',{count:'exact'}).eq('club_id',club).is('deleted_at',null).order('application_closes_at',{ascending:true}).order('campaign_id').range((q.page-1)*q.limit,q.page*q.limit-1),q);}
+ async managed(actor:string,club:string,q:ManagedRecruitmentQuery){
+  const ctx=await this.access.require(actor,club);
+  if(!['chairperson','head'].includes(ctx.membership.role))throw new ForbiddenException();
+  const now=new Date().toISOString();
+  const query=this.db.from('recruitment_campaigns').select('*',{count:'exact'}).eq('club_id',club).is('deleted_at',null);
+  if(q.campaign_status==='open')query.eq('status','open').lte('application_opens_at',now).gt('application_closes_at',now);
+  if(q.campaign_status==='waiting')query.eq('status','open').gt('application_opens_at',now).gt('application_closes_at',now);
+  if(q.campaign_status==='closed')query.or(`status.in.(closed,completed),and(status.eq.open,application_closes_at.lte.${now})`);
+  return this.page(await query.order('application_closes_at',{ascending:true}).order('campaign_id').range((q.page-1)*q.limit,q.page*q.limit-1),q);
+ }
  async save(actor:string,club:string,input:CampaignInput,id?:string){await this.access.require(actor,club,true);if(Date.parse(input.application_closes_at)<=Date.parse(input.application_opens_at))throw new BadRequestException('Hạn tuyển phải sau giờ bắt đầu.');if(new Set(input.departments.map(d=>d.department_id)).size!==input.departments.length)throw new BadRequestException('Ban tuyển bị trùng.');for(const d of input.departments)validateQuestions(d.questions);if(id&&!input.expected_updated_at)throw new BadRequestException('Thiếu phiên bản đợt tuyển.');const {expected_updated_at,...values}=input;return {item:await this.rpc('recruitment_v3_save',{p_actor:actor,p_club:club,p_id:id||null,p_expected:expected_updated_at||null,p_input:values})};}
  async publish(actor:string,club:string,id:string,expected:string,close=false){await this.access.require(actor,club,true);return {item:await this.rpc('recruitment_v3_publish',{p_actor:actor,p_club:club,p_id:id,p_expected:expected,p_close:close})};}
  async context(actor:string,id:string){const detail=await this.detail(id);const [profile,user,app,member]=await Promise.all([this.users.getProfile(actor),this.users.findById(actor),this.db.from('recruitment_applications').select('application_id,status').eq('campaign_id',id).eq('applicant_id',actor).maybeSingle(),this.db.from('club_memberships').select('membership_id').eq('club_id',detail.item.club_id).eq('user_id',actor).eq('status','active').maybeSingle()]);this.check(app.error);this.check(member.error);return {...detail,profile:{...profile,email:user?.email},application:app.data,can_apply:!!detail.item.accepting_applications&&!app.data&&!member.data,reason:app.data?'ALREADY_APPLIED':member.data?'ALREADY_MEMBER':!detail.item.accepting_applications?'WINDOW_CLOSED':null};}

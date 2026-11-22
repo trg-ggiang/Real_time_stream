@@ -45,3 +45,27 @@ it('builder offers eleven types, preview and safe text rendering',()=>{
 it('notification destinations distinguish reviewer and applicant and reject external targets',()=>{
  expect(notificationTarget({href:'/me/recruitment-applications/app',club_id:'club'})).toBe('/me/recruitment-applications/app');expect(notificationTarget({href:'/workspace/club/recruitments/campaign/applications/app'})).toBe('/workspace/club/recruitments/campaign/applications/app');expect(notificationTarget({href:'https://evil.invalid'})).toBe('/me/recruitment-applications');
 });
+
+it('keeps answers when the applicant returns from review', async () => {
+ mock(()=>({...detail,profile:{full_name:'Minh Hải'},can_apply:true,application:null}));
+ render(<MemoryRouter initialEntries={['/recruitments/campaign/apply']}><Routes><Route path='/recruitments/:campaignId/apply' element={<RecruitmentApply token='token'/>}/></Routes></MemoryRouter>);
+ fireEvent.change(await screen.findByLabelText('Chọn ban ứng tuyển'),{target:{value:'rd'}});
+ fireEvent.change(screen.getByLabelText('Họ tên'),{target:{value:'Minh Hải Nguyễn'}});
+ fireEvent.click(screen.getByRole('button',{name:/Xem lại đơn/}));
+ expect(screen.getByText('Kiểm tra và nộp').getAttribute('aria-current')).toBe('step');
+ fireEvent.click(screen.getByRole('button',{name:/Chỉnh sửa/}));
+ expect((screen.getByLabelText('Họ tên') as HTMLInputElement).value).toBe('Minh Hải Nguyễn');
+ expect(screen.getByText('Điền đơn').getAttribute('aria-current')).toBe('step');
+});
+
+it('opens the pending queue first and preserves the active filter in applicant detail links', async () => {
+ mock(url=>({items:[{...app,status:url.includes('status=accepted')?'accepted':'submitted'}],total:1}));
+ render(<MemoryRouter initialEntries={['/workspace/club/recruitments/campaign/applications']}><ClubContext.Provider value={session}><Routes><Route path='/workspace/:clubId/recruitments/:campaignId/applications' element={<RecruitmentQueue/>}/></Routes></ClubContext.Provider></MemoryRouter>);
+ expect(screen.getByRole('button',{name:'Chờ duyệt'}).getAttribute('aria-pressed')).toBe('true');
+ await screen.findByRole('link',{name:/Xem chi tiết đơn/});
+ fireEvent.click(screen.getByRole('button',{name:'Đã duyệt'}));
+ const detailLink=await screen.findByRole('link',{name:/Xem chi tiết đơn/});
+ expect(detailLink.getAttribute('href')).toContain('status=accepted');
+ expect(calls.some(({url})=>url.includes('status=submitted'))).toBe(true);
+ expect(calls.some(({url})=>url.includes('status=accepted'))).toBe(true);
+});

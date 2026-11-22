@@ -44,18 +44,20 @@ function fixture() {
   return { service, client, tables, removals };
 }
 
-test('permanent invitation cannot end a session; host and moderator can', async () => {
+test('only the host can end a session', async () => {
   const f = fixture();
   await assert.rejects(f.service.endSession({ userId: 'student' }, 'a', 'session-a'), error => error.getStatus() === 403);
   assert.equal(f.tables.meeting_sessions[0].status, 'ongoing');
   assert.deepEqual(f.removals, []);
-  for (const role of ['host', 'moderator']) {
-    const allowed = fixture(); allowed.tables.meeting_members[0].role = role;
-    const result = await allowed.service.endSession({ userId: 'student' }, 'a', 'session-a');
-    assert.equal(result.status, 'ended');
-    assert.equal(allowed.tables.meeting_sessions[0].status, 'ended');
-    assert.equal(allowed.removals.length, 2);
-  }
+  f.tables.meeting_members[0].role = 'moderator';
+  await assert.rejects(f.service.endSession({ userId: 'student' }, 'a', 'session-a'), error => error.getStatus() === 403);
+  assert.equal(f.tables.meeting_sessions[0].status, 'ongoing');
+  assert.deepEqual(f.removals, []);
+  f.tables.meeting_members[0].role = 'host';
+  const result = await f.service.endSession({ userId: 'student' }, 'a', 'session-a');
+  assert.equal(result.status, 'ended');
+  assert.equal(f.tables.meeting_sessions[0].status, 'ended');
+  assert.equal(f.removals.length, 2);
 });
 
 test('club revocation removes every device and durable meeting access only in that club', async () => {

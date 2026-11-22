@@ -1,0 +1,21 @@
+---
+title: Khôi phục token LiveKit bị từ chối
+description: Phân quyền tải phòng chờ và xử lý lỗi bắt tay LiveKit.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-07
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi
+
+Overview trả vai trò của người xem đã được duyệt. Sảnh dùng vai trò này để quyết định có tải yêu cầu vào phòng. Khi SDK báo USER_REJECTED, phòng đi qua luồng xin token mới có giới hạn và giữ kiểm tra quyền ở API. Cleanup effect bỏ qua lần React chạy lại effect khi attendance vẫn hoạt động.
+
+## Kiểm tra
+
+`npm test` đạt 105 test backend và 190 test frontend. `npm run typecheck` đạt. Chưa tái hiện lỗi thu hồi token trên LiveKit Cloud thật; bước kiểm tra tiếp theo là đối chiếu thời điểm ngắt với sự kiện LiveKit và attendance tương ứng.

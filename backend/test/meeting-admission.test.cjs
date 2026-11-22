@@ -16,10 +16,11 @@ function fixture(options={}) {
   const client={from(table){
     const call={table,mode:'select',filters:[]}; calls.push(call);
     const query={};
-    for(const operation of ['select','eq','neq','is','not','gte','order','limit']) query[operation]=(...args)=>{call.filters.push([operation,...args]);return query;};
+    for(const operation of ['select','eq','neq','is','not','gte','order','limit','in']) query[operation]=(...args)=>{call.filters.push([operation,...args]);return query;};
     query.insert=values=>{call.mode='insert';call.values=values;return query;};
     query.update=values=>{call.mode='update';call.values=values;return query;};
     const execute=()=>{
+      if (table === 'attendances' && call.filters.some(([, key]) => key === 'leave_reason')) return {data:[],error:null};
       if(options.resolve)return options.resolve(call);
       if(table==='club_memberships')return {data:options.clubMembership?{membership_id:'membership'}:null,error:null};
       if(table==='clubs')return {data:{club_id:'club'},error:null};
@@ -40,6 +41,7 @@ function fixture(options={}) {
   service.getMember=async()=>options.member||null;
   service.getMemberById=async()=>options.member||member();
   service.requireModerator=async()=>({role:'host'});
+  service.requireHost=async()=>{};
   service.requireMeetingMember=async()=>({role:'host'});
   service.checkAdmissionRetryLimit=async()=>{};
   return {service,calls};
@@ -113,7 +115,7 @@ test('join status reflects approval before attendance without attendance', async
   for(const status of ['pending','admitted']){
     const {service,calls}=fixture({member:member(status)});
     assert.equal((await service.joinStatus(user,'meeting',sessionId)).status,status);
-    assert.equal(calls.length,0);
+    assert.equal(calls.filter(call => call.mode === 'insert').length,0);
   }
 
 });

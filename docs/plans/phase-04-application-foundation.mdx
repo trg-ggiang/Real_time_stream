@@ -620,3 +620,19 @@ Sửa nháy toàn màn hình khi chuyển CLB: giữ rail/sidebar/main và theme
 ## 21/11/2026 — Xóa URL cũ khi đăng xuất
 
 Logout đưa về `/?mode=login` và xóa session; đăng nhập tài khoản khác không giữ workspace/trang cá nhân cũ, admin về `/admin`. Refresh sau logout vẫn mở form. Ba regression tái hiện trước sửa, 43 auth/redirect tests và frontend build đạt; chưa thử tài khoản thật trên browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-04-phase-04-logout-account-url).
+
+## Giao diện ứng tuyển thành viên (2026-11-22)
+
+Sinh viên điền đơn, xem lại và nộp theo hai bước. Chủ nhiệm mở hàng đợi chờ duyệt, lọc theo trạng thái và xem hồ sơ mà vẫn giữ bộ lọc khi quay lại. Frontend build, 32 test và kiểm tra Chromium mô phỏng đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-09-phase-04-recruitment-ux).
+
+## Thiết kế khu tuyển thành viên trong workspace (2026-11-22)
+
+Danh sách tập trung lịch nhận đơn, trạng thái và lối vào hồ sơ. Màn tạo đợt và xét duyệt dùng chung bố cục và màu workspace. Frontend build, 32 test liên quan và Chromium sáng/tối với dữ liệu mô phỏng đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-10-phase-04-workspace-recruitment).
+
+## Bộ lọc đợt tuyển trong workspace (2026-11-22)
+
+Thanh tab và thẻ theo mẫu nội dung CLB. API lọc theo thời gian nhận đơn trước khi phân trang. Typecheck và 21 test liên quan đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-11-phase-04-recruitment-filters).
+
+## Bố cục tuyển thành viên theo trang bài viết (2026-11-22)
+
+Danh sách đợt tuyển dùng chung mẫu tiêu đề, thẻ, phân trang và trạng thái tải của Bài viết CLB. Frontend typecheck và 32 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-12-phase-04-recruitment-post-layout).

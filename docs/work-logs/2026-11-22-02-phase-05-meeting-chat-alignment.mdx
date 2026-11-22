@@ -1,0 +1,22 @@
+---
+title: Căn tin nhắn phòng họp
+description: Tin của mình bên phải, tin của người khác bên trái.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-02
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và thay đổi
+
+Căn phải tin nhắn của chính mình và căn trái tin nhắn từ người khác. CSS trong `frontend/src/styles.css` dùng lớp `own` có sẵn cho cả tin đã gửi, đang gửi và có thể thử lại. Giới hạn chiều rộng để nội dung dài xuống dòng trong panel.
+
+## Kiểm tra
+
+- `npm --workspace frontend test -- src/features/meeting/chat` đạt 7 test.
+- Chưa kiểm tra vị trí hiển thị trên trình duyệt. Có thể đối chiếu bằng hai tài khoản gửi tin trong cùng buổi họp.

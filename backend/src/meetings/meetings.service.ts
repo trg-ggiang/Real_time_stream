@@ -218,9 +218,6 @@ export class MeetingsService {
     return this.livekitRoomService;
   }
 
-  private rank(role: string): number {
-    return role === 'host' ? 3 : role === 'moderator' ? 2 : 1;
-  }
 
   private async disconnectIfPresent(roomName: string, identity: string): Promise<void> {
     try {
@@ -307,6 +304,11 @@ export class MeetingsService {
     return member;
   }
 
+  private async requireHost(meetingId: string, userId: string) {
+    const member = await this.requireMember(meetingId, userId);
+    if (member.role !== 'host') throw new ForbiddenException('Meeting owner permission is required.');
+  }
+
   private async requireMeetingMember(meetingId: string, userId: string): Promise<Member> {
     const member = await this.requireMember(meetingId, userId);
     if (member.role === 'participant' && member.invited_at === null) {
@@ -378,11 +380,17 @@ export class MeetingsService {
   async listSessions(user: User, code: string) {
     const meeting = await this.getMeetingByCode(code);
     await this.requireClubMeetingAccess(user.userId, meeting.club_id);
-    const { data, error } = await this.supabase.from('meeting_sessions').select(SESSION_SELECT)
-      .eq('meeting_id', meeting.meeting_id).order('scheduled_start_at', { ascending: true });
+    const [{ data, error }, member] = await Promise.all([
+      this.supabase.from('meeting_sessions').select(SESSION_SELECT)
+        .eq('meeting_id', meeting.meeting_id).order('scheduled_start_at', { ascending: true }),
+      this.getMember(meeting.meeting_id, user.userId),
+    ]);
     if (error) throw new ServiceUnavailableException('Could not load meeting sessions.');
     return { meeting: { meetingId: meeting.meeting_id, title: meeting.title, meetingCode: meeting.meeting_code,
-      recurrenceRule: meeting.recurrence_rule, waitingRoomEnabled: meeting.waiting_room_enabled }, sessions: data ?? [] };
+      recurrenceRule: meeting.recurrence_rule, waitingRoomEnabled: meeting.waiting_room_enabled }, sessions: data ?? [],
+      membership: member?.admission_status === 'admitted' ? {
+        meetingMemberId: member.meeting_member_id, userId: member.user_id, role: member.role, invitedAt: member.invited_at,
+      } : null };
   }
 
   private async insertSession(meetingId: string, values: {
@@ -521,6 +529,10 @@ export class MeetingsService {
 
     if (member.admission_status !== 'admitted') throw new ForbiddenException('Meeting admission was denied.');
 
+    if (meeting.waiting_room_enabled && await this.requestReentry(member.meeting_member_id, sessionId)) {
+      return { status: 'pending', meetingId: meeting.meeting_id, sessionId } as const;
+    }
+
     if (!deviceMode) {
       const attendances = await this.openAttendances(member.meeting_member_id, sessionId);
       if (attendances.length) {
@@ -642,6 +654,20 @@ export class MeetingsService {
     return { approved };
   }
 
+  private async requestReentry(memberId: string, sessionId: string) {
+    const reasons = ['removed', 'rejoin_pending', 'rejoin_denied'];
+    const existing = await this.supabase.from('attendances').select('attendance_id')
+      .eq('meeting_member_id', memberId).eq('session_id', sessionId).in('leave_reason', reasons).limit(1);
+    if (existing.error) throw new ServiceUnavailableException('Could not check re-entry.');
+    if (!existing.data?.length) return false;
+    const { data, error } = await this.supabase.from('attendances')
+      .update({ leave_reason: 'rejoin_pending' }).eq('meeting_member_id', memberId)
+      .eq('session_id', sessionId).in('leave_reason', reasons)
+      .select('attendance_id');
+    if (error) throw new ServiceUnavailableException('Could not request re-entry.');
+    return Boolean(data?.length);
+  }
+
   async pending(user: User, meetingId: string, sessionId: string) {
     await this.requireModerator(meetingId, user.userId);
     const session = await this.getSession(meetingId, sessionId);
@@ -651,7 +677,17 @@ export class MeetingsService {
       .eq('role', 'participant').is('invited_at', null).is('removed_at', null)
       .eq('admission_status', 'pending');
     if (error) throw new ServiceUnavailableException('Could not load join requests.');
-    return (data ?? []).map(member => ({
+    const reentries = await this.supabase.from('attendances')
+      .select('meeting_member_id,meeting_members!inner(meeting_member_id,user_id,role,admission_status,created_at,users(display_name,avatar_url))')
+      .eq('session_id', sessionId).eq('leave_reason', 'rejoin_pending')
+      .eq('meeting_members.meeting_id', meetingId).is('meeting_members.removed_at', null);
+    if (reentries.error) throw new ServiceUnavailableException('Could not load re-entry requests.');
+    const members = new Map((data ?? []).map(member => [member.meeting_member_id, member]));
+    for (const entry of reentries.data ?? []) {
+      const member = entry.meeting_members as unknown as NonNullable<typeof data>[number];
+      members.set(member.meeting_member_id, { ...member, admission_status: 'pending' });
+    }
+    return [...members.values()].map(member => ({
       requestId: member.meeting_member_id,
       meeting_member_id: member.meeting_member_id,
       session_id: session.session_id,
@@ -671,6 +707,13 @@ export class MeetingsService {
         return { status: 'pending', meetingMemberId: member.meeting_member_id, sessionId };
       }
       if (member.admission_status === 'admitted') {
+        if (meeting.waiting_room_enabled) {
+          const reentry = await this.supabase.from('attendances').select('leave_reason')
+            .eq('session_id', sessionId).eq('meeting_member_id', member.meeting_member_id)
+            .in('leave_reason', ['rejoin_pending', 'rejoin_denied']).limit(1).maybeSingle();
+          if (reentry.error) throw new ServiceUnavailableException('Could not load re-entry status.');
+          if (reentry.data?.leave_reason) return { status: reentry.data.leave_reason === 'rejoin_pending' ? 'pending' : 'denied', meetingMemberId: member.meeting_member_id, sessionId };
+        }
         return { status: 'admitted', meetingMemberId: member.meeting_member_id, sessionId };
       }
     }
@@ -705,6 +748,8 @@ export class MeetingsService {
     const session = await this.getSession(meetingId, sessionId);
     if (session.status === 'ended') throw new ConflictException('Cannot approve entry into an ended session.');
     const member = await this.getMemberById(meetingId, memberId);
+    if (member.admission_status === 'admitted' && await this.decideReentry(sessionId, memberId, true))
+      return { admission_status: 'admitted', meeting_member_id: memberId, role: member.role, invited_at: member.invited_at, sessionId };
     if (member.admission_status !== 'pending' || member.invited_at !== null || member.role !== 'participant') {
       throw new ConflictException('Only guest requests can be approved here.');
     }
@@ -723,6 +768,8 @@ export class MeetingsService {
     await this.requireModerator(meetingId, user.userId);
     await this.getSession(meetingId, sessionId);
     const member = await this.getMemberById(meetingId, memberId);
+    if (member.admission_status === 'admitted' && await this.decideReentry(sessionId, memberId, false))
+      return { status: 'denied', meetingMemberId: memberId, sessionId };
     if (member.admission_status !== 'pending' || member.invited_at !== null || member.role !== 'participant') {
       throw new ConflictException('Only guest requests can be denied here.');
     }
@@ -791,14 +838,28 @@ export class MeetingsService {
     return data;
   }
 
+  async sessionMembers(user: User, meetingId: string, sessionId: string) {
+    await this.requireHost(meetingId, user.userId);
+    await this.getSession(meetingId, sessionId);
+    const { data, error } = await this.supabase.from('attendances')
+      .select('meeting_members!inner(meeting_member_id,user_id,role,invited_at,users(display_name))')
+      .eq('session_id', sessionId).not('joined_at', 'is', null).is('left_at', null)
+      .eq('meeting_members.meeting_id', meetingId).is('meeting_members.removed_at', null)
+      .eq('meeting_members.admission_status', 'admitted');
+    if (error) throw new ServiceUnavailableException('Could not load session members.');
+    const members = (data ?? []).map(row => row.meeting_members as unknown as
+      Pick<Member, 'meeting_member_id' | 'user_id' | 'role' | 'invited_at'> & { users: { display_name: string } | null });
+    return [...new Map(members.map(member => [member.meeting_member_id, member])).values()];
+  }
+
   async mute(user: User, meetingId: string, sessionId: string, memberId: string) {
-    const actor = await this.requireModerator(meetingId, user.userId);
+    await this.requireHost(meetingId, user.userId);
     const session = await this.getSession(meetingId, sessionId);
     if (session.status !== 'ongoing') throw new ConflictException('Microphone moderation requires an active session.');
     const target = await this.getMemberById(meetingId, memberId);
     if (target.admission_status !== 'admitted') throw new ForbiddenException('Target must be admitted to the meeting.');
     if (target.user_id === user.userId) throw new ForbiddenException('Use the meeting controls to mute your own microphone.');
-    if (this.rank(actor.role) < this.rank(target.role)) throw new ForbiddenException('You may mute members of your rank or lower.');
+    if (target.role === 'host') throw new ForbiddenException('The owner cannot be muted.');
     const { data, error } = await this.supabase.from('attendances')
       .select('livekit_identity').eq('meeting_member_id', memberId).eq('session_id', sessionId)
       .not('livekit_identity', 'is', null).not('joined_at', 'is', null).is('left_at', null)
@@ -820,18 +881,28 @@ export class MeetingsService {
     return { muted: true, persistsAfterReconnect: false, meetingMemberId: memberId, sessionId };
   }
 
-  async removeMember(user: User, meetingId: string, memberId: string) {
-    const actor = await this.requireModerator(meetingId, user.userId);
+  private async decideReentry(sessionId: string, memberId: string, approved: boolean) {
+    const { data, error } = await this.supabase.from('attendances')
+      .update({ leave_reason: approved ? 'rejoin_approved' : 'rejoin_denied' })
+      .eq('session_id', sessionId).eq('meeting_member_id', memberId)
+      .eq('leave_reason', 'rejoin_pending').select('attendance_id');
+    if (error) throw new ServiceUnavailableException('Could not decide re-entry.');
+    return Boolean(data?.length);
+  }
+
+  async removeMember(user: User, meetingId: string, memberId: string, sessionId: string) {
+    await this.requireHost(meetingId, user.userId);
     const target = await this.getMemberById(meetingId, memberId);
-    if (target.role === 'host' || this.rank(actor.role) < this.rank(target.role)) {
-      throw new ForbiddenException('You may remove only members of your rank or lower; the owner cannot be removed.');
+    if (target.role === 'host') {
+      throw new ForbiddenException('The owner cannot be removed.');
     }
+    const session = await this.getSession(meetingId, sessionId);
+    if (session.status !== 'ongoing') throw new ConflictException('Meeting session is not ongoing.');
     const { data: attendances, error: readError } = await this.supabase.from('attendances')
       .select('attendance_id,session_id,livekit_identity').eq('meeting_member_id', memberId)
-      .not('joined_at', 'is', null).is('left_at', null);
+      .eq('session_id', sessionId).not('joined_at', 'is', null).is('left_at', null);
     if (readError) throw new ServiceUnavailableException('Could not load active attendances.');
     for (const attendance of attendances ?? []) {
-      const session = await this.getSession(meetingId, attendance.session_id);
       if (attendance.livekit_identity) {
         await this.disconnectIfPresent(session.livekit_room_name, attendance.livekit_identity);
       }
@@ -839,9 +910,6 @@ export class MeetingsService {
         .eq('attendance_id', attendance.attendance_id).is('left_at', null);
       if (error) throw new ServiceUnavailableException('Could not close member attendance.');
     }
-    const { error } = await this.supabase.from('meeting_members').update({ removed_at: new Date().toISOString() })
-      .eq('meeting_id', meetingId).eq('meeting_member_id', memberId).is('removed_at', null);
-    if (error) throw new ServiceUnavailableException('Could not remove meeting member.');
     return { removed: true, meetingMemberId: memberId };
   }
 
@@ -904,7 +972,7 @@ export class MeetingsService {
   async endSession(user: User, meetingId: string, sessionId: string) {
     const meeting = await this.getMeetingById(meetingId);
     await this.requireClubMeetingAccess(user.userId, meeting.club_id);
-    await this.requireModerator(meetingId, user.userId);
+    await this.requireHost(meetingId, user.userId);
     const session = await this.getSession(meetingId, sessionId);
     if (session.status === 'ended') return { status: 'ended', sessionId, endedAt: session.ended_at };
     const { data: active, error: readError } = await this.supabase.from('attendances')

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { meetingRequest, MeetingApiError, roleLabels, type JoinRequest, type Member, type MeetingOverview } from '../services/meetings-api';
 import { ConfirmAction } from './ConfirmAction';
 
-export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
+export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, inCallHost = false, showSessionMembers = false, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
+  inCallHost?: boolean; showSessionMembers?: boolean;
   onPendingCountChange?: (count: number) => void;
   accessToken: string; overview: MeetingOverview; sessionId?: string; onlineUsers?: ReadonlySet<string>;
   knownMembers: Member[]; onMembersChanged: (meetingId: string, members: Member[]) => void;
@@ -10,7 +11,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
 }) {
   const member = overview.membership;
   const [requests, setRequests] = useState<JoinRequest[]>([]);
-  const [canModerate, setCanModerate] = useState(member?.role === 'host' || member?.role === 'moderator');
+  const [canModerate, setCanModerate] = useState(inCallHost || member?.role === 'host' || member?.role === 'moderator');
   const [loading, setLoading] = useState(true), [busy, setBusy] = useState(''), [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [waitingEnabled, setWaitingEnabled] = useState<boolean | undefined>(overview.meeting.waitingRoomEnabled);
@@ -19,7 +20,19 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
   const locked = useRef(false), mutation = useRef<AbortController | null>(null);
   const meetingId = overview.meeting.meetingId;
   const session = overview.sessions.find(s => s.session_id === sessionId);
-  const canEndSession = member?.role === 'host' || member?.role === 'moderator';
+  const isHost = inCallHost || member?.role === 'host';
+  const [sessionMembers, setSessionMembers] = useState<Member[]>([]);
+
+  useEffect(() => {
+    if (!inCallHost || !showSessionMembers || !sessionId) return;
+    const controller = new AbortController();
+    void meetingRequest<Member[]>(accessToken, `/${meetingId}/sessions/${sessionId}/members`, { signal: controller.signal })
+      .then(members => { if (!controller.signal.aborted) setSessionMembers(members); })
+      .catch(cause => { if (!controller.signal.aborted) onError(cause); });
+    return () => controller.abort();
+  }, [accessToken, inCallHost, meetingId, onError, onlineUsers, sessionId, showSessionMembers]);
+
+  const visibleMembers = inCallHost ? sessionMembers.filter(target => onlineUsers?.has(target.user_id)) : knownMembers;
 
   const load = useCallback(async (signal: AbortSignal) => {
     if (!sessionId || session?.status === 'ended') { setRequests([]); setLoading(false); return; }
@@ -65,9 +78,10 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
     onMembersChanged(meetingId, [...knownMembers.filter(item => item.meeting_member_id !== target.meeting_member_id), target]);
   }
   function approve(request: JoinRequest) {
-    void act(`/${meetingId}/sessions/${sessionId}/join-requests/${request.meeting_member_id}/approve`, undefined, 'POST', false, () => observe({
+    void act(`/${meetingId}/sessions/${sessionId}/join-requests/${request.meeting_member_id}/approve`, undefined, 'POST', false, data => observe({
       meeting_member_id: request.meeting_member_id, user_id: request.meeting_members.user_id,
-      role: 'participant', invited_at: null,
+      role: (data.role as Member['role'] | undefined) ?? 'participant',
+      invited_at: typeof data.invited_at === 'string' ? data.invited_at : null,
       users: { display_name: request.meeting_members.users?.display_name || 'Thành viên', email: '' },
     }));
   }
@@ -97,19 +111,19 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
       {!loading && requests.length === 0 ? <p className="workspace-empty">Chưa có yêu cầu tham gia buổi này.</p> : null}
       {requests.map(request => <div className="workspace-person" key={request.requestId}><span>{request.meeting_members?.users?.display_name || 'Thành viên'}</span><div className="workspace-person-actions"><button type="button" disabled={!!busy} onClick={() => approve(request)}>Duyệt</button><button type="button" className="workspace-text-button" disabled={!!busy} onClick={() => setConfirmation({ title: 'Từ chối yêu cầu tham gia này?', path: `/${meetingId}/sessions/${sessionId}/join-requests/${request.meeting_member_id}/deny` })}>Từ chối</button></div></div>)}
     </section> : null}
-    {knownMembers.length ? <section aria-labelledby="members-title"><h3 id="members-title">Thành viên đã xử lý trong phiên này</h3>
-      {knownMembers.map(target => {
+    {visibleMembers.length ? <section aria-labelledby="members-title"><h3 id="members-title">{inCallHost ? 'Quản lý người đang tham gia' : 'Thành viên đã xử lý trong phiên này'}</h3>
+      {visibleMembers.map(target => {
         const self = target.user_id === member?.userId;
-        const canAct = !self && target.role !== 'host';
+        const canAct = isHost && !self && target.role !== 'host';
         const online = onlineUsers?.has(target.user_id);
         return <div className="workspace-person" key={target.meeting_member_id}><div className="workspace-person-info"><strong>{target.users?.display_name || target.users?.email || 'Thành viên'}</strong><span>{roleLabels[target.role]}{onlineUsers ? online ? ' · Đang kết nối' : ' · Ngoại tuyến' : ''}</span></div><div className="workspace-person-actions">
           {canAct && online && session?.status === 'ongoing' ? <button type="button" disabled={!!busy} onClick={() => void act(`/${meetingId}/sessions/${sessionId}/members/${target.meeting_member_id}/mute`)}>Tắt mic</button> : null}
-          {!self && target.role !== 'host' && target.invited_at ? <button type="button" disabled={!!busy} onClick={() => void act(`/${meetingId}/members/${target.meeting_member_id}/moderator`, { enabled: target.role !== 'moderator' }, 'PATCH', false, data => observe({ ...target, role: data.role as Member['role'] }))}>{target.role === 'moderator' ? 'Gỡ điều hành' : 'Cấp điều hành'}</button> : null}
-          {canAct ? <button type="button" className="workspace-text-button" disabled={!!busy} onClick={() => setConfirmation({ title: `Loại ${target.users?.display_name || 'thành viên này'} khỏi cuộc họp?`, path: `/${meetingId}/members/${target.meeting_member_id}/remove`, memberId: target.meeting_member_id })}>Loại</button> : null}
+          {canAct && target.invited_at ? <button type="button" disabled={!!busy} onClick={() => void act(`/${meetingId}/members/${target.meeting_member_id}/moderator`, { enabled: target.role !== 'moderator' }, 'PATCH', false, data => observe({ ...target, role: data.role as Member['role'] }))}>{target.role === 'moderator' ? 'Gỡ điều hành' : 'Cấp điều hành'}</button> : null}
+          {canAct && online && sessionId && session?.status === 'ongoing' ? <button type="button" className="workspace-text-button" disabled={!!busy} onClick={() => setConfirmation({ title: `Loại ${target.users?.display_name || 'thành viên này'} khỏi cuộc họp?`, path: `/${meetingId}/sessions/${sessionId}/members/${target.meeting_member_id}/remove`, memberId: target.meeting_member_id })}>Loại</button> : null}
         </div></div>;
       })}
     </section> : null}
-    {canEndSession && sessionId && session?.status !== 'ended' ? <button type="button" className="workspace-danger" disabled={!!busy} onClick={() => setConfirmation({ title: 'Kết thúc buổi họp cho tất cả mọi người?', path: `/${meetingId}/sessions/${sessionId}/end`, end: true })}>Kết thúc buổi họp</button> : null}
+    {isHost && sessionId && session?.status !== 'ended' ? <button type="button" className="workspace-danger" disabled={!!busy} onClick={() => setConfirmation({ title: 'Kết thúc buổi họp cho tất cả mọi người?', path: `/${meetingId}/sessions/${sessionId}/end`, end: true })}>Kết thúc buổi họp</button> : null}
     {confirmation ? <ConfirmAction title={confirmation.title} busy={!!busy} onConfirm={() => void act(confirmation.path, undefined, 'POST', confirmation.end, () => {
       if (confirmation.memberId) onMembersChanged(meetingId, knownMembers.filter(target => target.meeting_member_id !== confirmation.memberId));
     })} onCancel={() => setConfirmation(null)} /> : null}

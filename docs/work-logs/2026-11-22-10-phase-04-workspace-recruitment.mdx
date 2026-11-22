@@ -1,0 +1,21 @@
+---
+title: Khu tuyển thành viên trong workspace
+description: Thiết kế danh sách đợt tuyển và màn xét duyệt của CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-10
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 04
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi
+
+`WorkspaceRecruitment.tsx` và `recruitment.css` gom các đợt vào danh sách có cột thời gian và lối vào đơn. Nhãn sắp mở và đã đóng dựa trên thời hạn của đợt đang mang trạng thái open. Trình sửa đợt, bộ lọc đơn và phần xét duyệt dùng chung các mẫu bố cục workspace.
+
+## Kiểm tra
+
+Frontend build và 32 test liên quan đạt. Chromium kiểm tra bố cục danh sách ở 375px và 1240px với giao diện sáng/tối, nhãn đợt quá hạn và liên kết hồ sơ bằng dữ liệu mô phỏng. Chưa kiểm tra bằng tài khoản thật.
