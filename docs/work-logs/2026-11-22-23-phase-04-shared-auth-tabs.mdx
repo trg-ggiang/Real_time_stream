@@ -1,0 +1,48 @@
+---
+title: Dùng chung đăng nhập giữa các tab
+description: Mở link họp trong tab mới với phiên đăng nhập còn hạn.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-23
+- Ngày: 22/11/2026, Asia/Saigon; không ghi nhận chính xác giờ bắt đầu/kết thúc.
+- Agent: Codex
+- Phase: 04 — Application foundation
+- Kết quả: Completed
+- Trạng thái phase: In Progress
+
+## Mục tiêu và phạm vi
+
+Sửa việc mở link cuộc họp trong tab mới cùng origin yêu cầu đăng nhập lại.
+
+## Công việc hoàn thành
+
+- session-storage.ts chuyển phiên đăng nhập sang localStorage; di chuyển phiên sessionStorage cũ khi đọc. Xóa cả hai nơi khi logout/expiry; dấu null ở bộ nhớ chung ngăn phiên cũ của tab khác phục hồi sau logout.
+- AuthApp.tsx nghe storage event và tải lại khi token thay đổi/đăng xuất để tháo các view riêng tư và request của tài khoản trước.
+- session-storage.test.ts kiểm tra tab không có sessionStorage, di chuyển phiên, logout và đổi tài khoản/hết hạn. AuthApp.test.tsx kiểm tra nơi lưu mới; App.test.tsx dọn bộ nhớ chung giữa các ca.
+- Cập nhật phase 04, master plan, session log, changelog, auth integration và docs.json.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| npm --workspace frontend run test | Passed: 198 tests / 32 files; JSDOM báo scrollTo chưa triển khai |
+| npm --workspace frontend run build | Passed sau khi bổ sung avatarUrl còn thiếu trong fixture mới; có cảnh báo chunk trên 500 kB |
+| Browser hai tab/tài khoản thật | Skipped: chưa có phiên browser kết nối để nghiệm thu |
+| Backend/Supabase/LiveKit | Không chạy: không đổi backend hoặc schema |
+
+## Quyết định và giới hạn
+
+Phiên chỉ dùng chung cùng origin và browser profile, giữ kiểm tra hạn JWT. localStorage giữ phiên qua lần đóng/mở trình duyệt tới khi logout/hết hạn. Không lưu mật khẩu. Phiên họp và lựa chọn thiết bị tiếp tục theo tab. Tab đang chạy bản cũ cần tải lại để di chuyển phiên trước khi mở link ở tab mới. Storage bị chặn tiếp tục chỉ đăng nhập trong memory.
+
+## Bước tiếp theo
+
+Nghiệm thu đăng nhập tab A, mở link họp tab B cùng origin, rồi logout/đổi tài khoản tại A và kiểm tra B tải lại. Phase 04 chưa hoàn thành toàn bộ acceptance criteria.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase và master plan
+- [x] Cập nhật session log/changelog/module auth
+- [x] Đăng ký trang mới
+- [x] Ghi kiểm tra tự động và giới hạn nghiệm thu thật

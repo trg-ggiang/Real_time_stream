@@ -636,3 +636,7 @@ Thanh tab và thẻ theo mẫu nội dung CLB. API lọc theo thời gian nhận
 ## Bố cục tuyển thành viên theo trang bài viết (2026-11-22)
 
 Danh sách đợt tuyển dùng chung mẫu tiêu đề, thẻ, phân trang và trạng thái tải của Bài viết CLB. Frontend typecheck và 32 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-12-phase-04-recruitment-post-layout).
+
+## Dùng chung đăng nhập giữa các tab (22/11/2026)
+
+Phiên đăng nhập hợp lệ lưu trong localStorage cùng origin; link họp ở tab mới dùng lại phiên còn hạn. Phiên sessionStorage cũ được chuyển khi mở lại ứng dụng. Đăng xuất xóa phiên chung và phiên cũ; tab khác tải lại khi tài khoản hoặc trạng thái đăng nhập thay đổi. Khác origin/trình duyệt vẫn cần đăng nhập riêng. Frontend 198 tests và build đạt; chưa nghiệm thu hai tab bằng tài khoản thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-23-phase-04-shared-auth-tabs).

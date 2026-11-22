@@ -15,6 +15,7 @@ import {
   restoreSession,
   saveSession,
   sessionExpiresAt,
+  AUTH_SESSION_KEY,
 } from "./session-storage";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
@@ -67,6 +68,19 @@ export function AuthApp() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const errorRef = useRef<HTMLParagraphElement | null>(null);
   const registering = mode === "register";
+
+  useEffect(() => {
+    const syncSession = (event: StorageEvent) => {
+      if (event.storageArea && event.storageArea !== localStorage) return;
+      if (event.key !== null && event.key !== AUTH_SESSION_KEY) return;
+      const next = restoreSession();
+      if (next?.access_token === session?.access_token) return;
+      // Reload tears down private views and in-flight requests from the former account.
+      window.location.reload();
+    };
+    window.addEventListener('storage', syncSession);
+    return () => window.removeEventListener('storage', syncSession);
+  }, [session?.access_token]);
 
   useEffect(() => {
     const syncView = () =>
