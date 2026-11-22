@@ -263,7 +263,7 @@ export function DepartmentsPage() {
   const { token, clubId, membership } = useClub();
   const result = usePersonalQuery<WorkspaceList<Department>>(
     token,
-    `workspace/${clubId}/departments`,
+    `workspace/${clubId}/departments?include_inactive=true`,
   );
   const [editing, setEditing] = useState<Department | null>(null);
   const [show, setShow] = useState(false);
@@ -354,6 +354,8 @@ function DepartmentForm({
   const [status, setStatus] = useState(department?.status || "active");
   async function save(e: FormEvent) {
     e.preventDefault();
+    if (department?.status === 'active' && status === 'inactive' &&
+        !(await confirmAction(`Ngừng hoạt động “${department.name}” và ẩn kênh của ban?`, true))) return;
     const r = await mutation.run((signal) =>
       workspaceRequest(
         token,
@@ -409,7 +411,7 @@ function DepartmentForm({
             disabled={mutation.busy}
           />
         </label>
-        <fieldset className="cw-department-visibility">
+        <fieldset className="cw-department-visibility" disabled={mutation.busy || Boolean(department)}>
           <legend>Quyền truy cập kênh</legend>
           <div className="cw-department-options">
             <label>
@@ -423,6 +425,7 @@ function DepartmentForm({
               <span><strong>Riêng tư</strong><small>Quyền truy cập giới hạn theo ban.</small></span>
             </label>
           </div>
+          {department && <p className="cw-muted">Chỉ trưởng ban có quyền đổi chế độ riêng tư.</p>}
         </fieldset>
       </div>
       {department && status === 'inactive' && <p className="cw-muted">

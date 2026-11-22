@@ -21,6 +21,15 @@ BEGIN
  PERFORM test_error(format('SELECT public.recruitment_v3_save(%L,%L,NULL,NULL,%L::jsonb)',test_id(2),test_id(101),inp),'42501');
  c:=public.recruitment_v3_save(test_id(1),test_id(101),NULL,NULL,inp);
  ASSERT NOT EXISTS(SELECT FROM public.public_activity_feed WHERE campaign_id=c.campaign_id);
+ ASSERT NOT has_function_privilege('authenticated','public.recruitment_v3_review(uuid,uuid,uuid,timestamptz,boolean)','EXECUTE');
+ PERFORM test_error(format('SELECT public.recruitment_v3_publish(%L,%L,%L,%L,false)',test_id(1),test_id(101),c.campaign_id,c.updated_at),'40001');
+ c:=public.recruitment_v3_review(test_id(1),test_id(101),c.campaign_id,c.updated_at,false);
+ ASSERT c.status='pending_review';
+ ASSERT NOT EXISTS(SELECT FROM public.public_activity_feed WHERE campaign_id=c.campaign_id);
+ PERFORM test_error(format('SELECT public.recruitment_v3_publish(%L,%L,%L,%L,false)',test_id(2),test_id(101),c.campaign_id,c.updated_at),'42501');
+ c:=public.recruitment_v3_review(test_id(1),test_id(101),c.campaign_id,c.updated_at,true);
+ ASSERT c.status='draft';
+ c:=public.recruitment_v3_review(test_id(1),test_id(101),c.campaign_id,c.updated_at,false);
  c:=public.recruitment_v3_publish(test_id(1),test_id(101),c.campaign_id,c.updated_at,false);
  ASSERT (SELECT count(*)=1 FROM public.public_activity_feed WHERE campaign_id=c.campaign_id AND entry_type='recruitment');
  SELECT * INTO d FROM public.recruitment_departments WHERE campaign_id=c.campaign_id;
@@ -68,6 +77,7 @@ BEGIN
  -- Deadline uses wall-clock across a transaction, not now().
  inp:=jsonb_set(inp,'{application_closes_at}',to_jsonb(clock_timestamp()+interval '150 milliseconds'));
  c:=public.recruitment_v3_save(test_id(1),test_id(101),NULL,NULL,inp);
+ c:=public.recruitment_v3_review(test_id(1),test_id(101),c.campaign_id,c.updated_at,false);
  c:=public.recruitment_v3_publish(test_id(1),test_id(101),c.campaign_id,c.updated_at,false);
  SELECT * INTO d FROM public.recruitment_departments WHERE campaign_id=c.campaign_id;
  PERFORM pg_sleep(0.25);
