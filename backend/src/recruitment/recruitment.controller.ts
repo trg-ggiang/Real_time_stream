@@ -23,6 +23,8 @@ export class ManagedRecruitmentController {
  @Post() save(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Body()b:CampaignInput){return this.s.save(u.userId,c,b);}
  @Get(':id') @Header('Cache-Control','private, no-store') detail(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string){return this.s.detail(id,{actor:u.userId,club:c});}
  @Patch(':id') edit(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignInput){return this.s.save(u.userId,c,b,id);}
+ @Post(':id/submit-review') submitReview(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.reviewCampaign(u.userId,c,id,b.expected_updated_at);}
+ @Post(':id/return-draft') returnDraft(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.reviewCampaign(u.userId,c,id,b.expected_updated_at,true);}
  @Post(':id/publish') publish(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.publish(u.userId,c,id,b.expected_updated_at);}
  @Post(':id/close') close(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.publish(u.userId,c,id,b.expected_updated_at,true);}
  @Get(':id/applications') @Header('Cache-Control','private, no-store') applications(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Query()q:RecruitmentQuery){return this.s.applications(u.userId,c,id,q);}

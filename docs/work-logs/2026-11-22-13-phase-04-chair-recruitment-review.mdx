@@ -1,0 +1,21 @@
+---
+title: Chủ nhiệm duyệt đợt tuyển
+description: Thêm bước duyệt trước khi đăng và chuẩn hóa form tạo ban.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-13
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 04
+- Kết quả: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi
+
+Migration `202611220001_recruitment_chair_review.sql` thêm trạng thái `pending_review`, khóa chuyển thẳng từ nháp sang công khai và yêu cầu vai trò chủ nhiệm. UI có gửi duyệt, duyệt và đăng, hoặc đưa về nháp để chỉnh sửa. Tab Đang chờ chứa đợt chờ duyệt và đợt đã duyệt nhưng chưa tới giờ mở. Form tạo ban nhóm các trường, dùng hai lựa chọn quyền truy cập và nút cân kích thước.
+
+## Kiểm tra và triển khai
+
+PostgreSQL tạm qua test migration, phân quyền và hiển thị công khai. Test frontend liên quan đạt. Cần áp migration vào môi trường đích trước khi triển khai backend/frontend mới. Chưa áp migration vào Supabase và chưa rà trực quan trên trình duyệt thật.

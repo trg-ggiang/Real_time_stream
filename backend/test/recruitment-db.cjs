@@ -6,7 +6,7 @@ const root=fs.mkdtempSync(path.join(os.tmpdir(),'rts-recruit-test-')),data=path.
 const exe=name=>path.join(bin,name+'.exe');
 try {
  execFileSync(exe('initdb'),['-D',data,'-U','postgres','-A','trust','-E','UTF8','--locale=C','--no-instructions'],{windowsHide:true,stdio:'pipe',timeout:30000});
- for(const file of ['fixtures/recruitment-schema.sql','fixtures/recruitment-seed.sql','../../supabase/migrations/202611200002_recruitment_workflow.sql','../../supabase/migrations/202611200002_recruitment_workflow.sql','fixtures/recruitment-assertions.sql']){
+ for(const file of ['fixtures/recruitment-schema.sql','fixtures/recruitment-seed.sql','../../supabase/migrations/202611200002_recruitment_workflow.sql','../../supabase/migrations/202611200002_recruitment_workflow.sql','../../supabase/migrations/202611220001_recruitment_chair_review.sql','fixtures/recruitment-assertions.sql']){
   const sql=fs.readFileSync(path.join(__dirname,file),'utf8').replace(/\r/g,'').split('\n').filter(line=>line.trim()).join('\n');
   const r=spawnSync(exe('postgres'),['--single','-D',data,'-j','-c','log_min_messages=error','postgres'],{input:sql+'\n;\n\n',encoding:'utf8',windowsHide:true,timeout:30000,maxBuffer:8*1024*1024});
   if(r.error||r.status!==0||/(?:ERROR|FATAL|PANIC):/.test(r.stderr))throw Error(r.error?.message||r.stderr);

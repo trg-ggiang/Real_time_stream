@@ -1,14 +1,35 @@
-.uc-confirm{position:fixed;inset:0;margin:auto;width:min(440px,calc(100vw - 32px));max-height:calc(100dvh - 48px);overflow:auto;padding:26px;border:1px solid #ccd8e8;border-radius:16px;background:#fff;color:#183454;box-shadow:0 20px 80px #10243d33;font:14px/1.7 'Be Vietnam Pro',system-ui,sans-serif;color-scheme:light}
-.uc-confirm::backdrop{background:#10243d66;backdrop-filter:blur(3px)}
-.uc-confirm h2{margin:0 0 12px;font-size:20px;font-weight:600;line-height:1.4}
-.uc-confirm p{margin:0;color:#4b607b;white-space:pre-wrap;overflow-wrap:anywhere}
-.uc-confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:26px}
-.uc-confirm button{min-height:42px;padding:9px 19px;border:1px solid #b8c8dd;border-radius:9px;background:#fff;color:#294564;font:inherit;font-weight:600;cursor:pointer}
-.uc-confirm button:hover{background:#edf3fc}
-.uc-confirm button.uc-confirm-accept{background:#245dc1;border-color:#245dc1;color:#fff}
-.uc-confirm button.uc-confirm-accept:hover{background:#1b4b9e}
-.uc-confirm button:focus-visible{outline:3px solid #8ab4f7;outline-offset:3px}
-.uc-confirm[data-theme=dark]{background:#21242b;color:#edf3fc;border-color:#526078;color-scheme:dark}
-.uc-confirm[data-theme=dark] p{color:#bfcee2}
-.uc-confirm[data-theme=dark] button:not(.uc-confirm-accept){background:#2d3440;border-color:#6b7e98;color:#edf3fc}
-@media(max-width:480px){.uc-confirm{padding:22px}.uc-confirm-actions button{flex:1}}
+dialog.uc-confirm {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  box-sizing: border-box;
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: clamp(20px, 5vw, 30px);
+  border: 1px solid #c9d8eb;
+  border-radius: 16px;
+  background: #fbfdff;
+  color: #183454;
+  box-shadow: 0 20px 64px #10243d45;
+  font: 14px/1.6 'Be Vietnam Pro', system-ui, sans-serif;
+  text-align: center;
+  color-scheme: light;
+}
+dialog.uc-confirm::backdrop { background: rgb(12 27 47 / .56); }
+dialog.uc-confirm h2 { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.45; text-wrap: balance; color: inherit; overflow-wrap: anywhere; }
+dialog.uc-confirm label { display: block; margin: 16px 0 0; color: inherit; }
+dialog.uc-confirm textarea { box-sizing: border-box; width: 100%; margin-top: 6px; text-align: start; }
+.uc-confirm-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 22px auto 0; width: min(100%, 300px); }
+dialog.uc-confirm .uc-confirm-actions button {
+  min-height: 44px; padding: 8px 10px; border: 1px solid #b8c8dd; border-radius: 8px;
+  background: #edf4ff; color: #294564; font: inherit; font-weight: 600; cursor: pointer;
+}
+dialog.uc-confirm .uc-confirm-actions button:hover:not(:disabled) { filter: brightness(.93); }
+dialog.uc-confirm .uc-confirm-actions button.uc-confirm-accept { background: #2458b9; border-color: #2458b9; color: white; }
+dialog.uc-confirm .uc-confirm-actions button[data-danger="true"] { background: #a52742; border-color: #a52742; color: white; }
+dialog.uc-confirm .uc-confirm-actions button:disabled { opacity: .58; cursor: default; }
+dialog.uc-confirm :is(button, textarea):focus-visible { outline: 3px solid #6795e3; outline-offset: 2px; }
+dialog.uc-confirm[data-theme="dark"] { background: #212832; color: #eef4ff; border-color: #526078; color-scheme: dark; }
+dialog.uc-confirm[data-theme="dark"] .uc-confirm-actions button:not(.uc-confirm-accept) { background: #2e3b50; border-color: #6b7e98; color: #eef4ff; }

@@ -69,8 +69,9 @@ export class WorkspaceController {
   @Get("departments") @Header("Cache-Control", "private, no-store") departments(
     @CurrentUser() u: User,
     @Param("clubId", ParseUUIDPipe) c: string,
+    @Query("include_inactive") includeInactive?: string,
   ) {
-    return this.people.departments(u.userId, c);
+    return this.people.departments(u.userId, c, includeInactive === "true");
   }
   @Post("departments") department(
     @CurrentUser() u: User,
