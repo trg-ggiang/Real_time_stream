@@ -51,7 +51,10 @@ flowchart TD
     J --> K{Được admission?}
     K -- Chờ duyệt --> L[Poll trạng thái; host/moderator duyệt]
     L --> J
-    K -- Được vào --> M[NestJS tạo identity và LiveKit token]
+    K -- Được vào --> DVC{Cùng tài khoản đã kết nối?}
+    DVC -- Có --> OPT[Chọn chuyển hoặc dùng cả hai thiết bị]
+    DVC -- Chưa --> M[NestJS tạo identity và LiveKit token]
+    OPT --> M
     M --> N[Kết nối media trực tiếp tới LiveKit Cloud]
     N --> O[Chat theo session qua Socket.IO]
     N --> P[Rời phòng: cập nhật attendance]
@@ -187,8 +190,10 @@ refresh định kỳ để cập nhật trạng thái.
 
 ### Quyền vào phiên (admission)
 
-Khi nhấn **Tham gia**, `useSessionFlow` gọi
-`POST /api/meetings/:code/join` với `sessionId`:
+Khi nhấn **Tham gia**, người dùng chọn camera và mic trong **Chuẩn bị vào phòng**.
+Khi xác nhận, `useSessionFlow` gọi `POST /api/meetings/:code/join` với `sessionId`.
+Nếu tab khôi phục phiên và gặp lựa chọn thiết bị trước, app mở bước chuẩn bị khi
+người dùng chọn tiếp tục mà chưa có cấu hình media cho lượt vào này.
 
 1. Backend tìm meeting/session, từ chối session đã kết thúc. Session scheduled
    chỉ được kích hoạt khi đã tới giờ; session ongoing tiếp tục nhận người vào.
@@ -205,7 +210,10 @@ Khi nhấn **Tham gia**, `useSessionFlow` gọi
    `POST .../join-requests/:memberId/approve` hoặc `/deny`. Khi được duyệt,
    frontend gọi join lại để lấy credentials. Có giới hạn lượt bị từ chối và
    cooldown.
-6. Backend tạo identity riêng cho kết nối, ký token LiveKit với room và quyền
+6. Sau admission, backend đối chiếu các attendance còn mở của thành viên trong
+   buổi này với danh sách kết nối LiveKit. Nếu có kết nối, frontend mở hộp thoại
+   **Chuyển sang thiết bị này** hoặc **Dùng cả hai thiết bị** trước khi xin token.
+7. Backend tạo identity riêng cho kết nối, ký token LiveKit với room và quyền
    từ membership, rồi ghi attendance gắn với identity và session. Quyền screen
    share mặc định chỉ cấp cho host là chủ sở hữu cuộc họp.
 
@@ -220,6 +228,13 @@ không relay audio/video. SDK quản lý signaling, track và participant state.
 
 - Microphone/camera có toggle và chọn thiết bị; lỗi được hiển thị riêng theo
   loại thiết bị. Trạng thái bật/tắt được nhớ theo tab.
+- **Dùng cả hai thiết bị** tạo attendance độc lập cho thiết bị mới. Khi **chuyển**,
+  thiết bị mới kết nối trước rồi gọi
+  `POST /api/meetings/:meetingId/sessions/:sessionId/device-transfer` với
+  `attendanceId` của nó. Backend kiểm tra thiết bị mới đã kết nối, ngắt các
+  lượt vào cũ của cùng thành viên trong buổi này và ghi `left_at` cùng
+  `leave_reason = 'device_transferred'`. Thiết bị mới áp lại lựa chọn camera/mic
+  của bước chuẩn bị sau khi hoàn tất.
 - Audio nhận từ phòng có thể mute riêng. Một số trình duyệt cho chọn output.
 - Camera dùng grid khi không có người share. Khi có screen share, `ScreenShareStage`
   hiển thị màn hình, camera thành viên nằm ở sidebar; có thể chọn giữa nhiều
@@ -242,11 +257,15 @@ không relay audio/video. SDK quản lý signaling, track và participant state.
   Trước join mới, hook thử hoàn tất departure cũ.
 - Phiên đang tham gia có thể được nhớ trong `sessionStorage`; khi tải lại đúng
   user, meeting và session, frontend xin credentials mới thay vì dùng token cũ.
-- Thành viên dài hạn có thể gọi `POST .../end`. Backend đóng attendance đang mở,
+- Chỉ host/moderator có thể gọi `POST .../end`; lời mời dài hạn không tự cấp quyền kết thúc. Backend đóng attendance đang mở,
   ngắt participant, hết hạn quyền guest chỉ dùng cho session đó và chuyển session
   sang `ended`.
 - Khi host/moderator loại thành viên, backend ngắt các identity đang hoạt động,
   đóng attendance và đánh dấu membership đã bị loại.
+- Khi chủ nhiệm gỡ một thành viên khỏi CLB, `WorkspacePeople.remove` thu hồi
+  meeting membership và ngắt mọi thiết bị của người đó trong các cuộc họp thuộc
+  CLB. Không ảnh hưởng phòng cá nhân hoặc CLB khác. Frontend thoát cuộc gọi khi
+  overview trả 403; sau LiveKit removal, tải lại quyền ngay để cập nhật thông báo.
 
 `GET /api/meeting-sessions` là endpoint phụ liệt kê session ongoing mà user đã
 được admitted; meeting UI hiện tại tập trung gọi `/api/meetings/*`.
@@ -267,7 +286,7 @@ MeetingChat
 
 `ChatAccessService` xác minh application JWT, kiểm tra identity bắt đầu bằng
 user ID trong token, xác nhận user còn tồn tại, session ongoing, membership
-admitted/chưa bị loại và participant identity thực sự đang kết nối trong room
+admitted/chưa bị loại, membership CLB còn active nếu là họp CLB và participant identity thực sự đang kết nối trong room
 LiveKit. Backend kiểm tra lại quyền khi gửi/đọc lịch sử, định kỳ mỗi 30 giây
 và trước khi phát tin cho từng người nhận.
 
@@ -297,7 +316,8 @@ meeting yêu cầu `Authorization: Bearer <application JWT>`.
 | `POST /meetings`, `POST /meetings/quick` | Tạo meeting thường hoặc nhanh |
 | `GET /meetings/:code/sessions` | Đọc meeting overview và sessions |
 | `POST /meetings/:meetingId/sessions` | Tạo lịch/session |
-| `POST /meetings/:code/join`, `GET /meetings/:meetingId/sessions/:sessionId/join-status` | Xin vào và xem trạng thái admission |
+| `POST /meetings/:code/join`, `GET /meetings/:meetingId/sessions/:sessionId/join-status` | Xin vào, chọn thiết bị nếu đã kết nối và xem trạng thái admission |
+| `POST /meetings/:meetingId/sessions/:sessionId/device-transfer` | Sau khi thiết bị mới kết nối, ngắt các kết nối cũ hơn của cùng thành viên trong buổi họp |
 | `GET/POST /meetings/:meetingId/sessions/:sessionId/join-requests/...` | Liệt kê, duyệt hoặc từ chối khách |
 | `POST /meetings/:meetingId/members`, `PATCH .../moderator` | Mời member dài hạn, đổi moderator |
 | `PATCH /meetings/:meetingId/settings` | Cài đặt waiting room |

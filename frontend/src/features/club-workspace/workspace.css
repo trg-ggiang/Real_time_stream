@@ -959,7 +959,6 @@
 .cw-group-heading { display: flex; align-items: center; justify-content: space-between; min-height: 28px; padding: 4px 8px 2px 10px; color: #687b94; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
 .cw-app .cw-group-heading button { border: 0; background: transparent; padding: 0; width: 23px; height: 23px; color: #56718f; font-size: 20px; line-height: 1; }
 .cw-group-heading button:hover { color: #174d9b; }
-.cw-voice-link span { display: inline-block; min-width: 17px; font-size: 16px; line-height: 1; vertical-align: -1px; }
 .cw-nav-details { border-top: 1px solid #d3deeb; margin-top: 8px; padding-top: 4px; }
 .cw-nav-details summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; min-height: 30px; padding: 4px 10px; color: #5b6e88; font-size: 11px; font-weight: 700; }
 .cw-nav-details summary::-webkit-details-marker { display: none; }

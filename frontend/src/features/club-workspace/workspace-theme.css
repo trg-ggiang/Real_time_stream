@@ -352,3 +352,22 @@
 .cw-app main .cw-department-visibility label{display:inline-flex;align-items:center;gap:8px;margin:3px 20px 8px 0;cursor:pointer}
 .cw-app main .cw-department-visibility input{width:18px;height:18px;min-width:18px;min-height:18px;padding:0;margin:0;accent-color:var(--cw-blue);box-shadow:none}
 .cw-app main .cw-department-visibility p{font-size:11px}
+
+.cw-app main .cw-department-form { max-width: 760px; margin-inline: auto; }
+.cw-app main .cw-department-form-heading { padding-bottom: 16px; border-bottom: 1px solid var(--cw-line); margin-bottom: 20px; }
+.cw-app main .cw-department-form-heading h2 { margin: 0; }
+.cw-department-fields { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; }
+.cw-department-description, .cw-department-visibility { grid-column: 1 / -1; }
+.cw-department-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cw-app main .cw-department-options label {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0;
+  padding: 12px; border: 1px solid var(--cw-line); border-radius: 8px;
+}
+.cw-app main .cw-department-options label:has(:checked) { border-color: var(--cw-accent); }
+.cw-department-options small { display: block; margin-top: 3px; }
+.cw-app main .cw-department-form-actions { justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--cw-line); }
+.cw-app main .cw-department-form-actions button { min-width: 112px; min-height: 44px; }
+@media (max-width: 600px) {
+  .cw-department-fields, .cw-department-options { grid-template-columns: minmax(0, 1fr); }
+  .cw-app main .cw-department-form-actions button { min-width: 0; flex: 1; }
+}

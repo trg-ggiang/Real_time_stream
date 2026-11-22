@@ -52,6 +52,18 @@
 .meeting-app[data-theme] .workspace-waiting p { color: var(--meeting-muted); }
 .meeting-app[data-theme] .workspace-confirm::backdrop { background: var(--theme-overlay); }
 .meeting-app[data-theme] .workspace-confirm button:not(.workspace-danger) { background: var(--theme-control); color: var(--meeting-text); border-color: var(--theme-input-line); }
+.meeting-app .meeting-device-choice { width: min(440px, calc(100% - 32px)); padding: clamp(18px, 5vw, 28px); }
+.meeting-app .meeting-device-choice h2 { margin: 0; font-weight: 650; line-height: 1.4; }
+.meeting-app .meeting-device-choice > p { margin: 10px 0 0; font-size: 14px; line-height: 1.55; }
+.meeting-app .meeting-device-choice > p:not(.notice) { color: var(--meeting-muted); }
+.meeting-app .meeting-device-choice .meeting-device-choice-options { display: grid; gap: 8px; margin-top: 20px; }
+.meeting-app .meeting-device-choice button { min-height: 44px; padding: 9px 14px; border: 1px solid; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 600; }
+.meeting-app .meeting-device-choice button:focus-visible { outline: 2px solid var(--meeting-accent); outline-offset: 2px; }
+.meeting-app[data-theme] .meeting-device-choice button.meeting-device-choice-primary { background: var(--theme-button); color: var(--theme-button-text); border-color: var(--theme-button); }
+.meeting-app[data-theme] .meeting-device-choice .meeting-device-choice-primary:hover:not(:disabled) { background: var(--theme-button-hover); }
+.meeting-app[data-theme] .meeting-device-choice button:not(.meeting-device-choice-primary):hover:not(:disabled) { background: var(--theme-control-hover); }
+.meeting-app[data-theme] .meeting-device-choice button.meeting-device-choice-cancel { display: block; margin: 8px 0 0 auto; background: transparent; border-color: transparent; }
+.meeting-app .meeting-transfer-error { margin-block: 10px; }
 .meeting-app[data-theme] .workspace-danger, .meeting-app[data-theme] .workspace-danger:hover:not(:disabled) { background: var(--theme-danger); color: #ffffff; border-color: var(--theme-danger); }
 .meeting-app[data-theme] .workspace-danger:hover:not(:disabled) { background: var(--theme-danger-hover); }
 .meeting-app[data-theme] .notice.error { background: var(--theme-danger-soft); color: var(--theme-danger-text); border-color: var(--theme-danger-text); }
@@ -200,4 +212,23 @@
   .meeting-room-page.meeting-app--incall .meeting-workspace.has-chat { grid-template-rows: minmax(160px, 1fr) minmax(200px, 1fr); min-height: 380px; }
   .meeting-room-page.meeting-app--incall .meeting-room [data-lk-theme] { padding-inline: 8px; }
   .meeting-room-page .meeting-participant-count { font-size: 10px; }
+}
+
+.meeting-people-list ul { margin: 0; padding: 0; list-style: none; max-height: 180px; overflow-y: auto; }
+.meeting-people-list li { padding: 8px 0; overflow-wrap: anywhere; }
+
+.meeting-livekit-expiry {
+  position: fixed;
+  inset: auto 16px 16px auto;
+  z-index: 1000;
+  max-width: min(340px, calc(100vw - 32px));
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid #bed4ee;
+  border-radius: 10px;
+  background: #eaf3ff;
+  color: #1b3c63;
+  box-shadow: 0 6px 20px #10243e30;
+  font-size: .875rem;
 }

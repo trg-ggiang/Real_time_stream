@@ -8,6 +8,9 @@ export class RecruitmentQuery {
  @IsOptional() @IsIn(['all','submitted','accepted','rejected']) status='all';
  @IsOptional() @IsUUID() club_id?:string;
 }
+export class ManagedRecruitmentQuery extends RecruitmentQuery {
+ @IsOptional() @IsIn(['all','open','closed','waiting']) campaign_status='all';
+}
 export class FormOption { @IsUUID() option_id!:string; @IsString() @MinLength(1) @MaxLength(500) label!:string; }
 export class FormQuestion {
  @IsOptional() @IsUUID() field_id?:string;

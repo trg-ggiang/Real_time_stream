@@ -63,15 +63,24 @@ test('channel socket authenticates, sends once, isolates channels and rechecks r
     const bad = await connect('bad', channelId, true); assert.equal(bad.connected, false);
     const sender = await connect('sender');
     const receiver = await connect('receiver');
+    const otherMembers = await Promise.all(
+      Array.from({ length: 8 }, (_, index) => connect('member-' + index)),
+    );
     const elsewhere = await connect('elsewhere', otherChannel);
     let leaked = 0; elsewhere.on('channel:message', () => leaked++);
     const received = nextEvent(receiver, 'channel:message');
+    const groupDelivery = Promise.all(otherMembers.map(peer => nextEvent(peer, 'channel:message')));
     const own = nextEvent(sender, 'channel:message');
     const payload = { client_message_id: key, content: 'Hello realtime' };
     const ack = await sender.timeout(5000).emitWithAck('channel:send', payload);
     assert.equal(ack.ok, true);
     assert.equal((await own).mine, true);
     const message = await received;
+    for (const delivered of await groupDelivery) {
+      assert.equal(delivered.message_id, message.message_id);
+      assert.equal(delivered.content, payload.content);
+      assert.equal(delivered.mine, false);
+    }
     assert.equal(message.content, 'Hello realtime'); assert.equal(message.mine, false);
     assert.equal(Object.hasOwn(message, 'client_message_id'), false);
     await sender.timeout(5000).emitWithAck('channel:send', payload);

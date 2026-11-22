@@ -13,6 +13,7 @@ import { randomUUID } from 'node:crypto';
 import { AccessToken, RoomServiceClient, ServerError, TrackSource } from 'livekit-server-sdk';
 import { SupabaseService } from '../supabase/supabase.service';
 import { User } from '../users/entities/user.entity';
+import type { DeviceJoinMode } from './dto/join-session.dto';
 
 type Meeting = {
   meeting_id: string;
@@ -217,9 +218,6 @@ export class MeetingsService {
     return this.livekitRoomService;
   }
 
-  private rank(role: string): number {
-    return role === 'host' ? 3 : role === 'moderator' ? 2 : 1;
-  }
 
   private async disconnectIfPresent(roomName: string, identity: string): Promise<void> {
     try {
@@ -230,6 +228,23 @@ export class MeetingsService {
       // Either the room or participant already being absent satisfies this cleanup.
       if (error instanceof ServerError && error.status === 404 && error.code === 'not_found') return;
       throw error;
+    }
+  }
+
+  private async openAttendances(memberId: string, sessionId: string) {
+    const { data, error } = await this.supabase.from('attendances')
+      .select('attendance_id,livekit_identity,joined_at')
+      .eq('meeting_member_id', memberId).eq('session_id', sessionId).is('left_at', null);
+    if (error) throw new ServiceUnavailableException('Could not load active attendances.');
+    return data ?? [];
+  }
+
+  private async connectedIdentities(roomName: string): Promise<Set<string>> {
+    try {
+      return new Set((await this.roomService.listParticipants(roomName)).map(participant => participant.identity));
+    } catch (cause) {
+      if (cause instanceof ServerError && cause.status === 404 && cause.code === 'not_found') return new Set();
+      throw new ServiceUnavailableException('Could not check connected devices.');
     }
   }
 
@@ -287,6 +302,11 @@ export class MeetingsService {
       throw new ForbiddenException('Meeting owner or moderator permission is required.');
     }
     return member;
+  }
+
+  private async requireHost(meetingId: string, userId: string) {
+    const member = await this.requireMember(meetingId, userId);
+    if (member.role !== 'host') throw new ForbiddenException('Meeting owner permission is required.');
   }
 
   private async requireMeetingMember(meetingId: string, userId: string): Promise<Member> {
@@ -360,11 +380,17 @@ export class MeetingsService {
   async listSessions(user: User, code: string) {
     const meeting = await this.getMeetingByCode(code);
     await this.requireClubMeetingAccess(user.userId, meeting.club_id);
-    const { data, error } = await this.supabase.from('meeting_sessions').select(SESSION_SELECT)
-      .eq('meeting_id', meeting.meeting_id).order('scheduled_start_at', { ascending: true });
+    const [{ data, error }, member] = await Promise.all([
+      this.supabase.from('meeting_sessions').select(SESSION_SELECT)
+        .eq('meeting_id', meeting.meeting_id).order('scheduled_start_at', { ascending: true }),
+      this.getMember(meeting.meeting_id, user.userId),
+    ]);
     if (error) throw new ServiceUnavailableException('Could not load meeting sessions.');
     return { meeting: { meetingId: meeting.meeting_id, title: meeting.title, meetingCode: meeting.meeting_code,
-      recurrenceRule: meeting.recurrence_rule, waitingRoomEnabled: meeting.waiting_room_enabled }, sessions: data ?? [] };
+      recurrenceRule: meeting.recurrence_rule, waitingRoomEnabled: meeting.waiting_room_enabled }, sessions: data ?? [],
+      membership: member?.admission_status === 'admitted' ? {
+        meetingMemberId: member.meeting_member_id, userId: member.user_id, role: member.role, invitedAt: member.invited_at,
+      } : null };
   }
 
   private async insertSession(meetingId: string, values: {
@@ -485,7 +511,7 @@ export class MeetingsService {
     return latest;
   }
 
-  async join(user: User, code: string, sessionId: string) {
+  async join(user: User, code: string, sessionId: string, deviceMode?: DeviceJoinMode) {
     const meeting = await this.getMeetingByCode(code);
     await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     let session = await this.getSession(meeting.meeting_id, sessionId);
@@ -496,12 +522,26 @@ export class MeetingsService {
       await this.checkAdmissionRetryLimit(meeting.meeting_id, user.userId);
       const admissionStatus = meeting.waiting_room_enabled ? 'pending' : 'admitted';
       member = await this.createGuestMember(meeting.meeting_id, user, admissionStatus);
-      if (admissionStatus === 'pending') return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id };
+      if (admissionStatus === 'pending') return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id } as const;
     } else if (member.admission_status === 'pending') {
-      return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id };
+      return { status: 'pending', meetingId: meeting.meeting_id, sessionId: session.session_id } as const;
     }
 
     if (member.admission_status !== 'admitted') throw new ForbiddenException('Meeting admission was denied.');
+
+    if (meeting.waiting_room_enabled && await this.requestReentry(member.meeting_member_id, sessionId)) {
+      return { status: 'pending', meetingId: meeting.meeting_id, sessionId } as const;
+    }
+
+    if (!deviceMode) {
+      const attendances = await this.openAttendances(member.meeting_member_id, sessionId);
+      if (attendances.length) {
+        const identities = await this.connectedIdentities(session.livekit_room_name);
+        if (attendances.some(attendance => identities.has(attendance.livekit_identity))) {
+          return { status: 'device_choice_required', meetingId: meeting.meeting_id, sessionId: session.session_id } as const;
+        }
+      }
+    }
 
     const livekitIdentity = `${user.userId}:${randomUUID()}`;
     const serverUrl = this.config.get<string>('LIVEKIT_URL')?.trim();
@@ -533,8 +573,21 @@ export class MeetingsService {
     if (error || !data) throw new ServiceUnavailableException('Could not record meeting attendance.');
     const attendanceId = data.attendance_id;
 
+    if (meeting.club_id) {
+      try {
+        // Membership can be removed while token/attendance creation is in flight.
+        await this.requireClubMeetingAccess(user.userId, meeting.club_id);
+      } catch (cause) {
+        const closed = await this.supabase.from('attendances')
+          .update({ left_at: new Date().toISOString(), leave_reason: 'club_membership_removed' })
+          .eq('attendance_id', attendanceId).eq('meeting_member_id', member.meeting_member_id).is('left_at', null);
+        if (closed.error) throw new ServiceUnavailableException('Could not close revoked meeting attendance.');
+        throw cause;
+      }
+    }
+
     return {
-      status: 'admitted',
+      status: 'admitted' as const,
       role: member.role,
       meetingId: meeting.meeting_id,
       sessionId: session.session_id,
@@ -543,7 +596,40 @@ export class MeetingsService {
       serverUrl,
       participantIdentity: livekitIdentity,
       token: accessToken,
+      ...(deviceMode === 'transfer' ? { transferAfterConnect: true } : {}),
     };
+  }
+
+  async transferDevice(user: User, meetingId: string, sessionId: string, attendanceId: string) {
+    const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
+    const member = await this.requireMember(meetingId, user.userId);
+    const session = await this.getSession(meetingId, sessionId);
+    if (session.status !== 'ongoing') throw new ConflictException('The session is not ongoing.');
+
+    const attendances = await this.openAttendances(member.meeting_member_id, sessionId);
+    const destination = attendances.find(attendance => attendance.attendance_id === attendanceId);
+    if (!destination) throw new ConflictException('The new device must be connected before transfer.');
+    const identities = await this.connectedIdentities(session.livekit_room_name);
+    if (!identities.has(destination.livekit_identity)) throw new ConflictException('The new device must be connected before transfer.');
+
+    // A delayed transfer must leave any connection that joined after its destination alone.
+    const joinedAt = Date.parse(destination.joined_at);
+    for (const source of attendances) {
+      if (Date.parse(source.joined_at) >= joinedAt) continue;
+      try {
+        // A prior attempt may have removed this identity before its attendance update failed.
+        await this.disconnectIfPresent(session.livekit_room_name, source.livekit_identity);
+      } catch {
+        throw new ServiceUnavailableException('Could not disconnect the previous device.');
+      }
+      const { error } = await this.supabase.from('attendances')
+        .update({ left_at: new Date().toISOString(), leave_reason: 'device_transferred' })
+        .eq('attendance_id', source.attendance_id).eq('meeting_member_id', member.meeting_member_id)
+        .eq('session_id', sessionId).is('left_at', null);
+      if (error) throw new ServiceUnavailableException('Could not record device transfer.');
+    }
+    return { transferred: true };
   }
 
   async decideScreenShare(user: User, meetingId: string, sessionId: string, identity: string, approved: boolean) {
@@ -568,6 +654,20 @@ export class MeetingsService {
     return { approved };
   }
 
+  private async requestReentry(memberId: string, sessionId: string) {
+    const reasons = ['removed', 'rejoin_pending', 'rejoin_denied'];
+    const existing = await this.supabase.from('attendances').select('attendance_id')
+      .eq('meeting_member_id', memberId).eq('session_id', sessionId).in('leave_reason', reasons).limit(1);
+    if (existing.error) throw new ServiceUnavailableException('Could not check re-entry.');
+    if (!existing.data?.length) return false;
+    const { data, error } = await this.supabase.from('attendances')
+      .update({ leave_reason: 'rejoin_pending' }).eq('meeting_member_id', memberId)
+      .eq('session_id', sessionId).in('leave_reason', reasons)
+      .select('attendance_id');
+    if (error) throw new ServiceUnavailableException('Could not request re-entry.');
+    return Boolean(data?.length);
+  }
+
   async pending(user: User, meetingId: string, sessionId: string) {
     await this.requireModerator(meetingId, user.userId);
     const session = await this.getSession(meetingId, sessionId);
@@ -577,7 +677,17 @@ export class MeetingsService {
       .eq('role', 'participant').is('invited_at', null).is('removed_at', null)
       .eq('admission_status', 'pending');
     if (error) throw new ServiceUnavailableException('Could not load join requests.');
-    return (data ?? []).map(member => ({
+    const reentries = await this.supabase.from('attendances')
+      .select('meeting_member_id,meeting_members!inner(meeting_member_id,user_id,role,admission_status,created_at,users(display_name,avatar_url))')
+      .eq('session_id', sessionId).eq('leave_reason', 'rejoin_pending')
+      .eq('meeting_members.meeting_id', meetingId).is('meeting_members.removed_at', null);
+    if (reentries.error) throw new ServiceUnavailableException('Could not load re-entry requests.');
+    const members = new Map((data ?? []).map(member => [member.meeting_member_id, member]));
+    for (const entry of reentries.data ?? []) {
+      const member = entry.meeting_members as unknown as NonNullable<typeof data>[number];
+      members.set(member.meeting_member_id, { ...member, admission_status: 'pending' });
+    }
+    return [...members.values()].map(member => ({
       requestId: member.meeting_member_id,
       meeting_member_id: member.meeting_member_id,
       session_id: session.session_id,
@@ -597,6 +707,13 @@ export class MeetingsService {
         return { status: 'pending', meetingMemberId: member.meeting_member_id, sessionId };
       }
       if (member.admission_status === 'admitted') {
+        if (meeting.waiting_room_enabled) {
+          const reentry = await this.supabase.from('attendances').select('leave_reason')
+            .eq('session_id', sessionId).eq('meeting_member_id', member.meeting_member_id)
+            .in('leave_reason', ['rejoin_pending', 'rejoin_denied']).limit(1).maybeSingle();
+          if (reentry.error) throw new ServiceUnavailableException('Could not load re-entry status.');
+          if (reentry.data?.leave_reason) return { status: reentry.data.leave_reason === 'rejoin_pending' ? 'pending' : 'denied', meetingMemberId: member.meeting_member_id, sessionId };
+        }
         return { status: 'admitted', meetingMemberId: member.meeting_member_id, sessionId };
       }
     }
@@ -631,6 +748,8 @@ export class MeetingsService {
     const session = await this.getSession(meetingId, sessionId);
     if (session.status === 'ended') throw new ConflictException('Cannot approve entry into an ended session.');
     const member = await this.getMemberById(meetingId, memberId);
+    if (member.admission_status === 'admitted' && await this.decideReentry(sessionId, memberId, true))
+      return { admission_status: 'admitted', meeting_member_id: memberId, role: member.role, invited_at: member.invited_at, sessionId };
     if (member.admission_status !== 'pending' || member.invited_at !== null || member.role !== 'participant') {
       throw new ConflictException('Only guest requests can be approved here.');
     }
@@ -649,6 +768,8 @@ export class MeetingsService {
     await this.requireModerator(meetingId, user.userId);
     await this.getSession(meetingId, sessionId);
     const member = await this.getMemberById(meetingId, memberId);
+    if (member.admission_status === 'admitted' && await this.decideReentry(sessionId, memberId, false))
+      return { status: 'denied', meetingMemberId: memberId, sessionId };
     if (member.admission_status !== 'pending' || member.invited_at !== null || member.role !== 'participant') {
       throw new ConflictException('Only guest requests can be denied here.');
     }
@@ -663,6 +784,7 @@ export class MeetingsService {
 
   async setModerator(user: User, meetingId: string, memberId: string, enabled: boolean) {
     const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     if (meeting.created_by !== user.userId) throw new ForbiddenException('Only the meeting owner can change moderator roles.');
     const target = await this.getMemberById(meetingId, memberId);
     if (target.role === 'host') throw new ForbiddenException('Owner role cannot be changed.');
@@ -706,6 +828,7 @@ export class MeetingsService {
 
   async updateSettings(user: User, meetingId: string, body: { waitingRoomEnabled: boolean }) {
     const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     if (meeting.created_by !== user.userId) throw new ForbiddenException('Only the meeting owner can update meeting settings.');
     const { data, error } = await this.supabase.from('meetings').update({ waiting_room_enabled: body.waitingRoomEnabled })
       .eq('meeting_id', meetingId).select('meeting_id,waiting_room_enabled').single();
@@ -715,14 +838,28 @@ export class MeetingsService {
     return data;
   }
 
+  async sessionMembers(user: User, meetingId: string, sessionId: string) {
+    await this.requireHost(meetingId, user.userId);
+    await this.getSession(meetingId, sessionId);
+    const { data, error } = await this.supabase.from('attendances')
+      .select('meeting_members!inner(meeting_member_id,user_id,role,invited_at,users(display_name))')
+      .eq('session_id', sessionId).not('joined_at', 'is', null).is('left_at', null)
+      .eq('meeting_members.meeting_id', meetingId).is('meeting_members.removed_at', null)
+      .eq('meeting_members.admission_status', 'admitted');
+    if (error) throw new ServiceUnavailableException('Could not load session members.');
+    const members = (data ?? []).map(row => row.meeting_members as unknown as
+      Pick<Member, 'meeting_member_id' | 'user_id' | 'role' | 'invited_at'> & { users: { display_name: string } | null });
+    return [...new Map(members.map(member => [member.meeting_member_id, member])).values()];
+  }
+
   async mute(user: User, meetingId: string, sessionId: string, memberId: string) {
-    const actor = await this.requireModerator(meetingId, user.userId);
+    await this.requireHost(meetingId, user.userId);
     const session = await this.getSession(meetingId, sessionId);
     if (session.status !== 'ongoing') throw new ConflictException('Microphone moderation requires an active session.');
     const target = await this.getMemberById(meetingId, memberId);
     if (target.admission_status !== 'admitted') throw new ForbiddenException('Target must be admitted to the meeting.');
     if (target.user_id === user.userId) throw new ForbiddenException('Use the meeting controls to mute your own microphone.');
-    if (this.rank(actor.role) < this.rank(target.role)) throw new ForbiddenException('You may mute members of your rank or lower.');
+    if (target.role === 'host') throw new ForbiddenException('The owner cannot be muted.');
     const { data, error } = await this.supabase.from('attendances')
       .select('livekit_identity').eq('meeting_member_id', memberId).eq('session_id', sessionId)
       .not('livekit_identity', 'is', null).not('joined_at', 'is', null).is('left_at', null)
@@ -744,18 +881,28 @@ export class MeetingsService {
     return { muted: true, persistsAfterReconnect: false, meetingMemberId: memberId, sessionId };
   }
 
-  async removeMember(user: User, meetingId: string, memberId: string) {
-    const actor = await this.requireModerator(meetingId, user.userId);
+  private async decideReentry(sessionId: string, memberId: string, approved: boolean) {
+    const { data, error } = await this.supabase.from('attendances')
+      .update({ leave_reason: approved ? 'rejoin_approved' : 'rejoin_denied' })
+      .eq('session_id', sessionId).eq('meeting_member_id', memberId)
+      .eq('leave_reason', 'rejoin_pending').select('attendance_id');
+    if (error) throw new ServiceUnavailableException('Could not decide re-entry.');
+    return Boolean(data?.length);
+  }
+
+  async removeMember(user: User, meetingId: string, memberId: string, sessionId: string) {
+    await this.requireHost(meetingId, user.userId);
     const target = await this.getMemberById(meetingId, memberId);
-    if (target.role === 'host' || this.rank(actor.role) < this.rank(target.role)) {
-      throw new ForbiddenException('You may remove only members of your rank or lower; the owner cannot be removed.');
+    if (target.role === 'host') {
+      throw new ForbiddenException('The owner cannot be removed.');
     }
+    const session = await this.getSession(meetingId, sessionId);
+    if (session.status !== 'ongoing') throw new ConflictException('Meeting session is not ongoing.');
     const { data: attendances, error: readError } = await this.supabase.from('attendances')
       .select('attendance_id,session_id,livekit_identity').eq('meeting_member_id', memberId)
-      .not('joined_at', 'is', null).is('left_at', null);
+      .eq('session_id', sessionId).not('joined_at', 'is', null).is('left_at', null);
     if (readError) throw new ServiceUnavailableException('Could not load active attendances.');
     for (const attendance of attendances ?? []) {
-      const session = await this.getSession(meetingId, attendance.session_id);
       if (attendance.livekit_identity) {
         await this.disconnectIfPresent(session.livekit_room_name, attendance.livekit_identity);
       }
@@ -763,9 +910,6 @@ export class MeetingsService {
         .eq('attendance_id', attendance.attendance_id).is('left_at', null);
       if (error) throw new ServiceUnavailableException('Could not close member attendance.');
     }
-    const { error } = await this.supabase.from('meeting_members').update({ removed_at: new Date().toISOString() })
-      .eq('meeting_id', meetingId).eq('meeting_member_id', memberId).is('removed_at', null);
-    if (error) throw new ServiceUnavailableException('Could not remove meeting member.');
     return { removed: true, meetingMemberId: memberId };
   }
 
@@ -787,8 +931,48 @@ export class MeetingsService {
     return { status: 'left', sessionId, attendanceId };
   }
 
+  async revokeClubMember(clubId: string, userId: string) {
+    const meetings = await this.supabase.from('meetings').select('meeting_id').eq('club_id', clubId);
+    if (meetings.error) throw new ServiceUnavailableException('Could not load club meetings for access revocation.');
+    const meetingIds = (meetings.data ?? []).map(row => row.meeting_id);
+    if (!meetingIds.length) return;
+    // Include previously removed memberships so retries can finish partial cleanup.
+    const members = await this.supabase.from('meeting_members').select('meeting_member_id')
+      .in('meeting_id', meetingIds).eq('user_id', userId);
+    if (members.error) throw new ServiceUnavailableException('Could not load club meeting memberships.');
+    const memberIds = (members.data ?? []).map(row => row.meeting_member_id);
+    if (!memberIds.length) return;
+    const removedAt = new Date().toISOString();
+    const revoked = await this.supabase.from('meeting_members').update({ removed_at: removedAt })
+      .in('meeting_id', meetingIds).in('meeting_member_id', memberIds).eq('user_id', userId).is('removed_at', null);
+    if (revoked.error) throw new ServiceUnavailableException('Could not revoke club meeting memberships.');
+    const attendances = await this.supabase.from('attendances')
+      .select('attendance_id,meeting_member_id,session_id,livekit_identity')
+      .in('meeting_member_id', memberIds).is('left_at', null);
+    if (attendances.error) throw new ServiceUnavailableException('Could not load club meeting connections.');
+    if (!attendances.data?.length) return;
+    const sessionIds = [...new Set(attendances.data.map(row => row.session_id))];
+    const sessions = await this.supabase.from('meeting_sessions').select('session_id,livekit_room_name')
+      .in('meeting_id', meetingIds).in('session_id', sessionIds);
+    if (sessions.error) throw new ServiceUnavailableException('Could not load club meeting rooms.');
+    const rooms = new Map((sessions.data ?? []).map(row => [row.session_id, row.livekit_room_name]));
+    const results = await Promise.allSettled(attendances.data.map(async attendance => {
+      const room = rooms.get(attendance.session_id);
+      if (!room) throw new ServiceUnavailableException('Could not find club meeting room.');
+      if (attendance.livekit_identity) await this.disconnectIfPresent(room, attendance.livekit_identity);
+      const closed = await this.supabase.from('attendances')
+        .update({ left_at: new Date().toISOString(), leave_reason: 'club_membership_removed' })
+        .eq('attendance_id', attendance.attendance_id).eq('meeting_member_id', attendance.meeting_member_id).is('left_at', null);
+      if (closed.error) throw new ServiceUnavailableException('Could not close club meeting attendance.');
+    }));
+    if (results.some(result => result.status === 'rejected'))
+      throw new ServiceUnavailableException('Club membership removed, but some meeting connections could not be closed. Retry removal.');
+  }
+
   async endSession(user: User, meetingId: string, sessionId: string) {
-    await this.requireMeetingMember(meetingId, user.userId);
+    const meeting = await this.getMeetingById(meetingId);
+    await this.requireClubMeetingAccess(user.userId, meeting.club_id);
+    await this.requireHost(meetingId, user.userId);
     const session = await this.getSession(meetingId, sessionId);
     if (session.status === 'ended') return { status: 'ended', sessionId, endedAt: session.ended_at };
     const { data: active, error: readError } = await this.supabase.from('attendances')

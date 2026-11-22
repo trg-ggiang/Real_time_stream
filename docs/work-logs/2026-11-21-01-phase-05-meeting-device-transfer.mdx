@@ -1,0 +1,43 @@
+---
+title: Chuyển thiết bị trong buổi họp
+description: Chọn cách tham gia khi cùng tài khoản đã kết nối vào một buổi họp LiveKit.
+---
+
+## Thông tin phiên
+
+- Phiên 2026-11-21-01, múi giờ Asia/Bangkok.
+- Agent Codex. Mốc bắt đầu và kết thúc không được ghi tự động.
+- Phase 05 — Tích hợp LiveKit Cloud. Kết quả phiên **Completed**, phase vẫn **In Progress**.
+
+## Mục tiêu
+
+Khi cùng tài khoản mở một buổi họp đã tham gia trên trình duyệt khác, cho phép chuyển buổi họp sang trình duyệt mới hoặc dùng đồng thời cả hai.
+
+## Triển khai
+
+- `backend/src/meetings/meetings.service.ts` đối chiếu các lượt vào còn mở trong Supabase với danh sách participant của phòng LiveKit. API trả `device_choice_required` trước khi cấp token nếu tài khoản đã kết nối trong buổi này.
+- Chọn **Dùng cả hai thiết bị** tạo một attendance mới và cấp token theo quyền của thành viên. Chọn **Chuyển sang thiết bị này** cấp token mới, sau đó frontend đợi LiveKit báo đã kết nối mới gọi API `device-transfer`.
+- API chuyển xác nhận kết nối đích thuộc người gọi và đúng buổi họp. Nó ngắt những lượt vào cũ hơn cùng thành viên rồi ghi `left_at` và `leave_reason = 'device_transferred'` vào bảng `attendances`. Các trường có sẵn đáp ứng luồng này.
+- `MeetingDeviceChoice.tsx`, `use-session-flow.ts` và `MeetingRoom.tsx` tổ chức hộp thoại, trạng thái chuyển và thông báo cho thiết bị bị ngắt. Thiết bị mới đợi chuyển xong rồi khôi phục tùy chọn camera/mic. Nếu API chuyển báo lỗi, trình duyệt mới giữ kết nối và hiện nút thử lại.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm test` | 74 backend và 129 frontend đạt. Có kiểm tra quyền, attendance cũ, điều kiện thiết bị mới đã kết nối, retry và tab nhân bản. |
+| `npm --workspace frontend run build` | Đạt. Vite vẫn cảnh báo một số chunk trên 500 kB. |
+| Chromium và một phòng LiveKit Cloud riêng | Đạt các ca hủy bằng Escape, giữ hai kết nối cùng phát camera/mic, chuyển sang kết nối mới và ngắt các kết nối cũ. Đã xem hộp thoại ở 320, 768 và 1440 px. |
+
+## Quyết định và giới hạn
+
+- Quyền trong token mới dựa trên vai trò của thành viên. Phê duyệt chia sẻ màn hình tạm thời gắn với kết nối đang được duyệt.
+- Ca qua Cloud dùng luồng camera/mic tổng hợp và dữ liệu attendance giả lập. Còn chờ nghiệm thu thiết bị vật lý và hai mạng qua HTTPS Tunnel.
+
+## Bước tiếp theo
+
+Dùng cùng tài khoản trên hai máy, vào cùng link buổi họp, thử **Dùng cả hai thiết bị**, sau đó thử **Chuyển sang thiết bị này**. Xác nhận máy cũ về sảnh và máy mới bật cam/mic theo tùy chọn.
+
+## Kiểm tra khi tích hợp với bố cục mới của final
+
+- Giữ **Chuẩn bị vào phòng** và phần tiêu đề/chia sẻ bên trong phòng. Hộp thoại thiết bị dùng lựa chọn camera/mic đã xác nhận. Nếu tab khôi phục phiên gặp hộp thoại thiết bị trước, bước chuẩn bị mở khi người dùng tiếp tục.
+- Chromium qua phòng LiveKit Cloud riêng đã xác nhận cả **Hủy**, **Dùng cả hai thiết bị** và **Chuyển sang thiết bị này**. Khi chuyển với camera bật và mic tắt, thiết bị mới phát camera sau khi các kết nối cũ bị ngắt và giữ mic tắt. Lượt thử dùng media và dữ liệu attendance mô phỏng.

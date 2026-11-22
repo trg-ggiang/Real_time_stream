@@ -301,18 +301,12 @@ it('shows a pending message immediately and replaces it once the server confirms
   expect((field as HTMLTextAreaElement).value).toBe('');
 });
 
-it('receives pushed messages without polling and retains the draft while disconnected', async () => {
-  const { fetcher } = fixture();
+it('receives pushed messages immediately and retains the draft while disconnected', async () => {
+  fixture();
   history.replaceState(null, '', '/workspace/beta/channels/general');
   render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
   const field = await screen.findByRole('textbox', { name: 'Nhắn tin trong Chung' });
   await waitFor(() => expect((field as HTMLTextAreaElement).disabled).toBe(false));
-  const reads = () => fetcher.mock.calls.filter(([url, options]) => url.endsWith('/messages') && options?.method !== 'POST').length;
-  const before = reads();
-  vi.useFakeTimers();
-  await act(async () => { await vi.advanceTimersByTimeAsync(9000); });
-  expect(reads()).toBe(before);
-  vi.useRealTimers();
   await act(async () => channelSockets.at(-1).receive('channel:message', {
     message_id: 'pushed', channel_id: 'real-general', sender_membership_id: 'other', sender: 'Bình',
     content: 'Nhận ngay qua socket', created_at: '2026-11-20T01:00:00Z', mine: false,
@@ -322,6 +316,27 @@ it('receives pushed messages without polling and retains the draft while disconn
   await act(async () => channelSockets.at(-1).disconnect());
   expect((field as HTMLTextAreaElement).value).toBe('Bản nháp đang viết');
   expect((field as HTMLTextAreaElement).disabled).toBe(true);
+});
+
+it('shows a message saved by another client even when its socket event is lost', async () => {
+  const messages: ChannelMessage[] = [];
+  fixture([], messages);
+  history.replaceState(null, '', '/workspace/beta/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  const field = await screen.findByRole<HTMLTextAreaElement>('textbox', { name: 'Nhắn tin trong Chung' });
+  await waitFor(() => expect(field.disabled).toBe(false));
+  const socket = channelSockets.at(-1);
+  expect(socket?.connected).toBe(true);
+  const item: ChannelMessage = {
+    message_id: 'missed-push', channel_id: 'real-general', sender_membership_id: 'other',
+    sender: 'Binh', content: 'Tin mới từ máy khác', created_at: '2026-11-20T01:00:00Z', mine: false,
+    avatar_url: null, edited_at: null, deleted_at: null,
+  };
+  messages.push(item);
+  expect(screen.queryByText(item.content)).toBeNull();
+  expect(await screen.findByText(item.content, {}, { timeout: 4200 })).toBeTruthy();
+  await act(async () => socket.receive('channel:message', item));
+  expect(screen.getAllByText(item.content)).toHaveLength(1);
 });
 
 it('walks missed history pages after reconnect and clears messages when channel access is revoked', async () => {
@@ -412,6 +427,7 @@ it.each(['/workspace/alpha/meetings', '/workspace/alpha/recurring-meetings'])('o
   history.replaceState(null, '', path);
   const onMeeting = vi.fn();
   render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Mã hoặc đường dẫn mời' }));
   const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
   fireEvent.change(input, { target: { value: ' https://other.example/?view=meeting&meeting=abcd123456&session=invited-session ' } });
   fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));
@@ -427,6 +443,7 @@ it('rejects invalid meeting links and clears a previous session when opening a c
   history.replaceState(null, '', '/workspace/alpha/meetings?session=old-session');
   const onMeeting = vi.fn();
   render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={onMeeting} />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Mã hoặc đường dẫn mời' }));
   const input = await screen.findByRole('textbox', { name: 'Mã hoặc đường dẫn mời' });
   fireEvent.change(input, { target: { value: 'https://example.com/no-meeting' } });
   fireEvent.click(screen.getByRole('button', { name: 'Mở cuộc họp' }));

@@ -18,7 +18,7 @@ Người ngoài meeting được duyệt vào đúng một session. Yêu cầu s
 
 - Owner và moderator có thể xem, duyệt hoặc từ chối yêu cầu guest.
 - Owner có thể mời member lâu dài, đổi role moderator, và chỉnh `waiting_room_enabled`.
-- Member đã được duyệt có thể tạo hoặc kết thúc session trong meeting.
+- Thành viên được mời lâu dài có thể lên lịch theo quyền hiện có. Chỉ host/moderator được kết thúc session; lời mời lâu dài không tự cấp quyền điều hành.
 - Owner/moderator có thể mute hoặc remove target cùng cấp hay thấp hơn; owner không thể bị remove và không cho phép tự mute bằng endpoint quản trị.
 - Mute tắt các audio track đang publish trên kết nối hiện tại. Khi kết nối lại, mute không được giữ.
 - Khi tắt phòng chờ, yêu cầu đang chờ vẫn chờ duyệt; cài đặt mới áp dụng cho lượt vào mới. Cách xử lý này giống hành vi lobby của Teams, nơi người đang chờ vẫn ở lobby khi cài đặt được đổi trong cuộc họp ([tài liệu Microsoft Teams](https://support.microsoft.com/en-gb/teams/meetings/using-the-lobby-in-microsoft-teams-meetings)).
@@ -32,7 +32,7 @@ Tất cả route yêu cầu JWT ứng dụng hợp lệ. ID là UUID. Mã meetin
 | `POST /api/meetings` | Tạo meeting theo lịch/phòng dùng lại: `{ title, waitingRoomEnabled?, recurrenceRule? }` | User đăng nhập thành owner |
 | `POST /api/meetings/quick` | Tạo meeting nhanh và session `active`: `{ title, waitingRoomEnabled? }` | User đăng nhập thành owner |
 | `GET /api/meetings/:code/sessions` | Trả meeting và danh sách session để chọn | User đăng nhập |
-| `POST /api/meetings/:meetingId/sessions` | Lên lịch: `{ scheduledStartAt, scheduledEndAt }`; nếu meeting có RRULE thì tạo toàn bộ các lần lặp | Member đã được mời/owner/moderator |
+| `POST /api/meetings/:meetingId/sessions` | Lên lịch: `{ scheduledStartAt, scheduledEndAt }`; nếu meeting có RRULE thì tạo toàn bộ các lần lặp | Host hoặc moderator |
 | `POST /api/meetings/:code/join` | `{ sessionId }`; trả pending hoặc LiveKit credentials và `attendanceId` | User đăng nhập |
 | `GET /api/meetings/:meetingId/sessions/:sessionId/join-status` | `not_requested`, `pending`, `admitted`, `denied` hoặc `session_ended` | User đăng nhập |
 | `GET /api/meetings/:meetingId/sessions/:sessionId/join-requests` | Danh sách guest đang chờ đúng session | Owner hoặc moderator |
@@ -44,9 +44,15 @@ Tất cả route yêu cầu JWT ứng dụng hợp lệ. ID là UUID. Mã meetin
 | `POST /api/meetings/:meetingId/sessions/:sessionId/members/:memberId/mute` | Mute micro track hiện tại | Owner/moderator theo thứ bậc role |
 | `POST /api/meetings/:meetingId/members/:memberId/remove` | Xóa member và ngắt các kết nối hoạt động | Owner/moderator theo thứ bậc role |
 | `POST /api/meetings/:meetingId/sessions/:sessionId/leave` | `{ attendanceId }`; đóng đúng kết nối của thiết bị hiện tại | Member đã được duyệt |
-| `POST /api/meetings/:meetingId/sessions/:sessionId/end` | Kết thúc session, ngắt participant, hết hạn guest session-only | Member đã được mời/owner/moderator |
+| `POST /api/meetings/:meetingId/sessions/:sessionId/end` | Kết thúc session, ngắt participant, hết hạn guest session-only | Host hoặc moderator |
 
 Yêu cầu bị từ chối có thể gửi lại tối đa ba lần trong cửa sổ giới hạn; sau lần từ chối thứ ba phải chờ 30 phút. Member được mời lâu dài không chịu giới hạn này.
+
+## Thu hồi quyền họp khi gỡ khỏi CLB — 22/11/2026
+
+`WorkspacePeople.remove` cập nhật membership CLB, sau đó gọi `MeetingsService.revokeClubMember`. Backend hết hạn các meeting membership của người đó trong đúng CLB, ngắt mọi identity có attendance đang mở và ghi `left_at`/`leave_reason = 'club_membership_removed'`. Phòng cá nhân và phòng của CLB khác giữ nguyên. Nếu một kết nối lỗi, các kết nối khác vẫn được xử lý; có thể gọi lại thao tác gỡ để hoàn tất phần còn lại.
+
+Chat kiểm tra membership CLB còn active khi xác thực và kiểm tra lại quyền. API join kiểm tra lại membership trước khi trả credentials để chặn trường hợp đang join thì bị gỡ. Frontend ngắt cuộc gọi khi API overview trả 403; sau sự kiện LiveKit loại participant, nó tải lại quyền ngay để hiển thị lý do. Lỗi mạng/503 không tự coi là bị gỡ quyền. Không cần migration mới. [Kết quả kiểm thử](/work-logs/2026-11-22-01-phase-05-meeting-permissions-club-removal).
 
 ## Định dạng lặp lịch
 
@@ -58,7 +64,7 @@ Ví dụ: `FREQ=WEEKLY;BYDAY=MO,WE;COUNT=10`. Thời lượng mỗi lần lặp 
 
 - Frontend hiện vẫn gọi `/api/livekit/token` cho room cố định, chưa gọi các meeting endpoints ở trên.
 - Chưa kết nối Supabase/LiveKit development trong lượt triển khai này; chưa xác minh trực tiếp nullable/default/foreign key/RLS trên DB.
-- Việc kết thúc session hiện là thao tác API của member. Chưa có worker tự kết thúc đúng giờ hoặc LiveKit webhook để dọn attendance khi mất mạng đột ngột.
+- Việc kết thúc session là thao tác API của host/moderator. Chưa có worker tự kết thúc đúng giờ hoặc LiveKit webhook để dọn attendance khi mất mạng đột ngột.
 - Tạo meeting và thêm owner membership là hai request DB; nếu bước sau lỗi, cleanup meeting là best-effort, chưa có transaction RPC.
 - Code không tự áp dụng migration cũ. Migration ấy thêm capacity/self-unmute không thuộc ERD hiện được dùng.
 

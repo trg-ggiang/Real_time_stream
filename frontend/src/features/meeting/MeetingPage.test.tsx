@@ -1,11 +1,34 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MeetingPage } from './MeetingPage';
 
-vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken }: any) =>
-  <div data-testid="joined-room" data-session={credentials.sessionId} data-auth={accessToken}>Joined</div> }));
+vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected, onEnded }: any) =>
+  <div data-testid="joined-room" data-session={credentials.sessionId} data-auth={accessToken}
+    data-microphone={audioSelection?.microphone} data-camera={audioSelection?.camera}>
+    <button onClick={() => onConnected?.()}>Connected</button>
+    <button onClick={() => onEnded?.('Thiết bị này đã bị ngắt khỏi phòng họp.', true)}>Server removed</button>
+  </div> }));
 afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); window.history.replaceState(null,'','/'); vi.unstubAllGlobals(); });
+
+it.each([401, 403, 404, 503])('calls the meeting details API and only signs out on HTTP 401 (status %s)', async status => {
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
+  const onLogout = vi.fn();
+  const fetcher = vi.fn(async (_url: string, _options?: RequestInit) => ({
+    ok: false, status, json: async () => ({}),
+  }));
+  vi.stubGlobal('fetch', fetcher);
+  render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={onLogout} />);
+  if (status === 401) await waitFor(() => expect(onLogout).toHaveBeenCalledOnce());
+  else {
+    await screen.findByRole('alert');
+    expect(onLogout).not.toHaveBeenCalled();
+  }
+  expect(fetcher).toHaveBeenCalledExactlyOnceWith(
+    expect.stringMatching(/\/api\/meetings\/ABCDEFGHIJ\/sessions$/),
+    expect.objectContaining({ method: 'GET', headers: { Authorization: 'Bearer app-jwt' } }),
+  );
+});
 
 it('opens an existing room directly without the removed overview and joins with chat authentication', async () => {
   vi.stubGlobal('isSecureContext',true);
@@ -34,6 +57,9 @@ it('opens an existing room directly without the removed overview and joins with 
   const room=await screen.findByTestId('joined-room');
   expect(room.getAttribute('data-session')).toBe('s');
   expect(room.getAttribute('data-auth')).toBe('app-jwt');
+  expect(fetch).toHaveBeenCalledWith(expect.stringMatching(/\/api\/meetings\/ABCDEFGHIJ\/join$/),
+    expect.objectContaining({ method: 'POST', headers: expect.objectContaining({ Authorization: 'Bearer app-jwt' }) }));
+  expect(fetch.mock.calls.some(([url]) => url.includes('/api/auth/login'))).toBe(false);
   expect(JSON.parse(sessionStorage.getItem('rts.meeting-devices.v1') || '{}').audio).toBe(false);
   expect(sessionStorage.getItem('rts.meeting-speaker.v1')).toBe('on');
   expect(fetch.mock.calls.some(([url])=>url.includes('/meeting-sessions')||url.includes('/livekit/token'))).toBe(false);
@@ -59,8 +85,146 @@ it('keeps the invited session and copies a canonical link for the chosen row', a
     expect(copyButtons[1].closest('article')?.getAttribute('data-selected')).toBe('true');
     await act(async () => fireEvent.click(copyButtons[0]));
     expect(writeText).toHaveBeenCalledWith(origin + '/?view=meeting&meeting=ABCDEFGHIJ&session=a');
+    expect(screen.getByText('Đã sao chép', { exact: true }).closest('.meeting-share-popup')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng thông báo chia sẻ' }));
+    expect(screen.queryByText(/Đã sao chép/)).toBeNull();
+
+    writeText.mockRejectedValueOnce(new Error('Clipboard denied'));
+    await act(async () => fireEvent.click(copyButtons[1]));
+    expect(screen.getByRole('alert').textContent).toContain('Không thể sao chép tự động');
+    expect((screen.getByRole('textbox', { name: 'Đường dẫn cuộc họp' }) as HTMLInputElement).value)
+      .toBe(origin + '/?view=meeting&meeting=ABCDEFGHIJ&session=b');
+
   } finally {
     if (clipboard) Object.defineProperty(navigator, 'clipboard', clipboard);
     else Reflect.deleteProperty(navigator, 'clipboard');
   }
+});
+
+it.each([
+  { choice: 'Chuyển sang thiết bị này', mode: 'transfer', resumed: false },
+  { choice: 'Dùng cả hai thiết bị', mode: 'add', resumed: false },
+  { choice: 'Hủy', mode: undefined, resumed: false },
+  { choice: 'Chuyển sang thiết bị này', mode: 'transfer', resumed: true },
+])('keeps media choices for "$choice" (resumed: $resumed)', async ({ choice, mode, resumed }) => {
+  vi.stubGlobal('isSecureContext', true);
+  const getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => [] });
+  Object.defineProperty(navigator, 'mediaDevices', { value: { getUserMedia }, configurable: true });
+  const joinBodies: Array<{ sessionId: string; deviceMode?: string }> = [];
+  const fetch = vi.fn(async (url: string, options?: RequestInit) => ({
+    ok: true,
+    json: async () => {
+      if (url.endsWith('/join')) {
+        const body = JSON.parse(String(options?.body));
+        joinBodies.push(body);
+        if (!body.deviceMode) return { status: 'device_choice_required', meetingId: 'm', sessionId: 's' };
+        return {
+          status: 'admitted', meetingId: 'm', sessionId: 's', attendanceId: 'a', token: 'room-jwt',
+          serverUrl: 'wss://unit.invalid', participantIdentity: 'user:connection', roomName: 'room',
+          transferAfterConnect: body.deviceMode === 'transfer',
+        };
+      }
+      if (url.endsWith('/device-transfer')) return { transferred: true };
+      if (url.endsWith('/leave')) return { status: 'left' };
+      return {
+        meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Team' },
+        membership: { role: 'participant', invitedAt: null },
+        sessions: [{ session_id: 's', status: 'ongoing' }],
+      };
+    },
+  }));
+  vi.stubGlobal('fetch', fetch);
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
+  const accessToken = resumed ? `header.${btoa(JSON.stringify({ sub: 'user' }))}.signature` : 'app-jwt';
+  if (resumed) sessionStorage.setItem('rts.active-meeting.v1', JSON.stringify({
+    owner: 'user', code: 'ABCDEFGHIJ', meetingId: 'm', sessionId: 's', attendanceId: 'other-device', savedAt: Date.now(),
+  }));
+  render(<MeetingPage accessToken={accessToken} displayName="Tester" onLogout={vi.fn()} />);
+  async function continueWithMicOff() {
+    fireEvent.click(screen.getByRole('button', { name: 'Micro trước khi vào phòng' }));
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Tiếp tục tham gia' }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' }));
+  }
+  if (!resumed) {
+    fireEvent.click(await screen.findByRole('button', { name: 'Tham gia' }));
+    await continueWithMicOff();
+  }
+  await screen.findByRole('dialog', { name: 'Bạn đang họp trên thiết bị khác' });
+  expect(joinBodies).toEqual([{ sessionId: 's' }]);
+  fireEvent.click(screen.getByRole('button', { name: choice }));
+  if (resumed) {
+    expect(joinBodies).toHaveLength(1);
+    await continueWithMicOff();
+  }
+  if (!mode) {
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByTestId('joined-room')).toBeNull();
+    expect(joinBodies).toHaveLength(1);
+    return;
+  }
+  const room = await screen.findByTestId('joined-room');
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(room.getAttribute('data-microphone')).toBe('false');
+  expect(room.getAttribute('data-camera')).toBe('true');
+  expect(joinBodies).toEqual([{ sessionId: 's' }, { sessionId: 's', deviceMode: mode }]);
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/device-transfer'))).toBe(false);
+  await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Connected' })));
+  const transfers = fetch.mock.calls.filter(([url]) => url.endsWith('/device-transfer'));
+  expect(transfers).toHaveLength(mode === 'transfer' ? 1 : 0);
+});
+
+it.each([{ status: 403, removed: false }, { status: 403, removed: true }, { status: 503, removed: false }])('handles revoked overview access and server removal, but not transient errors ($status, $removed)', async ({ status, removed }) => {
+  vi.useFakeTimers();
+  const hidden = Object.getOwnPropertyDescriptor(document, 'hidden');
+  Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+  let rejected = false;
+  const fetch = vi.fn().mockImplementation(async (url: string) => {
+    if (url.endsWith('/join')) return { ok: true, status: 200, json: async () => ({
+      status: 'admitted', meetingId: 'm', sessionId: 's', attendanceId: 'a', role: 'participant',
+      token: 'room-jwt', serverUrl: 'wss://unit.invalid', participantIdentity: 'user:connection', roomName: 'room',
+    }) };
+    if (rejected) return { ok: false, status, json: async () => ({ message: 'Access failed' }) };
+    return { ok: true, status: 200, json: async () => ({
+      meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Team' },
+      membership: { userId: 'user', role: 'participant', invitedAt: null },
+      sessions: [{ session_id: 's', meeting_id: 'm', status: 'ongoing' }],
+    }) };
+  });
+  vi.stubGlobal('fetch', fetch); vi.stubGlobal('isSecureContext', true);
+  Object.defineProperty(navigator, 'mediaDevices', { value: {}, configurable: true });
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
+  try {
+    render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
+    await act(async () => {});
+    fireEvent.click(screen.getByRole('button', { name: /^Tham gia$/ }));
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' })));
+    expect(screen.queryByTestId('joined-room')).not.toBeNull();
+    rejected = true;
+    await act(async () => {
+      if (removed) fireEvent.click(screen.getByRole('button', { name: 'Server removed' }));
+      else await vi.advanceTimersByTimeAsync(6000);
+    });
+    expect(screen.queryByTestId('joined-room') === null).toBe(status === 403);
+    if (status === 403) {
+      expect(screen.getByRole('alert').textContent).toContain('Quyền tham gia cuộc họp đã kết thúc');
+      expect(sessionStorage.getItem('rts.active-meeting.v1')).toBeNull();
+      expect(fetch.mock.calls.some(([url]) => url.endsWith('/leave'))).toBe(false);
+    }
+  } finally {
+    cleanup(); vi.useRealTimers();
+    if (hidden) Object.defineProperty(document, 'hidden', hidden);
+    else Reflect.deleteProperty(document, 'hidden');
+  }
+});
+
+it.each([null, { role: 'participant', invitedAt: '2026-11-22' }])('does not poll the waiting room without a moderation role (%j)', async membership => {
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ');
+  const fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
+    meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Team' },
+    membership, sessions: [{ session_id: 's', status: 'ongoing' }],
+  }) });
+  vi.stubGlobal('fetch', fetch);
+  render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
+  await screen.findByRole('heading', { name: 'Team' });
+  expect(fetch.mock.calls.some(([url]) => url.endsWith('/join-requests'))).toBe(false);
 });

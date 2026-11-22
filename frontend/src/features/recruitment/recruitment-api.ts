@@ -11,7 +11,7 @@ export interface FileItem {file_id:string;file_name:string;question_id?:string;s
 export interface ApplicationDetail {item:Application;questions:Question[];answers:{question_id:string;answer_value:unknown}[];files:FileItem[];department?:{club_departments?:{name:string}}}
 export interface Context extends Detail {profile:Record<string,string>;application:Application|null;can_apply:boolean;reason:string|null}
 export interface Page<T>{items:T[];total:number;page:number;hasMore:boolean}
-export const statusLabel=(s:string)=>({draft:'Bản nháp',open:'Đã đăng',closed:'Đã đóng',completed:'Hoàn tất',cancelled:'Đã hủy',submitted:'Chờ duyệt',interviewing:'Chờ duyệt',accepted:'Đã duyệt',rejected:'Từ chối'})[s]||s;
+export const statusLabel=(s:string)=>({draft:'Bản nháp',pending_review:'Chờ duyệt',open:'Đã đăng',closed:'Đã đóng',completed:'Hoàn tất',cancelled:'Đã hủy',submitted:'Chờ duyệt',interviewing:'Chờ duyệt',accepted:'Đã duyệt',rejected:'Từ chối'})[s]||s;
 export const dateLabel=(d?:string)=>d?new Date(d).toLocaleString('vi-VN'):'—';
 export const profileLabels={full_name:'Họ tên',student_code:'MSSV',email:'Email',phone:'Điện thoại',school_or_faculty:'Trường / khoa',major:'Ngành',cohort:'Khóa'};
 export function useRecruitment<T>(path:string,token?:string){

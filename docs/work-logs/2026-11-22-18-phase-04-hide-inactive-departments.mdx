@@ -1,0 +1,17 @@
+---
+title: Ẩn ban ngừng hoạt động
+description: Lọc ban không hoạt động khỏi các mục chọn ban và ứng tuyển.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-18
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 04
+- Kết quả: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi và xác minh
+
+API danh sách ban lọc active theo mặc định. Chủ nhiệm có thể yêu cầu cả ban inactive từ Cơ cấu CLB. Chi tiết công khai của đợt tuyển chỉ tải ban còn hoạt động. Kênh sinh hoạt tiếp tục dùng kiểm tra active có sẵn của Supabase, thanh kênh tải lại sau khi lưu trạng thái ban. Hồ sơ cũ giữ ban đã đăng ký. Typecheck, 17 test backend và 32 test frontend đạt. Chưa thử đổi trạng thái ban thật trên trình duyệt.

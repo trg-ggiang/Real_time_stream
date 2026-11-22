@@ -41,6 +41,13 @@ export class WorkspaceChannels {
 
   requireChannel(userId: string, clubId: string, channelId: string) { return this.authorize(userId, clubId, channelId); }
 
+  async markRead(userId: string, clubId: string, channelId: string, messageId: string) {
+    await this.authorize(userId, clubId, channelId);
+    const result = await this.db.rpc('clubspace_mark_channel_read', { p_actor: userId, p_channel: channelId, p_message: messageId });
+    this.access.check(result.error);
+    return { ok: true };
+  }
+
   private saved(clubId: string, channelId: string, message: Record<string, any>) {
     this.events?.publish({ clubId, channelId, message });
     return { item: message };

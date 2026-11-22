@@ -12,9 +12,10 @@ import {
 } from "../../discovery/components/PublicContent";
 import { useUnsavedChanges } from "../../../shared/lib/use-unsaved-changes";
 import { ImageUpload } from '../../../shared/components/ImageUpload';
+import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
 export { MeetingsEntry, RecurringMeetings } from "./WorkspaceMeetingsEntries";
 export function ClubInformation() {
-  const { club, clubId, token, membership, reload } = useClub();
+  const { club, clubId, token, membership, reload, notify } = useClub();
   const [values, setValues] = useState({
     contact_email: club.contact_email || "",
     contact_phone: club.contact_phone || "",
@@ -24,6 +25,7 @@ export function ClubInformation() {
   const [dirty, setDirty] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  useAutoDismiss(message, () => setMessage(''));
   const mutation = useWorkspaceMutation();
   useUnsavedChanges(dirty);
   async function save(e: FormEvent) {
@@ -43,6 +45,7 @@ export function ClubInformation() {
     if (r) {
       setDirty(false);
       setMessage("Đã cập nhật thông tin liên hệ và ảnh.");
+      notify("Đã cập nhật thông tin liên hệ và ảnh.");
       reload();
     }
   }

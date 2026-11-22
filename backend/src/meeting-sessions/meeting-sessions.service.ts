@@ -37,6 +37,16 @@ export class MeetingSessionsService {
     if (!session.data || session.data.status !== 'ongoing') {
       throw new ForbiddenException('Phiên họp chưa bắt đầu hoặc đã kết thúc.');
     }
+    const meeting = await this.supabase.client.from('meetings').select('club_id')
+      .eq('meeting_id', session.data.meeting_id).maybeSingle();
+    if (meeting.error) throw new ServiceUnavailableException('Không thể kiểm tra CLB của cuộc họp.');
+    if (!meeting.data) throw new ForbiddenException('Cuộc họp không còn tồn tại.');
+    if (meeting.data.club_id) {
+      const membership = await this.supabase.client.from('club_memberships').select('membership_id')
+        .eq('club_id', meeting.data.club_id).eq('user_id', userId).eq('status', 'active').maybeSingle();
+      if (membership.error) throw new ServiceUnavailableException('Không thể kiểm tra quyền thành viên CLB.');
+      if (!membership.data) throw new ForbiddenException('Bạn không còn là thành viên của CLB này.');
+    }
     const member = await this.supabase.client.from('meeting_members').select('meeting_member_id')
       .eq('meeting_id', session.data.meeting_id).eq('user_id', userId)
       .eq('admission_status', 'admitted').is('removed_at', null).limit(1);

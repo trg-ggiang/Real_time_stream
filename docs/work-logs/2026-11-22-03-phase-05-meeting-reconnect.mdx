@@ -1,0 +1,23 @@
+---
+title: Khôi phục kết nối phòng họp
+description: Tự thử vào lại sau khi mất kết nối LiveKit.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-03
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Công việc hoàn thành
+
+`MeetingRoom.tsx` phân loại ngắt kết nối và chuyển các trường hợp lỗi kết nối tới `MeetingPage.tsx`. `use-session-flow.ts` thử xin lại thông tin kết nối một lần qua API tham gia buổi hiện tại. Sau khi kết nối thành công, hệ thống dọn lượt tham gia cũ theo đúng ID và cho phép phục hồi ở lần mất kết nối sau. Ngắt do bị loại hoặc buổi đã kết thúc tiếp tục theo luồng hiện tại.
+
+## Kiểm tra
+
+- Frontend typecheck đạt.
+- 78 test phòng họp đạt, bao gồm mất tín hiệu, sự kiện lặp, dọn lượt kết nối cũ và thất bại khi kết nối lại.
+- Chưa chạy thử LiveKit thật trong thời gian dài. Nếu lỗi tái diễn, đối chiếu thời điểm rớt với sự kiện ngắt LiveKit và phản hồi API phiên họp.

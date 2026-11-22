@@ -1,0 +1,55 @@
+---
+title: Thông báo trong không gian CLB
+description: Số chưa đọc trên biểu tượng CLB và các mục cần xử lý.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-13
+- Thời gian: 2026-11-22 14:25 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Hiện số thông báo ở góc biểu tượng từng CLB, làm đậm kênh có tin chưa đọc và báo phòng họp hoặc bài viết, hoạt động cần xử lý.
+
+## Công việc hoàn thành
+
+- API `GET /workspace/:clubId/attention` đếm tin chưa đọc trong các kênh người gọi được xem, buổi họp đang diễn ra hoặc sắp tới, nội dung chờ chủ nhiệm duyệt và nội dung bị yêu cầu sửa của tác giả.
+- API `POST /workspace/:clubId/channels/:channelId/read` dùng RPC `clubspace_mark_channel_read` sẵn có sau khi kiểm tra quyền kênh.
+- Workspace cập nhật tổng hợp mỗi 15 giây khi tab hiển thị, hiển thị số trên rail CLB và các mục liên quan; kênh có tin mới được làm đậm. Mở kênh ghi mốc đọc và cập nhật lại số.
+- Không thêm migration; dùng `channel_read_states` của schema nền.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd test` | Passed | 108 backend, 194 frontend |
+| `npm.cmd run build` | Passed | Vite báo cảnh báo kích thước chunk hiện có |
+| `node --test backend/test/workspace-channels.test.cjs` và `node --test backend/test/workspace-attention.test.cjs` | Passed | Chạy riêng: 7 và 1 test |
+| `npm.cmd --workspace frontend test -- WorkspaceRail.test.tsx` | Passed | Hiển thị số trên biểu tượng CLB |
+| Browser fixture | Skipped | Chưa tạo fixture cho thông báo |
+| Supabase read-only/live end-to-end | Skipped | Chưa kiểm tra trên DB development và nhiều tài khoản |
+
+## Quyết định và lý do
+
+Số thông báo phản ánh trạng thái hiện còn cần xử lý; mở trang họp hoặc bài viết không tự xóa một việc chưa được giải quyết. Mốc đọc chat do database giữ để đồng bộ giữa thiết bị. Tính tin sau thời điểm tham gia CLB khi chưa có mốc đọc.
+
+## Blocker và việc chưa hoàn thành
+
+Cần nghiệm thu trên Supabase development với nhiều tài khoản và kênh riêng tư. Cần đánh giá tải API khi tài khoản tham gia nhiều CLB.
+
+## Bước tiếp theo
+
+Chạy luồng hai tài khoản: gửi tin ở kênh Chung/kênh riêng, mở kênh để xác nhận số giảm; tạo buổi họp, gửi bài chờ duyệt và yêu cầu sửa để đối chiếu badge theo vai trò.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

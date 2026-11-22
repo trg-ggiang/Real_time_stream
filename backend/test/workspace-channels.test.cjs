@@ -19,6 +19,7 @@ function fixture({ allowed = true, role = 'chairperson', outsider = false, dupli
     if (table === 'clubs') return Response.json([{ club_id: 'club' }]);
     if (table === 'club_channels') return Response.json([{ channel_id: 'channel', club_id: 'club', kind: 'general', name: 'Chung' }]);
     if (table === 'clubspace_can_read_channel') return Response.json(allowed);
+    if (table === 'clubspace_mark_channel_read') return Response.json(null);
     if (table === 'channel_messages') {
       if (options.method === 'POST') return duplicate ? Response.json({ code: '23505' }, { status: 409 }) : Response.json(row);
       if (url.searchParams.has('client_message_id')) return Response.json([row]);
@@ -80,6 +81,16 @@ test('blank messages never reach insert', async () => {
   const f = fixture();
   await assert.rejects(f.service.send('actor', 'club', 'channel', { content: '  ', client_message_id: 'key' }), e => e.getStatus() === 400);
   assert.equal(f.calls.some(c => c.table === 'channel_messages'), false);
+});
+
+test('mark read checks channel access and binds the authenticated actor', async () => {
+  const f = fixture();
+  await f.service.markRead('actor', 'club', 'channel', 'message');
+  assert.deepEqual(f.calls.find(c => c.table === 'clubspace_mark_channel_read').body,
+    { p_actor: 'actor', p_channel: 'channel', p_message: 'message' });
+  const denied = fixture({ allowed: false });
+  await assert.rejects(denied.service.markRead('actor', 'club', 'channel', 'message'), e => e.getStatus() === 403);
+  assert.equal(denied.calls.some(c => c.table === 'clubspace_mark_channel_read'), false);
 });
 
 test('meeting creation binds club only after active membership validation', async () => {

@@ -14,7 +14,7 @@ Không tự tạo meeting/session, không chuyển status, không tự admitted 
 - Backend có Supabase/LiveKit/JWT như auth và screen sharing hiện tại.
 - `POC_ENABLED` chỉ cần cho phòng PoC cố định. Join theo session dùng chính sách admission/attendance/role của MeetingsService, kể cả khi gọi endpoint token tương thích.
 - Bảng meeting_messages đã có theo migration 20261108000100; backend dùng secret key, frontend không truy cập bảng trực tiếp.
-- Session status ongoing, có livekit_room_name hợp lệ. Thành viên thuộc cùng meeting, admission_status admitted và removed_at NULL.
+- Session status ongoing, có livekit_room_name hợp lệ. Thành viên thuộc cùng meeting, admission_status admitted và removed_at NULL. Với họp gắn CLB, người dùng còn phải có membership CLB active; lời mời lâu dài không thay thế điều kiện này.
 - Người dùng chọn cùng session trước khi vào. Token của session dùng livekit_room_name trong DB thay vì LIVEKIT_ROOM_NAME.
 - Room PoC từ env vẫn giữ riêng để thử media, không có chat. Giao diện mới đã có tạo/lên lịch cuộc họp và phòng chờ.
 

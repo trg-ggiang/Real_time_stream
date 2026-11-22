@@ -1,0 +1,21 @@
+---
+title: Popup chia sẻ đường dẫn họp
+description: Phản hồi sao chép link tại sảnh, phòng họp và workspace CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-04
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 05
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Công việc hoàn thành
+
+`MeetingSharePopup` thay thông báo nội tuyến trong `MeetingPage.tsx` và `WorkspaceMeetings.tsx`. Khi clipboard bị chặn, popup giữ link có thể chọn và sao chép thủ công. Popup thành công tự ẩn sau 5 giây.
+
+## Kiểm tra
+
+Frontend typecheck và 101 test meeting/workspace đạt, gồm test đúng link, đóng popup, clipboard từ chối và sao chép thủ công. Chưa rà trực quan trên trình duyệt thật.

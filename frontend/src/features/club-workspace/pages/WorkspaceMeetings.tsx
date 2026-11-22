@@ -1,10 +1,14 @@
-import { useRef, useState } from 'react';
+import { MeetingSharePopup } from '../../meeting/components/MeetingSharePopup';
+import { PaginationButton } from "../../../shared/components/PaginationButton";
+import { useRef, useState, type RefObject } from 'react';
 import { useClub } from '../workspace-context';
 import { usePersonalQuery } from '../../personal/use-personal-query';
 import { PersonalState } from '../../personal/components/PersonalState';
 import { CreateMeetingForm, type CreateValues } from '../../meeting/components/MeetingForms';
-import { copyMeetingInvite, meetingRequest, parseMeetingInvite } from '../../meeting/services/meetings-api';
+import { copyMeetingInvite, meetingRequest, parseMeetingInvite, type MeetingShareResult } from '../../meeting/services/meetings-api';
 import { type ClubMeeting, type WorkspaceList } from '../services/workspace-api';
+import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
+import { MeetingCalendar } from './MeetingCalendar';
 
 export function openClubMeeting(code: string, session: string | undefined, onMeeting?: () => void) {
   if (!onMeeting) return;
@@ -15,10 +19,10 @@ export function openClubMeeting(code: string, session: string | undefined, onMee
   onMeeting();
 }
 
-function JoinMeetingByInvite({ onMeeting }: { onMeeting?: () => void }) {
+function JoinMeetingByInvite({ onMeeting, inputRef }: { onMeeting?: () => void; inputRef: RefObject<HTMLInputElement | null> }) {
   const [error, setError] = useState('');
   return <section className="cw-panel" aria-labelledby="join-meeting-title">
-    <h2 id="join-meeting-title">Tham gia bằng link mời</h2>
+    <h2 id="join-meeting-title">Tham gia phòng</h2>
     <form className="workspace-form" onSubmit={event => {
       event.preventDefault();
       if (!onMeeting) return;
@@ -31,7 +35,7 @@ function JoinMeetingByInvite({ onMeeting }: { onMeeting?: () => void }) {
         setError(cause instanceof Error ? cause.message : 'Kiểm tra lại mã hoặc đường dẫn mời.');
       }
     }}>
-      <label>Mã hoặc đường dẫn mời<input name="invite" type="text" required maxLength={2048} placeholder="Dán link mời hoặc nhập mã cuộc họp" autoComplete="off" onChange={() => setError('')} aria-invalid={!!error} aria-describedby={error ? 'join-meeting-error' : undefined} /></label>
+      <label>Mã hoặc đường dẫn mời<input ref={inputRef} name="invite" type="text" required maxLength={2048} placeholder="Dán link mời hoặc nhập mã cuộc họp" autoComplete="off" onChange={() => setError('')} aria-invalid={!!error} aria-describedby={error ? 'join-meeting-error' : undefined} /></label>
       {error && <p id="join-meeting-error" role="alert" className="cw-error">{error}</p>}
       <div><button type="submit" disabled={!onMeeting}>Mở cuộc họp</button></div>
     </form>
@@ -39,15 +43,18 @@ function JoinMeetingByInvite({ onMeeting }: { onMeeting?: () => void }) {
 }
 
 export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }) {
-  const { token, clubId, club, onMeeting } = useClub();
+  const { token, clubId, club, onMeeting, notify } = useClub();
   const [page, setPage] = useState(1);
-  const state = usePersonalQuery<WorkspaceList<ClubMeeting>>(token, `workspace/${clubId}/meetings?page=${page}&limit=12`);
+  const state = usePersonalQuery<WorkspaceList<ClubMeeting>>(token, `workspace/${clubId}/meetings?page=${page}&limit=24`);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
-  const [shareNotice, setShareNotice] = useState('');
+  const [shareNotice, setShareNotice] = useState<MeetingShareResult | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const [error, setError] = useState('');
   const lock = useRef(false);
   const pending = useRef<{ id: string; code: string; values: CreateValues } | null>(null);
+  const inviteInputRef = useRef<HTMLInputElement>(null);
+  useAutoDismiss(notice, () => setNotice(''));
   async function schedulePending() {
     if (!pending.current) return;
     const saved = pending.current;
@@ -55,7 +62,8 @@ export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }
       scheduledStartAt: saved.values.scheduledStartAt, scheduledEndAt: saved.values.scheduledEndAt,
     } });
     pending.current = null;
-    setNotice(`Đã tạo lịch họp ${saved.code} cho ${club.name}.`);
+    const message = `Đã tạo lịch họp ${saved.code} cho ${club.name}.`;
+    setNotice(message); notify(message);
   }
   async function create(values: CreateValues, quick: boolean) {
     if (lock.current) return;
@@ -67,7 +75,7 @@ export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }
         ...(!quick ? { recurrenceRule: values.recurrenceRule } : {}),
       } });
       if (!quick) { pending.current = { id: meeting.meeting_id, code: meeting.meeting_code, values }; await schedulePending(); }
-      else setNotice(`Đã mở phòng ${meeting.meeting_code} cho ${club.name}.`);
+      else { const message = `Đã mở phòng ${meeting.meeting_code} cho ${club.name}.`; setNotice(message); notify(message); }
       state.retry();
       window.dispatchEvent(new CustomEvent('uc:workspace-meetings-changed', { detail: clubId }));
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chưa tạo được cuộc họp.'); state.retry(); }
@@ -80,35 +88,34 @@ export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }
     catch (cause) { setError(cause instanceof Error ? cause.message : 'Chưa lưu được lịch.'); }
     finally { lock.current = false; setBusy(false); }
   }
+  const undated = state.data?.items.flatMap(meeting => meeting.meeting_sessions
+    .filter(session => !session.scheduled_start_at)
+    .map(session => ({ meeting, session }))) ?? [];
   return <div className="cw-meetings">
-    <div className="cw-heading"><div><h1>{recurring ? 'Họp theo lịch' : 'Phòng họp CLB'}</h1><p>Tạo và tham gia cuộc họp của {club.name}. Quyền host và duyệt người vào phòng vẫn áp dụng trong từng cuộc họp.</p></div></div>
-    <JoinMeetingByInvite onMeeting={onMeeting} />
-    <section className="cw-panel">
-      <CreateMeetingForm busy={busy || !!pending.current} initialKind={recurring ? 'scheduled' : 'quick'} onCreate={create} />
-      {notice && <p role="status">{notice}</p>}
-      {error && <p role="alert" className="cw-error">{error}</p>}
-      {pending.current && <div role="status"><p>Phòng {pending.current.code} đã tồn tại; lịch buổi họp chưa được xác nhận. Không tạo lại phòng.</p><button className="cw-link" disabled={busy} onClick={() => void retrySchedule()}>Kiểm tra và lưu lại lịch</button><button className="cw-link" disabled={!onMeeting} onClick={() => openClubMeeting(pending.current!.code, undefined, onMeeting)}>Mở phòng để kiểm tra</button></div>}
-    </section>
-    <section className="cw-panel cw-meeting-list-panel"><h2>Các cuộc họp của CLB</h2>
-      {shareNotice && <p role="status" className="cw-share-notice">{shareNotice}</p>}
-      {!state.data || !state.data.items.length ? <PersonalState {...state} empty="Chưa có cuộc họp gắn với CLB này." showDiscoveryLink={false} /> : <div className="cw-meeting-list">{state.data.items.map(meeting => <article key={meeting.meeting_id}>
-        <h3>{meeting.title}</h3><p>{meeting.recurrence_rule ? 'Họp định kỳ' : 'Cuộc họp'} · Mã {meeting.meeting_code}</p>
-        {meeting.meeting_sessions.length ? meeting.meeting_sessions.slice().sort((a, b) => (a.scheduled_start_at || '').localeCompare(b.scheduled_start_at || '')).map(session => <div className="cw-meeting-session" key={session.session_id}>
-          <span>{session.scheduled_start_at ? new Date(session.scheduled_start_at).toLocaleString('vi-VN') : 'Chưa có giờ bắt đầu'} · {{ scheduled: 'Đã lên lịch', ongoing: 'Đang diễn ra', ended: 'Đã kết thúc' }[session.status]}</span>
-          <div className="cw-session-actions">
-            <button className="cw-link" disabled={!onMeeting} onClick={() => openClubMeeting(meeting.meeting_code, session.session_id, onMeeting)}>Mở buổi họp</button>
-            {(session.status === 'scheduled' || session.status === 'ongoing') && (
-              <button className="cw-link" onClick={async () => setShareNotice(await copyMeetingInvite(meeting.meeting_code, session.session_id))}>Sao chép link buổi</button>
-            )}
-          </div>
-        </div>) : <p>Chưa có buổi họp.</p>}
-        <button className="cw-link cw-meeting-management-link" disabled={!onMeeting} onClick={() => openClubMeeting(meeting.meeting_code, undefined, onMeeting)}>Quản lý trong công cụ họp</button>
-      </article>)}</div>}
+    <div className="cw-meeting-hero"><div><span className="cw-eyebrow">Không gian {club.name}</span><h1>{recurring ? 'Họp theo lịch' : 'Phòng họp CLB'}</h1></div><button type="button" className="cw-meeting-hero-hint" aria-expanded={inviteOpen} aria-controls="cw-meeting-invite" onClick={() => { setInviteOpen(value => !value); if (!inviteOpen) requestAnimationFrame(() => inviteInputRef.current?.focus()); }}>Mã hoặc đường dẫn mời</button>{inviteOpen && <div id="cw-meeting-invite" className="cw-meeting-invite-popover"><button type="button" className="cw-invite-close" aria-label="Đóng nhập mã mời" onClick={() => setInviteOpen(false)}>×</button><JoinMeetingByInvite onMeeting={onMeeting} inputRef={inviteInputRef} /></div>}</div>
+    <div className="cw-meeting-actions-grid">
+      <section className="cw-panel cw-meeting-create-panel">
+        <CreateMeetingForm busy={busy || !!pending.current} initialKind={recurring ? 'scheduled' : 'quick'} onCreate={create} />
+        {error && <p role="alert" className="cw-error">{error}</p>}
+        {pending.current && <div role="status"><p>Phòng {pending.current.code} đã tồn tại; lịch chưa được xác nhận.</p><button className="cw-link" disabled={busy} onClick={() => void retrySchedule()}>Kiểm tra và lưu lại lịch</button><button className="cw-link" disabled={!onMeeting} onClick={() => openClubMeeting(pending.current!.code, undefined, onMeeting)}>Mở phòng để kiểm tra</button></div>}
+      </section>
+    </div>
+    <section className="cw-panel cw-meeting-list-panel" aria-label="Lịch và thông tin cuộc họp">
+      <MeetingSharePopup result={shareNotice} dismiss={setShareNotice} />
+      {!state.data ? <PersonalState {...state} showDiscoveryLink={false} /> : <>
+        <MeetingCalendar meetings={state.data.items} onOpen={(meeting, sessionId) => openClubMeeting(meeting.meeting_code, sessionId, onMeeting)} onShare={(meeting, sessionId) => { void copyMeetingInvite(meeting.meeting_code, sessionId).then(setShareNotice); }} />
+        {undated.map(({ meeting, session }) => <div className="cw-meeting-unscheduled" key={session.session_id}>
+          <span>{meeting.title} · {{ scheduled: 'Đã lên lịch', ongoing: 'Đang diễn ra', ended: 'Đã kết thúc' }[session.status]}</span>
+          <button type="button" onClick={() => openClubMeeting(meeting.meeting_code, session.session_id, onMeeting)}>Mở buổi họp</button>
+          {session.status !== 'ended' && <button type="button" aria-label="Sao chép link buổi" onClick={() => { void copyMeetingInvite(meeting.meeting_code, session.session_id).then(setShareNotice); }}>Chia sẻ</button>}
+        </div>)}
+        {state.data.items.filter(meeting => !meeting.meeting_sessions.length).map(meeting => <div className="cw-meeting-unscheduled" key={meeting.meeting_id}><span>{meeting.title} · Chưa có buổi họp</span><button type="button" onClick={() => openClubMeeting(meeting.meeting_code, undefined, onMeeting)}>Mở phòng</button></div>)}
+      </>}
       <div className="cw-meeting-list-controls">
         <nav className="cw-meeting-pagination" aria-label="Phân trang cuộc họp">
-          <button type="button" className="cw-link" disabled={page === 1 || state.loading} onClick={() => setPage(value => value - 1)}>Trang trước</button>
+          <PaginationButton direction="previous" type="button" className="cw-link" disabled={page === 1 || state.loading} onClick={() => setPage(value => value - 1)} />
           <span aria-current="page" aria-live="polite">Trang {page}</span>
-          <button type="button" className="cw-link" disabled={!state.data?.hasMore || state.loading} onClick={() => setPage(value => value + 1)}>Trang sau</button>
+          <PaginationButton direction="next" type="button" className="cw-link" disabled={!state.data?.hasMore || state.loading} onClick={() => setPage(value => value + 1)} />
         </nav>
         <button type="button" className="cw-link cw-meeting-refresh" onClick={state.retry}>Tải lại</button>
       </div>

@@ -9,7 +9,11 @@ export type MeetingSession = {
   scheduled_start_at: string | null; scheduled_end_at: string | null; started_at?: string | null; ended_at?: string | null;
 };
 export type MeetingOverview = { meeting: MeetingInfo; membership?: Membership | null; sessions: MeetingSession[] };
-export type JoinedSession = JoinCredentials & { status: 'admitted'; meetingId: string; sessionId: string; attendanceId: string };
+export type DeviceJoinMode = 'add' | 'transfer';
+export type JoinedSession = JoinCredentials & {
+  status: 'admitted'; meetingId: string; sessionId: string; attendanceId: string; transferAfterConnect?: boolean;
+};
+type JoinResult = JoinedSession | { status: 'pending' | 'device_choice_required'; meetingId: string; sessionId: string };
 export type Admission = { status: 'pending' | 'admitted' | 'denied' | 'not_requested' | 'session_ended'; meetingMemberId?: string; remainingAttempts?: number; retryAt?: string | null };
 export type Member = {
   meeting_member_id: string; user_id: string; role: Role; invited_at: string | null;
@@ -67,15 +71,17 @@ export function meetingInviteUrl(origin: string, code: string, sessionId?: strin
   return url;
 }
 
-export async function copyMeetingInvite(code: string, sessionId?: string) {
+export type MeetingShareResult = { message: string; manualLink?: string };
+
+export async function copyMeetingInvite(code: string, sessionId?: string): Promise<MeetingShareResult> {
   const link = meetingInviteUrl(window.location.origin, code, sessionId);
   const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(link.hostname);
   const hint = loopback ? ' Mở ứng dụng bằng URL HTTPS của tunnel để chia sẻ ra ngoài.' : '';
   try {
     await navigator.clipboard.writeText(link.href);
-    return (loopback ? 'Đã sao chép link cục bộ.' : 'Đã sao chép đường dẫn.') + hint;
+    return { message: 'Đã sao chép' };
   } catch {
-    return link.href + hint;
+    return { message: 'Không thể sao chép tự động. Hãy sao chép đường dẫn bên dưới.' + hint, manualLink: link.href };
   }
 }
 
@@ -95,10 +101,9 @@ export function parseMeetingCode(value: string): string {
   return code;
 }
 
-// Existing read API does not expose the viewer's role. Unknown permissions must
-// be checked by the existing mutation endpoints, never inferred from a JWT or UI input.
+// A null membership explicitly means the viewer has no admitted membership.
 export function canManageSessions(member: Membership | null | undefined): boolean {
-  return member ? member.role !== 'participant' || member.invitedAt !== null : true;
+  return !!member && (member.role !== 'participant' || member.invitedAt !== null);
 }
 export const roleLabels: Record<Role, string> = { host: 'Chủ phòng', moderator: 'Điều hành', participant: 'Thành viên' };
 const dateFormatter = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium', timeStyle: 'short' });
@@ -106,12 +111,14 @@ export function formatMeetingDate(value: string | null | undefined): string {
   return value && Number.isFinite(Date.parse(value)) ? dateFormatter.format(new Date(value)) : 'Không giới hạn thời gian';
 }
 
-export async function joinMeeting(accessToken: string, code: string, sessionId: string, signal: AbortSignal) {
-  const result = await meetingRequest<JoinedSession | { status: 'pending'; meetingId: string; sessionId: string }>(accessToken,
-    `/${encodeURIComponent(code)}/join`, { method: 'POST', body: { sessionId }, signal });
+export async function joinMeeting(accessToken: string, code: string, sessionId: string, signal: AbortSignal, deviceMode?: DeviceJoinMode) {
+  const result = await meetingRequest<JoinResult>(accessToken,
+    `/${encodeURIComponent(code)}/join`, { method: 'POST', body: { sessionId, deviceMode }, signal });
   if (result.status === 'admitted' && (!result.token || !result.serverUrl?.startsWith('wss://') || !result.attendanceId || !result.participantIdentity || !result.roomName)) {
     throw new Error('Thông tin vào phòng không hợp lệ. Hãy tải lại cuộc họp.');
   }
-  if (result.status !== 'pending' && result.status !== 'admitted') throw new Error('Trạng thái tham gia không hợp lệ.');
+  if (result.status !== 'pending' && result.status !== 'admitted' && result.status !== 'device_choice_required') {
+    throw new Error('Trạng thái tham gia không hợp lệ.');
+  }
   return result;
 }

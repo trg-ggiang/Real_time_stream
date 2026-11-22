@@ -3,6 +3,14 @@ title: Code change logs
 description: Reserved for completed code changes only.
 ---
 
+## Quyền kết thúc họp và gỡ thành viên CLB (2026-11-22)
+
+Chỉ host/moderator được kết thúc buổi họp. Gỡ thành viên CLB thu hồi quyền họp và ngắt các thiết bị của người đó trong các cuộc họp thuộc CLB; frontend thoát cuộc gọi khi bị ngắt hoặc mất quyền. Không đổi schema. Phase 04/05 vẫn **In Progress**; chờ nghiệm thu LiveKit thật. [Work log](/work-logs/2026-11-22-01-phase-05-meeting-permissions-club-removal).
+
+## Chuyển thiết bị trong buổi họp (2026-11-21)
+
+Thêm lựa chọn chuyển thiết bị hoặc dùng cả hai khi mở lại cùng buổi họp. [Luồng và kết quả kiểm thử](/work-logs/2026-11-21-01-phase-05-meeting-device-transfer).
+
 ## Realtime chat and meeting overview cleanup (2026-11-20)
 
 [Implementation, user decisions, tests and deployment limits](/work-logs/2026-11-20-11-phase-04-realtime-chat-room-cleanup).
@@ -605,3 +613,118 @@ Sửa nháy toàn màn hình khi chuyển CLB: giữ rail/sidebar/main và theme
 ## 21/11/2026 — Xóa URL cũ khi đăng xuất
 
 Logout đưa về `/?mode=login` và xóa session; đăng nhập tài khoản khác không giữ workspace/trang cá nhân cũ, admin về `/admin`. Refresh sau logout vẫn mở form. Ba regression tái hiện trước sửa, 43 auth/redirect tests và frontend build đạt; chưa thử tài khoản thật trên browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-04-phase-04-logout-account-url).
+
+## Căn tin nhắn phòng họp (2026-11-22)
+
+Tin nhắn của mình nằm bên phải, tin của người khác nằm bên trái. Tin đang gửi và tin chờ gửi lại dùng cùng vị trí với tin đã gửi. 7 test chat đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-02-phase-05-meeting-chat-alignment).
+
+## Khôi phục kết nối phòng họp (2026-11-22)
+
+Phòng họp thử xin lại kết nối một lần sau khi mất tín hiệu hoặc hết thời gian kết nối. Dùng API vào lại cùng buổi, giữ kiểm tra quyền và phòng chờ. Frontend typecheck và 78 test phòng họp đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-03-phase-05-meeting-reconnect).
+
+## Popup chia sẻ đường dẫn họp (2026-11-22)
+
+Sảnh, phòng họp và workspace báo kết quả sao chép bằng popup. Thành công tự đóng sau 5 giây, lỗi cung cấp link để sao chép thủ công. Frontend typecheck và 101 test liên quan đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-04-phase-05-meeting-share-popup).
+
+## Căn giữa popup chia sẻ (2026-11-22)
+
+Popup sao chép link họp nằm giữa màn hình. 13 test MeetingPage đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-05-phase-05-center-share-popup).
+
+## Popup sao chép xanh nhạt (2026-11-22)
+
+Popup thành công hiện “Đã sao chép” trên nền xanh nhạt. 13 test MeetingPage đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-06-phase-05-light-share-popup).
+
+## Khôi phục token LiveKit bị từ chối (2026-11-22)
+
+Xin token mới một lần khi LiveKit từ chối bắt tay. Sảnh chỉ gọi API duyệt khi máy chủ xác nhận vai trò quản lý phòng. Typecheck, 105 test backend và 190 test frontend đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-07-phase-05-livekit-revoked-token).
+
+## Thông báo token LiveKit (2026-11-22)
+
+Phòng họp báo ở góc dưới bên phải trong 60 giây cuối hạn token vào phòng ban đầu. Typecheck và 12 test MeetingRoom đạt. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-08-phase-05-livekit-expiry-notice).
+
+## Giao diện ứng tuyển thành viên (2026-11-22)
+
+Sinh viên điền đơn, xem lại và nộp theo hai bước. Chủ nhiệm mở hàng đợi chờ duyệt, lọc theo trạng thái và xem hồ sơ mà vẫn giữ bộ lọc khi quay lại. Frontend build, 32 test và kiểm tra Chromium mô phỏng đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-09-phase-04-recruitment-ux).
+
+## Thiết kế khu tuyển thành viên trong workspace (2026-11-22)
+
+Danh sách tập trung lịch nhận đơn, trạng thái và lối vào hồ sơ. Màn tạo đợt và xét duyệt dùng chung bố cục và màu workspace. Frontend build, 32 test liên quan và Chromium sáng/tối với dữ liệu mô phỏng đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-10-phase-04-workspace-recruitment).
+
+## Bộ lọc đợt tuyển trong workspace (2026-11-22)
+
+Thanh tab và thẻ theo mẫu nội dung CLB. API lọc theo thời gian nhận đơn trước khi phân trang. Typecheck và 21 test liên quan đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-11-phase-04-recruitment-filters).
+
+## Bố cục tuyển thành viên theo trang bài viết (2026-11-22)
+
+Danh sách đợt tuyển dùng chung mẫu tiêu đề, thẻ, phân trang và trạng thái tải của Bài viết CLB. Frontend typecheck và 32 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-12-phase-04-recruitment-post-layout).
+
+## Thông báo trong không gian CLB (2026-11-22)
+
+Thêm badge số trên rail CLB, làm đậm kênh chưa đọc và đếm buổi họp, nội dung cần duyệt/sửa. Typecheck, build và kiểm tra backend/frontend đạt; chưa nghiệm thu Supabase/browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-13-phase-04-workspace-attention).
+
+## Chỉnh hiển thị thông báo CLB (2026-11-22)
+
+Căn lại badge ở góc icon CLB; kênh có tin mới dùng chữ đậm và dấu `#` đổi màu thay cho số cạnh tên. Typecheck, 19 test workspace và frontend build đạt; chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-14-phase-04-attention-visual-polish).
+
+## Tinh chỉnh badge CLB và mục họp (2026-11-22)
+
+Badge CLB nhỏ và sát góc ngoài; mục họp dùng icon camera/lịch, nhãn số họp xanh nhẹ. Typecheck, 19 test workspace và frontend build đạt; chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-15-phase-04-attention-icon-meeting-polish).
+
+## Tự ẩn thông báo thao tác workspace và phòng họp (2026-11-22)
+
+Thêm hook tự ẩn cho trạng thái hoàn thành của thao tác workspace và phòng họp; lỗi vẫn giữ để xử lý. Typecheck và 19 test workspace đạt; chưa rà browser thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-16-phase-04-transient-workspace-feedback).
+
+## Sửa thông báo bị mất sau thao tác workspace (2026-11-22)
+
+Thêm toast ở lớp workspace để phản hồi lưu thông tin CLB và tạo/lên lịch họp vẫn hiện sau khi tải lại context. Typecheck và 19 test workspace đạt. [Work log](/work-logs/2026-11-22-17-phase-04-workspace-feedback-toast).
+
+## Tối ưu bố cục phòng họp CLB (2026-11-22)
+
+Gom thao tác tham gia/tạo họp, giảm khoảng cách và tách vùng cuộn danh sách trên desktop; mobile một cột. Typecheck, 18 test workspace và frontend build đạt. [Work log](/work-logs/2026-11-22-18-phase-04-meeting-page-compact-layout).
+
+## Giảm thông tin thừa ở trang phòng họp (2026-11-22)
+
+Rút gọn form/card họp và bỏ nút quản lý trùng khi có session. Typecheck, 18 test workspace và frontend build đạt. [Work log](/work-logs/2026-11-22-19-phase-04-meeting-page-information-reduction).
+
+## Bố cục hai cột cho phòng họp CLB (2026-11-22)
+
+Đưa mã/link mời lên popover góc phải và tách tạo mới khỏi danh sách họp thành hai cột. Typecheck, 18 test workspace và frontend build đạt. [Work log](/work-logs/2026-11-22-20-phase-04-meeting-two-column-actions).
+
+## Lịch họp CLB hai cột (2026-11-22)
+
+Thêm nút đóng popup mời và lịch tháng có chọn ngày, thông tin buổi họp, danh sách tuần/tháng; cột 3:7 và lề gọn. Typecheck, 18 test workspace và frontend build đạt. [Work log](/work-logs/2026-11-22-21-phase-04-meeting-calendar).
+
+## Tinh chỉnh nền và vùng cuộn lịch họp (2026-11-22)
+
+Bỏ topbar riêng, thu lịch tháng và chuyển tuần/tháng thành tab với vùng danh sách cuộn riêng. Typecheck, 18 test workspace và frontend build đạt. [Work log](/work-logs/2026-11-22-22-phase-04-meeting-calendar-layout-refine).
+## Chủ nhiệm duyệt đợt tuyển (2026-11-22)
+
+Đợt tuyển chuyển từ bản nháp sang chờ duyệt, sau đó chủ nhiệm duyệt và đăng. Form tạo ban gom quyền truy cập, mô tả và nút thao tác theo bố cục responsive. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-13-phase-04-chair-recruitment-review).
+
+## Tiêu đề danh sách đơn ứng tuyển (2026-11-22)
+
+Đồng bộ tiêu đề danh sách và chi tiết đơn với Bài viết CLB. Đã xác nhận 3 đơn mẫu chờ duyệt trên đợt tuyển thành viên lần 4 của AE 18. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-14-phase-04-application-queue-heading).
+
+## Popup xác nhận duyệt đơn (2026-11-22)
+
+Nút duyệt và từ chối được đưa lên trước, dùng popup giữa màn hình. Frontend typecheck và 9 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-15-phase-04-application-decision-dialog).
+
+## Căn nút xử lý hồ sơ và popup (2026-11-22)
+
+Duyệt và Từ chối nằm cạnh tiêu đề hồ sơ. Popup căn giữa nội dung. Typecheck và 9 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-16-phase-04-application-header-actions).
+
+## Sửa lỗi lưu thông tin ban (2026-11-22)
+
+Chỉnh sửa ban chỉ cập nhật tên, mô tả và trạng thái. Quyền riêng tư được bảo vệ theo quyền của trưởng ban. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-17-phase-04-department-edit-permission).
+
+## Ẩn ban ngừng hoạt động (2026-11-22)
+
+Các nơi chọn ban chỉ nhận ban đang hoạt động. Chủ nhiệm vẫn xem được ban đã ngừng tại Cơ cấu CLB. Typecheck, 17 test backend và 32 test frontend đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-18-phase-04-hide-inactive-departments).
+
+## Nút chọn ảnh (2026-11-22)
+
+Đồng bộ nút tải ảnh ở workspace, hồ sơ CLB và đợt tuyển. Typecheck và 11 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-19-phase-04-image-picker).
+
+## Đồng bộ popup xác nhận (2026-11-22)
+
+Popup xác nhận dùng chung kiểu sáng/tối. Bổ sung xác nhận khi ngừng ban, gỡ ban khỏi bản nháp và xóa câu hỏi. Typecheck và 119 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-20-phase-04-confirmation-dialogs).

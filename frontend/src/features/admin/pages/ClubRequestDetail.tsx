@@ -1,3 +1,4 @@
+import { adminDate } from "../components/AdminTools";
 import { confirmAction } from '../../../shared/lib/confirm-action';
 import { Link } from "react-router-dom";
 import { usePersonalQuery } from "../../personal/use-personal-query";
@@ -5,7 +6,6 @@ import { PersonalState } from "../../personal/components/PersonalState";
 import {
   ContentImage,
 } from "../../discovery/components/PublicContent";
-import { publicDate } from "../../../shared/lib/content-format";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { accountRequest } from "../../../shared/api/account-http";
@@ -147,11 +147,11 @@ function RequestDetail({
                 {creator?.display_name || "Không còn thông tin người gửi"}
               </dd>
               <dt>Email tài khoản</dt>
-              <dd>{creator?.email || "—"}</dd>
+              <dd>{creator?.email || "Chưa cung cấp"}</dd>
               <dt>Ngày gửi</dt>
-              <dd>{publicDate(item.created_at)}</dd>
+              <dd>{adminDate(item.created_at)}</dd>
               <dt>Cập nhật lần cuối</dt>
-              <dd>{publicDate(item.updated_at)}</dd>
+              <dd>{adminDate(item.updated_at)}</dd>
             </dl>
           </section>
           <section className="ad-panel">
@@ -205,7 +205,7 @@ function RequestDetail({
                   <dt>Thời điểm xét duyệt</dt>
                   <dd>
                     {item.reviewed_at
-                      ? publicDate(item.reviewed_at)
+                      ? adminDate(item.reviewed_at)
                       : "Chưa có thông tin"}
                   </dd>
                 </dl>

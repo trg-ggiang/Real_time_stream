@@ -15,6 +15,38 @@ vi.mock('../guest/GuestLanding', () => ({
 afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); vi.unstubAllGlobals(); window.history.replaceState(null, '', '/'); });
 const completedProfile = { full_name: 'Test User', student_code: 'SV001', school_or_faculty: 'CNTT', major: 'IT', cohort: '2026' };
 
+it('keeps each independent signed-in session when opening the meeting link in its own tab', async () => {
+  const invite = '/?view=meeting&meeting=ABCDEF1234&session=invited-session';
+  // Exercise each browser's login separately. Retain its tab storage across navigation.
+  for (const id of ['first', 'second']) {
+    sessionStorage.clear();
+    localStorage.clear();
+    history.replaceState(null, '', '/?mode=login');
+    const user = { userId: id, email: `${id}@test.dev`, displayName: id, role: 'student' };
+    const token = `header.${btoa(JSON.stringify({ sub: id, exp: Math.floor(Date.now() / 1000) + 3600 }))}.signature`;
+    const fetcher = vi.fn(async (url: string) => ({
+      ok: true, json: async () => url.endsWith('/profile') ? completedProfile
+        : url.endsWith('/auth/me') ? user : { access_token: token, user },
+    }));
+    vi.stubGlobal('fetch', fetcher);
+    const login = render(<App />);
+    const email = await screen.findByLabelText('Email');
+    fireEvent.change(email, { target: { value: user.email } });
+    fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
+    fireEvent.submit(email.closest('form')!);
+    await waitFor(() => expect(JSON.parse(sessionStorage.getItem('rts.auth-session.v1') ?? 'null')?.access_token).toBe(token));
+    login.unmount();
+
+    history.replaceState(null, '', invite);
+    const meeting = render(<App />);
+    expect((await screen.findByTestId('token')).textContent).toBe(token);
+    expect(screen.queryByLabelText('Email')).toBeNull();
+    expect(location.pathname + location.search).toBe(invite);
+    expect(fetcher.mock.calls.filter(([url]) => url.endsWith('/auth/login'))).toHaveLength(1);
+    meeting.unmount();
+  }
+});
+
 it.each([
   ['/me/clubs?mode=login&returnTo=%2Fadmin', 'user', 'admin', '/admin'],
   ['/me/clubs?mode=login&returnTo=%2Fadmin', 'admin', 'user', '/'],

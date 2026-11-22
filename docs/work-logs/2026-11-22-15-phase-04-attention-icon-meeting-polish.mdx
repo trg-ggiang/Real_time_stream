@@ -1,0 +1,51 @@
+---
+title: Tinh chỉnh badge CLB và mục họp
+description: Cân lại badge CLB và thông báo họp trong sidebar.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-15
+- Thời gian: 2026-11-22 14:41 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chỉnh thông báo trên icon CLB và trong mục Gọi và gặp mặt cho cân đối, dễ nhìn hơn.
+
+## Công việc hoàn thành
+
+- Badge số CLB nhỏ hơn, nằm sát góc ngoài icon, dùng viền theo màu rail và thêm khoảng đệm trong vùng cuộn để không bị cắt.
+- Thay ký tự họp cũ bằng icon camera và lịch Phosphor. Số buổi họp trong menu dùng nhãn xanh nhạt cùng chữ đậm, có màu tương ứng ở theme tối; giữ mô tả số buổi họp cho trình đọc màn hình.
+- Giữ nguyên cách tính thông báo, quyền xem và các đường dẫn họp.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx WorkspaceRail.test.tsx` | Passed | 19 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite còn cảnh báo chunk lớn hiện có |
+| Browser fixture và live end-to-end | Skipped | Chưa có phiên đăng nhập/fixture trực quan cho badge |
+
+## Quyết định và lý do
+
+Icon họp dùng cùng thư viện với menu Công việc CLB; nhãn họp xanh nhẹ để phân biệt trạng thái với badge tổng của CLB.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa rà trực quan nhiều CLB ở desktop/mobile và theme sáng/tối trên browser thật.
+
+## Bước tiếp theo
+
+Mở workspace với nhiều CLB và một buổi họp đang/sắp diễn ra để xem badge và menu họp ở các độ rộng màn hình.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

@@ -86,7 +86,7 @@ export function DiscoveryApp({
     main.current?.focus({ preventScroll: true });
   }, [location.pathname, location.search]);
   useEffect(() => {
-    document.title = `${location.pathname.startsWith("/clubs") ? "Câu lạc bộ" : location.pathname.startsWith("/activities") ? "Hoạt động" : location.pathname.startsWith("/posts") ? "Bài viết" : "Khám phá"} · uniCircle`;
+    document.title = `${location.pathname.startsWith("/admin") ? "Quản trị hệ thống" : location.pathname.startsWith("/clubs") ? "Câu lạc bộ" : location.pathname.startsWith("/activities") ? "Hoạt động" : location.pathname.startsWith("/posts") ? "Bài viết" : "Khám phá"} · uniCircle`;
   }, [location.pathname]);
   const authUrl = (mode: "login" | "register") =>
     authFormHref(mode, `${location.pathname}${location.search}${location.hash}`);

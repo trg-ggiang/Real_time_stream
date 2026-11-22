@@ -148,5 +148,5 @@ test('legacy session token requests reuse current admission and role policy', as
     {join:async(...args)=>{calls.push(args);return result;}},
     {client:{from:()=>({select(){return this;},eq(){return this;},single:async()=>({data:{meeting_code:'ABCDEFGHIJ'},error:null})})}});
   assert.deepEqual(await service.createJoinCredentials({userId:'user'},'session'),result);
-  assert.deepEqual(calls[0],[{userId:'user'},'ABCDEFGHIJ','session']);
+  assert.deepEqual(calls[0],[{userId:'user'},'ABCDEFGHIJ','session','add']);
 });

@@ -1,0 +1,45 @@
+---
+title: Lịch họp CLB hai cột
+description: Lịch tháng, chi tiết ngày và danh sách tuần/tháng.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-21
+- Thời gian: 2026-11-22 15:22 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm nút đóng popup mời; làm cột tạo mới 30%, lịch 70%, cùng chiều cao; lịch tháng đánh dấu buổi họp, chọn ngày xem chi tiết, có danh sách tuần/tháng; giảm bo thẻ và lề trang.
+
+## Công việc hoàn thành
+
+- Popup mã mời có nút đóng riêng và mở bằng nút góc phải.
+- Cột tạo họp và cột lịch dùng tỉ lệ 3:7, cùng chiều cao trên desktop; trang rộng hơn với lề nhỏ.
+- Lịch tháng đánh dấu ngày có buổi họp. Chọn ngày xem tên, giờ, trạng thái và thao tác mở/chia sẻ. Bên dưới có danh sách tuần và tháng.
+- Giữ lối vào cho buổi họp chưa có giờ và phòng chưa có session. Bỏ nền thẻ bo của hai cột chính.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 18 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite còn cảnh báo chunk lớn hiện có |
+| `git diff --check` | Passed | Không có whitespace lỗi |
+| Browser/live end-to-end | Skipped | Chưa rà trực quan với dữ liệu lịch thật |
+
+## Giới hạn và bước tiếp theo
+
+Lịch hiển thị các cuộc họp của trang API hiện tại, tối đa 24 cuộc họp; điều hướng trang nằm bên dưới lịch. Cần nghiệm thu với CLB nhiều cuộc họp và cân nhắc API truy vấn theo khoảng ngày để lịch tháng luôn đầy đủ.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

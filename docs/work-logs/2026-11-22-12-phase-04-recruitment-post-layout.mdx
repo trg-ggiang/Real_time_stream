@@ -1,0 +1,17 @@
+---
+title: Bố cục tuyển thành viên theo trang bài viết
+description: Đồng bộ danh sách đợt tuyển với Bài viết CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-12
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 04
+- Kết quả: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi và xác minh
+
+`WorkspaceRecruitment.tsx` dùng tiêu đề, nút tạo, danh sách thẻ và phân trang của workspace cùng `PersonalState`. `recruitment.css` bỏ các kích thước riêng trùng với thẻ bài viết. Giữ bộ lọc theo thời hạn và lối tới đơn ứng tuyển. Frontend typecheck và 32 test đạt. Chưa rà trực quan bản này trên Chromium.

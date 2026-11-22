@@ -16,6 +16,7 @@ export class ChannelMessageDto {
   @IsUUID('4') client_message_id!: string;
   @IsString() @MinLength(1) @MaxLength(4000) content!: string;
 }
+class ChannelReadDto { @IsUUID() message_id!: string; }
 class ChannelFileMessageDto {
   @IsUUID('4') client_message_id!: string;
   @IsString() @MaxLength(4000) content!: string;
@@ -37,6 +38,10 @@ export class WorkspaceChannelsController {
   @Post(':channelId/messages') send(@CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string,
     @Param('channelId', ParseUUIDPipe) channelId: string, @Body() body: ChannelMessageDto) {
     return this.channels.send(u.userId, clubId, channelId, body);
+  }
+  @Post(':channelId/read') read(@CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string,
+    @Param('channelId', ParseUUIDPipe) channelId: string, @Body() body: ChannelReadDto) {
+    return this.channels.markRead(u.userId, clubId, channelId, body.message_id);
   }
 
   @Post(':channelId/messages/attachments')

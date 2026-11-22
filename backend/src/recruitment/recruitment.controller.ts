@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CompleteProfileGuard } from '../users/complete-profile.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
-import { ApplicationInput,CampaignInput,CampaignVersion,DecisionInput,RecruitmentQuery,UploadPurpose } from './recruitment.dto';
+import { ApplicationInput,CampaignInput,CampaignVersion,DecisionInput,ManagedRecruitmentQuery,RecruitmentQuery,UploadPurpose } from './recruitment.dto';
 import { RecruitmentService } from './recruitment.service';
 import { RecruitmentFiles } from './recruitment-files.service';
 @Controller('public/recruitments')
@@ -19,10 +19,12 @@ export class PublicRecruitmentController {
 @UseGuards(JwtAuthGuard,CompleteProfileGuard,ThrottlerGuard) @Throttle({default:{limit:120,ttl:60000}})
 export class ManagedRecruitmentController {
  constructor(private readonly s:RecruitmentService){}
- @Get() @Header('Cache-Control','private, no-store') list(@CurrentUser() u:User,@Param('clubId',ParseUUIDPipe)c:string,@Query()q:RecruitmentQuery){return this.s.managed(u.userId,c,q);}
+ @Get() @Header('Cache-Control','private, no-store') list(@CurrentUser() u:User,@Param('clubId',ParseUUIDPipe)c:string,@Query()q:ManagedRecruitmentQuery){return this.s.managed(u.userId,c,q);}
  @Post() save(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Body()b:CampaignInput){return this.s.save(u.userId,c,b);}
  @Get(':id') @Header('Cache-Control','private, no-store') detail(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string){return this.s.detail(id,{actor:u.userId,club:c});}
  @Patch(':id') edit(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignInput){return this.s.save(u.userId,c,b,id);}
+ @Post(':id/submit-review') submitReview(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.reviewCampaign(u.userId,c,id,b.expected_updated_at);}
+ @Post(':id/return-draft') returnDraft(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.reviewCampaign(u.userId,c,id,b.expected_updated_at,true);}
  @Post(':id/publish') publish(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.publish(u.userId,c,id,b.expected_updated_at);}
  @Post(':id/close') close(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Body()b:CampaignVersion){return this.s.publish(u.userId,c,id,b.expected_updated_at,true);}
  @Get(':id/applications') @Header('Cache-Control','private, no-store') applications(@CurrentUser()u:User,@Param('clubId',ParseUUIDPipe)c:string,@Param('id',ParseUUIDPipe)id:string,@Query()q:RecruitmentQuery){return this.s.applications(u.userId,c,id,q);}

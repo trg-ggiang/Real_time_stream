@@ -36,6 +36,13 @@ export interface AdminSummary {
   pending: number;
   published: number;
   rejected: number;
+  suspended?: number;
+  archived?: number;
+  users?: number;
+  clubs?: number;
+  posts?: number;
+  activities?: number;
+  registrations?: { date: string; count: number }[];
 }
 export const clubStatus = (status: string) =>
   ({
@@ -44,4 +51,4 @@ export const clubStatus = (status: string) =>
     rejected: "Đã từ chối",
     suspended: "Tạm ngừng",
     archived: "Đã lưu trữ",
-  })[status] || status;
+  })[status] || 'Chưa xác định';

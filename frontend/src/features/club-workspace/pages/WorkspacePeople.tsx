@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../../shared/components/PaginationButton";
 import { confirmAction } from '../../../shared/lib/confirm-action';
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -12,6 +13,7 @@ import {
 import { usePersonalQuery } from "../../personal/use-personal-query";
 import { PersonalState } from "../../personal/components/PersonalState";
 import { ContentImage } from "../../discovery/components/PublicContent";
+import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
 export function MembersPage() {
   const { token, clubId, membership, reload } = useClub();
   const [params, setParams] = useSearchParams();
@@ -29,6 +31,7 @@ export function MembersPage() {
   const [email, setEmail] = useState("");
   const [department, setDepartment] = useState("");
   const [message, setMessage] = useState("");
+  useAutoDismiss(message, () => setMessage(''));
   const chair = membership.role === "chairperson";
   async function add(event: FormEvent) {
     event.preventDefault();
@@ -135,19 +138,11 @@ export function MembersPage() {
         )}
       </section>
       <nav className="cw-pagination" aria-label="Phân trang thành viên">
-        <button
-          disabled={page === 1 || state.loading}
-          onClick={() => setParams({ page: String(page - 1) })}
-        >
-          ← Trước
-        </button>
+        <PaginationButton direction="previous" disabled={page === 1 || state.loading}
+          onClick={() => setParams({ page: String(page - 1) })} />
         <span>Trang {page}</span>
-        <button
-          disabled={!state.data?.hasMore || state.loading}
-          onClick={() => setParams({ page: String(page + 1) })}
-        >
-          Sau →
-        </button>
+        <PaginationButton direction="next" disabled={!state.data?.hasMore || state.loading}
+          onClick={() => setParams({ page: String(page + 1) })} />
       </nav>
     </>
   );
@@ -167,6 +162,7 @@ function MemberRow({
   const mutation = useWorkspaceMutation();
   const [department, setDepartment] = useState(member.department_id);
   const [message, setMessage] = useState("");
+  useAutoDismiss(message, () => setMessage(''));
   async function action(kind: "move" | "remove" | "transfer" | "head" | "unhead") {
     if (
       kind !== "move" &&
@@ -267,7 +263,7 @@ export function DepartmentsPage() {
   const { token, clubId, membership } = useClub();
   const result = usePersonalQuery<WorkspaceList<Department>>(
     token,
-    `workspace/${clubId}/departments`,
+    `workspace/${clubId}/departments?include_inactive=true`,
   );
   const [editing, setEditing] = useState<Department | null>(null);
   const [show, setShow] = useState(false);
@@ -358,6 +354,8 @@ function DepartmentForm({
   const [status, setStatus] = useState(department?.status || "active");
   async function save(e: FormEvent) {
     e.preventDefault();
+    if (department?.status === 'active' && status === 'inactive' &&
+        !(await confirmAction(`Ngừng hoạt động “${department.name}” và ẩn kênh của ban?`, true))) return;
     const r = await mutation.run((signal) =>
       workspaceRequest(
         token,
@@ -379,8 +377,8 @@ function DepartmentForm({
   }
   return (
     <form className="cw-panel cw-department-form" onSubmit={save}>
-      <h2>{department ? "Chỉnh sửa ban" : "Tạo ban mới"}</h2>
-      <div className="cw-form-grid">
+      <header className="cw-department-form-heading"><h2>{department ? "Chỉnh sửa ban" : "Tạo ban mới"}</h2></header>
+      <div className="cw-department-fields">
         <label>
           Tên ban
           <input
@@ -403,32 +401,47 @@ function DepartmentForm({
             <option value="inactive">Ngừng hoạt động</option>
           </select>
         </label>
-        <label>
+        <label className="cw-department-description">
           Mô tả
           <textarea
+            rows={4}
             maxLength={5000}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={mutation.busy}
           />
         </label>
-        <fieldset className="cw-department-visibility"><legend>Quyền truy cập kênh</legend><label><input type="radio" name="department-visibility" checked={!privateBan} onChange={() => setPrivate(false)} disabled={mutation.busy} />Công khai</label><label><input type="radio" name="department-visibility" checked={privateBan} onChange={() => setPrivate(true)} disabled={mutation.busy} />Riêng tư</label><p className="cw-muted">Công khai trong CLB, không hiển thị cho khách bên ngoài.</p></fieldset>
+        <fieldset className="cw-department-visibility" disabled={mutation.busy || Boolean(department)}>
+          <legend>Quyền truy cập kênh</legend>
+          <div className="cw-department-options">
+            <label>
+              <input type="radio" name="department-visibility" checked={!privateBan}
+                onChange={() => setPrivate(false)} disabled={mutation.busy} />
+              <span><strong>Công khai</strong><small>Thành viên CLB có thể vào kênh.</small></span>
+            </label>
+            <label>
+              <input type="radio" name="department-visibility" checked={privateBan}
+                onChange={() => setPrivate(true)} disabled={mutation.busy} />
+              <span><strong>Riêng tư</strong><small>Quyền truy cập giới hạn theo ban.</small></span>
+            </label>
+          </div>
+          {department && <p className="cw-muted">Chỉ trưởng ban có quyền đổi chế độ riêng tư.</p>}
+        </fieldset>
       </div>
-      <p className="cw-muted">
-        Chuyển hết thành viên đang hoạt động trước khi ngừng một ban. Ban quản
-        trị không được ngừng.
-      </p>
+      {department && status === 'inactive' && <p className="cw-muted">
+        Chuyển thành viên đang hoạt động sang ban khác trước khi ngừng ban này.
+      </p>}
       {mutation.error && (
         <p role="alert" className="cw-error">
           {mutation.error}
         </p>
       )}
-      <div className="cw-actions">
+      <div className="cw-actions cw-department-form-actions">
         <button type="button" disabled={mutation.busy} onClick={close}>
           Đóng
         </button>
-        <button className="cw-primary" disabled={mutation.busy}>
-          {department ? 'Lưu thay đổi' : 'Tạo ban'}
+        <button type="submit" className="cw-primary" disabled={mutation.busy}>
+          {mutation.busy ? 'Đang lưu…' : department ? 'Lưu thay đổi' : 'Tạo ban'}
         </button>
       </div>
     </form>

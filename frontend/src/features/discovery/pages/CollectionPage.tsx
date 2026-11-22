@@ -1,3 +1,4 @@
+import { PaginationButton } from "../../../shared/components/PaginationButton";
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/csr/MagnifyingGlass";
@@ -134,19 +135,11 @@ export function CollectionPage({ kind }: { kind: Collection }) {
         </button>
       )}
       <nav className="dc-pagination" aria-label="Phân trang">
-        <button
-          disabled={page <= 1 || result.loading}
-          onClick={() => update({ page: String(page - 1) })}
-        >
-          ← Trang trước
-        </button>
+        <PaginationButton direction="previous" disabled={page <= 1 || result.loading}
+          onClick={() => update({ page: String(page - 1) })} />
         <span>Trang {page}</span>
-        <button
-          disabled={!result.data?.hasMore || result.loading}
-          onClick={() => update({ page: String(page + 1) })}
-        >
-          Trang sau →
-        </button>
+        <PaginationButton direction="next" disabled={!result.data?.hasMore || result.loading}
+          onClick={() => update({ page: String(page + 1) })} />
       </nav>
     </div>
   );

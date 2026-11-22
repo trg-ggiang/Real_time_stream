@@ -6,6 +6,8 @@ import { AdminOverview } from "./pages/AdminOverview";
 import { ClubList } from "./pages/ClubList";
 import { RequestDetailRoute } from "./pages/ClubRequestDetail";
 import { AdminLayout } from "./AdminLayout";
+import { AdminUsers } from './pages/AdminUsers';
+import { AdminContent } from './pages/AdminContent';
 import "./admin.css";
 
 export function AdminApp({
@@ -56,6 +58,8 @@ export function AdminApp({
         element={<AdminLayout displayName={viewer.displayName} onLogout={onLogout} />}
       >
         <Route index element={<AdminOverview token={accessToken} />} />
+        <Route path="users" element={<AdminUsers token={accessToken} />} />
+        <Route path="content" element={<AdminContent token={accessToken} />} />
         <Route
           path="club-requests"
           element={<ClubList key="requests" token={accessToken} />}

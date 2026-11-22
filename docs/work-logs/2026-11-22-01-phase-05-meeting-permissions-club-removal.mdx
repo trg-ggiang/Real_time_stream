@@ -1,0 +1,61 @@
+---
+title: Phase 05 — Quyền kết thúc họp và thu hồi khi gỡ CLB
+description: Chặn người chỉ được mời kết thúc họp, ngắt các thiết bị sau khi bị gỡ khỏi CLB và kiểm tra quyền chat.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-01
+- Thời gian: không có dữ liệu giờ bắt đầu chính xác; hoàn tất 2026-11-22T10:24:20+07:00 (Asia/Saigon).
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud; liên quan Phase 04 — workspace và thành viên CLB.
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa hai lỗi người dùng báo: người được mời lâu dài kết thúc buổi họp khi chưa được cấp điều hành; người bị gỡ khỏi CLB vẫn giữ kết nối họp và chỉ thấy lỗi quyền.
+
+## Công việc hoàn thành
+
+- `backend/src/meetings/meetings.service.ts`: endpoint end yêu cầu host/moderator và quyền CLB hiện tại; lời mời lâu dài không đủ. Join kiểm tra lại quyền CLB sau khi ghi attendance và trước khi trả token. Owner mutations kiểm tra quyền CLB hiện tại.
+- `backend/src/workspace/workspace-people.service.ts`, `workspace.module.ts`: gỡ membership gọi dịch vụ meetings đã export. Cho phép retry cleanup khi membership đã removed.
+- `MeetingsService.revokeClubMember`: thu hồi meeting membership, tìm mọi attendance đang mở và ngắt từng identity. Đóng attendance sau khi LiveKit xác nhận ngắt hoặc SDK báo not_found. Một lỗi không ngăn thử ngắt các thiết bị còn lại. Chỉ tác động meeting của đúng CLB/người dùng, không kết thúc session của người khác.
+- `backend/src/meeting-sessions/meeting-sessions.service.ts`: quyền chat yêu cầu membership CLB active dù meeting invitation cũ còn tồn tại.
+- `frontend/src/features/meeting/components/MeetingManagement.tsx`: chỉ hiện nút kết thúc cho host/moderator rõ ràng; không suy quyền kết thúc từ invitedAt hoặc role chưa biết.
+- `frontend/src/features/meeting/MeetingPage.tsx`: mất quyền overview (403) thoát active room, xóa resume và hiện thông báo quyền đã kết thúc. LiveKit removal kích hoạt refresh quyền ngay; 503 không tự ngắt cuộc gọi.
+- Regression: `backend/test/club-meeting-revocation.test.cjs`, `backend/test/meeting-admission.test.cjs`, `frontend/src/features/meeting/MeetingPage.test.tsx`, `frontend/src/features/meeting/components/MeetingManagement.test.tsx`.
+- Cập nhật CODE_FLOW, hướng dẫn meeting controls/chat, phase 04/05, master plan, session log, changelog và navigation.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Backend build và focused Node tests | Passed | 38 tests trước vòng kiểm tra đầy đủ. |
+| Frontend focused Vitest | Passed | 30 tests trước khi bổ sung ca LiveKit removal refresh; ca bổ sung nằm trong toàn bộ suite bên dưới. |
+| `npm run build` | Passed | Build cả hai workspace; Vite vẫn cảnh báo chunk trên 500 kB. |
+| `npm test` | Passed | 96 backend và 171 frontend tests; có Socket.IO integration trong Nest với DB/media fixtures. JSDOM có thông báo scrollTo chưa triển khai. |
+| JSON/navigation, liên kết mới và `git diff --check` | Passed trong phạm vi thay đổi | JSON hợp lệ, trang mới được đăng ký đúng một lần, các liên kết mới tồn tại; không thêm liên kết hỏng. Có 11 mục work-log cũ bị thiếu từ HEAD, giữ nguyên và không báo toàn bộ navigation đã sạch. |
+| Browser/LiveKit thật, Supabase thật | Skipped | Không chạy E2E hoặc ghi service thật; regression dùng fixtures, không phải nghiệm thu hai tài khoản thật. |
+
+## Quyết định và lý do
+
+- Không đổi quyền lên lịch của thành viên mời lâu dài; chỉ sửa quyền kết thúc buổi họp theo yêu cầu.
+- Không thêm bảng, migration hoặc thay cấu hình credentials. Dùng meeting_members.removed_at và attendances.left_at/leave_reason hiện có.
+- Thu hồi quyền trước khi ngắt media để các thao tác API/chat mới không dựa trên quyền cũ; hỗ trợ retry nếu LiveKit/DB cleanup lỗi.
+- Không commit/push; giữ nguyên `.vscode/` không liên quan.
+
+## Blocker và việc chưa hoàn thành
+
+Code được giao đã hoàn thành. Phase 04/05 vẫn In Progress vì chưa nghiệm thu media/thu hồi quyền với hai tài khoản và thiết bị thật. Việc ngắt cloud phụ thuộc LiveKit phản hồi; nếu cleanup thất bại API báo lỗi và thao tác gỡ có thể gọi lại. Không có worker tự retry bền vững.
+
+## Bước tiếp theo
+
+Restart backend và tải bản frontend mới. Mời S1 lâu dài, xác nhận không thấy nút kết thúc và gọi API trực tiếp bị chặn; cấp moderator rồi thử lại. Cho S1 vào họp CLB trên hai thiết bị, dùng chủ nhiệm gỡ S1 khỏi CLB; xác nhận cả hai kết nối rời phòng, mic/camera/chat dừng, không vào lại được và người khác tiếp tục họp.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

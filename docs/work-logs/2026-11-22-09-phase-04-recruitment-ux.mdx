@@ -1,0 +1,21 @@
+---
+title: Giao diện ứng tuyển thành viên
+description: Cập nhật trải nghiệm của sinh viên và chủ nhiệm CLB.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-09
+- Ngày: 2026-11-22, Asia/Saigon
+- Agent: Codex
+- Phase: 04
+- Kết quả phiên: Completed
+- Trạng thái phase: In Progress
+
+## Thay đổi
+
+`PublicRecruitment.tsx` ưu tiên chọn ban và câu hỏi, đặt hạn nộp và hồ sơ trong phần tóm tắt. Tiến độ thể hiện hai bước và giữ câu trả lời khi quay lại sửa. `WorkspaceRecruitment.tsx` nhóm thông tin đợt tuyển và biểu mẫu, mở bộ lọc chờ duyệt theo mặc định và bảo toàn trạng thái lọc trong đường dẫn chi tiết. `recruitment.css` dùng màu workspace cho các bề mặt sáng/tối.
+
+## Kiểm tra
+
+Frontend build và 32 test tuyển thành viên/workspace đạt. Chromium chạy biểu mẫu điền và xem lại, danh sách duyệt sáng/tối ở 375px và 1240px với dữ liệu mô phỏng. Chưa thử nộp hoặc duyệt bằng tài khoản thật.

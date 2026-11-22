@@ -1,0 +1,51 @@
+---
+title: Chỉnh hiển thị thông báo CLB
+description: Căn badge trên biểu tượng CLB và nhấn mạnh kênh có tin mới.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-22-14
+- Thời gian: 2026-11-22 14:33 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Căn lại icon thông báo CLB và làm khu Kênh sinh hoạt gọn hơn, dùng chữ đậm và màu icon thay cho số thông báo cạnh tên kênh.
+
+## Công việc hoàn thành
+
+- Badge số trên biểu tượng CLB đặt gọn trong góc phải trên, sửa kích thước tính cả padding và viền.
+- Kênh sinh hoạt dùng dấu `#` khác màu; kênh chưa đọc có tên đậm và dấu `#` xanh nổi bật, cả theme sáng và tối. Bỏ badge số trong từng hàng kênh; tên truy cập vẫn báo số tin chưa đọc cho trình đọc màn hình.
+- Giữ badge tổng trên biểu tượng CLB và thông báo công việc, họp trong menu.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx WorkspaceRail.test.tsx` | Passed | 19 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite còn cảnh báo chunk lớn hiện có |
+| Browser fixture và live end-to-end | Skipped | Chưa có phiên đăng nhập/fixture giao diện cho badge |
+
+## Quyết định và lý do
+
+Số ở rail giúp nhìn trạng thái từng CLB, còn nhấn mạnh hàng kênh tránh nhiều badge sát nhau trong sidebar hẹp.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa xác minh trực quan trên trình duyệt với nhiều CLB và cả desktop/mobile.
+
+## Bước tiếp theo
+
+Mở workspace với tài khoản có ít nhất hai CLB và tin mới ở một kênh; kiểm tra badge trên rail, chữ đậm và dấu `#` ở cả theme sáng/tối, màn hình rộng/hẹp.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

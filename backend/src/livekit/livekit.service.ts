@@ -27,7 +27,8 @@ export class LivekitService {
       const session = await this.sessions.requireAccess(user.userId, sessionId);
       const { data, error } = await this.supabase.client.from('meetings').select('meeting_code').eq('meeting_id', session.meeting_id).single();
       if (error || !data) throw new ServiceUnavailableException('Không thể đọc cuộc họp.');
-      const result = await this.meetings.join(user, data.meeting_code, sessionId);
+      // The legacy response has no device-choice state. Keep its existing multi-device behavior.
+      const result = await this.meetings.join(user, data.meeting_code, sessionId, 'add');
       if (result.status !== 'admitted' || !result.token || !result.serverUrl || !result.participantIdentity || !result.roomName) {
         throw new ForbiddenException('Bạn cần được duyệt trước khi vào phòng.');
       }

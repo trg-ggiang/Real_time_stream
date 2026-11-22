@@ -51,3 +51,28 @@ test('media sniffing rejects renamed content before upload',()=>{assert.equal(sn
 test('upcoming activities query includes currently-open recruitment, not only future starts',async()=>{
  const f=fixture();await new PublicContentService({client:f.client}).list('activities',1,3,{period:'upcoming'});const c=f.calls[0];assert.equal(c.table,'public_activity_feed');assert.match(c.url.searchParams.get('or'),/entry_type.eq.recruitment,ends_at.gt/);assert.match(c.url.searchParams.get('or'),/entry_type.eq.activity,starts_at.gte/);
 });
+
+test('managed recruitment filters by the acceptance window before paginating', async () => {
+ for (const [status, constraint] of [
+  ['open', ['application_opens_at', 'lte.']],
+  ['waiting', ['or', '(status.eq.pending_review,and(status.eq.open,application_opens_at.gt.']],
+  ['closed', ['or', '(status.in.(closed,completed),and(status.eq.open,application_closes_at.lte.']],
+ ]) {
+  const {service,calls}=fixture('chairperson');
+  await service.managed(id(1),id(101),{campaign_status:status,page:2,limit:8});
+  const params=calls[0].url.searchParams;
+  assert.ok(params.get(constraint[0]).startsWith(constraint[1]));
+  assert.equal(params.get('deleted_at'),'is.null');
+  assert.equal(params.get('offset'),'8');
+  assert.equal(params.get('limit'),'8');
+ }
+});
+
+test('public recruitment omits inactive departments while managed detail keeps historical configuration', async () => {
+ const f=fixture('chairperson',table=>['public_recruitment_campaigns','recruitment_campaigns'].includes(table)?[{campaign_id:id(401)}]:[]);
+ await f.service.detail(id(401));
+ await f.service.detail(id(401),{actor:id(1),club:id(101)});
+ const calls=f.calls.filter(c=>c.table==='recruitment_departments');
+ assert.equal(calls[0].url.searchParams.get('club_departments.status'),'eq.active');
+ assert.equal(calls[1].url.searchParams.has('club_departments.status'),false);
+});

@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 import { usePersonalQuery } from "../../personal/use-personal-query";
 import { PersonalState } from "../../personal/components/PersonalState";
 import { ContentImage } from "../../discovery/components/PublicContent";
-import { publicDate } from "../../../shared/lib/content-format";
 import type { FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { clubStatus, type AdminPage } from "../admin-model";
+import { AdminPagination, adminDate, exportAdminCsv } from '../components/AdminTools';
 export function ClubList({
   token,
   directory = false,
@@ -26,7 +26,7 @@ export function ClubList({
   const q = (params.get("q") || "").slice(0, 100);
   const result = usePersonalQuery<AdminPage>(
     token,
-    `admin/clubs?scope=${directory ? "directory" : "requests"}&status=${status}&page=${page}&limit=12&q=${encodeURIComponent(q)}`,
+    `admin/clubs?scope=${directory ? "directory" : "requests"}&status=${status}&page=${page}&limit=8&q=${encodeURIComponent(q)}`,
   );
   const base = directory ? "/admin/clubs" : "/admin/club-requests";
   function search(e: FormEvent<HTMLFormElement>) {
@@ -45,9 +45,9 @@ export function ClubList({
               : "Đọc hồ sơ, ghi nhận quyết định và phản hồi cho người gửi."}
           </p>
         </div>
-        <button onClick={result.retry} disabled={result.loading}>
+        <div className="ad-actions"><button disabled={!result.data?.items.length} onClick={() => exportAdminCsv(`clb-trang-${page}.csv`, [['CLB', 'Trạng thái', 'Ngày gửi', 'Xét duyệt'], ...result.data!.items.map(item => [item.name, clubStatus(item.status), adminDate(item.created_at), adminDate(item.reviewed_at)])])}>Xuất trang CSV</button><button onClick={result.retry} disabled={result.loading}>
           Tải lại
-        </button>
+        </button></div>
       </div>
       <nav className="ad-tabs" aria-label="Lọc trạng thái">
         {allowed.map((s) => (
@@ -101,9 +101,9 @@ export function ClubList({
                   </h3>
                   <p>{c.summary}</p>
                   <small>
-                    Gửi {publicDate(c.created_at)}
+                    Gửi {adminDate(c.created_at)}
                     {c.reviewed_at
-                      ? ` · Xét duyệt ${publicDate(c.reviewed_at)}`
+                      ? ` · Xét duyệt ${adminDate(c.reviewed_at)}`
                       : ""}
                   </small>
                 </div>
@@ -125,21 +125,7 @@ export function ClubList({
           />
         )}
       </section>
-      <nav className="ad-pagination" aria-label="Phân trang">
-        <button
-          disabled={page === 1 || result.loading}
-          onClick={() => setParams({ status, q, page: String(page - 1) })}
-        >
-          ← Trước
-        </button>
-        <span>Trang {page}</span>
-        <button
-          disabled={!result.data?.hasMore || result.loading}
-          onClick={() => setParams({ status, q, page: String(page + 1) })}
-        >
-          Sau →
-        </button>
-      </nav>
+      <AdminPagination page={page} hasMore={result.data?.hasMore} loading={result.loading} onPage={value => setParams({ status, q, page: String(value) })} />
     </>
   );
 }
