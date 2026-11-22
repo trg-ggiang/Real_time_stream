@@ -72,6 +72,14 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
     itemsRef.current = mergeChannelMessages(itemsRef.current, incoming);
     setItems(itemsRef.current);
   }, []);
+  const lastMarked = useRef('');
+  const markRead = useCallback((message: ChannelMessage | undefined) => {
+    if (!message || document.hidden || lastMarked.current === message.message_id) return;
+    lastMarked.current = message.message_id;
+    void workspaceRequest(token, clubId, `channels/${channel.channel_id}/read`, {
+      method: 'POST', body: JSON.stringify({ message_id: message.message_id }),
+    }).then(() => window.dispatchEvent(new Event('uc:workspace-attention-changed'))).catch(() => { lastMarked.current = ''; });
+  }, [token, clubId, channel.channel_id]);
 
   useEffect(() => {
     const field = composer.current;
@@ -104,6 +112,7 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
         const result = await workspaceRequest<ChannelHistory>(token, clubId, path, { signal: controller.signal });
         if (!valid(run)) return;
         accept(result.items);
+        markRead(result.items.at(-1));
         if (!known.size) { setCursor(result.cursor); setHasMore(result.hasMore); }
         // Walk backwards to the prior history, including gaps longer than one page.
         let page = result;
@@ -130,6 +139,7 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
       if (controller.signal.aborted || item.channel_id !== channel.channel_id) return;
       const follow = !history.current || history.current.scrollHeight - history.current.scrollTop - history.current.clientHeight < 100;
       accept([item]);
+      markRead(item);
       if (follow) requestAnimationFrame(() => { if (history.current) history.current.scrollTop = history.current.scrollHeight; });
     });
     socket.on('disconnect', () => { generation++; setConnected(false); setLoading(false); });
@@ -144,7 +154,7 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
       if (!document.hidden) void synchronize(true);
     }, 3000);
     return () => { window.clearInterval(reconciliation); generation++; controller.abort(); socket.removeAllListeners(); socket.disconnect(); socketRef.current = null; };
-  }, [token, clubId, path, channel.channel_id, refresh, accept]);
+  }, [token, clubId, path, channel.channel_id, refresh, accept, markRead]);
 
   async function older() {
     if (!cursor || olderBusy) return;

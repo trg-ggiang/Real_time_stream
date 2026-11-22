@@ -147,3 +147,11 @@ Chưa nghiệm thu Supabase thật; Phase 04 vẫn In Progress.
 ## Chuyển CLB — 21/11/2026
 
 Giữ khung workspace và theme khi đổi CLB; tải context/nội dung mới trong vùng chính và không hiển thị công cụ của CLB cũ khi chờ. Xem [work log](../work-logs/2026-11-21-03-phase-04-club-switch-flicker.mdx).
+
+## Thông báo trong workspace — 22/11/2026
+
+Biểu tượng từng CLB có số thông báo; kênh có tin mới được làm đậm. Tổng số gồm tin chưa đọc ở kênh có quyền truy cập, buổi họp đang diễn ra/sắp tới, bài và hoạt động chờ chủ nhiệm duyệt hoặc bị yêu cầu sửa của tác giả. Mở kênh cập nhật `channel_read_states`; dữ liệu khác giữ badge đến khi trạng thái nghiệp vụ đổi. Workspace tải lại tổng hợp mỗi 15 giây khi tab hiển thị. [Work log](../work-logs/2026-11-22-13-phase-04-workspace-attention.mdx).
+
+Badge tổng được căn trong góc icon CLB. Danh sách kênh dùng tên đậm và dấu `#` đổi màu khi có tin mới, không hiện số ở từng hàng kênh. [Work log chỉnh giao diện](../work-logs/2026-11-22-14-phase-04-attention-visual-polish.mdx).
+
+Badge CLB sau đó được đưa sát góc ngoài, với khoảng đệm khi rail cuộn. Mục Gọi và gặp mặt dùng icon camera/lịch và nhãn số họp xanh nhẹ. [Work log tinh chỉnh](../work-logs/2026-11-22-15-phase-04-attention-icon-meeting-polish.mdx).

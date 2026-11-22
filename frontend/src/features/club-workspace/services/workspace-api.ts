@@ -74,6 +74,15 @@ export interface ClubChannel {
   channel_id: string; club_id: string; department_id: string | null;
   kind: 'general' | 'department'; name: string; description: string | null;
 }
+export interface WorkspaceAttention {
+  channels: { channel_id: string; unread: number }[];
+  meetings: number;
+  review: number;
+  revisions: number;
+  postRevisions: number;
+  activityRevisions: number;
+  total: number;
+}
 export interface ChannelMessage {
   message_id: string; channel_id: string; sender_membership_id: string; content: string;
   sender: string; avatar_url: string | null; created_at: string; edited_at: string | null;

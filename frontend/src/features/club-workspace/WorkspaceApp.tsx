@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Article } from "@phosphor-icons/react/dist/csr/Article";
 import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
+import { VideoCamera } from "@phosphor-icons/react/dist/csr/VideoCamera";
 import { ClipboardText } from "@phosphor-icons/react/dist/csr/ClipboardText";
 import { NotePencil } from "@phosphor-icons/react/dist/csr/NotePencil";
 import { UserPlus } from "@phosphor-icons/react/dist/csr/UserPlus";
@@ -42,6 +43,7 @@ import { WorkspaceRecruitment,RecruitmentEditor,RecruitmentQueue,RecruitmentAppl
 import './workspace-polish.css';
 import './workspace-theme.css';
 import { channelLabel } from './channel-label';
+import { useWorkspaceAttention } from './use-workspace-attention';
 export function WorkspaceApp(props: DiscoveryViewer) {
   const match = useMatch("/workspace/:clubId/*");
   const clubId = match?.params.clubId || "";
@@ -67,6 +69,7 @@ function WorkspaceScope({
   onLogout,
 }: { clubId: string; clubs?: Membership[] } & DiscoveryViewer) {
   const location = useLocation();
+  const attention = useWorkspaceAttention(accessToken, clubs?.map(item => item.club.club_id) ?? []);
 
   const state = usePersonalQuery<WorkspaceContext>(
     accessToken,
@@ -131,7 +134,7 @@ function WorkspaceScope({
         <a className="cw-skip" href="#workspace-content">
           Đến nội dung
         </a>
-        <WorkspaceRail viewer={viewer} currentId={clubId} onLogout={onLogout} clubs={clubs ? [
+        <WorkspaceRail viewer={viewer} currentId={clubId} onLogout={onLogout} attention={attention} clubs={clubs ? [
           ...clubs.map(item => ({ id: item.club.club_id, name: item.club.name, logoUrl: item.club.logo_url })),
           ...(ctx && !clubs.some(item => item.club.club_id === clubId) ? [{ id: clubId, name: ctx.club.name, logoUrl: ctx.club.logo_url }] : []),
         ] : []} />
@@ -157,14 +160,14 @@ function WorkspaceScope({
           >
             {ctx && <><NavLink to={base} end className="cw-overview-link">Tổng quan CLB</NavLink>
             <div className="cw-channel-scroll" role="group" aria-label="Danh sách kênh">
-            <ChannelNavigation channels={channels} clubId={clubId} chair={chair} />
+            <ChannelNavigation channels={channels} clubId={clubId} chair={chair} attention={attention[clubId]} />
             </div>
             <details className="cw-nav-details cw-work-pinned" open={workOpen} onToggle={event => setWorkOpen(event.currentTarget.open)}><summary>Công việc CLB</summary><div>
               <NavLink to={`${base}/posts/new`}><NotePencil size={17} aria-hidden="true" />Viết bài</NavLink>
-              <NavLink to={`${base}/posts`} end><Article size={17} aria-hidden="true" />Bài viết</NavLink>
-              <NavLink to={`${base}/activities`} end><CalendarBlank size={17} aria-hidden="true" />Hoạt động</NavLink>
+              <NavLink to={`${base}/posts`} end><Article size={17} aria-hidden="true" />Bài viết{attention[clubId]?.postRevisions ? <span className="cw-nav-count" aria-label={`${attention[clubId].postRevisions} bài cần sửa`}>{attention[clubId].postRevisions}</span> : null}</NavLink>
+              <NavLink to={`${base}/activities`} end><CalendarBlank size={17} aria-hidden="true" />Hoạt động{attention[clubId]?.activityRevisions ? <span className="cw-nav-count" aria-label={`${attention[clubId].activityRevisions} hoạt động cần sửa`}>{attention[clubId].activityRevisions}</span> : null}</NavLink>
               {(chair||ctx.membership.role==='head')&&<NavLink to={`${base}/recruitments`}><UserPlus size={17} aria-hidden="true" />Tuyển thành viên</NavLink>}
-              {chair && <NavLink to={`${base}/review`}><ClipboardText size={17} aria-hidden="true" />Duyệt nội dung</NavLink>}
+              {chair && <NavLink to={`${base}/review`}><ClipboardText size={17} aria-hidden="true" />Duyệt nội dung{attention[clubId]?.review ? <span className="cw-nav-count">{attention[clubId].review}</span> : null}</NavLink>}
             </div></details></>}
           </nav>
         </aside>
@@ -236,17 +239,18 @@ function WorkspaceScope({
     </ClubContext.Provider>
   );
 }
-function ChannelNavigation({ channels, clubId, chair }: { channels: ReturnType<typeof usePersonalQuery<WorkspaceList<ClubChannel>>>; clubId: string; chair: boolean }) {
+function ChannelNavigation({ channels, clubId, chair, attention }: { channels: ReturnType<typeof usePersonalQuery<WorkspaceList<ClubChannel>>>; clubId: string; chair: boolean; attention?: import('./services/workspace-api').WorkspaceAttention }) {
+  const unread = attention?.channels ?? [];
   return <>
     <div className="cw-channel-group"><div className="cw-group-heading"><span>Kênh sinh hoạt</span>{chair && <Link to={`/workspace/${clubId}/departments`} title="Quản lý ban và kênh của ban" aria-label="Quản lý ban và kênh">+</Link>}</div></div>
     <div className="cw-channel-list">
       {channels.loading && <p role="status">Đang tải kênh…</p>}
       {channels.error && <><p role="alert">{channels.error}</p><button onClick={channels.retry}>Thử lại</button></>}
-      {channels.data?.items.map(channel => <NavLink key={channel.channel_id} to={`/workspace/${clubId}/channels/${channel.channel_id}`}>{channelLabel(channel)}</NavLink>)}
+      {channels.data?.items.map(channel => { const count = unread.find(item => item.channel_id === channel.channel_id)?.unread ?? 0; return <NavLink key={channel.channel_id} className={count ? 'cw-channel-unread' : undefined} aria-label={count ? `${channelLabel(channel)}, ${count} tin chưa đọc` : undefined} to={`/workspace/${clubId}/channels/${channel.channel_id}`}>{channelLabel(channel)}</NavLink>; })}
       {channels.data && !channels.data.items.length && <p>Chưa có kênh bạn có thể truy cập.</p>}
     </div>
     <div className="cw-channel-group"><div className="cw-group-heading"><span>Gọi và gặp mặt</span></div></div>
-    <div className="cw-channel-list cw-voice-list"><NavLink to={`/workspace/${clubId}/meetings`} className="cw-voice-link"><span aria-hidden="true">◖</span> Phòng họp CLB</NavLink><NavLink to={`/workspace/${clubId}/recurring-meetings`} className="cw-voice-link"><span aria-hidden="true">◖</span> Họp theo lịch</NavLink></div>
+    <div className="cw-channel-list cw-voice-list"><NavLink to={`/workspace/${clubId}/meetings`} className={`cw-voice-link${attention?.meetings ? ' cw-voice-link--pending' : ''}`} aria-label={attention?.meetings ? `Phòng họp CLB, ${attention.meetings} buổi họp đang hoặc sắp diễn ra` : undefined}><VideoCamera size={18} aria-hidden="true" /><span className="cw-voice-label">Phòng họp CLB</span>{attention?.meetings ? <span className="cw-meeting-count" aria-hidden="true">{attention.meetings > 99 ? '99+' : attention.meetings}</span> : null}</NavLink><NavLink to={`/workspace/${clubId}/recurring-meetings`} className="cw-voice-link"><CalendarBlank size={18} aria-hidden="true" /><span className="cw-voice-label">Họp theo lịch</span></NavLink></div>
   </>;
 }
 function EditorRoute({ kind }: { kind: "posts" | "activities" }) {

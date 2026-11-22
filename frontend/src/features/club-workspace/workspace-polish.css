@@ -223,8 +223,25 @@
 .cw-app main .cw-message-avatar-space{width:40px;flex:0 0 40px}
 @media(max-width:640px){.cw-app main .cw-message-avatar-space{width:36px;flex-basis:36px}}
 /* Keep the active-club marker inside the scroll viewport, beside its icon. */
-.cw-app .cw-rail-clubs{width:calc(100% + 12px);padding-inline:6px;box-sizing:border-box}
+.cw-app .cw-rail-clubs{width:calc(100% + 12px);padding:5px 6px;box-sizing:border-box}
 .cw-app .cw-rail-clubs .cw-rail-club{position:relative}
+.cw-app .cw-rail-clubs .cw-rail-club .cw-rail-badge{position:absolute;right:-4px;top:-4px;z-index:2;min-width:18px;width:max-content;height:18px;padding:0 4px;display:grid;place-items:center;box-sizing:border-box;border:2px solid #14284a;border-radius:10px;background:#ee5262;color:#fff;font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;box-shadow:0 2px 5px #0c214b4d}
+.cw-app .cw-channel-list:not(.cw-voice-list) a::before{content:'#';display:inline-block;width:20px;color:#7489a7;font-size:15px;font-weight:700;line-height:1}
+.cw-app .cw-sidebar nav .cw-channel-list a.cw-channel-unread{font-weight:800;color:#183f7a}
+.cw-app .cw-channel-list a.cw-channel-unread::before{color:#2365c5}
+.cw-app[data-theme="dark"] .cw-sidebar nav .cw-channel-list a.cw-channel-unread{color:#dceaff}
+.cw-app[data-theme="dark"] .cw-channel-list a.cw-channel-unread::before{color:#8dbbff}
+.cw-app[data-theme="dark"] .cw-rail-clubs .cw-rail-club .cw-rail-badge{border-color:#21242b}
+.cw-app .cw-nav-count{margin-left:auto;padding:1px 6px;border-radius:10px;background:#d92e40;color:white;font-size:11px;font-weight:800}
+.cw-app .cw-sidebar nav .cw-voice-list a.cw-voice-link{display:flex;align-items:center;gap:9px;padding:7px 10px}
+.cw-app .cw-voice-link svg{flex:none;color:#657fa2}
+.cw-app .cw-voice-label{flex:1;min-width:0}
+.cw-app .cw-sidebar nav .cw-voice-list a.cw-voice-link--pending{font-weight:700}
+.cw-app .cw-voice-link--pending svg{color:#2868bf}
+.cw-app .cw-meeting-count{display:grid;place-items:center;flex:none;min-width:19px;height:19px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:#dceaff;color:#245a9e;font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.cw-app[data-theme="dark"] .cw-voice-link svg{color:#9bb4d4}
+.cw-app[data-theme="dark"] .cw-voice-link--pending svg{color:#8dbbff}
+.cw-app[data-theme="dark"] .cw-meeting-count{background:#344d73;color:#d7e7ff}
 .cw-app .cw-rail-clubs .cw-rail-club.is-current::before{display:block;content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:3px;height:26px;border-radius:3px;background:#245dc1}
 @media(max-width:640px){.cw-app .cw-rail-clubs{width:auto}.cw-app .cw-rail-clubs .cw-rail-club.is-current::before{height:22px}}
 

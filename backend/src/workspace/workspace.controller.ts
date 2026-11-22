@@ -18,6 +18,7 @@ import { User } from "../users/entities/user.entity";
 import { WorkspaceAccess } from "./workspace-access.service";
 import { WorkspacePeople } from "./workspace-people.service";
 import { WorkspaceContent, WorkspaceKind } from "./workspace-content.service";
+import { WorkspaceAttention } from './workspace-attention.service';
 import {
   ActivityDraftDto,
   AddMemberDto,
@@ -43,7 +44,11 @@ export class WorkspaceController {
     private readonly access: WorkspaceAccess,
     private readonly people: WorkspacePeople,
     private readonly content: WorkspaceContent,
+    private readonly attention: WorkspaceAttention,
   ) {}
+  @Get('attention') @Header('Cache-Control', 'private, no-store') attentionSummary(
+    @CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string,
+  ) { return this.attention.summary(u.userId, clubId); }
   @Get('meetings') @Header('Cache-Control', 'private, no-store') async meetings(
     @CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string, @Query() q: WorkspacePage,
   ) {
