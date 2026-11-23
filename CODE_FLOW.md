@@ -1,6 +1,6 @@
 # Real-time Stream — luồng hoạt động của hệ thống
 
-> Realtime update 2026-11-20: club messages use Socket.IO `/workspace-chat`; history uses HTTP only on connection/reconnection/pagination. Meeting messages use `/chat`. Older polling/meeting-overview descriptions below are historical; see [current transport and room decisions](docs/work-logs/2026-11-20-11-phase-04-realtime-chat-room-cleanup.mdx). Meetings still open as a separate full-page view; only the duplicate overview was removed.
+> Hiện trạng 23/11/2026. Chat kênh CLB dùng Socket.IO `/workspace-chat` và đồng bộ qua HTTP khoảng mỗi 3 giây khi tab hiển thị. Chat phiên họp dùng `/chat` và tải bù khi socket kết nối lại. Cuộc gọi có thể thu nhỏ khi điều hướng trong uniCircle.
 
 Tài liệu này mô tả luồng đang có trong source: ứng dụng React/Vite, API NestJS,
 Supabase và LiveKit Cloud. Đây là hướng dẫn đọc code, không phải thiết kế cho các
@@ -158,7 +158,7 @@ Trang khám phá dùng route danh sách và chi tiết riêng, chẳng hạn `/c
 
 1. `/workspace` lấy CLB đã tham gia và mở kênh Chung của CLB đầu tiên. `WorkspaceApp` lấy lại context khi đổi CLB. NestJS yêu cầu application JWT, hồ sơ đầy đủ, CLB published và membership active.
 2. `GET /api/workspace/:clubId/channels` chỉ trả kênh mà `clubspace_can_read_channel` cho phép. Kênh ban mở dùng chung trong CLB. Kênh private phụ thuộc ban của người dùng hoặc quyền được cấp riêng.
-3. `GET/POST /api/workspace/:clubId/channels/:channelId/messages` đọc hoặc ghi `channel_messages`. Backend xác định người gửi từ membership và dùng `client_message_id` để xử lý lần gửi lại. UI lấy 50 tin mỗi lượt, tải tin cũ theo cursor, polling khoảng 3 giây khi tab hiển thị. Enter gửi, Shift+Enter xuống dòng. Theme workspace lưu trong trình duyệt.
+3. Chat văn bản gửi qua `channel:send` và nhận qua `channel:message` trên `/workspace-chat`. Backend xác định người gửi từ membership, lưu vào `channel_messages` và dùng `client_message_id` cho lần gửi lại. UI gọi `GET /api/workspace/:clubId/channels/:channelId/messages` để tải lịch sử, phân trang và lấy bù khoảng mỗi 3 giây khi tab hiển thị. Tệp đính kèm được gửi qua API HTTP. Enter gửi, Shift+Enter xuống dòng.
 4. Trang thành viên, ban, bài viết và hoạt động gọi API workspace. Trang họp liệt kê theo `clubId`. Tạo cuộc họp từ workspace gửi `clubId`, sau đó mở module họp bằng mã/phần định danh buổi. Quyền vào và vai trò host vẫn thuộc module meeting.
 
 Xem [bàn giao workspace](docs/design/phase-04-club-workspace.md) để biết các đầu mối code, ca lỗi tải bù chat, phân quyền head và lịch họp tạo dở.
@@ -246,6 +246,15 @@ không relay audio/video. SDK quản lý signaling, track và participant state.
   Backend xác minh host, session, attendance, trạng thái request rồi cập nhật
   permission của đúng LiveKit identity.
 - Browser cần secure context (HTTPS hoặc localhost) để truy cập media.
+
+### Thu nhỏ, Picture-in-Picture và thông báo
+
+1. `SignedInApp` giữ `MeetingPage` khi người dùng quay về workspace qua nút **Thu nhỏ cuộc họp** hoặc nút Back nội bộ. Mở lại phòng hiển thị cùng `MeetingRoom`, cùng `sessionId` và `attendanceId`. Việc đổi bố cục không gọi API join/leave. Chat trong phòng vẫn theo phiên, còn chat CLB theo kênh đã chọn.
+2. `MeetingFloatingView` hiển thị video từ cùng kết nối LiveKit, ưu tiên màn hình đang chia sẻ rồi đến camera. Khung nội bộ trên mobile hiển thị các nút điều khiển gọn để chừa chỗ nhắn tin. `use-meeting-picture-in-picture` chọn video từ thanh điều khiển hoặc từ ô người dùng bấm. Trình duyệt hỗ trợ Document PiP mở cửa sổ kèm nút điều khiển. Nếu chỉ hỗ trợ API PiP video, nút trên từng ô mở riêng video đó.
+3. Đóng PiP giữ nguyên cuộc gọi. Bấm **Rời cuộc họp**, đăng xuất, hết phiên hoặc bị ngắt khỏi phòng sẽ dọn khung họp và cửa sổ PiP. Khi tải lại trang, dùng luồng khôi phục của phiên thay vì giữ nguyên kết nối cũ.
+4. `MeetingNotification` hiển thị phản hồi ngắn như timeout, lỗi thiết bị và cảnh báo token. Popup tự ẩn sau 5 giây. Popup chứa link cần sao chép thủ công giữ ô nhập đến khi người dùng đóng. Lỗi cần xử lý trong biểu mẫu hoặc hộp thoại vẫn hiện ngay tại thao tác.
+
+[Work log thu nhỏ và PiP](docs/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture.mdx) · [Work log thông báo](docs/work-logs/2026-11-22-24-phase-05-meeting-notifications.mdx).
 
 ### Rời, kết thúc và khôi phục
 
@@ -377,7 +386,8 @@ workspaces backend/frontend.
 ## 11. Trạng thái và giới hạn cần nhớ
 
 - Phase 03–06 đang **In Progress**. Đã có API và giao diện cho các luồng chính của CLB, meeting và hai loại chat. Tuyển thành viên đã nối vào workspace (xem mục 13); phỏng vấn chưa triển khai.
-- Lượt rà gần nhất trên source `36ff795` đạt **44 test backend và 94 test frontend**. Đã thử giao diện với API mô phỏng, đồng thời đọc quyền kênh thật của AE 18. [Work log](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx)
+- Lượt kiểm tra tính năng thu nhỏ và PiP ngày 23/11 đạt **204 test frontend** và build. Đã thử trên Chrome bằng API, Socket.IO và video mô phỏng. Media LiveKit trên hai thiết bị thật vẫn chờ nghiệm thu. [Work log](docs/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture.mdx)
+- Lượt rà workspace trên source `36ff795` đạt **44 test backend và 94 test frontend**. Đã thử giao diện với API mô phỏng, đồng thời đọc quyền kênh thật của AE 18. [Work log](docs/work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx)
 - Nghiệm thu ghi Supabase và media LiveKit trên hai thiết bị vẫn còn. Gói SQL mở rộng được lưu cùng [tài liệu migration](output/unicircle-platform-migration-20261117/README.md).
 
 ## 12. Đọc tiếp

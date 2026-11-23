@@ -10,9 +10,9 @@
 
 - **Khám phá** tại `/`, `/clubs`, `/activities`, `/posts`. Guest xem dữ liệu công khai. Quan tâm và đăng ký hoạt động cần đăng nhập.
 - **Tài khoản** yêu cầu hoàn thiện hồ sơ sau khi đăng ký hoặc khi đăng nhập bằng tài khoản còn thiếu hồ sơ. Sinh viên mặc định về `/`, admin về `/admin`, còn đích nội bộ hợp lệ được giữ. Trang `/me` chứa hồ sơ, theo dõi CLB, hoạt động đã đăng ký và lịch sử đề nghị thành lập CLB.
-- **Không gian sinh hoạt** tại `/workspace` có kênh Chung/kênh ban, chat lưu trên Supabase, quản lý thành viên/ban, nội dung và lịch họp gắn CLB.
+- **Không gian sinh hoạt** tại `/workspace` có kênh Chung và kênh ban, quản lý thành viên, nội dung và lịch họp gắn CLB. Chat kênh dùng Socket.IO, lưu trên Supabase và tải bù qua HTTP.
 - **Quản trị** tại `/admin` có danh sách CLB và quy trình duyệt hoặc từ chối đề nghị thành lập.
-- **Meeting** dùng LiveKit Cloud cho media, NestJS/Supabase cho phiên/quyền vào, Socket.IO cho chat theo phiên. Chat CLB là luồng riêng qua HTTP polling. Tuyển thành viên đã nối vào workspace; phỏng vấn chưa triển khai.
+- **Meeting** dùng LiveKit Cloud cho media, NestJS/Supabase cho phiên và quyền vào, Socket.IO cho chat theo phiên. Người đang họp có thể thu nhỏ để nhắn tin trong kênh CLB và mở Picture-in-Picture (PiP) trên trình duyệt hỗ trợ. Tuyển thành viên đã nối vào workspace. Phỏng vấn chưa triển khai.
 
 ## Cài đặt và cấu hình
 
@@ -65,6 +65,10 @@ Preview chạy cổng 4173 và dùng cùng API proxy khi `VITE_API_URL` để tr
 
 Chạy `npm run tunnel` ở root để build và mở Cloudflare Quick Tunnel tới frontend preview; script khởi động backend nếu chưa chạy. Gửi URL HTTPS được in cho nhóm thử nghiệm. Dừng bằng Ctrl+C hoặc `npm run tunnel:stop`. Giữ `VITE_API_URL=` trống. Đăng nhập để mở cuộc họp bằng mã hoặc vào qua workspace. Phòng cố định chỉ áp dụng cho luồng PoC. Xem [hướng dẫn tunnel](docs/modules/https-tunnel.mdx) về luồng, log và giới hạn.
 
+## Vừa họp vừa nhắn tin trong CLB
+
+Trong cuộc gọi, bấm **Thu nhỏ cuộc họp**, mở kênh CLB rồi nhắn tin. Bấm **Mở lại phòng** trên khung nổi để quay về cùng phiên, hoặc **Rời cuộc họp** để ngắt kết nối. Muốn xem cuộc gọi khi chuyển tab, bấm **Picture-in-Picture** trước khi chuyển. Chủ phòng, điều hành và thành viên đều có thể chọn camera hoặc màn hình đang chia sẻ trên trình duyệt hỗ trợ. [Cách sử dụng và giới hạn](docs/modules/meeting-controls.mdx) · [Checklist hai thiết bị](docs/modules/https-tunnel.mdx).
+
 ## Tổ chức source
 
 - [Chat trong phiên họp](docs/modules/meeting-chat.mdx): cần session ongoing và member admitted/chưa removed; chọn cùng phiên trước khi join. Chat dùng bảng meeting_messages đã được nhóm áp dụng. Backend kiểm tra participant thực tế qua LiveKit; không tự tạo session/duyệt thành viên/ghi attendance. Restart backend trước khi chạy tunnel nếu backend cũ đang chạy.
@@ -100,7 +104,7 @@ Tham khảo [quy tắc gitignore](https://git-scm.com/docs/gitignore) và [xử 
 
 Bản SQL mở rộng CLB, tuyển dụng, kênh và thông báo được theo dõi trong [gói migration 17/11](output/unicircle-platform-migration-20261117/README.md). Thư mục `supabase/migrations/` ở root hiện chứa migration điều khiển và chat cuộc họp. Khi dựng môi trường mới, kiểm tra schema nền và preflight của gói trước khi áp dụng. Các bảng trong migration có thể phục vụ nghiệp vụ tương lai ngay cả khi ứng dụng chưa gọi chúng.
 
-Lượt rà gần nhất đạt **44 test backend và 94 test frontend**. Đã thử UI với API mô phỏng và kiểm tra chỉ đọc quyền kênh trên Supabase. Nghiệm thu ghi thật và LiveKit hai thiết bị vẫn còn. Xem [bàn giao workspace](docs/design/phase-04-club-workspace.md) để chọn việc cho phiên tiếp theo. [Tổng kết PoC](PHASE_05_SUMMARY.md) lưu lịch sử triển khai media ban đầu.
+Bản tích hợp thu nhỏ và PiP đạt **204 test frontend**, build và kiểm thử Chrome mô phỏng. Lượt này chưa chạy lại test backend hay thử LiveKit Cloud trên hai thiết bị thật. [Kết quả kiểm thử](docs/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture.mdx) · [Bàn giao workspace](docs/design/phase-04-club-workspace.md) · [Tổng kết PoC](PHASE_05_SUMMARY.md).
 
 ## Loại câu lạc bộ — cập nhật 20/11/2026
 

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { MonitorArrowUp } from '@phosphor-icons/react/dist/csr/MonitorArrowUp';
 import { useConnectionState, useLocalParticipant, useLocalParticipantPermissions, useParticipantAttribute } from '@livekit/components-react';
 import { ConnectionState, Track } from 'livekit-client';
+import { MeetingNotification } from './MeetingNotification';
 
 export function ScreenShareButton() {
   const { localParticipant, isScreenShareEnabled } = useLocalParticipant();
@@ -56,7 +57,7 @@ export function ScreenShareButton() {
     </button>
     {!supported && <p className="screen-share-message" role="status">Chia sẻ màn hình cần trình duyệt hỗ trợ và HTTPS hoặc localhost.</p>}
     {!allowed && request === 'pending' && <p className="screen-share-message" role="status">Đang chờ chủ phòng duyệt chia sẻ.</p>}
-    {!allowed && request === 'denied' && <p className="screen-share-message" role="status">Chủ phòng đã từ chối yêu cầu chia sẻ.</p>}
-    {error && <p className="notice error screen-share-message" role="alert">{error}</p>}
+    {!allowed && request === 'denied' && <MeetingNotification kind="warning" message="Chủ phòng đã từ chối yêu cầu chia sẻ." />}
+    {error && <MeetingNotification kind="error" message={error} />}
   </>;
 }

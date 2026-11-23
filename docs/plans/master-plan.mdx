@@ -12,6 +12,8 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 
 ## Các cập nhật theo phiên
 
+2026-11-23. Người dùng có thể thu nhỏ cuộc họp để nhắn tin trong workspace, mở lại cùng phiên hoặc dùng Picture-in-Picture trên trình duyệt hỗ trợ. Nút PiP của camera và màn hình chia sẻ dùng chung cho chủ phòng, điều hành và thành viên. Build và 204 test frontend đạt, đã thử Chrome với dữ liệu mô phỏng. Phase 05 In Progress, chờ nghiệm thu LiveKit Cloud trên hai thiết bị. [Work log](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture).
+
 2026-11-23: Tinh chỉnh roster cuộc họp để thành viên nhận diện chủ phòng; làm mới khu vực quản lý, phòng chờ, mời thành viên và yêu cầu duyệt. Backend join bổ sung hostUserId. Chưa chạy tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-08-phase-05-meeting-member-management-visual-refinement).
 
 2026-11-23: Ghim camera local chỉ ở trang camera đầu tiên; các trang tiếp theo dành cho camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-07-phase-05-self-camera-first-page).
@@ -27,6 +29,8 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 2026-11-23: Thêm phân trang cho dải camera participant cạnh màn hình chia sẻ, 3 ô mỗi trang; danh sách tên dùng 10 người mỗi trang. Trang tự điều chỉnh khi số người giảm. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-02-phase-05-meeting-participant-pagination).
 
 2026-11-23: Thiết kế lại phòng họp thành video lớn, sidebar thành viên/quản lý có thể đóng/mở và thanh điều khiển dưới cùng; giữ nguyên backend. `git diff --check` đạt; chưa kiểm tra browser hoặc chạy frontend test/build. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-01-phase-05-meeting-room-layout).
+
+2026-11-22: Đồng bộ popup tự ẩn cho timeout, cảnh báo token và phản hồi ngắn của module phòng họp. Phase 05 In Progress. [Work log](/work-logs/2026-11-22-24-phase-05-meeting-notifications).
 
 2026-11-22: Sửa quyền kết thúc buổi họp và ngắt kết nối khi bị gỡ khỏi CLB. Build, 96 backend và 171 frontend tests đạt. Phase 04/05 In Progress; chờ nghiệm thu LiveKit thật. [Work log](/work-logs/2026-11-22-01-phase-05-meeting-permissions-club-removal).
 

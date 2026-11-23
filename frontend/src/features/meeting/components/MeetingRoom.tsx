@@ -1,5 +1,8 @@
 import { LiveKitExpiryNotice } from './LiveKitExpiryNotice';
+import { MeetingNotification } from './MeetingNotification';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { PictureInPicture } from '@phosphor-icons/react/dist/csr/PictureInPicture';
 import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { Hand } from '@phosphor-icons/react/dist/csr/Hand';
 import { Users } from '@phosphor-icons/react/dist/csr/Users';
@@ -27,6 +30,7 @@ import {
   useParticipantAttribute,
   useParticipants,
   useTrackRefContext,
+  isTrackReference,
 } from '@livekit/components-react';
 import {
   ConnectionState,
@@ -46,6 +50,10 @@ import { MeetingMediaLayout } from './MeetingMediaLayout';
 import { MeetingChat } from '../chat/components/MeetingChat';
 import { MeetingManagement } from './MeetingManagement';
 import type { AudioSelection } from './PreJoinAudio';
+import { MeetingFloatingView } from './MeetingFloatingView';
+import { canOpenTrackPictureInPicture, useMeetingPictureInPicture, type OpenTrackPictureInPicture } from '../hooks/use-meeting-picture-in-picture';
+import floatingStyle from './meeting-floating.css?inline';
+import './meeting-floating.css';
 
 const PARTICIPANTS_PER_PAGE = 10;
 import type { ComponentProps } from 'react';
@@ -104,24 +112,31 @@ function RaiseHandButton({ connected }: { connected: boolean }) {
       >
         <Hand size={23} weight={raised ? 'fill' : 'regular'} aria-hidden="true" />
       </button>
-      {error && <p className="notice error raise-hand-error" role="alert">{error}</p>}
+      {error && <MeetingNotification kind="error" message={error} />}
     </>
   );
 }
 
-function MeetingParticipantTile() {
-  const { participant } = useTrackRefContext();
+function MeetingParticipantTile({ onPictureInPicture }: { onPictureInPicture: OpenTrackPictureInPicture }) {
+  const track = useTrackRefContext();
+  const { participant } = track;
   const raised = useParticipantAttribute(handRaisedAttribute, { participant }) === 'true';
 
   return (
     <div className="meeting-participant-tile">
       <ParticipantTile />
+      {isTrackReference(track) && track.publication.track && !track.publication.isMuted && canOpenTrackPictureInPicture() && <button
+        type="button" className="meeting-tile-pip" title="Mở Picture-in-Picture"
+        aria-label={`Mở Picture-in-Picture cho camera của ${participant.name || 'thành viên'}`}
+        onClick={event => onPictureInPicture(track, event.currentTarget.parentElement?.querySelector('video'))}>
+        <PictureInPicture size={18} aria-hidden="true" />
+      </button>}
       {raised && <span className="raised-hand-badge" role="img" aria-label="Đang giơ tay"><Hand size={22} weight="fill" aria-hidden="true" /></span>}
     </div>
   );
 }
 
-function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, onLeave, management, isHost, credentials, accessToken, onShare, initialSpeaker, preferredMedia, transferPending, restoreTransferMedia }: {
+function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, onLeave, management, isHost, credentials, accessToken, onShare, initialSpeaker, preferredMedia, transferPending, restoreTransferMedia, compact, title, theme, onExpand }: {
   credentials: JoinCredentials;
   accessToken: string;
   onDeviceError: (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => void;
@@ -135,8 +150,13 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   preferredMedia: ReturnType<typeof readMediaPreferences>;
   transferPending: boolean;
   restoreTransferMedia: boolean;
+  compact: boolean;
+  title: string;
+  theme: string;
+  onExpand?: () => void;
 }) {
   const state = useConnectionState();
+  const pip = useMeetingPictureInPicture(title);
   const participants = useParticipants();
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled, microphoneTrack } = useLocalParticipant();
   const [audioMuted, setAudioMuted] = useState(() => !initialSpeaker);
@@ -167,18 +187,38 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   }, [connected, localParticipant, onDeviceError, preferredMedia, restoreTransferMedia]);
   const microphoneLabel = isMicrophoneEnabled ? 'Tắt microphone' : 'Bật microphone';
   const cameraLabel = isCameraEnabled ? 'Tắt camera' : 'Bật camera';
+  const cameraControls = {
+    title, status: connected ? 'Đang trong cuộc họp' : connectionLabels[state],
+    canUseDevices, isMicrophoneEnabled, isCameraEnabled, onLeave,
+    onToggleMedia(kind: 'audioinput' | 'videoinput', enabled: boolean, userInitiated: boolean) {
+      if (enabled) onDeviceEnabled(kind);
+      if (userInitiated) onMediaPreferenceChange(kind, enabled);
+    },
+    onMediaError(kind: 'audioinput' | 'videoinput', error: Error) {
+      onDeviceError(MediaDeviceFailure.getFailure(error), kind);
+    },
+    onExpand() { onExpand?.(); },
+  };
   return (
     <>
-      <div className="room-status">
+      {compact && <MeetingFloatingView {...cameraControls} showVideo={!pip.pictureWindow}
+        onPictureInPicture={pip.supportsWindow ? () => void pip.open() : undefined} />}
+      {pip.pictureWindow && createPortal(<div className="meeting-pip-document" data-theme={theme}>
+        <style>{floatingStyle}</style>
+        <MeetingFloatingView {...cameraControls} selection={pip.selection}
+          onExpand={() => { pip.closeWindow(); window.focus(); onExpand?.(); }} />
+      </div>, pip.pictureWindow.document.body)}
+      <MeetingNotification kind="error" message={pip.error} onClose={pip.dismissError} />
+      <div className="room-status" hidden={compact}>
         {!connected && <span className="meeting-connection" role="status" data-connected={false}>{connectionLabels[state]}</span>}
       </div>
       {isHost && management?.sessionId ? <ScreenShareRequests accessToken={management.accessToken} meetingId={management.overview.meeting.meetingId} sessionId={management.sessionId} /> : null}
       <RoomAudioRenderer volume={audioMuted || transferPending ? 0 : 1} />
       <StartAudio label="Bật âm thanh từ phòng" />
-      <div className="meeting-call-layout" data-sidebar-open={showManagement} data-chat-open={chatOpen}>
+      <div className="meeting-call-layout" hidden={compact} data-sidebar-open={showManagement} data-chat-open={chatOpen}>
         <div className="meeting-call-stage">
-          <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen} onUnreadChange={setChatUnread}>
-            <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
+          <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen && !compact} onUnreadChange={setChatUnread}>
+            <MeetingMediaLayout onPictureInPicture={pip.open}><MeetingParticipantTile onPictureInPicture={pip.open} /></MeetingMediaLayout>
           </MeetingChat>
         </div>
         {showManagement && <aside id="meeting-people" className="meeting-sidebar" aria-label="Thành viên và quản lý cuộc họp">
@@ -207,7 +247,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
             showSessionMembers onPendingCountChange={setPendingCount} />}
         </aside>}
       </div>
-      <div className="meeting-controls-row">
+      <div className="meeting-controls-row" hidden={compact}>
       <div className="meeting-controls">
         <fieldset className="meeting-device-controls" disabled={!canUseDevices} aria-label="Thiết bị">
         <div className="meeting-device-group">
@@ -243,6 +283,10 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
           setShowManagement(next);
           if (next) setChatOpen(false);
         }}><Users size={23} aria-hidden="true" />{hostManagement && pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button>
+        {pip.supportsWindow && <button type="button" className="lk-button meeting-control-icon"
+          aria-label="Mở Picture-in-Picture" title="Mở Picture-in-Picture" onClick={() => void pip.open()}>
+          <PictureInPicture size={23} aria-hidden="true" />
+        </button>}
         <button type="button" className="lk-button meeting-control-icon meeting-control-leave" aria-label="Rời phòng" title="Rời phòng" onClick={onLeave}><SignOut size={23} aria-hidden="true" /></button>
       </div>
       <div className="meeting-room-footer">
@@ -265,6 +309,10 @@ export function MeetingRoom({
   management,
   onShare,
   audioSelection,
+  compact = false,
+  title = 'Cuộc họp',
+  theme = 'light',
+  onExpand,
 }: {
   credentials: JoinCredentials & { transferAfterConnect?: boolean };
   accessToken: string;
@@ -276,6 +324,10 @@ export function MeetingRoom({
   management?: ManagementProps;
   onShare?: () => void;
   audioSelection?: AudioSelection;
+  compact?: boolean;
+  title?: string;
+  theme?: string;
+  onExpand?: () => void;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [preferredMedia, setPreferredMedia] = useState(() => {
@@ -339,14 +391,12 @@ export function MeetingRoom({
         onMediaDeviceFailure={handleDeviceError}
         data-lk-theme="default"
       >
-        {error && (
-          <p className="notice error" role="alert">
-            {error}
-          </p>
-        )}
-        {Object.entries(deviceErrors).map(([kind, message]) => message ? <p className="notice error" role="alert" key={kind}>{message}</p> : null)}
+        {error && <MeetingNotification kind="error" message={error} />}
+        {Object.entries(deviceErrors).map(([kind, message]) => message ?
+          <MeetingNotification kind="error" message={message} key={kind} /> : null)}
         <RoomContent credentials={credentials} accessToken={accessToken} onDeviceError={handleDeviceError} onDeviceEnabled={handleDeviceEnabled} onLeave={onLeave} management={management} isHost={credentials.role === 'host'}
           initialSpeaker={audioSelection?.speaker ?? readSpeakerPreference()} onShare={onShare}
+          compact={compact} title={title} theme={theme} onExpand={onExpand}
           preferredMedia={preferredMedia} onMediaPreferenceChange={handleMediaPreferenceChange}
           transferPending={transferStatus === 'pending'} restoreTransferMedia={transferStatus === null && credentials.transferAfterConnect === true} />
       </LiveKitRoom>

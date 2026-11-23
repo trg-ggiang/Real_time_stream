@@ -3,6 +3,10 @@ title: Phase 05 — Tích hợp LiveKit Cloud
 description: Theo dõi Module 1 trong phạm vi đã được giao.
 ---
 
+## Thu nhỏ cuộc họp và Picture-in-Picture (2026-11-23)
+
+Người dùng có thể thu nhỏ cuộc họp để nhắn tin trong workspace, mở lại cùng phiên hoặc dùng Picture-in-Picture trên trình duyệt hỗ trợ. Nút PiP của camera và màn hình chia sẻ dùng chung cho chủ phòng, điều hành và thành viên. Build và 204 test frontend đạt. Chrome với API, Socket.IO và video mô phỏng đã kiểm tra gửi tin kênh khi thu nhỏ, mở lại cùng phiên, dùng Back và chuyển tab khi có PiP. Phase 05 vẫn **In Progress**, chờ nghiệm thu media và tình huống kết thúc phiên trên hai thiết bị thật. [Work log](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture).
+
 ## Giao diện thành viên và quản lý cuộc họp (2026-11-23)
 
 Roster hiển thị vai trò chủ phòng cho mọi participant; danh sách quản lý, duyệt và form mời được tinh chỉnh theo ảnh tham khảo. Backend join trả thêm `hostUserId`. Chưa chạy tests/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-08-phase-05-meeting-member-management-visual-refinement).
@@ -41,6 +45,10 @@ Chỉ host/moderator được kết thúc buổi họp. Gỡ thành viên CLB th
 
 Trạng thái: In Progress. Bắt đầu: 2026-10-19 (Asia/Saigon).
 
+## Thông báo tự ẩn trong phòng họp (2026-11-22)
+
+Phản hồi ngắn ở sảnh và trong phòng dùng popup tự ẩn sau 5 giây. [Work log](/work-logs/2026-11-22-24-phase-05-meeting-notifications).
+
 ## Chuyển thiết bị trong buổi họp (2026-11-21)
 
 Cùng tài khoản có thể giữ nhiều kết nối hoặc chuyển sang thiết bị mới. Backend xác minh kết nối mới rồi mới ngắt kết nối cũ trong cùng phiên. Xem kết quả kiểm thử và các ca còn chờ nghiệm thu. [Work log](/work-logs/2026-11-21-01-phase-05-meeting-device-transfer).
@@ -68,7 +76,7 @@ Người dùng đã điền env LiveKit và xác nhận nghe/thấy giữa nhi�
 
 ## Bước tiếp theo
 
-Tải lại frontend, thử Join và thực hiện checklist nghiệm thu hai thiết bị trong tài liệu Module 1. Ghi bằng chứng trước khi đóng phase.
+Thử Join và kiểm tra media hai chiều trên hai thiết bị. Sau đó chạy các ca thu nhỏ, gửi tin trong kênh, chuyển tab với PiP và kết thúc phiên khi có thành viên đang ở khung nhỏ. Ghi kết quả trước khi đóng phase. [Checklist hai thiết bị](/modules/https-tunnel).
 
 ## Cập nhật kết nối cục bộ
 
