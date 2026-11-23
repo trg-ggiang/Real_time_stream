@@ -140,7 +140,6 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   const [showManagement, setShowManagement] = useState(false);
   const [chatOpen, setChatOpen] = useState(false), [chatUnread, setChatUnread] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
-  const title = management?.overview.meeting.title || 'Phòng họp';
   const onlineUsers = useMemo(() => new Set(participants.map(participant => participant.identity.split(':')[0])), [participants]);
   const connected = state === ConnectionState.Connected;
   const canUseDevices = connected && !transferPending;
@@ -159,9 +158,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   return (
     <>
       <div className="room-status">
-        <div className="meeting-room-name"><h1>{title}</h1>{!connected && <span className="meeting-connection" role="status" data-connected={false}>{connectionLabels[state]}</span>}</div>
-        <span className="meeting-participant-count"><Users size={17} aria-hidden="true" />{participants.length} người trong phòng</span>
-        {onShare && <button type="button" className="workspace-icon meeting-share-button" onClick={onShare} aria-label="Chia sẻ đường dẫn" title="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button>}
+        {!connected && <span className="meeting-connection" role="status" data-connected={false}>{connectionLabels[state]}</span>}
       </div>
       <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen} onUnreadChange={setChatUnread}>
         <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
@@ -169,6 +166,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
       {isHost && management?.sessionId ? <ScreenShareRequests accessToken={management.accessToken} meetingId={management.overview.meeting.meetingId} sessionId={management.sessionId} /> : null}
       <RoomAudioRenderer volume={audioMuted || transferPending ? 0 : 1} />
       <StartAudio label="Bật âm thanh từ phòng" />
+      <div className="meeting-controls-row">
       <div className="meeting-controls">
         <fieldset className="meeting-device-controls" disabled={!canUseDevices} aria-label="Thiết bị">
         <div className="meeting-device-group">
@@ -197,6 +195,11 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
         </button> : null}
         <button type="button" className="lk-button meeting-control-icon" aria-label={`Mọi người${pendingCount ? `, ${pendingCount} người chờ duyệt` : ''}`} title="Mọi người" aria-controls="meeting-people" aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => setShowManagement(value => !value)}><Users size={23} aria-hidden="true" />{hostManagement && pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button>
         <button type="button" className="lk-button meeting-control-icon meeting-control-leave" aria-label="Rời phòng" title="Rời phòng" onClick={onLeave}><SignOut size={23} aria-hidden="true" /></button>
+      </div>
+      <div className="meeting-room-footer">
+        <span className="meeting-participant-count"><Users size={17} aria-hidden="true" />{participants.length} người trong phòng</span>
+        {onShare && <button type="button" className="workspace-icon meeting-share-button" onClick={onShare} aria-label="Chia sẻ đường dẫn" title="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button>}
+      </div>
       </div>
       <div id="meeting-people" className="meeting-management-panel" hidden={!showManagement}>
         {showManagement && <section className="workspace-management meeting-people-list" aria-label="Mọi người">

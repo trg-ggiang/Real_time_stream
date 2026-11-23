@@ -149,6 +149,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack }: { ac
     <a className="meeting-skip" href="#meeting-main">Đến nội dung chính</a>
     <header className="meeting-topbar"><div className="meeting-brand"><UniCircleLogo /></div>
       {onBack && <button className="meeting-home-link" type="button" onClick={() => { void flow.leave(); onBack(); }}><ArrowLeft size={17} aria-hidden="true" />Trang chủ</button>}
+      {flow.active && overview ? <h1 className="meeting-topbar-title" title={overview.meeting.title}>{overview.meeting.title}</h1> : null}
       <div className="meeting-account"><span className="meeting-account-name" title={name}>{name}</span><span className="meeting-avatar-small" aria-hidden="true">{initials}</span><MeetingThemeToggle theme={theme} onChange={setTheme} /></div>
     </header>
     {pendingJoin && <PreJoinAudio title={overview?.meeting.title || 'Cuộc họp'} onCancel={() => setPendingJoin(null)} onConfirm={selection => {
