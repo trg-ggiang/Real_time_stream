@@ -3,6 +3,10 @@ title: Code change logs
 description: Reserved for completed code changes only.
 ---
 
+## Thiết kế lại bố cục phòng họp (2026-11-23)
+
+Sắp video lớn bên trái, sidebar thành viên/quản lý bên phải và thanh điều khiển phía dưới; sidebar đóng/mở được. Giữ các thao tác cuộc họp frontend hiện có, không đổi backend. `git diff --check` đạt; chưa chạy test/build hay kiểm tra trình duyệt. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-01-phase-05-meeting-room-layout).
+
 ## Quyền kết thúc họp và gỡ thành viên CLB (2026-11-22)
 
 Chỉ host/moderator được kết thúc buổi họp. Gỡ thành viên CLB thu hồi quyền họp và ngắt các thiết bị của người đó trong các cuộc họp thuộc CLB; frontend thoát cuộc gọi khi bị ngắt hoặc mất quyền. Không đổi schema. Phase 04/05 vẫn **In Progress**; chờ nghiệm thu LiveKit thật. [Work log](/work-logs/2026-11-22-01-phase-05-meeting-permissions-club-removal).

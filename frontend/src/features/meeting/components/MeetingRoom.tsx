@@ -137,7 +137,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   const [audioMuted, setAudioMuted] = useState(() => !initialSpeaker);
   const canSelectOutput = typeof HTMLMediaElement !== 'undefined' && 'setSinkId' in HTMLMediaElement.prototype;
   const hostManagement = isHost ? management : undefined;
-  const [showManagement, setShowManagement] = useState(false);
+  const [showManagement, setShowManagement] = useState(true);
   const [chatOpen, setChatOpen] = useState(false), [chatUnread, setChatUnread] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const onlineUsers = useMemo(() => new Set(participants.map(participant => participant.identity.split(':')[0])), [participants]);
@@ -160,12 +160,31 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
       <div className="room-status">
         {!connected && <span className="meeting-connection" role="status" data-connected={false}>{connectionLabels[state]}</span>}
       </div>
-      <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen} onUnreadChange={setChatUnread}>
-        <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
-      </MeetingChat>
       {isHost && management?.sessionId ? <ScreenShareRequests accessToken={management.accessToken} meetingId={management.overview.meeting.meetingId} sessionId={management.sessionId} /> : null}
       <RoomAudioRenderer volume={audioMuted || transferPending ? 0 : 1} />
       <StartAudio label="Bật âm thanh từ phòng" />
+      <div className="meeting-call-layout" data-sidebar-open={showManagement} data-chat-open={chatOpen}>
+        <div className="meeting-call-stage">
+          <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen} onUnreadChange={setChatUnread}>
+            <MeetingMediaLayout><MeetingParticipantTile /></MeetingMediaLayout>
+          </MeetingChat>
+        </div>
+        {showManagement && <aside id="meeting-people" className="meeting-sidebar" aria-label="Thành viên và quản lý cuộc họp">
+          <section className="meeting-sidebar-roster" aria-labelledby="meeting-roster-title">
+            <h2 id="meeting-roster-title"><Users size={19} aria-hidden="true" />Thành viên ({participants.length})</h2>
+            <ul>{participants.map(participant => {
+              const isSelf = participant.identity === credentials.participantIdentity;
+              const participantName = participant.name || 'Thành viên';
+              return <li key={participant.identity}>
+                <span className="meeting-roster-avatar" aria-hidden="true">{Array.from(participantName)[0]?.toLocaleUpperCase('vi') || 'T'}</span>
+                <span className="meeting-roster-info"><strong>{participantName}{isSelf ? ' (Bạn)' : ''}</strong>{isSelf && credentials.role ? <small>{credentials.role === 'host' ? 'Chủ phòng' : credentials.role === 'moderator' ? 'Điều hành' : 'Thành viên'}</small> : null}</span>
+              </li>;
+            })}</ul>
+          </section>
+          {hostManagement && <MeetingManagement {...hostManagement} inCallHost onlineUsers={onlineUsers}
+            showSessionMembers onPendingCountChange={setPendingCount} />}
+        </aside>}
+      </div>
       <div className="meeting-controls-row">
       <div className="meeting-controls">
         <fieldset className="meeting-device-controls" disabled={!canUseDevices} aria-label="Thiết bị">
@@ -193,25 +212,13 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
           <ChatCircleText size={23} weight={chatOpen ? 'fill' : 'regular'} aria-hidden="true" />
           {!chatOpen && chatUnread > 0 ? <span className="meeting-chat-unread" aria-hidden="true">{chatUnread > 99 ? '99+' : chatUnread}</span> : null}
         </button> : null}
-        <button type="button" className="lk-button meeting-control-icon" aria-label={`Mọi người${pendingCount ? `, ${pendingCount} người chờ duyệt` : ''}`} title="Mọi người" aria-controls="meeting-people" aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => setShowManagement(value => !value)}><Users size={23} aria-hidden="true" />{hostManagement && pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button>
+        <button type="button" className="lk-button meeting-control-icon" aria-label={`Mọi người${pendingCount ? `, ${pendingCount} người chờ duyệt` : ''}`} title="Mọi người" aria-controls={showManagement ? 'meeting-people' : undefined} aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => setShowManagement(value => !value)}><Users size={23} aria-hidden="true" />{hostManagement && pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button>
         <button type="button" className="lk-button meeting-control-icon meeting-control-leave" aria-label="Rời phòng" title="Rời phòng" onClick={onLeave}><SignOut size={23} aria-hidden="true" /></button>
       </div>
       <div className="meeting-room-footer">
         <span className="meeting-participant-count"><Users size={17} aria-hidden="true" />{participants.length} người trong phòng</span>
         {onShare && <button type="button" className="workspace-icon meeting-share-button" onClick={onShare} aria-label="Chia sẻ đường dẫn" title="Chia sẻ đường dẫn"><ShareNetwork size={22} aria-hidden="true" /></button>}
       </div>
-      </div>
-      <div id="meeting-people" className="meeting-management-panel" hidden={!showManagement}>
-        {showManagement && <section className="workspace-management meeting-people-list" aria-label="Mọi người">
-          <h2>Mọi người ({participants.length})</h2>
-          <ul>
-            {participants.map(participant => <li key={participant.identity}>
-              {participant.name || 'Thành viên'}{participant.identity === credentials.participantIdentity ? ' (Bạn)' : ''}
-            </li>)}
-          </ul>
-        </section>}
-        {hostManagement && <MeetingManagement {...hostManagement} inCallHost onlineUsers={onlineUsers}
-          showSessionMembers={showManagement} onPendingCountChange={setPendingCount} />}
       </div>
     </>
   );

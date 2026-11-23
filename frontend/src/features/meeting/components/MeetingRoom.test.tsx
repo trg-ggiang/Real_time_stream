@@ -56,20 +56,20 @@ it('applies muted microphone and speakers from the pre-join selection', () => {
   expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('1');
   expect(sessionStorage.getItem('rts.meeting-speaker.v1')).toBe('on');
 });
-it('places the meeting title inside the room and shows pending approvals while management is closed', () => {
+it('shows the participant and management sidebar by default and lets people toggle it', () => {
   const onShare = vi.fn();
   render(<MeetingRoom accessToken="test" credentials={{token:'test',serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u',role:'host'}}
     onLeave={vi.fn()} onEnded={vi.fn()} onShare={onShare} management={{
       accessToken: 'test', overview: { meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Sinh hoạt CLB' }, sessions: [] },
       knownMembers: [], onMembersChanged: vi.fn(), onChanged: vi.fn(), onError: vi.fn(), onSessionEnded: vi.fn(),
     }} />);
-  expect(screen.getByRole('heading', { name: 'Sinh hoạt CLB' }).closest('.meeting-room')).toBeTruthy();
+  expect(screen.getByRole('heading', { name: 'Thành viên (0)' }).closest('.meeting-sidebar')).toBeTruthy();
   expect(screen.queryByText('Đã kết nối')).toBeNull();
   const control = screen.getByRole('button', { name: 'Mọi người, 2 người chờ duyệt' });
-  expect(control.getAttribute('aria-expanded')).toBe('false');
-  expect(screen.getByText('Management content').parentElement?.hidden).toBe(true);
+  expect(control.getAttribute('aria-expanded')).toBe('true');
+  expect(screen.getByText('Management content')).toBeTruthy();
   fireEvent.click(control);
-  expect(screen.getByText('Management content').parentElement?.hidden).toBe(false);
+  expect(screen.queryByText('Management content')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: 'Chia sẻ đường dẫn' }));
   expect(onShare).toHaveBeenCalledOnce();
 });
@@ -165,8 +165,7 @@ it.each(['participant', 'moderator', undefined] as const)('shows a live, read-on
   };
   const { rerender } = render(<MeetingRoom {...props} />);
   const control = screen.getByRole('button', { name: 'Mọi người' });
-  expect(control.getAttribute('aria-expanded')).toBe('false');
-  fireEvent.click(control);
+  expect(control.getAttribute('aria-expanded')).toBe('true');
   expect(screen.getAllByRole('listitem')).toHaveLength(10);
   expect(screen.getByText('Person 9')).toBeTruthy();
   expect(screen.queryByText('Management content')).toBeNull();
@@ -175,6 +174,7 @@ it.each(['participant', 'moderator', undefined] as const)('shows a live, read-on
   expect(screen.queryByText('Person 9')).toBeNull();
   expect(screen.getByText('New arrival')).toBeTruthy();
   fireEvent.click(control);
+  expect(control.getAttribute('aria-expanded')).toBe('false');
   expect(screen.queryByRole('list')).toBeNull();
 });
 
