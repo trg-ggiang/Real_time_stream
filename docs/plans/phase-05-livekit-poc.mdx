@@ -3,6 +3,30 @@ title: Phase 05 — Tích hợp LiveKit Cloud
 description: Theo dõi Module 1 trong phạm vi đã được giao.
 ---
 
+## Camera local ở trang đầu (2026-11-23)
+
+Camera của người dùng được ghim ở trang đầu; các trang sau chỉ hiện camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-07-phase-05-self-camera-first-page).
+
+## Chat và thành viên dùng panel riêng (2026-11-23)
+
+Chat và panel Thành viên/quản lý không mở đồng thời; chọn một panel sẽ đóng panel còn lại. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-06-phase-05-exclusive-chat-roster-panels).
+
+## Chat chiếm hết chiều cao stage (2026-11-23)
+
+Khung chat lấp đầy chiều cao cột chat, khu vực tin nhắn co giãn và composer nằm ở đáy. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-05-phase-05-meeting-chat-full-height).
+
+## Camera local khi chia sẻ màn hình (2026-11-23)
+
+Thêm camera của người chia sẻ vào sidebar; camera local luôn giữ vị trí, phân trang chỉ áp dụng cho camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-04-phase-05-meeting-self-camera-sidebar).
+
+## Kích thước ô camera khi ít người (2026-11-23)
+
+Dải camera dùng ba hàng cố định để 1–2 participant không bị kéo giãn kín sidebar; mobile giữ độ rộng tile cố định. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-03-phase-05-meeting-camera-tile-sizing).
+
+## Phân trang thành viên tham gia cuộc họp (2026-11-23)
+
+Dải camera participant cạnh màn hình chia sẻ phân trang 3 ô mỗi trang; sidebar tên thành viên hiển thị 10 người mỗi trang. Trang tự điều chỉnh nếu số participant giảm. Không đổi backend. `git diff --check` đạt; chưa chạy test/build. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-02-phase-05-meeting-participant-pagination).
+
 ## Thiết kế lại bố cục phòng họp (2026-11-23)
 
 Video chiếm cột chính, sidebar thành viên và quản lý nằm bên phải, thanh điều khiển ở dưới; sidebar đóng/mở được và xếp dọc trên màn hình hẹp. Giữ các thao tác frontend hiện có, không đổi backend. `git diff --check` đạt; chưa chạy test/build hoặc kiểm tra browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-01-phase-05-meeting-room-layout).

@@ -1,0 +1,45 @@
+---
+title: 2026-11-23-04 — Hiển thị camera của mình khi chia sẻ
+description: Giữ ô camera local trong sidebar cạnh màn hình đang chia sẻ.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-04
+- Thời gian: 2026-11-23, Asia/Saigon
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Khi chia sẻ màn hình, hiển thị camera của người chia sẻ trong sidebar cùng các camera khác, không thay đổi backend.
+
+## Công việc hoàn thành
+
+- Thêm camera local vào sidebar khi có màn hình chia sẻ.
+- Giữ camera local cố định ngoài phân trang; phân trang vẫn áp dụng cho camera remote.
+- Giữ layout presentation-only khi không có camera local hoặc remote.
+
+## File thay đổi
+
+- `frontend/src/features/meeting/components/MeetingMediaLayout.tsx`
+- `docs/work-logs/2026-11-23-04-phase-05-meeting-self-camera-sidebar.mdx`
+- `docs/docs.json`
+- `docs/plans/phase-05-livekit-poc.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Frontend tests/build | Skipped | Chưa kiểm tra trực quan trên trình duyệt |
+| Backend | Skipped | Không có thay đổi backend |
+
+## Bước tiếp theo
+
+Kiểm tra trực quan camera local khi bật/tắt camera và khi chia sẻ màn hình. Phase 05 vẫn In Progress.

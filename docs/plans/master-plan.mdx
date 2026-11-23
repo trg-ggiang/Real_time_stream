@@ -12,6 +12,18 @@ description: Tiến trình phase và thứ tự triển khai theo context.
 
 ## Các cập nhật theo phiên
 
+2026-11-23: Ghim camera local chỉ ở trang camera đầu tiên; các trang tiếp theo dành cho camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-07-phase-05-self-camera-first-page).
+
+2026-11-23: Làm Chat và Thành viên/quản lý thành hai panel loại trừ nhau để vùng họp không bị chia cho cả hai. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-06-phase-05-exclusive-chat-roster-panels).
+
+2026-11-23: Cho khung chat trong cuộc gọi chiếm hết chiều cao vùng stage; danh sách tin nhắn co giãn, ô nhập nằm ở đáy. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-05-phase-05-meeting-chat-full-height).
+
+2026-11-23: Hiển thị camera local trong sidebar khi chia sẻ; phân trang chỉ áp dụng cho camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-04-phase-05-meeting-self-camera-sidebar).
+
+2026-11-23: Giữ ô camera kích thước cố định khi trang chỉ có 1–2 participant; trên mobile tile không giãn toàn chiều ngang. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-03-phase-05-meeting-camera-tile-sizing).
+
+2026-11-23: Thêm phân trang cho dải camera participant cạnh màn hình chia sẻ, 3 ô mỗi trang; danh sách tên dùng 10 người mỗi trang. Trang tự điều chỉnh khi số người giảm. Không đổi backend. `git diff --check` đạt; chưa chạy frontend tests/build. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-02-phase-05-meeting-participant-pagination).
+
 2026-11-23: Thiết kế lại phòng họp thành video lớn, sidebar thành viên/quản lý có thể đóng/mở và thanh điều khiển dưới cùng; giữ nguyên backend. `git diff --check` đạt; chưa kiểm tra browser hoặc chạy frontend test/build. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-01-phase-05-meeting-room-layout).
 
 2026-11-22: Sửa quyền kết thúc buổi họp và ngắt kết nối khi bị gỡ khỏi CLB. Build, 96 backend và 171 frontend tests đạt. Phase 04/05 In Progress; chờ nghiệm thu LiveKit thật. [Work log](/work-logs/2026-11-22-01-phase-05-meeting-permissions-club-removal).

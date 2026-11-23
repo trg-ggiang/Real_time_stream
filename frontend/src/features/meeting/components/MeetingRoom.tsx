@@ -10,6 +10,8 @@ import { Microphone } from '@phosphor-icons/react/dist/csr/Microphone';
 import { MicrophoneSlash } from '@phosphor-icons/react/dist/csr/MicrophoneSlash';
 import { VideoCameraSlash } from '@phosphor-icons/react/dist/csr/VideoCameraSlash';
 import { CaretDown } from '@phosphor-icons/react/dist/csr/CaretDown';
+import { CaretLeft } from '@phosphor-icons/react/dist/csr/CaretLeft';
+import { CaretRight } from '@phosphor-icons/react/dist/csr/CaretRight';
 import { Headphones } from '@phosphor-icons/react/dist/csr/Headphones';
 import {
   MediaDeviceMenu,
@@ -43,6 +45,8 @@ import { MeetingMediaLayout } from './MeetingMediaLayout';
 import { MeetingChat } from '../chat/components/MeetingChat';
 import { MeetingManagement } from './MeetingManagement';
 import type { AudioSelection } from './PreJoinAudio';
+
+const PARTICIPANTS_PER_PAGE = 10;
 import type { ComponentProps } from 'react';
 type ManagementProps = Omit<ComponentProps<typeof MeetingManagement>, 'onlineUsers'>;
 
@@ -140,7 +144,13 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   const [showManagement, setShowManagement] = useState(true);
   const [chatOpen, setChatOpen] = useState(false), [chatUnread, setChatUnread] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
+  const [participantPage, setParticipantPage] = useState(0);
+  const participantPageCount = Math.max(1, Math.ceil(participants.length / PARTICIPANTS_PER_PAGE));
+  const visibleParticipants = participants.slice(participantPage * PARTICIPANTS_PER_PAGE, (participantPage + 1) * PARTICIPANTS_PER_PAGE);
   const onlineUsers = useMemo(() => new Set(participants.map(participant => participant.identity.split(':')[0])), [participants]);
+  useEffect(() => {
+    setParticipantPage(current => Math.min(current, participantPageCount - 1));
+  }, [participantPageCount]);
   const connected = state === ConnectionState.Connected;
   const canUseDevices = connected && !transferPending;
   const restoredMedia = useRef(false);
@@ -172,7 +182,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
         {showManagement && <aside id="meeting-people" className="meeting-sidebar" aria-label="Thành viên và quản lý cuộc họp">
           <section className="meeting-sidebar-roster" aria-labelledby="meeting-roster-title">
             <h2 id="meeting-roster-title"><Users size={19} aria-hidden="true" />Thành viên ({participants.length})</h2>
-            <ul>{participants.map(participant => {
+            <ul>{visibleParticipants.map(participant => {
               const isSelf = participant.identity === credentials.participantIdentity;
               const participantName = participant.name || 'Thành viên';
               return <li key={participant.identity}>
@@ -180,6 +190,13 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
                 <span className="meeting-roster-info"><strong>{participantName}{isSelf ? ' (Bạn)' : ''}</strong>{isSelf && credentials.role ? <small>{credentials.role === 'host' ? 'Chủ phòng' : credentials.role === 'moderator' ? 'Điều hành' : 'Thành viên'}</small> : null}</span>
               </li>;
             })}</ul>
+            {participantPageCount > 1 ? <nav className="meeting-roster-pagination" aria-label="Phân trang thành viên">
+              <button type="button" className="meeting-roster-page-button" aria-label="Trang trước" title="Trang trước"
+                disabled={participantPage === 0} onClick={() => setParticipantPage(page => Math.max(0, page - 1))}><CaretLeft size={17} aria-hidden="true" /></button>
+              <span aria-live="polite">Trang {participantPage + 1}/{participantPageCount}</span>
+              <button type="button" className="meeting-roster-page-button" aria-label="Trang sau" title="Trang sau"
+                disabled={participantPage >= participantPageCount - 1} onClick={() => setParticipantPage(page => Math.min(participantPageCount - 1, page + 1))}><CaretRight size={17} aria-hidden="true" /></button>
+            </nav> : null}
           </section>
           {hostManagement && <MeetingManagement {...hostManagement} inCallHost onlineUsers={onlineUsers}
             showSessionMembers onPendingCountChange={setPendingCount} />}
@@ -208,11 +225,19 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
         </fieldset>
         <RaiseHandButton connected={state === ConnectionState.Connected} />
         <ScreenShareButton />
-        {credentials.sessionId ? <button type="button" className="lk-button meeting-control-icon meeting-chat-toggle" aria-label={`${chatOpen ? 'Đóng chat' : 'Mở chat'}${!chatOpen && chatUnread ? `, ${chatUnread} tin chưa đọc` : ''}`} title={chatOpen ? 'Đóng chat' : 'Mở chat'} aria-controls="meeting-chat-panel" aria-expanded={chatOpen} aria-pressed={chatOpen} onClick={() => setChatOpen(value => !value)}>
+        {credentials.sessionId ? <button type="button" className="lk-button meeting-control-icon meeting-chat-toggle" aria-label={`${chatOpen ? 'Đóng chat' : 'Mở chat'}${!chatOpen && chatUnread ? `, ${chatUnread} tin chưa đọc` : ''}`} title={chatOpen ? 'Đóng chat' : 'Mở chat'} aria-controls="meeting-chat-panel" aria-expanded={chatOpen} aria-pressed={chatOpen} onClick={() => {
+          const next = !chatOpen;
+          setChatOpen(next);
+          if (next) setShowManagement(false);
+        }}>
           <ChatCircleText size={23} weight={chatOpen ? 'fill' : 'regular'} aria-hidden="true" />
           {!chatOpen && chatUnread > 0 ? <span className="meeting-chat-unread" aria-hidden="true">{chatUnread > 99 ? '99+' : chatUnread}</span> : null}
         </button> : null}
-        <button type="button" className="lk-button meeting-control-icon" aria-label={`Mọi người${pendingCount ? `, ${pendingCount} người chờ duyệt` : ''}`} title="Mọi người" aria-controls={showManagement ? 'meeting-people' : undefined} aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => setShowManagement(value => !value)}><Users size={23} aria-hidden="true" />{hostManagement && pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button>
+        <button type="button" className="lk-button meeting-control-icon" aria-label={`Mọi người${pendingCount ? `, ${pendingCount} người chờ duyệt` : ''}`} title="Mọi người" aria-controls={showManagement ? 'meeting-people' : undefined} aria-expanded={showManagement} aria-pressed={showManagement} onClick={() => {
+          const next = !showManagement;
+          setShowManagement(next);
+          if (next) setChatOpen(false);
+        }}><Users size={23} aria-hidden="true" />{hostManagement && pendingCount > 0 && <span className="meeting-pending-badge">{pendingCount}</span>}</button>
         <button type="button" className="lk-button meeting-control-icon meeting-control-leave" aria-label="Rời phòng" title="Rời phòng" onClick={onLeave}><SignOut size={23} aria-hidden="true" /></button>
       </div>
       <div className="meeting-room-footer">
