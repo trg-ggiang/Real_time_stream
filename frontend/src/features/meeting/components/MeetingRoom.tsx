@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { Hand } from '@phosphor-icons/react/dist/csr/Hand';
 import { Users } from '@phosphor-icons/react/dist/csr/Users';
+import { CrownSimple } from '@phosphor-icons/react/dist/csr/CrownSimple';
 import { ChatCircleText } from '@phosphor-icons/react/dist/csr/ChatCircleText';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { SignOut } from '@phosphor-icons/react/dist/csr/SignOut';
@@ -148,6 +149,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   const participantPageCount = Math.max(1, Math.ceil(participants.length / PARTICIPANTS_PER_PAGE));
   const visibleParticipants = participants.slice(participantPage * PARTICIPANTS_PER_PAGE, (participantPage + 1) * PARTICIPANTS_PER_PAGE);
   const onlineUsers = useMemo(() => new Set(participants.map(participant => participant.identity.split(':')[0])), [participants]);
+  const participantRoles = useMemo(() => new Map((hostManagement?.knownMembers ?? []).map(member => [member.user_id, member.role])), [hostManagement?.knownMembers]);
   useEffect(() => {
     setParticipantPage(current => Math.min(current, participantPageCount - 1));
   }, [participantPageCount]);
@@ -185,9 +187,11 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
             <ul>{visibleParticipants.map(participant => {
               const isSelf = participant.identity === credentials.participantIdentity;
               const participantName = participant.name || 'Thành viên';
+              const participantUserId = participant.identity.split(':')[0];
+              const role = participantRoles.get(participantUserId) ?? (participantUserId === credentials.hostUserId ? 'host' : isSelf ? credentials.role : undefined);
               return <li key={participant.identity}>
                 <span className="meeting-roster-avatar" aria-hidden="true">{Array.from(participantName)[0]?.toLocaleUpperCase('vi') || 'T'}</span>
-                <span className="meeting-roster-info"><strong>{participantName}{isSelf ? ' (Bạn)' : ''}</strong>{isSelf && credentials.role ? <small>{credentials.role === 'host' ? 'Chủ phòng' : credentials.role === 'moderator' ? 'Điều hành' : 'Thành viên'}</small> : null}</span>
+                <span className="meeting-roster-info"><span className="meeting-roster-heading"><strong>{participantName}{isSelf ? ' (Bạn)' : ''}</strong><small className="meeting-roster-role">{role === 'host' ? <><CrownSimple size={13} weight="fill" aria-hidden="true" />Chủ phòng</> : role === 'moderator' ? 'Điều hành' : <><Users size={13} aria-hidden="true" />Thành viên</>}</small></span><small className="meeting-roster-status"><span aria-hidden="true" />Đang kết nối</small></span>
               </li>;
             })}</ul>
             {participantPageCount > 1 ? <nav className="meeting-roster-pagination" aria-label="Phân trang thành viên">
@@ -199,6 +203,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
             </nav> : null}
           </section>
           {hostManagement && <MeetingManagement {...hostManagement} inCallHost onlineUsers={onlineUsers}
+            microphoneStates={new Map(participants.map(participant => [participant.identity.split(':')[0], participant.isMicrophoneEnabled]))}
             showSessionMembers onPendingCountChange={setPendingCount} />}
         </aside>}
       </div>

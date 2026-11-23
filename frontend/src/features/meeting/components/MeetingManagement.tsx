@@ -2,11 +2,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { meetingRequest, MeetingApiError, roleLabels, type JoinRequest, type Member, type MeetingOverview } from '../services/meetings-api';
 import { ConfirmationDialog } from '../../../shared/components/ConfirmationDialog';
 import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
+import { MicrophoneSlash } from '@phosphor-icons/react/dist/csr/MicrophoneSlash';
+import { Microphone } from '@phosphor-icons/react/dist/csr/Microphone';
+import { SignOut } from '@phosphor-icons/react/dist/csr/SignOut';
+import { CrownSimple } from '@phosphor-icons/react/dist/csr/CrownSimple';
+import { Users } from '@phosphor-icons/react/dist/csr/Users';
+import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
+import { EnvelopeSimple } from '@phosphor-icons/react/dist/csr/EnvelopeSimple';
 
-export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, inCallHost = false, showSessionMembers = false, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
+export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, microphoneStates, inCallHost = false, showSessionMembers = false, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
   inCallHost?: boolean; showSessionMembers?: boolean;
   onPendingCountChange?: (count: number) => void;
   accessToken: string; overview: MeetingOverview; sessionId?: string; onlineUsers?: ReadonlySet<string>;
+  microphoneStates?: ReadonlyMap<string, boolean>;
   knownMembers: Member[]; onMembersChanged: (meetingId: string, members: Member[]) => void;
   onChanged: () => Promise<void>; onError: (cause: unknown) => void; onSessionEnded: () => void;
 }) {
@@ -89,7 +97,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
   }
 
   return <section className="workspace-management" aria-label="Quản lý cuộc họp">
-    <div className="workspace-section-title"><h2>Quản lý cuộc họp</h2>{member ? <span className="workspace-role">{roleLabels[member.role]}</span> : null}</div>
+    <div className="workspace-section-title"><span className="workspace-management-icon"><VideoCamera size={20} weight="fill" aria-hidden="true" /></span><h2>Quản lý cuộc họp</h2>{member ? <span className="workspace-role">{roleLabels[member.role]}</span> : isHost ? <span className="workspace-role">Chủ phòng</span> : null}</div>
     {error ? <p className="notice error" role="alert">{error}</p> : null}
     <p className="workspace-feedback" role="status">{notice}</p>
     {canModerate || !sessionId ? <><div className="workspace-form workspace-setting" aria-label="Cài đặt phòng chờ">
@@ -107,21 +115,23 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
       event.preventDefault(); if (locked.current) return;
       const email = String(new FormData(event.currentTarget).get('inviteEmail')).trim().toLowerCase();
       void act(`/${meetingId}/members`, { email }, 'POST', false, data => observe({ ...(data as unknown as Member), users: { display_name: email, email } }));
-    }}><label>Mời thành viên lâu dài<input type="email" name="inviteEmail" autoComplete="off" spellCheck={false} required maxLength={254} placeholder="email@gmail.com" disabled={!!busy} /></label><button type="submit" disabled={!!busy}>{busy === `/${meetingId}/members` ? 'Đang mời…' : 'Mời thành viên'}</button></form></> : null}
+    }}><label>Mời thành viên lâu dài<span className="workspace-invite-input"><EnvelopeSimple size={18} aria-hidden="true" /><input type="email" name="inviteEmail" autoComplete="off" spellCheck={false} required maxLength={254} placeholder="email@gmail.com" disabled={!!busy} /></span></label><button type="submit" disabled={!!busy}>{busy === `/${meetingId}/members` ? 'Đang mời…' : 'Mời thành viên'}</button></form></> : null}
     {loading ? <p role="status">Đang kiểm tra yêu cầu vào phòng…</p> : null}
-    {canModerate && sessionId && session?.status !== 'ended' ? <section className="workspace-requests" aria-labelledby="requests-title"><h3 id="requests-title">Đang chờ duyệt ({requests.length})</h3>
+    {canModerate && sessionId && session?.status !== 'ended' ? <section className="workspace-requests" aria-labelledby="requests-title"><h3 id="requests-title"><span className="workspace-requests-icon"><Users size={22} aria-hidden="true" /></span>Đang chờ duyệt ({requests.length})</h3>
       {!loading && requests.length === 0 ? <p className="workspace-empty">Chưa có yêu cầu tham gia buổi này.</p> : null}
-      {requests.map(request => <div className="workspace-person" key={request.requestId}><span>{request.meeting_members?.users?.display_name || 'Thành viên'}</span><div className="workspace-person-actions"><button type="button" disabled={!!busy} onClick={() => approve(request)}>Duyệt</button><button type="button" className="workspace-text-button" disabled={!!busy} onClick={() => setConfirmation({ title: 'Từ chối yêu cầu tham gia này?', path: `/${meetingId}/sessions/${sessionId}/join-requests/${request.meeting_member_id}/deny` })}>Từ chối</button></div></div>)}
+      {requests.map(request => { const name = request.meeting_members?.users?.display_name || 'Thành viên'; return <div className="workspace-person workspace-request-person" key={request.requestId}><span className="workspace-person-avatar" aria-hidden="true">{Array.from(name)[0]?.toLocaleUpperCase('vi') || 'T'}</span><div className="workspace-person-info"><strong>{name}</strong><span>Đang chờ vào phòng</span></div><div className="workspace-person-actions"><button type="button" className="workspace-request-approve" disabled={!!busy} onClick={() => approve(request)}>Duyệt</button><button type="button" className="workspace-request-deny" disabled={!!busy} onClick={() => setConfirmation({ title: 'Từ chối yêu cầu tham gia này?', path: `/${meetingId}/sessions/${sessionId}/join-requests/${request.meeting_member_id}/deny` })}>Từ chối</button></div></div>; })}
     </section> : null}
     {visibleMembers.length ? <section aria-labelledby="members-title"><h3 id="members-title">{inCallHost ? 'Quản lý người đang tham gia' : 'Thành viên đã xử lý trong phiên này'}</h3>
       {visibleMembers.map(target => {
         const self = target.user_id === member?.userId;
         const canAct = isHost && !self && target.role !== 'host';
         const online = onlineUsers?.has(target.user_id);
-        return <div className="workspace-person" key={target.meeting_member_id}><div className="workspace-person-info"><strong>{target.users?.display_name || target.users?.email || 'Thành viên'}</strong><span>{roleLabels[target.role]}{onlineUsers ? online ? ' · Đang kết nối' : ' · Ngoại tuyến' : ''}</span></div><div className="workspace-person-actions">
-          {canAct && online && session?.status === 'ongoing' ? <button type="button" disabled={!!busy} onClick={() => void act(`/${meetingId}/sessions/${sessionId}/members/${target.meeting_member_id}/mute`)}>Tắt mic</button> : null}
+        const microphoneEnabled = microphoneStates?.get(target.user_id) ?? false;
+        const name = target.users?.display_name || target.users?.email || 'Thành viên';
+        return <div className="workspace-person" key={target.meeting_member_id}><span className="workspace-person-avatar" aria-hidden="true">{Array.from(name)[0]?.toLocaleUpperCase('vi') || 'T'}</span><div className="workspace-person-info"><div className="workspace-person-heading"><strong>{name}</strong><small className={`workspace-person-role${target.role === 'host' ? ' is-host' : ''}`}>{target.role === 'host' ? <CrownSimple size={13} weight="fill" aria-hidden="true" /> : <Users size={13} aria-hidden="true" />}{roleLabels[target.role]}</small></div><span className="workspace-person-status"><i aria-hidden="true" />{onlineUsers ? online ? 'Đang kết nối' : 'Ngoại tuyến' : roleLabels[target.role]}</span></div><div className="workspace-person-actions">
+          {canAct && online && session?.status === 'ongoing' ? <button type="button" aria-label="Tắt mic" title="Tắt mic" disabled={!!busy} onClick={() => void act(`/${meetingId}/sessions/${sessionId}/members/${target.meeting_member_id}/mute`)}>{microphoneEnabled ? <Microphone size={15} aria-hidden="true" /> : <MicrophoneSlash size={15} aria-hidden="true" />}Tắt mic</button> : null}
           {canAct && target.invited_at ? <button type="button" disabled={!!busy} onClick={() => void act(`/${meetingId}/members/${target.meeting_member_id}/moderator`, { enabled: target.role !== 'moderator' }, 'PATCH', false, data => observe({ ...target, role: data.role as Member['role'] }))}>{target.role === 'moderator' ? 'Gỡ điều hành' : 'Cấp điều hành'}</button> : null}
-          {canAct && online && sessionId && session?.status === 'ongoing' ? <button type="button" className="workspace-text-button" disabled={!!busy} onClick={() => setConfirmation({ title: `Loại ${target.users?.display_name || 'thành viên này'} khỏi cuộc họp?`, path: `/${meetingId}/sessions/${sessionId}/members/${target.meeting_member_id}/remove`, memberId: target.meeting_member_id })}>Loại</button> : null}
+          {canAct && online && sessionId && session?.status === 'ongoing' ? <button type="button" className="workspace-text-button workspace-remove-member" disabled={!!busy} onClick={() => setConfirmation({ title: `Loại ${target.users?.display_name || 'thành viên này'} khỏi cuộc họp?`, path: `/${meetingId}/sessions/${sessionId}/members/${target.meeting_member_id}/remove`, memberId: target.meeting_member_id })}><SignOut size={15} aria-hidden="true" />Loại</button> : null}
         </div></div>;
       })}
     </section> : null}
