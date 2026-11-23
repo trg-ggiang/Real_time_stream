@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { meetingRequest, MeetingApiError, roleLabels, type JoinRequest, type Member, type MeetingOverview } from '../services/meetings-api';
 import { ConfirmationDialog } from '../../../shared/components/ConfirmationDialog';
-import { useAutoDismiss } from '../../../shared/lib/use-auto-dismiss';
 import { MicrophoneSlash } from '@phosphor-icons/react/dist/csr/MicrophoneSlash';
 import { Microphone } from '@phosphor-icons/react/dist/csr/Microphone';
 import { SignOut } from '@phosphor-icons/react/dist/csr/SignOut';
@@ -9,6 +8,7 @@ import { CrownSimple } from '@phosphor-icons/react/dist/csr/CrownSimple';
 import { Users } from '@phosphor-icons/react/dist/csr/Users';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 import { EnvelopeSimple } from '@phosphor-icons/react/dist/csr/EnvelopeSimple';
+import { MeetingNotification } from './MeetingNotification';
 
 export function MeetingManagement({ accessToken, overview, sessionId, onlineUsers, microphoneStates, inCallHost = false, showSessionMembers = false, knownMembers, onMembersChanged, onChanged, onError, onSessionEnded, onPendingCountChange }: {
   inCallHost?: boolean; showSessionMembers?: boolean;
@@ -23,7 +23,7 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
   const [canModerate, setCanModerate] = useState(inCallHost || member?.role === 'host' || member?.role === 'moderator');
   const [loading, setLoading] = useState(true), [busy, setBusy] = useState(''), [notice, setNotice] = useState('');
   const [error, setError] = useState('');
-  useAutoDismiss(notice, () => setNotice(''));
+  const dismissNotice = useCallback(() => setNotice(''), []);
   const [waitingEnabled, setWaitingEnabled] = useState<boolean | undefined>(overview.meeting.waitingRoomEnabled);
   const [confirmation, setConfirmation] = useState<{ title: string; path: string; end?: boolean; memberId?: string; request?: JoinRequest } | null>(null);
   useEffect(() => { onPendingCountChange?.(canModerate ? requests.length : 0); }, [canModerate, requests.length, onPendingCountChange]);
@@ -98,8 +98,8 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
 
   return <section className="workspace-management" aria-label="Quản lý cuộc họp">
     <div className="workspace-section-title"><span className="workspace-management-icon"><VideoCamera size={20} weight="fill" aria-hidden="true" /></span><h2>Quản lý cuộc họp</h2>{member ? <span className="workspace-role">{roleLabels[member.role]}</span> : isHost ? <span className="workspace-role">Chủ phòng</span> : null}</div>
-    {error ? <p className="notice error" role="alert">{error}</p> : null}
-    <p className="workspace-feedback" role="status">{notice}</p>
+    <MeetingNotification kind="error" message={confirmation ? '' : error} />
+    <MeetingNotification kind="success" message={notice} onClose={dismissNotice} />
     {canModerate || !sessionId ? <><div className="workspace-form workspace-setting" aria-label="Cài đặt phòng chờ">
       <label className="workspace-check"><input type="checkbox" name="waitingEnabled"
         checked={waitingEnabled === true}
@@ -138,6 +138,8 @@ export function MeetingManagement({ accessToken, overview, sessionId, onlineUser
     {isHost && sessionId && session?.status !== 'ended' ? <button type="button" className="workspace-danger" disabled={!!busy} onClick={() => setConfirmation({ title: 'Kết thúc buổi họp cho tất cả mọi người?', path: `/${meetingId}/sessions/${sessionId}/end`, end: true })}>Kết thúc buổi họp</button> : null}
     {confirmation ? <ConfirmationDialog danger title={confirmation.title} busy={!!busy} onConfirm={() => void act(confirmation.path, undefined, 'POST', confirmation.end, () => {
       if (confirmation.memberId) onMembersChanged(meetingId, knownMembers.filter(target => target.meeting_member_id !== confirmation.memberId));
-    })} onCancel={() => setConfirmation(null)} /> : null}
+    })} onCancel={() => setConfirmation(null)}>
+      {error ? <p className="notice error" role="alert">{error}</p> : null}
+    </ConfirmationDialog> : null}
   </section>;
 }

@@ -3,6 +3,7 @@ import { ConnectionState } from 'livekit-client';
 import { useConnectionState } from '@livekit/components-react';
 import type { JoinCredentials } from '../../types';
 import { useMeetingChat } from '../hooks/use-meeting-chat';
+import { MeetingNotification } from '../../components/MeetingNotification';
 
 export function MeetingChat({ credentials, accessToken, children, open, onUnreadChange }: {
   credentials: JoinCredentials; accessToken: string; children: ReactNode; open: boolean; onUnreadChange: (count: number) => void;
@@ -59,7 +60,7 @@ export function MeetingChat({ credentials, accessToken, children, open, onUnread
       <div className="meeting-workspace-media">{children}</div>
       {open && <section id="meeting-chat-panel" className="meeting-chat-panel" aria-label="Chat trong phiên họp">
         <div className="chat-panel-heading"><strong>Chat trong phiên họp</strong><span className="chat-connection-status" role="status">{chat.status === 'connected' ? chat.syncing ? 'Đang đồng bộ tin nhắn…' : 'Chat đã kết nối' : chat.status === 'connecting' ? 'Đang kết nối chat…' : 'Chat chưa kết nối'}</span></div>
-        {chat.error && <p className="notice error" role="alert">{chat.error}</p>}
+        {chat.error && <MeetingNotification kind="error" message={chat.error} />}
         {(chat.status === 'offline' || (chat.error && !chat.syncing)) && <button type="button" className="secondary chat-reconnect" disabled={!connected || chat.status === 'connecting'} onClick={chat.reconnect}>Kết nối lại chat</button>}
         <div ref={listRef} className="chat-message-list" onScroll={() => {
           const list = listRef.current;

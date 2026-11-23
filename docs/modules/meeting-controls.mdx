@@ -3,6 +3,15 @@ title: Backend điều khiển meeting
 description: API tạo meeting, session, duyệt người tham gia và mute micro.
 ---
 
+## Thu nhỏ và Picture-in-Picture
+
+- **Thu nhỏ cuộc họp** đưa bạn về ứng dụng trong cùng tab. Bạn có thể mở kênh CLB để nhắn tin, giữ nguyên mic, camera và chia sẻ đang chạy. **Mở lại phòng** trở về đúng phiên mà không tạo lượt tham gia mới.
+- **Picture-in-Picture** trên thanh điều khiển mở cửa sổ nổi khi trình duyệt hỗ trợ Document PiP. Bấm nút trên ô camera hoặc màn hình chia sẻ để chọn đúng video. Với trình duyệt chỉ hỗ trợ API PiP video, dùng nút trên từng ô đang có video. Chủ phòng, điều hành và thành viên có cùng thao tác PiP. Quyền bắt đầu chia sẻ màn hình vẫn theo cấu hình cuộc họp.
+- Mở PiP bằng thao tác bấm trước khi đổi tab. Đóng cửa sổ PiP chỉ đóng khung nổi. Dùng **Rời cuộc họp** để ngắt kết nối của thiết bị hiện tại. Nếu phiên kết thúc hoặc thiết bị bị ngắt khỏi phòng, khung và cửa sổ PiP sẽ đóng.
+- Phản hồi ngắn như timeout, lỗi thiết bị và cảnh báo token tự ẩn sau 5 giây. Lỗi trong hộp thoại xác nhận vẫn hiện cạnh thao tác. Khi cần sao chép link thủ công, popup giữ link cho đến khi đóng.
+
+[Kiểm thử thu nhỏ và PiP](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture) · [Kiểm thử thông báo](/work-logs/2026-11-22-24-phase-05-meeting-notifications).
+
 ## Quy tắc nghiệp vụ
 
 Backend dùng JWT ứng dụng do NestJS phát hành (`Authorization: Bearer ...`) và lấy định danh từ `users.user_id`. Supabase service-role key và LiveKit API secret chỉ được dùng ở backend. Code meeting tuân theo schema DB hiện có; không yêu cầu áp dụng migration cũ `202611070001_meeting_controls.sql` cho database mới.
@@ -60,10 +69,10 @@ Chat kiểm tra membership CLB còn active khi xác thực và kiểm tra lại 
 
 Ví dụ: `FREQ=WEEKLY;BYDAY=MO,WE;COUNT=10`. Thời lượng mỗi lần lặp được lấy từ `scheduledEndAt - scheduledStartAt` của session đầu.
 
-## Giới hạn cần biết
+## Giới hạn backend
 
-- Frontend hiện vẫn gọi `/api/livekit/token` cho room cố định, chưa gọi các meeting endpoints ở trên.
-- Chưa kết nối Supabase/LiveKit development trong lượt triển khai này; chưa xác minh trực tiếp nullable/default/foreign key/RLS trên DB.
+- Trang họp hiện dùng `POST /api/meetings/:code/join` cho buổi họp động. Endpoint `/api/livekit/token` phục vụ PoC và tương thích cũ.
+- Ở mốc triển khai backend ban đầu, chưa xác minh trực tiếp nullable, default, khóa ngoại và RLS trên Supabase development.
 - Việc kết thúc session là thao tác API của host/moderator. Chưa có worker tự kết thúc đúng giờ hoặc LiveKit webhook để dọn attendance khi mất mạng đột ngột.
 - Tạo meeting và thêm owner membership là hai request DB; nếu bước sau lỗi, cleanup meeting là best-effort, chưa có transaction RPC.
 - Code không tự áp dụng migration cũ. Migration ấy thêm capacity/self-unmute không thuộc ERD hiện được dùng.

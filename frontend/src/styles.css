@@ -158,11 +158,6 @@ button.secondary {
   border: 0;
 }
 
-.raise-hand-error {
-  order: 1;
-  flex-basis: 100%;
-}
-
 .video-grid {
   height: min(60vh, 540px);
   min-height: 280px;

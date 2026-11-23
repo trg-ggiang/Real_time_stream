@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import { DisconnectReason, MediaDeviceFailure } from 'livekit-client';
+import { DisconnectReason, MediaDeviceFailure, Track } from 'livekit-client';
 import { MeetingRoom } from './MeetingRoom';
 
 const roster = vi.hoisted(() => ({ people: [] as { identity: string; name?: string }[] }));
+const media = vi.hoisted(() => ({
+  tracks: [] as { source: string; participant: { identity: string; name: string; isLocal?: boolean }; publication: { track: object; isMuted: boolean; trackSid: string } }[],
+}));
 const localParticipant = vi.hoisted(() => ({
   setMicrophoneEnabled: vi.fn().mockResolvedValue(undefined),
   setCameraEnabled: vi.fn().mockResolvedValue(undefined),
@@ -22,13 +25,17 @@ vi.mock('@livekit/components-react', () => ({
     <button onClick={() => onMediaDeviceFailure(MediaDeviceFailure.PermissionDenied, 'audioinput')}>Mic denied</button>
   </div>,
   useConnectionState: () => 'connected', useParticipants: () => roster.people,
+  useTracks: () => media.tracks, useSpeakingParticipants: () => [],
+  useTrackRefContext: () => media.tracks[1], isTrackReference: () => true,
+  ParticipantTile: () => <video />,
+  VideoTrack: ({ trackRef }: any) => <video data-testid="floating-video" data-identity={trackRef.participant.identity} />,
   useLocalParticipant: () => ({localParticipant,isCameraEnabled:false,isMicrophoneEnabled:false}),
   useLocalParticipantPermissions: () => ({canUpdateMetadata:true}), useParticipantAttribute: () => '',
   TrackToggle: ({source,onChange,children}: any) => <button onClick={() => onChange(true,true)} aria-label={`enable-${source}`}>{children}</button>,
   MediaDeviceMenu: ({kind,children,...props}: any) => <button {...props} data-kind={kind}>{children}</button>,
   RoomAudioRenderer: ({volume}: any) => <div data-testid="room-volume" data-volume={volume} />, StartAudio: () => null,
 }));
-vi.mock('./MeetingMediaLayout', () => ({MeetingMediaLayout: () => <div>Media</div>}));
+vi.mock('./MeetingMediaLayout', () => ({MeetingMediaLayout: ({ children }: any) => <div>{media.tracks[1] ? children : 'Media'}</div>}));
 vi.mock('./ScreenShareButton', () => ({ScreenShareButton: () => null}));
 vi.mock('./ScreenShareRequests', () => ({ScreenShareRequests: () => null}));
 vi.mock('./MeetingManagement', async () => {
@@ -43,6 +50,8 @@ afterEach(() => {
   cleanup();
   vi.useRealTimers();
   roster.people = [];
+  media.tracks = [];
+  vi.unstubAllGlobals();
   sessionStorage.clear();
   localParticipant.setMicrophoneEnabled.mockClear();
   localParticipant.setCameraEnabled.mockClear();
@@ -194,17 +203,89 @@ it('requests reconnection after signaling loss and ends the call after server re
   expect(onReconnect).toHaveBeenCalledTimes(2);
 });
 
-it('shows the original LiveKit token warning only during its last minute', () => {
+it('opens the initial LiveKit token warning during its last minute and dismisses it after five seconds', () => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date('2026-11-22T05:00:00Z'));
   const token = `header.${btoa(JSON.stringify({ exp: Date.now() / 1000 + 120 }))}.signature`;
   render(<MeetingRoom accessToken="test" credentials={{token,serverUrl:'wss://unit.invalid',roomName:'test',participantIdentity:'u'}}
     onLeave={vi.fn()} onEnded={vi.fn()} />);
-  const warning = 'Token vào phòng LiveKit ban đầu sắp hết hạn.';
+  const warning = /^Token vào phòng LiveKit ban đầu sắp hết hạn/;
   act(() => { vi.advanceTimersByTime(59_999); });
   expect(screen.queryByText(warning)).toBeNull();
   act(() => { vi.advanceTimersByTime(1); });
   expect(screen.getByText(warning).getAttribute('role')).toBe('status');
+  expect(screen.getByText(warning).closest('.meeting-notification')).toBeTruthy();
+  act(() => { vi.advanceTimersByTime(5000); });
+  expect(screen.queryByText(warning)).toBeNull();
+  expect(screen.getByRole('region', { name: 'Phòng họp' })).toBeTruthy();
   act(() => { vi.advanceTimersByTime(60_000); });
   expect(screen.queryByText(warning)).toBeNull();
+});
+
+it.each(['host', 'moderator', 'participant'] as const)('offers the same Picture-in-Picture controls to role %s', async role => {
+  const frame = document.body.appendChild(document.createElement('iframe'));
+  const target = frame.contentWindow!;
+  const close = vi.spyOn(target, 'close').mockImplementation(() => target.dispatchEvent(new Event('pagehide')));
+  const requestWindow = vi.fn().mockResolvedValue(target);
+  vi.stubGlobal('documentPictureInPicture', { requestWindow });
+  media.tracks = [
+    { source: Track.Source.ScreenShare, participant: { identity: 'presenter', name: 'Người chia sẻ' }, publication: { track: {}, isMuted: false, trackSid: 'screen' } },
+    { source: Track.Source.Camera, participant: { identity: 'guest', name: 'Camera thành viên' }, publication: { track: {}, isMuted: false, trackSid: 'camera' } },
+  ];
+  roster.people = media.tracks.map(track => track.participant);
+  const onExpand = vi.fn();
+  const props = {
+    credentials: { token: 'room', serverUrl: 'wss://unit.invalid', roomName: 'room', participantIdentity: 'u', role },
+    accessToken: 'jwt', onLeave: vi.fn(), onEnded: vi.fn(), onExpand,
+  };
+  const { rerender, unmount } = render(<MeetingRoom {...props} />);
+  const instance = screen.getByTestId('livekit-room');
+
+  fireEvent.click(screen.getByRole('button', { name: 'Mở Picture-in-Picture cho camera của Camera thành viên' }));
+  const overlay = within(target.document.body);
+  expect((await overlay.findByTestId('floating-video')).getAttribute('data-identity')).toBe('guest');
+  expect(overlay.getByRole('button', { name: 'Mở lại phòng' })).toBeTruthy();
+  expect(requestWindow).toHaveBeenCalledOnce();
+
+  rerender(<MeetingRoom {...props} compact />);
+  expect(screen.getByTestId('livekit-room')).toBe(instance);
+  expect(screen.getByRole('region', { name: 'Cuộc họp thu nhỏ' })).toBeTruthy();
+  expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('1');
+  act(() => { target.dispatchEvent(new Event('pagehide')); });
+  expect(overlay.queryByTestId('floating-video')).toBeNull();
+  expect(screen.getByTestId('floating-video').getAttribute('data-identity')).toBe('presenter');
+  fireEvent.click(screen.getByRole('button', { name: 'Mở lại phòng' }));
+  expect(onExpand).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByRole('button', { name: 'Mở Picture-in-Picture' }));
+  expect((await overlay.findByTestId('floating-video')).getAttribute('data-identity')).toBe('presenter');
+
+  unmount();
+  expect(close).toHaveBeenCalledOnce();
+  frame.remove();
+});
+
+it('allows a regular participant to use native video PiP when the document API is absent', async () => {
+  vi.stubGlobal('documentPictureInPicture', undefined);
+  const enabled = Object.getOwnPropertyDescriptor(document, 'pictureInPictureEnabled');
+  const method = Object.getOwnPropertyDescriptor(HTMLVideoElement.prototype, 'requestPictureInPicture');
+  const open = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(document, 'pictureInPictureEnabled', { configurable: true, value: true });
+  Object.defineProperty(HTMLVideoElement.prototype, 'requestPictureInPicture', { configurable: true, value: open });
+  const participant = { identity: 'remote', name: 'Bạn cùng phòng' };
+  media.tracks = [participant, participant].map((person, index) => ({
+    source: Track.Source.Camera, participant: person, publication: { track: {}, isMuted: false, trackSid: 'cam-' + index },
+  }));
+  try {
+    render(<MeetingRoom accessToken="test" credentials={{ token: 'test', serverUrl: 'wss://unit.invalid',
+      roomName: 'test', participantIdentity: 'self', role: 'participant' }} onLeave={vi.fn()} onEnded={vi.fn()} />);
+    const button = screen.getByRole('button', { name: 'Mở Picture-in-Picture cho camera của Bạn cùng phòng' });
+    await act(async () => { fireEvent.click(button); });
+    expect(open).toHaveBeenCalledOnce();
+    expect(open.mock.contexts[0]).toBe(button.parentElement?.querySelector('video'));
+  } finally {
+    if (enabled) Object.defineProperty(document, 'pictureInPictureEnabled', enabled);
+    else Reflect.deleteProperty(document, 'pictureInPictureEnabled');
+    if (method) Object.defineProperty(HTMLVideoElement.prototype, 'requestPictureInPicture', method);
+    else Reflect.deleteProperty(HTMLVideoElement.prototype, 'requestPictureInPicture');
+  }
 });

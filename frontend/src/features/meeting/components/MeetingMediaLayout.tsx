@@ -4,10 +4,11 @@ import { Track } from 'livekit-client';
 import { CaretLeft } from '@phosphor-icons/react/dist/csr/CaretLeft';
 import { CaretRight } from '@phosphor-icons/react/dist/csr/CaretRight';
 import { ScreenShareStage } from './ScreenShareStage';
+import type { OpenTrackPictureInPicture } from '../hooks/use-meeting-picture-in-picture';
 
 const CAMERA_TILES_PER_PAGE = 3;
 
-export function MeetingMediaLayout({ children }: { children: ReactElement }) {
+export function MeetingMediaLayout({ children, onPictureInPicture }: { children: ReactElement; onPictureInPicture?: OpenTrackPictureInPicture }) {
   const cameras = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }]);
   const screens = useTracks([Track.Source.ScreenShare], { onlySubscribed: false });
   const selfCamera = cameras.filter(track => track.participant.isLocal);
@@ -22,7 +23,7 @@ export function MeetingMediaLayout({ children }: { children: ReactElement }) {
   }
 
   return <div className={`meeting-media-layout${others.length === 0 && selfCamera.length === 0 ? ' meeting-media-layout--presentation-only' : ''}`}>
-    <ScreenShareStage />
+    <ScreenShareStage onPictureInPicture={onPictureInPicture} />
     {((page === 0 && selfCamera.length > 0) || others.length > 0) && <aside className="meeting-camera-sidebar" aria-label="Camera trong phòng">
       {page === 0 && selfCamera.length > 0 ? <section className="meeting-self-camera" aria-label="Camera của bạn">
         <TrackLoop tracks={selfCamera}>{children}</TrackLoop>
