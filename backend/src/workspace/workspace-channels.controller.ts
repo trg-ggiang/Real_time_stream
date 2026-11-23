@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Param, ParseUUIDPipe, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, ParseUUIDPipe, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { IsIn, IsISO8601, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -11,12 +11,17 @@ import { attachmentByteLimit, attachmentCountLimit, type ChannelUpload } from '.
 export class ChannelHistoryQuery {
   @IsOptional() @IsISO8601() before?: string;
   @IsOptional() @IsUUID() before_id?: string;
+  @IsOptional() @IsString() @MaxLength(1849) ids?: string;
 }
 export class ChannelMessageDto {
   @IsUUID('4') client_message_id!: string;
   @IsString() @MinLength(1) @MaxLength(4000) content!: string;
 }
 class ChannelReadDto { @IsUUID() message_id!: string; }
+class ChannelMessageActionDto {
+  @IsIn(['edit', 'hide', 'recall']) action!: 'edit' | 'hide' | 'recall';
+  @IsOptional() @IsString() @MaxLength(4000) content?: string;
+}
 class ChannelFileMessageDto {
   @IsUUID('4') client_message_id!: string;
   @IsString() @MaxLength(4000) content!: string;
@@ -33,7 +38,13 @@ export class WorkspaceChannelsController {
   }
   @Get(':channelId/messages') @Header('Cache-Control', 'private, no-store') history(@CurrentUser() u: User,
     @Param('clubId', ParseUUIDPipe) clubId: string, @Param('channelId', ParseUUIDPipe) channelId: string, @Query() q: ChannelHistoryQuery) {
-    return this.channels.history(u.userId, clubId, channelId, q.before, q.before_id);
+    return this.channels.history(u.userId, clubId, channelId, q.before, q.before_id, q.ids);
+  }
+  @Patch(':channelId/messages/:messageId')
+  changeMessage(@CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string,
+    @Param('channelId', ParseUUIDPipe) channelId: string, @Param('messageId', ParseUUIDPipe) messageId: string,
+    @Body() body: ChannelMessageActionDto) {
+    return this.channels.changeMessage(u.userId, clubId, channelId, messageId, body);
   }
   @Post(':channelId/messages') send(@CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string,
     @Param('channelId', ParseUUIDPipe) channelId: string, @Body() body: ChannelMessageDto) {

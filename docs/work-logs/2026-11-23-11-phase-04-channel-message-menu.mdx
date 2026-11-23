@@ -1,0 +1,48 @@
+---
+title: Menu và khung chỉnh sửa tin nhắn kênh
+description: Menu gọn cạnh bong bóng và chỉnh sửa trong ô soạn của workspace.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-11
+- Thời gian: 2026-11-23, múi giờ Asia/Saigon. Không ghi giờ bắt đầu.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Đưa thao tác tin nhắn vào menu ba chấm và chuyển chỉnh sửa xuống ô soạn, sử dụng màu của workspace.
+
+## Công việc hoàn thành
+
+- `WorkspaceChat.tsx` mở menu bên cạnh bong bóng. Tin của mình có Chỉnh sửa và Thu hồi, còn tin nhận có Xóa. Chỉnh sửa bị vô hiệu hóa sau 5 phút.
+- Ô soạn dùng lại bàn phím và emoji, hiển thị nút lưu hoặc hủy và giữ riêng bản nháp tin mới.
+- `workspace-theme.css` hiển thị nút khi rê chuột hoặc dùng bàn phím trên desktop, giữ nút hiện trên thiết bị cảm ứng và sử dụng màu theme sáng/tối.
+- `Workspace.test.tsx` kiểm tra lựa chọn theo người gửi, dùng chung ô soạn, giữ bản nháp và xóa riêng.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run test -- src/features/club-workspace/Workspace.test.tsx` | Passed | 19 test với dữ liệu mô phỏng |
+| `npm.cmd --workspace frontend run build` | Passed | TypeScript và Vite, có cảnh báo kích thước chunk |
+| Trình duyệt thật | Skipped | Giao diện mới được kiểm tra qua fixture React |
+| Supabase chỉ đọc và end-to-end | Skipped | Phiên này sửa giao diện |
+
+## Quyết định và lý do
+
+Dùng lại ô soạn và các biến màu của workspace để giữ nhịp thao tác và hỗ trợ hai theme hiện hành.
+
+## Bước tiếp theo
+
+Rà trực quan menu ở mép vùng cuộn trên desktop và màn hình cảm ứng. Nghiệm thu thao tác trên Supabase sau khi áp dụng migration của phiên trước.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu workspace
+- [x] Đăng ký trang trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

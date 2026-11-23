@@ -339,6 +339,52 @@ it('shows a message saved by another client even when its socket event is lost',
   expect(screen.getAllByText(item.content)).toHaveLength(1);
 });
 
+it('edits a recent channel message and remembers a private deletion despite stale socket delivery', async () => {
+  const item: ChannelMessage = {
+    message_id: 'mine', channel_id: 'real-general', sender_membership_id: 'me',
+    sender: 'An', content: 'Nội dung cũ', created_at: new Date().toISOString(), mine: true,
+    avatar_url: null, edited_at: null, deleted_at: null,
+  };
+  const received = { ...item, message_id: 'received', sender_membership_id: 'other', mine: false, content: 'Tin của bạn Bình' };
+  const { fetcher } = fixture([], [item, received]);
+  const read = fetcher.getMockImplementation()!;
+  fetcher.mockImplementation(async (url, options) => {
+    if (!/\/messages\/(mine|received)$/.test(url) || options?.method !== 'PATCH') return read(url, options);
+    const body = JSON.parse(String(options.body));
+    return { ok: true, json: async () => ({ item: body.action === 'hide'
+      ? { ...received, hidden: true, content: '' }
+      : { ...item, content: body.content, edited_at: new Date().toISOString() } }) };
+  });
+  history.replaceState(null, '', '/workspace/beta/channels/general');
+  render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" />);
+  const ownRow = (await screen.findByText(item.content)).closest('article')!;
+  const receivedRow = screen.getByText(received.content).closest('article')!;
+  const draft = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Nhắn tin trong Chung' });
+  fireEvent.change(draft, { target: { value: 'Bản nháp tin mới' } });
+  fireEvent.click(within(ownRow).getByRole('button', { name: 'Thao tác tin nhắn' }));
+  expect(within(ownRow).getByRole('button', { name: 'Thu hồi' })).toBeTruthy();
+  expect(within(ownRow).queryByRole('button', { name: 'Xóa' })).toBeNull();
+  fireEvent.click(within(ownRow).getByRole('button', { name: 'Chỉnh sửa' }));
+  const editor = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Nội dung chỉnh sửa' });
+  expect(editor).toBe(draft);
+  expect(editor.value).toBe(item.content);
+  fireEvent.change(editor, { target: { value: 'Nội dung mới' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Lưu chỉnh sửa' }));
+  await screen.findByText('Nội dung mới');
+  expect(draft.value).toBe('Bản nháp tin mới');
+  await act(async () => channelSockets.at(-1).receive('channel:message', { ...item, deleted_at: new Date().toISOString(), content: '' }));
+  expect(screen.getByText('Tin nhắn đã được thu hồi')).toBeTruthy();
+  await act(async () => channelSockets.at(-1).receive('channel:message', item));
+  expect(screen.queryByText(item.content)).toBeNull();
+  fireEvent.click(within(receivedRow).getByRole('button', { name: 'Thao tác tin nhắn' }));
+  expect(within(receivedRow).queryByRole('button', { name: 'Chỉnh sửa' })).toBeNull();
+  expect(within(receivedRow).queryByRole('button', { name: 'Thu hồi' })).toBeNull();
+  fireEvent.click(within(receivedRow).getByRole('button', { name: 'Xóa' }));
+  await waitFor(() => expect(screen.queryByText(received.content)).toBeNull());
+  await act(async () => channelSockets.at(-1).receive('channel:message', received));
+  expect(screen.queryByText(received.content)).toBeNull();
+});
+
 it('walks missed history pages after reconnect and clears messages when channel access is revoked', async () => {
   const old = { message_id: 'old', channel_id: 'real-general', sender_membership_id: 'other', sender: 'Bình', content: 'Tin cũ', created_at: '2026-11-20T01:00:00Z' };
   const { fetcher } = fixture([], [old]);

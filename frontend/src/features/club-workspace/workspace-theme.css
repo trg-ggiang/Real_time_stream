@@ -214,7 +214,60 @@
   flex-wrap: wrap;
 }
 .cw-app main .cw-live-composer input[type="file"][hidden] { display: none; }
-.cw-message-body > p + .cw-message-attachments { margin-top: 6px; }
+.cw-message-content > p + .cw-message-attachments { margin-top: 6px; }
+.cw-message-line { display: flex; align-items: center; gap: 6px; }
+.cw-message.is-mine .cw-message-line { flex-direction: row-reverse; }
+.cw-message-content { min-width: 0; }
+.cw-message-actions { position: relative; flex: none; }
+.cw-app main .cw-message-action-toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cw-received-bg);
+  color: var(--cw-secondary-ink);
+  cursor: pointer;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cw-message:not(:hover):not(:focus-within) .cw-message-action-toggle:not([aria-expanded="true"]) {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+.cw-message-action-box {
+  position: absolute;
+  z-index: 5;
+  inset-inline-start: 0;
+  bottom: calc(100% + 4px);
+  box-sizing: border-box;
+  width: 156px;
+  padding: 4px;
+  border: 1px solid var(--cw-pane-line);
+  border-radius: 12px;
+  background: var(--cw-received-bg);
+  box-shadow: 0 6px 18px #0e203231;
+}
+.cw-message-action-box[data-below="true"] { top: calc(100% + 4px); bottom: auto; }
+.cw-message-action-box[data-align-end="true"] { inset-inline: auto 0; }
+.cw-app main .cw-message-action-box button {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cw-navy);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.cw-app main :is(.cw-message-action-toggle, .cw-message-action-box button):hover:not(:disabled),
+.cw-app main .cw-message-action-toggle[aria-expanded="true"] { background: var(--cw-active-surface); }
+.cw-app main .cw-message-action-box button:disabled { opacity: .55; cursor: default; }
 .cw-app main .cw-message a.cw-message-link {
   color: inherit;
   text-decoration: underline;
@@ -325,6 +378,18 @@
 .cw-app main form.cw-live-composer .cw-draft-attachments,.cw-app main form.cw-live-composer>p{flex-basis:100%;width:100%}
 .cw-app[data-theme="dark"] main form.cw-live-composer{background:transparent;border:0;box-shadow:none}
 .cw-app[data-theme="dark"] main form.cw-live-composer textarea{background:var(--cw-night-surface);border-color:#526078}
+.cw-app main form.cw-live-composer.is-editing { padding-top: 8px; border-top: 1px solid var(--cw-pane-line); }
+.cw-composer-edit-header {
+  display: flex;
+  flex-basis: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline-start: 8px;
+  color: var(--cw-navy);
+}
+.cw-app[data-theme="dark"] main form.cw-live-composer.is-editing :is(.cw-emoji-toggle, .cw-composer-send) {
+  color: var(--cw-night-accent);
+}
 @media(max-width:640px){.cw-app main form.cw-live-composer{margin:10px 10px 14px;gap:4px}.cw-app main form.cw-live-composer .cw-emoji-toggle,.cw-app main form.cw-live-composer .cw-composer-send{flex-basis:34px;width:34px;min-width:34px}.cw-app main form.cw-live-composer textarea{padding-inline:12px;font-size:13px}}
 /* Content and publication state form one card for posts and activities. */
 .cw-app main .cw-detail-card{--cw-detail-border:#a6b6cb;display:block;padding:28px;border:2px solid var(--cw-detail-border);border-radius:16px;background:var(--cw-received-bg);box-shadow:none}

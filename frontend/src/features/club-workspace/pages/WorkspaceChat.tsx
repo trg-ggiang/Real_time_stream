@@ -3,6 +3,9 @@ import type { Socket } from 'socket.io-client';
 import { Smiley } from '@phosphor-icons/react/dist/csr/Smiley';
 import { Paperclip } from '@phosphor-icons/react/dist/csr/Paperclip';
 import { PaperPlaneRight } from '@phosphor-icons/react/dist/csr/PaperPlaneRight';
+import { DotsThreeVertical } from '@phosphor-icons/react/dist/csr/DotsThreeVertical';
+import { Check } from '@phosphor-icons/react/dist/csr/Check';
+import { X } from '@phosphor-icons/react/dist/csr/X';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { AccountApiError } from '../../../shared/api/account-http';
 import { useUnsavedChanges } from '../../../shared/lib/use-unsaved-changes';
@@ -28,11 +31,22 @@ export function WorkspaceChannel({ channels }: { channels: ReturnType<typeof use
 }
 
 export function mergeChannelMessages(old: ChannelMessage[], incoming: ChannelMessage[]) {
-  return [...new Map([...old, ...incoming].map(message => [message.message_id, message])).values()]
+  const messages = new Map(old.map(message => [message.message_id, message]));
+  for (const message of incoming) {
+    const previous = messages.get(message.message_id);
+    if (previous?.hidden) continue;
+    if (!message.hidden && previous) {
+      if (previous.deleted_at && !message.deleted_at) continue;
+      if (!message.deleted_at && previous.edited_at && (!message.edited_at || previous.edited_at > message.edited_at)) continue;
+    }
+    messages.set(message.message_id, message);
+  }
+  return [...messages.values()]
     .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at) || a.message_id.localeCompare(b.message_id));
 }
 
 const messageLengthLimit = 2000;
+const editWindowMs = 5 * 60_000;
 const emojis = [
   ['😀', 'Cười'], ['😂', 'Cười ra nước mắt'], ['😊', 'Mỉm cười'], ['😍', 'Yêu thích'],
   ['😮', 'Bất ngờ'], ['😢', 'Buồn'], ['🤔', 'Suy nghĩ'], ['❤️', 'Trái tim'],
@@ -58,14 +72,33 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
   const emojiPickerId = useId();
   const emojiToggle = useRef<HTMLButtonElement>(null);
   const composer = useRef<HTMLTextAreaElement>(null);
-  useUnsavedChanges(text.trim().length > 0 || files.length > 0);
   const [cursor, setCursor] = useState<ChannelHistory['cursor']>(null);
   const [hasMore, setHasMore] = useState(false);
   const [olderBusy, setOlderBusy] = useState(false);
   const history = useRef<HTMLDivElement>(null);
   const retryKey = useRef<{ text: string; id: string; files: typeof files } | null>(null);
   const mutation = useWorkspaceMutation();
-  const composerDisabled = mutation.busy || denied || loading || !connected;
+  const messageAction = useWorkspaceMutation();
+  const [openActions, setOpenActions] = useState<{ id: string; below: boolean; alignEnd: boolean } | null>(null);
+  const activeActions = useRef<HTMLDivElement>(null);
+  const [editing, setEditing] = useState<{ id: string; content: string } | null>(null);
+  const [, updateClock] = useState(Date.now);
+  const now = Date.now();
+  const visibleItems = items.filter(item => !item.hidden);
+  const editedItem = editing && visibleItems.find(item => item.message_id === editing.id && !item.deleted_at);
+  const editExpired = !!editedItem && Date.parse(editedItem.created_at) + editWindowMs <= now;
+  const composerText = editing?.content ?? text;
+  useUnsavedChanges(text.trim().length > 0 || files.length > 0 || (!!editedItem && editing?.content !== editedItem.content));
+  const nextEditExpiry = visibleItems.reduce((next, item) => {
+    const expiry = Date.parse(item.created_at) + editWindowMs;
+    return item.mine && !item.deleted_at && expiry > now ? Math.min(next, expiry) : next;
+  }, Infinity);
+  useEffect(() => {
+    if (!Number.isFinite(nextEditExpiry)) return;
+    const timer = window.setTimeout(() => updateClock(Date.now()), Math.max(0, nextEditExpiry - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [nextEditExpiry]);
+  const composerDisabled = denied || (editing ? messageAction.busy || editExpired : mutation.busy || loading || !connected);
   const path = `channels/${channel.channel_id}/messages`;
   const [refresh, setRefresh] = useState(0);
   const accept = useCallback((incoming: ChannelMessage[]) => {
@@ -86,7 +119,25 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
     if (!field) return;
     field.style.height = 'auto';
     field.style.height = `${Math.min(field.scrollHeight, 144)}px`;
-  }, [text]);
+  }, [composerText]);
+
+  useEffect(() => {
+    if (!editing?.id) return;
+    composer.current?.focus();
+  }, [editing?.id]);
+
+  useEffect(() => {
+    if (editing && !editedItem) setEditing(null);
+  }, [editing, editedItem]);
+
+  useEffect(() => {
+    if (!openActions) return;
+    function dismiss(event: PointerEvent) {
+      if (event.target instanceof Node && !activeActions.current?.contains(event.target)) setOpenActions(null);
+    }
+    document.addEventListener('pointerdown', dismiss);
+    return () => document.removeEventListener('pointerdown', dismiss);
+  }, [openActions]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -99,7 +150,7 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
     function revoke(message: string) {
       revoked = true;
       setError(message); setDenied(true); setConnected(false); setLoading(false);
-      itemsRef.current = []; setItems([]); socket.disconnect();
+      itemsRef.current = []; setItems([]); setEditing(null); setOpenActions(null); socket.disconnect();
     }
     async function synchronize(background = false) {
       if (revoked || controller.signal.aborted || (background && activeRun !== undefined)) return;
@@ -116,10 +167,20 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
         if (!known.size) { setCursor(result.cursor); setHasMore(result.hasMore); }
         // Walk backwards to the prior history, including gaps longer than one page.
         let page = result;
+        const refreshed = new Set(result.items.map(item => item.message_id));
         while (known.size && page.hasMore && page.cursor && !page.items.some(item => known.has(item.message_id))) {
           page = await workspaceRequest<ChannelHistory>(token, clubId, `${path}?${new URLSearchParams(page.cursor)}`, { signal: controller.signal });
           if (!valid(run)) return;
           accept(page.items);
+          for (const item of page.items) refreshed.add(item.message_id);
+        }
+        // Edits and recalls can affect pages already loaded above the latest messages.
+        const olderIds = [...known].filter(id => !refreshed.has(id));
+        for (let offset = 0; offset < olderIds.length; offset += 50) {
+          const query = new URLSearchParams({ ids: olderIds.slice(offset, offset + 50).join(',') });
+          const updates = await workspaceRequest<ChannelHistory>(token, clubId, `${path}?${query}`, { signal: controller.signal });
+          if (!valid(run)) return;
+          accept(updates.items);
         }
         if (!background) { setError(''); setLoading(false); }
         if (!known.size || follow) requestAnimationFrame(() => { if (valid(run) && history.current) history.current.scrollTop = history.current.scrollHeight; });
@@ -137,6 +198,10 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
     socket.on('connect', () => { void synchronize(); });
     socket.on('channel:message', (item: ChannelMessage) => {
       if (controller.signal.aborted || item.channel_id !== channel.channel_id) return;
+      if (item.edited_at || item.deleted_at) {
+        if (itemsRef.current.some(message => message.message_id === item.message_id)) accept([item]);
+        return;
+      }
       const follow = !history.current || history.current.scrollHeight - history.current.scrollTop - history.current.clientHeight < 100;
       accept([item]);
       markRead(item);
@@ -165,15 +230,35 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chưa tải được tin nhắn cũ.'); }
     finally { setOlderBusy(false); }
   }
+
+  async function changeMessage(id: string, action: 'edit' | 'hide' | 'recall', content?: string) {
+    const result = await messageAction.run(signal => workspaceRequest<{ item: ChannelMessage }>(token, clubId,
+      `${path}/${id}`, { method: 'PATCH', signal, body: JSON.stringify({ action, content }) }));
+    if (!result) return;
+    accept([result.item]);
+    setOpenActions(null);
+    if (action === 'edit') setEditing(null);
+  }
+  function updateComposer(value: string) {
+    if (editing) setEditing({ id: editing.id, content: value });
+    else setText(value);
+  }
+
+  function cancelEdit() {
+    setEditing(null);
+    setEmojiOpen(false);
+    composer.current?.focus();
+  }
+
   function insertEmoji(emoji: string) {
     const field = composer.current;
     if (!field || composerDisabled) return;
     const { selectionStart: start, selectionEnd: end } = field;
-    const next = text.slice(0, start) + emoji + text.slice(end);
+    const next = composerText.slice(0, start) + emoji + composerText.slice(end);
     setEmojiOpen(false);
     field.focus();
     if (next.length > messageLengthLimit) return;
-    setText(next);
+    updateComposer(next);
     const caret = start + emoji.length;
     requestAnimationFrame(() => {
       if (composer.current === field && document.activeElement === field) field.setSelectionRange(caret, caret);
@@ -182,6 +267,13 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
 
   async function send(event: FormEvent) {
     event.preventDefault();
+    if (editing) {
+      if (!composerDisabled && editedItem && (editing.content.trim() || editedItem.attachments?.length)) {
+        setEmojiOpen(false);
+        await changeMessage(editing.id, 'edit', editing.content);
+      }
+      return;
+    }
     const content = text.trim();
     if ((!content && !files.length) || composerDisabled) return;
     setEmojiOpen(false);
@@ -225,17 +317,60 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
       {hasMore && <button className="cw-link" disabled={olderBusy} onClick={() => void older()}>{olderBusy ? 'Đang tải…' : 'Tin nhắn cũ hơn'}</button>}
       {loading && <p role="status">Đang tải tin nhắn…</p>}
       {error && <div role="alert"><p>{error}</p><button onClick={() => setRefresh(value => value + 1)}>Thử lại</button></div>}
-      {!loading && !error && !items.length && <div className="cw-channel-empty"><h2>Bắt đầu ở {channelLabel(channel)}</h2><p>Chưa có tin nhắn. Gửi lời chào đầu tiên đến CLB.</p></div>}
-      {items.map((item, index) => {
-        const continued = index > 0 && items[index - 1].sender_membership_id === item.sender_membership_id;
+      {!loading && !error && !visibleItems.length && <div className="cw-channel-empty"><h2>Bắt đầu ở {channelLabel(channel)}</h2><p>Chưa có tin nhắn để hiển thị.</p></div>}
+      {visibleItems.map((item, index) => {
+        const continued = index > 0 && visibleItems[index - 1].sender_membership_id === item.sender_membership_id;
+        const canEdit = item.mine && !item.deleted_at && Date.parse(item.created_at) + editWindowMs > now;
+        const actions = openActions?.id === item.message_id ? openActions : null;
         return <article className={`cw-message${item.mine ? ' is-mine' : ''}${continued ? ' is-continuation' : ''}`} key={item.message_id} tabIndex={0} aria-label={`${item.sender}, ${new Date(item.created_at).toLocaleString('vi-VN')}`}>
         {continued ? <span className="cw-message-avatar-space" aria-hidden="true" /> : <ContentImage className="cw-message-avatar" src={item.avatar_url} fallbackText={Array.from(item.sender.trim())[0] || '?'} />}
         <div className="cw-message-body">{!continued && <header className="cw-message-meta"><strong>{item.sender}</strong><time dateTime={item.created_at} title={new Date(item.created_at).toLocaleString('vi-VN')}>{new Date(item.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</time></header>}
-        {(item.deleted_at || item.content) && <p>{item.deleted_at ? 'Tin nhắn đã được gỡ.' : <ChannelMessageText content={item.content} />}</p>}
-        {!item.deleted_at && !!item.attachments?.length && <ul className="cw-message-attachments">
-          {item.attachments.map(attachment => <ChannelMessageAttachment key={attachment.attachment_id}
-            attachment={attachment} channelId={channel.channel_id} />)}
-        </ul>}</div>
+          <div className="cw-message-line">
+            <div className="cw-message-content">
+              {(item.deleted_at || item.content) && <p>{item.deleted_at ? 'Tin nhắn đã được thu hồi' : <ChannelMessageText content={item.content} />}</p>}
+              {!item.deleted_at && !!item.attachments?.length && <ul className="cw-message-attachments">
+                {item.attachments.map(attachment => <ChannelMessageAttachment key={attachment.attachment_id}
+                  attachment={attachment} channelId={channel.channel_id} />)}
+              </ul>}
+            </div>
+            {(!item.mine || !item.deleted_at) && <div className="cw-message-actions" ref={actions ? activeActions : undefined}
+              onBlur={event => {
+                if (actions && !event.currentTarget.contains(event.relatedTarget)) setOpenActions(null);
+              }}
+              onKeyDown={event => {
+                if (event.key !== 'Escape' || !actions) return;
+                event.stopPropagation();
+                setOpenActions(null);
+                event.currentTarget.querySelector('button')?.focus();
+              }}>
+              <button type="button" className="cw-message-action-toggle" aria-label="Thao tác tin nhắn" aria-expanded={!!actions}
+                onClick={event => {
+                  if (actions) { setOpenActions(null); return; }
+                  const button = event.currentTarget.getBoundingClientRect();
+                  const bounds = history.current?.getBoundingClientRect();
+                  setOpenActions({ id: item.message_id,
+                    below: !!bounds && button.top - bounds.top < 100 && bounds.bottom - button.bottom > button.top - bounds.top,
+                    alignEnd: !!bounds && bounds.right - button.left < 160 });
+                }}>
+                <DotsThreeVertical size={21} weight="bold" aria-hidden="true" />
+              </button>
+              {actions && <div className="cw-message-action-box" role="group" aria-label="Thao tác khả dụng"
+                data-below={actions.below} data-align-end={actions.alignEnd}>
+                {item.mine ? <>
+                  <button type="button" disabled={!canEdit || messageAction.busy || mutation.busy}
+                    title={canEdit ? undefined : 'Đã hết thời gian chỉnh sửa'} onClick={() => {
+                    setOpenActions(null);
+                    setEmojiOpen(false);
+                    setEditing({ id: item.message_id, content: item.content });
+                  }}>Chỉnh sửa</button>
+                  <button type="button" disabled={messageAction.busy} onClick={() => void changeMessage(item.message_id, 'recall')}>Thu hồi</button>
+                </> : <button type="button" disabled={messageAction.busy}
+                  onClick={() => void changeMessage(item.message_id, 'hide')}>Xóa</button>}
+              </div>}
+            </div>}
+          </div>
+          {!item.deleted_at && item.edited_at && <small className="cw-muted">Đã chỉnh sửa</small>}
+        </div>
       </article>;
       })}
       {sending && !denied && !items.some(item => item.client_message_id === sending.id) && <article className="cw-message is-mine cw-message-sending" aria-label="Tin nhắn đang gửi">
@@ -247,8 +382,13 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
         </div>
       </article>}
     </div>
-    <form className="cw-channel-composer cw-live-composer" onSubmit={event => void send(event)}>
-      {!!files.length && <ul className="cw-draft-attachments" aria-label="Tệp đính kèm đang soạn">
+    <form className={`cw-channel-composer cw-live-composer${editing ? ' is-editing' : ''}`} onSubmit={event => void send(event)}>
+      {editing && <div className="cw-composer-edit-header">
+        <strong>Chỉnh sửa tin nhắn</strong>
+        <button type="button" className="cw-emoji-toggle" aria-label="Hủy chỉnh sửa" disabled={messageAction.busy}
+          onClick={cancelEdit}><X size={19} aria-hidden="true" /></button>
+      </div>}
+      {!editing && !!files.length && <ul className="cw-draft-attachments" aria-label="Tệp đính kèm đang soạn">
         {files.map(({ id, file }) => <DraftChannelAttachment key={id} file={file} disabled={composerDisabled}
           onRemove={() => { setFiles(items => items.filter(item => item.id !== id)); setFileError(''); }} />)}
       </ul>}
@@ -272,27 +412,40 @@ function ChannelChat({ channel }: { channel: ClubChannel }) {
           ))}
         </div>
       </div>
-      <button type="button" className="cw-emoji-toggle" aria-label="Đính kèm ảnh hoặc tệp" title="Đính kèm ảnh hoặc tệp"
+      {!editing && <><button type="button" className="cw-emoji-toggle" aria-label="Đính kèm ảnh hoặc tệp" title="Đính kèm ảnh hoặc tệp"
         disabled={composerDisabled} onClick={() => fileInput.current?.click()}><Paperclip size={21} aria-hidden="true" /></button>
       <input hidden ref={fileInput} type="file" multiple accept={channelFileAccept} aria-label="Tệp đính kèm"
         disabled={composerDisabled} onChange={event => {
           const input = event.currentTarget;
           addFiles(Array.from(input.files ?? []));
           input.value = '';
-        }} />
-      <textarea ref={composer} aria-label={`Nhắn tin trong ${channelLabel(channel)}`} placeholder={`Nhắn tin trong ${channelLabel(channel)}`} value={text} onChange={event => setText(event.target.value)} onPaste={event => {
+        }} /></>}
+      <textarea ref={composer} aria-label={editing ? 'Nội dung chỉnh sửa' : `Nhắn tin trong ${channelLabel(channel)}`}
+        placeholder={editing ? 'Chỉnh sửa nội dung' : `Nhắn tin trong ${channelLabel(channel)}`}
+        value={composerText} onChange={event => updateComposer(event.target.value)} onPaste={event => {
+        if (editing) return;
         const images = pastedChannelImages(event.clipboardData);
         if (!images.length) return;
         event.preventDefault();
         addFiles(images);
       }} onKeyDown={event => {
+        if (event.key === 'Escape' && editing && !messageAction.busy) {
+          event.preventDefault();
+          cancelEdit();
+          return;
+        }
         if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return;
         event.preventDefault();
         if (!event.repeat) event.currentTarget.form?.requestSubmit();
       }} maxLength={messageLengthLimit} disabled={composerDisabled} rows={1} />
-      <button className="cw-primary cw-composer-send" aria-label={mutation.busy ? 'Đang gửi…' : 'Gửi'} title="Gửi tin nhắn" aria-busy={mutation.busy} disabled={(!text.trim() && !files.length) || composerDisabled}><PaperPlaneRight size={24} weight="fill" aria-hidden="true" /></button>
-      {fileError && <p role="alert">{fileError}</p>}
-      {mutation.error && <p role="alert">{mutation.error} Nội dung được giữ lại để bạn kiểm tra và gửi lại.</p>}
+      {editing ? <button className="cw-primary cw-composer-send" aria-label="Lưu chỉnh sửa" title="Lưu chỉnh sửa"
+        aria-busy={messageAction.busy} disabled={composerDisabled || (!composerText.trim() && !editedItem?.attachments?.length)}>
+        <Check size={23} weight="bold" aria-hidden="true" />
+      </button> : <button className="cw-primary cw-composer-send" aria-label={mutation.busy ? 'Đang gửi…' : 'Gửi'} title="Gửi tin nhắn" aria-busy={mutation.busy} disabled={(!text.trim() && !files.length) || composerDisabled}><PaperPlaneRight size={24} weight="fill" aria-hidden="true" /></button>}
+      {editExpired && <p role="status">Đã hết thời gian chỉnh sửa.</p>}
+      {!editing && fileError && <p role="alert">{fileError}</p>}
+      {!editing && mutation.error && <p role="alert">{mutation.error} Nội dung được giữ lại để bạn kiểm tra và gửi lại.</p>}
+      {messageAction.error && <p role="alert">{messageAction.error}</p>}
     </form>
   </section>;
 }
