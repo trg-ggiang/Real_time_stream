@@ -1,0 +1,45 @@
+---
+title: 2026-11-23-03 — Giữ kích thước ô camera khi ít người
+description: Không kéo giãn ô camera khi trang hiện một hoặc hai participant.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-03
+- Thời gian: 2026-11-23, Asia/Saigon
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Giữ kích thước nhất quán cho ô camera trong dải chia sẻ màn hình khi trang có ít hơn ba participant.
+
+## Công việc hoàn thành
+
+- Dùng ba hàng lưới cố định cho dải camera desktop; một hoặc hai ô giữ nguyên kích thước hàng, không kéo giãn kín sidebar.
+- Trên mobile giữ độ rộng tile cố định và cho phép cuộn ngang khi cần.
+- Không thay đổi backend.
+
+## File thay đổi
+
+- `frontend/src/styles.css`
+- `docs/work-logs/2026-11-23-03-phase-05-meeting-camera-tile-sizing.mdx`
+- `docs/docs.json`
+- `docs/plans/phase-05-livekit-poc.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Frontend tests/build | Skipped | Chưa kiểm tra trực quan trên trình duyệt |
+| Backend | Skipped | Không có thay đổi backend |
+
+## Bước tiếp theo
+
+Rà trực quan với 1, 2 và 3 ô camera trong trang. Phase 05 vẫn In Progress.

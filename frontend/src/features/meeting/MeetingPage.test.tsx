@@ -2,11 +2,18 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MeetingPage } from './MeetingPage';
+import { SignedInApp } from '../auth/SignedInApp';
 
-vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected, onEnded }: any) =>
+vi.mock('../guest/GuestLanding', () => ({ GuestLanding: () =>
+  <main><label>Tin nhắn kênh CLB<input /></label></main>,
+}));
+
+vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected, onEnded, compact, onExpand, onLeave }: any) =>
   <div data-testid="joined-room" data-session={credentials.sessionId} data-auth={accessToken}
-    data-microphone={audioSelection?.microphone} data-camera={audioSelection?.camera}>
+    data-microphone={audioSelection?.microphone} data-camera={audioSelection?.camera} data-compact={String(compact)}>
     <button onClick={() => onConnected?.()}>Connected</button>
+    {compact && <button onClick={onExpand}>Mở lại phòng</button>}
+    <button onClick={onLeave}>Rời cuộc họp</button>
     <button onClick={() => onEnded?.('Thiết bị này đã bị ngắt khỏi phòng họp.', true)}>Server removed</button>
   </div> }));
 afterEach(() => { cleanup(); sessionStorage.clear(); localStorage.clear(); window.history.replaceState(null,'','/'); vi.unstubAllGlobals(); });
@@ -85,8 +92,8 @@ it('keeps the invited session and copies a canonical link for the chosen row', a
     expect(copyButtons[1].closest('article')?.getAttribute('data-selected')).toBe('true');
     await act(async () => fireEvent.click(copyButtons[0]));
     expect(writeText).toHaveBeenCalledWith(origin + '/?view=meeting&meeting=ABCDEFGHIJ&session=a');
-    expect(screen.getByText('Đã sao chép', { exact: true }).closest('.meeting-share-popup')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Đóng thông báo chia sẻ' }));
+    expect(screen.getByText('Đã sao chép', { exact: true }).closest('.meeting-notification')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng thông báo' }));
     expect(screen.queryByText(/Đã sao chép/)).toBeNull();
 
     writeText.mockRejectedValueOnce(new Error('Clipboard denied'));
@@ -98,6 +105,32 @@ it('keeps the invited session and copies a canonical link for the chosen row', a
   } finally {
     if (clipboard) Object.defineProperty(navigator, 'clipboard', clipboard);
     else Reflect.deleteProperty(navigator, 'clipboard');
+  }
+});
+
+it('shows a request timeout in a popup and dismisses it without removing retry', async () => {
+  vi.useFakeTimers();
+  const deadline = new AbortController();
+  const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(deadline.signal);
+  const fetch = vi.fn((_url: string, options: RequestInit) => new Promise((_resolve, reject) => {
+    options.signal?.addEventListener('abort', () => reject(options.signal?.reason), { once: true });
+  }));
+  vi.stubGlobal('fetch', fetch);
+  history.replaceState(null, '', '/?view=meeting&meeting=ABCDEFGHIJ&session=s');
+  try {
+    render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
+    await act(async () => deadline.abort());
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBe('Yêu cầu quá thời gian. Hãy thử lại.');
+    expect(alert.closest('.meeting-notification-stack')).toBeTruthy();
+    await act(async () => vi.advanceTimersByTimeAsync(4999));
+    expect(screen.getByRole('alert')).toBeTruthy();
+    await act(async () => vi.advanceTimersByTimeAsync(1));
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Thử tải lại' })).toBeTruthy();
+  } finally {
+    timeout.mockRestore();
+    vi.useRealTimers();
   }
 });
 
@@ -227,4 +260,58 @@ it.each([null, { role: 'participant', invitedAt: '2026-11-22' }])('does not poll
   render(<MeetingPage accessToken="app-jwt" displayName="Tester" onLogout={vi.fn()} />);
   await screen.findByRole('heading', { name: 'Team' });
   expect(fetch.mock.calls.some(([url]) => url.endsWith('/join-requests'))).toBe(false);
+});
+
+it('preserves the live attendance while minimizing, navigating to club chat, and restoring', async () => {
+  vi.stubGlobal('isSecureContext', true);
+  Object.defineProperty(navigator, 'mediaDevices', { value: {}, configurable: true });
+  const invite = '/?view=meeting&meeting=ABCDEFGHIJ&session=s';
+  history.replaceState(null, '', invite);
+  const fetcher = vi.fn(async (url: string) => ({ ok: true, status: 200, json: async () =>
+    url.endsWith('/join') ? {
+      status: 'admitted', meetingId: 'm', sessionId: 's', attendanceId: 'attendance-original',
+      role: 'participant', token: 'room-jwt', serverUrl: 'wss://unit.invalid',
+      participantIdentity: 'user:connection', roomName: 'room',
+    } : {
+      meeting: { meetingId: 'm', meetingCode: 'ABCDEFGHIJ', title: 'Sinh hoạt CLB' },
+      sessions: [{ session_id: 's', status: 'ongoing' }],
+    },
+  }));
+  vi.stubGlobal('fetch', fetcher);
+
+  render(<SignedInApp session={{ access_token: 'app-jwt', user: {
+    userId: 'user', displayName: 'Tester', email: 'tester@example.test', avatarUrl: null, role: 'student',
+  } }} onLogout={vi.fn()} />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Tham gia' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' }));
+  const room = await screen.findByTestId('joined-room');
+
+  fireEvent.click(screen.getByRole('button', { name: 'Thu nhỏ cuộc họp' }));
+  expect(location.pathname).toBe('/workspace');
+  expect(screen.getByTestId('joined-room')).toBe(room);
+  expect(room.getAttribute('data-compact')).toBe('true');
+
+  const channel = '/workspace/club-1/channels/general';
+  act(() => {
+    history.replaceState(history.state, '', channel);
+    dispatchEvent(new PopStateEvent('popstate'));
+  });
+  fireEvent.change(screen.getByRole('textbox', { name: 'Tin nhắn kênh CLB' }), { target: { value: 'Tin nhắn khi đang họp' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Mở lại phòng' }));
+  expect(location.pathname + location.search).toBe(invite);
+  expect(screen.getByTestId('joined-room')).toBe(room);
+  expect(room.getAttribute('data-compact')).toBe('false');
+
+  act(() => {
+    history.replaceState(history.state, '', channel);
+    dispatchEvent(new PopStateEvent('popstate'));
+  });
+  expect(room.getAttribute('data-compact')).toBe('true');
+  expect((screen.getByRole('textbox', { name: 'Tin nhắn kênh CLB' }) as HTMLInputElement).value).toBe('Tin nhắn khi đang họp');
+  expect(fetcher.mock.calls.filter(([url]) => url.endsWith('/join'))).toHaveLength(1);
+  expect(fetcher.mock.calls.filter(([url]) => url.endsWith('/leave'))).toHaveLength(0);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Rời cuộc họp' }));
+  await waitFor(() => expect(fetcher.mock.calls.filter(([url]) => url.endsWith('/sessions/s/leave'))).toHaveLength(1));
+  expect(screen.queryByTestId('joined-room')).toBeNull();
 });

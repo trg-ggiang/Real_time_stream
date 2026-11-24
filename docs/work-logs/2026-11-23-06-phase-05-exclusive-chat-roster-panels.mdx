@@ -1,0 +1,46 @@
+---
+title: 2026-11-23-06 — Chat và thành viên dùng panel riêng
+description: Đóng panel đang mở khi chuyển giữa chat và thành viên.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-06
+- Thời gian: 2026-11-23, Asia/Saigon
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Không để panel Chat và Thành viên/quản lý cuộc họp mở cùng lúc.
+
+## Công việc hoàn thành
+
+- Mở Chat sẽ đóng panel Thành viên/quản lý.
+- Mở Thành viên/quản lý sẽ đóng Chat.
+- Nút của panel đang mở vẫn đóng panel đó như trước.
+- Không thay đổi backend.
+
+## File thay đổi
+
+- `frontend/src/features/meeting/components/MeetingRoom.tsx`
+- `docs/work-logs/2026-11-23-06-phase-05-exclusive-chat-roster-panels.mdx`
+- `docs/docs.json`
+- `docs/plans/phase-05-livekit-poc.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `git diff --check` | Passed | Không có lỗi whitespace |
+| Frontend tests/build | Skipped | Chưa chạy trong phiên này |
+| Backend | Skipped | Không có thay đổi backend |
+
+## Bước tiếp theo
+
+Rà thao tác chuyển qua lại hai panel trên trình duyệt. Phase 05 vẫn In Progress.

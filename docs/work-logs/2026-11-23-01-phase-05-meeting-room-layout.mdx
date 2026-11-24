@@ -1,0 +1,53 @@
+---
+title: 2026-11-23-01 — Thiết kế lại bố cục phòng họp
+description: Đưa bố cục cuộc gọi theo ảnh tham chiếu và giữ các thao tác hiện có.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-01
+- Thời gian: 2026-11-23, Asia/Saigon
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thiết kế lại giao diện phòng họp theo ảnh tham chiếu: video lớn bên trái, thành viên và công cụ quản lý bên phải, thanh điều khiển ở dưới. Giữ các chức năng frontend hiện có và không thay đổi backend.
+
+## Công việc hoàn thành
+
+- Tạo bố cục hai cột cho sân khấu video và sidebar thành viên/quản lý; nút Mọi người đóng/mở sidebar.
+- Hiển thị danh sách người đang kết nối, vai trò của người hiện tại, yêu cầu tham gia và các công cụ quản lý trong sidebar.
+- Giữ chat, thiết bị âm thanh/video, giơ tay, chia sẻ màn hình, mời thành viên, phòng chờ, duyệt/từ chối yêu cầu, quản lý người tham gia, kết thúc buổi và chia sẻ link.
+- Thêm bố cục xếp dọc cho màn hình hẹp.
+- Không thay đổi backend hoặc API.
+
+## File thay đổi
+
+- `frontend/src/features/meeting/components/MeetingRoom.tsx`
+- `frontend/src/features/meeting/components/MeetingRoom.test.tsx`
+- `frontend/src/features/meeting/meeting-theme.css`
+- `docs/work-logs/2026-11-23-01-phase-05-meeting-room-layout.mdx`
+- `docs/plans/phase-05-livekit-poc.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+- `docs/docs.json`
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `git diff --check` | Passed | Không có lỗi whitespace trong diff tại thời điểm kiểm tra |
+| Frontend tests/build/typecheck | Skipped | Không chạy theo phạm vi yêu cầu; chưa xác minh trực quan trên trình duyệt |
+| Backend | Skipped | Không có thay đổi backend |
+
+## Quyết định và giới hạn
+
+Sidebar hiển thị mặc định trong cuộc gọi và có thể đóng/mở bằng nút Mọi người. Các luồng nghiệp vụ vẫn gọi API hiện tại qua component quản lý hiện hữu.
+
+## Bước tiếp theo
+
+Rà trực quan bố cục trên trình duyệt ở desktop và mobile; Phase 05 vẫn In Progress, còn nghiệm thu LiveKit thật.

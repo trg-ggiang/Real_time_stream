@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { MeetingNotification } from './MeetingNotification';
 
 const warningMs = 60_000;
 const maxTimerMs = 2_147_483_647;
@@ -30,7 +31,5 @@ export function LiveKitExpiryNotice({ token }: { token: string }) {
     return () => window.clearTimeout(timer);
   }, [token]);
 
-  return show ? <p className="meeting-livekit-expiry" role="status">
-    Token vào phòng LiveKit ban đầu sắp hết hạn.
-  </p> : null;
+  return show ? <MeetingNotification kind="warning" message="Token vào phòng LiveKit ban đầu sắp hết hạn. Bạn có thể tiếp tục họp nếu vẫn đang kết nối." /> : null;
 }

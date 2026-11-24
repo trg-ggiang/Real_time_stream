@@ -1,0 +1,33 @@
+---
+title: Thu nhỏ cuộc họp và Picture-in-Picture
+description: Giữ cuộc gọi khi điều hướng trong uniCircle và cho mọi vai trò mở video nổi.
+---
+
+## Thông tin phiên
+
+- Mã phiên `2026-11-23-09`, ngày 23/11/2026, UTC+07:00.
+- Agent Codex. Thay đổi hoàn thành trong Phase 05, phase vẫn In Progress.
+
+## Mục tiêu và phạm vi
+
+Cho phép người đang họp quay về kênh CLB để nhắn tin. Cùng một bộ nút Picture-in-Picture áp dụng cho host, moderator và participant, kể cả khi chọn camera thành viên khác hoặc màn hình đang chia sẻ.
+
+## Công việc hoàn thành
+
+- `SignedInApp.tsx` giữ màn hình họp ở tầng giao diện sau đăng nhập. Điều hướng nội bộ và Back chuyển cuộc gọi đang chạy sang khung nhỏ. Khi mở lại, giữ nguyên phiên, camera, mic và lượt tham gia. `MeetingPage.tsx` và `use-session-flow.ts` giữ luồng khôi phục kết nối và phân biệt rời phòng với đổi bố cục.
+- `MeetingRoom.tsx` giữ một kết nối LiveKit và một khe phát âm thanh. `MeetingFloatingView.tsx` dùng chung cho khung trong app và cửa sổ Document Picture-in-Picture. Khung ưu tiên màn hình chia sẻ rồi đến camera. Chế độ mobile thu gọn video trong khung nội bộ để chừa chỗ nhắn tin.
+- Nút trên từng camera hoặc màn hình mở đúng video được chọn. Khi trình duyệt có API PiP video chuẩn nhưng thiếu Document PiP, nút riêng của video dùng API đó.
+- Đóng cửa sổ PiP giữ cuộc gọi. Rời phòng, kết thúc phiên và bị ngắt quyền dọn cả khung cuộc gọi và cửa sổ PiP. Hành vi backend và cấu trúc dữ liệu giữ như cũ.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm --workspace frontend run test` | Đạt 204 test, gồm các vai trò, khung thu nhỏ và PiP theo từng video. |
+| `npm --workspace frontend run build` | Đạt. Vite cảnh báo gói JavaScript lớn hơn 500 kB. |
+| Chrome với API/Socket.IO và video mô phỏng | Gửi được tin từ kênh CLB khi đã thu nhỏ, sau đó mở lại và dùng Back. Ghi nhận một lần join và một lần leave khi bấm rời. Kiểm tra khung ở 1440, 768 và 390 px. Chrome mở đúng camera được chọn và video mô phỏng tiếp tục chạy sau khi mở tab khác. |
+| LiveKit Cloud trên hai thiết bị thật | Chờ nghiệm thu cam, mic, chia sẻ và tình huống host kết thúc phiên khi người khác đang thu nhỏ. |
+
+## Quyết định và bước tiếp theo
+
+Cửa sổ bên ngoài tab mở sau thao tác bấm của người dùng, theo hỗ trợ của trình duyệt. Dùng hai thiết bị để kiểm tra camera và âm thanh tiếp tục hoạt động khi người dùng nhắn tin, chuyển tab và mở lại đúng phiên.

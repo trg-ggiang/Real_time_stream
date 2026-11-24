@@ -15,7 +15,7 @@ export function openClubMeeting(code: string, session: string | undefined, onMee
   const url = new URL(window.location.href);
   url.searchParams.set('meeting', code);
   if (session) url.searchParams.set('session', session); else url.searchParams.delete('session');
-  window.history.replaceState(null, '', url);
+  window.history.replaceState(window.history.state, '', url);
   onMeeting();
 }
 

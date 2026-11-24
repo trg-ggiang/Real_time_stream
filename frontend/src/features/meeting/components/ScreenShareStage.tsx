@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { PictureInPicture } from '@phosphor-icons/react/dist/csr/PictureInPicture';
+import { canOpenTrackPictureInPicture, type OpenTrackPictureInPicture } from '../hooks/use-meeting-picture-in-picture';
 import { useTracks, VideoTrack } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 
-export function ScreenShareStage() {
+export function ScreenShareStage({ onPictureInPicture }: { onPictureInPicture?: OpenTrackPictureInPicture }) {
+  const video = useRef<HTMLVideoElement>(null);
   const tracks = useTracks([Track.Source.ScreenShare], { onlySubscribed: false });
   const [selectedIdentity, setSelectedIdentity] = useState<string | null>(null);
   // Derive a valid selection immediately when a presenter stops or leaves.
@@ -21,7 +24,12 @@ export function ScreenShareStage() {
           </option>)}
         </select>
       </label>}
+      {onPictureInPicture && selected.publication.track && !selected.publication.isMuted && canOpenTrackPictureInPicture() &&
+        <button type="button" className="screen-share-pip" aria-label="Mở Picture-in-Picture cho màn hình chia sẻ"
+          title="Mở Picture-in-Picture" onClick={() => onPictureInPicture(selected, video.current)}>
+          <PictureInPicture size={18} aria-hidden="true" />
+        </button>}
     </div>
-    <VideoTrack key={selected.publication.trackSid} trackRef={selected} className="screen-share-video" />
+    <VideoTrack ref={video} key={selected.publication.trackSid} trackRef={selected} className="screen-share-video" />
   </section>;
 }

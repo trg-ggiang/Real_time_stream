@@ -66,6 +66,17 @@ Chạy lại `npm run tunnel` sau cập nhật và dùng URL mới được in. 
 
 Mở link HTTPS trên laptop và điện thoại (thử cả Wi-Fi và 4G/5G). Cho phép camera/mic, dùng tai nghe, kiểm tra thấy/nghe nhau hai chiều, mute/unmute, Leave/Join lại và mất mạng/reconnect theo [checklist Module 1](/modules/module-01-media-poc).
 
+Với tính năng thu nhỏ và PiP, mở **cùng link HTTPS và cùng buổi họp** trên hai thiết bị rồi thử các ca sau:
+
+| Thao tác | Kết quả cần xác nhận |
+| --- | --- |
+| Thành viên thu nhỏ cuộc gọi và gửi tin ở kênh CLB | Thiết bị còn lại vẫn nghe và thấy người đó theo trạng thái mic/camera đã chọn. Tin xuất hiện trong kênh CLB. |
+| Thành viên mở lại phòng hoặc bấm Back nội bộ | Vẫn là cùng `sessionId` và `attendanceId`. Không phát sinh yêu cầu join/leave do đổi màn hình. |
+| Thành viên mở PiP từ camera người khác hoặc màn hình đang chia sẻ rồi chuyển tab | Cửa sổ nổi hiển thị đúng video trên trình duyệt hỗ trợ. Đóng PiP vẫn nghe được cuộc gọi. |
+| Chủ phòng kết thúc phiên khi thành viên đang thu nhỏ hoặc mở PiP | Cửa sổ nổi đóng, cuộc gọi ngắt và thiết bị rời phiên. |
+
+Các thao tác thu nhỏ, gửi tin kênh, mở lại, Back và PiP đã qua kiểm thử Chrome dùng dữ liệu và video mô phỏng. Checklist trên dành cho nghiệm thu LiveKit Cloud trên thiết bị thật. [Kết quả hiện có](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture).
+
 Script kiểm tra `/api/health` qua HTTPS. Nếu máy host không phân giải được hostname mới, kiểm tra link từ mạng khác và xem log tunnel. Health chỉ xác nhận đường HTTP tới API; token 200 chưa chứng minh media hai chiều. Không chia sẻ nội dung token response hoặc log chứa token.
 
 ## Nguồn

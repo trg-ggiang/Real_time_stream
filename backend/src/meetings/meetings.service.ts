@@ -589,6 +589,7 @@ export class MeetingsService {
     return {
       status: 'admitted' as const,
       role: member.role,
+      hostUserId: meeting.created_by,
       meetingId: meeting.meeting_id,
       sessionId: session.session_id,
       attendanceId,

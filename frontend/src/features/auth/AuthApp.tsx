@@ -6,15 +6,15 @@ import { EyeSlash } from "@phosphor-icons/react/dist/csr/EyeSlash";
 import { Monitor } from "@phosphor-icons/react/dist/csr/Monitor";
 import { Moon } from "@phosphor-icons/react/dist/csr/Moon";
 import { Sun } from "@phosphor-icons/react/dist/csr/Sun";
-import { MeetingPage } from "../meeting/MeetingPage";
+import { SignedInApp } from "./SignedInApp";
 import { PersonalProfile } from "./PersonalProfile";
-import { GuestLanding } from "../guest/GuestLanding";
 import { authenticate, type AuthSession } from "./auth-api";
 import { resolvePostLoginPath, sanitizeReturnTo } from "./redirect";
 import {
   restoreSession,
   saveSession,
   sessionExpiresAt,
+  AUTH_SESSION_KEY,
 } from "./session-storage";
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
@@ -43,9 +43,6 @@ export function AuthApp() {
       ? null
       : restoreSession();
   });
-  const [enterMeeting, setEnterMeeting] = useState(
-    () => new URLSearchParams(window.location.search).get("view") === "meeting",
-  );
   const [profileReady, setProfileReady] = useState(false);
   const [checkedToken, setCheckedToken] = useState("");
   const [landingToken, setLandingToken] = useState("");
@@ -69,35 +66,17 @@ export function AuthApp() {
   const registering = mode === "register";
 
   useEffect(() => {
-    const syncView = () =>
-      setEnterMeeting(
-        new URLSearchParams(window.location.search).get("view") === "meeting",
-      );
-    window.addEventListener("popstate", syncView);
-    return () => window.removeEventListener("popstate", syncView);
-  }, []);
-
-  function openMeeting() {
-    const url = new URL(window.location.href);
-    if (!url.searchParams.get('meeting')) {
-      window.history.pushState(null, '', '/workspace');
-      setEnterMeeting(false);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      return;
-    }
-    url.searchParams.set("view", "meeting");
-    window.history.pushState(null, "", url);
-    setEnterMeeting(true);
-  }
-
-  function returnToLanding() {
-    const url = new URL(window.location.href);
-    url.searchParams.delete("view");
-    url.searchParams.delete("meeting");
-    url.searchParams.delete("session");
-    window.history.replaceState(null, "", url);
-    setEnterMeeting(false);
-  }
+    const syncSession = (event: StorageEvent) => {
+      if (event.storageArea && event.storageArea !== localStorage) return;
+      if (event.key !== null && event.key !== AUTH_SESSION_KEY) return;
+      const next = restoreSession();
+      if (next?.access_token === session?.access_token) return;
+      // Reload tears down private views and in-flight requests from the former account.
+      window.location.reload();
+    };
+    window.addEventListener('storage', syncSession);
+    return () => window.removeEventListener('storage', syncSession);
+  }, [session?.access_token]);
 
   function logout() {
     submittedAuth.current = false;
@@ -106,7 +85,6 @@ export function AuthApp() {
     window.history.replaceState(null, "", "/?mode=login");
     setTheme(savedTheme());
     setSession(null);
-    setEnterMeeting(false);
     setProfileReady(false);
     setCheckedToken("");
     setLandingToken("");
@@ -133,7 +111,6 @@ export function AuthApp() {
       const legacyPath = `${legacyUrl.pathname}${legacyUrl.search}${legacyUrl.hash}`;
       const destination = resolvePostLoginPath(explicitPath ?? legacyPath, session.user.role);
       window.history.replaceState(window.history.state, "", destination);
-      setEnterMeeting(new URL(window.location.href).searchParams.get("view") === "meeting");
     }
     submittedAuth.current = false;
     setLandingToken(session.access_token);
@@ -331,7 +308,6 @@ export function AuthApp() {
           `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`,
         );
         setJustRegistered(mode === "register");
-        setEnterMeeting(false);
         setProfileReady(false);
         setCheckedToken("");
         setLandingToken("");
@@ -370,25 +346,8 @@ export function AuthApp() {
     );
   if (session && landingToken !== session.access_token)
     return <p role="status">Đang kiểm tra tài khoản…</p>;
-  if (session && enterMeeting && new URLSearchParams(window.location.search).get('meeting'))
-    return (
-      <MeetingPage
-        accessToken={session.access_token}
-        displayName={session.user.displayName}
-        onBack={returnToLanding}
-        onLogout={logout}
-      />
-    );
   if (session)
-    return (
-      <GuestLanding
-        viewer={session.user}
-        role={session.user.role}
-        accessToken={session.access_token}
-        onMeeting={openMeeting}
-        onLogout={logout}
-      />
-    );
+    return <SignedInApp key={session.access_token} session={session} onLogout={logout} />;
 
   return (
     <div className="auth-page" data-theme={theme}>
