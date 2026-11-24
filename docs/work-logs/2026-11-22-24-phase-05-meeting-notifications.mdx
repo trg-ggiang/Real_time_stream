@@ -1,0 +1,21 @@
+---
+title: Thông báo tự ẩn trong phòng họp
+description: Dùng chung popup cho phản hồi ngắn ở sảnh và trong phòng.
+---
+
+## Phiên 2026-11-22-24
+
+Codex, múi giờ Asia/Bangkok. Phase 05 **In Progress**, thay đổi trong phiên đã hoàn thành.
+
+## Triển khai
+
+- `MeetingNotification.tsx` hiển thị thông báo ở góc trên bên phải, tự ẩn sau 5 giây hoặc đóng bằng nút. Nhiều thông báo được xếp thành cột. Giao diện dùng màu của chủ đề phòng họp.
+- Sảnh, quản lý cuộc họp, LiveKit và chat dùng popup chung cho phản hồi ngắn như timeout, lỗi thiết bị, thao tác chia sẻ, lưu lịch và sao chép link. Lỗi trong biểu mẫu và trạng thái đang chờ vẫn nằm cạnh thao tác tương ứng. Nếu cần sao chép link thủ công, popup giữ ô nhập đến khi người dùng đóng.
+- Cảnh báo hạn token chỉ thông báo về token vào phòng ban đầu. Thời điểm hiện vẫn là phút cuối của token.
+
+## Kiểm tra
+
+- Frontend đạt 199 test và build thành công. Vite vẫn cảnh báo một số chunk vượt 500 kB.
+- Regression test kiểm tra thông báo timeout và cảnh báo token tự ẩn sau 5 giây. Nút thử tải lại vẫn dùng được.
+- Chromium dùng API mô phỏng. Đã kiểm tra timeout ở 1440, 768 và 320 px, hai chủ đề, nút đóng và tự ẩn.
+- Chưa chạy cuộc gọi với thiết bị vật lý. Đợt này tập trung vào cách hiển thị phản hồi trên frontend.

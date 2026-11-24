@@ -1,0 +1,53 @@
+---
+title: 2026-11-23-02 — Phân trang người tham gia cuộc họp
+description: Phân trang danh sách participant realtime trong sidebar phòng họp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-02
+- Thời gian: 2026-11-23, Asia/Saigon
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm phân trang cho danh sách thành viên đang tham gia cuộc họp trong giao diện hiện tại, giữ dữ liệu participant realtime và không thay đổi backend.
+
+## Công việc hoàn thành
+
+- Danh sách tên participant hiển thị tối đa 10 người mỗi trang.
+- Dải camera cạnh màn hình chia sẻ hiển thị tối đa 3 ô mỗi trang, có điều hướng thay cho cuộn dọc liên tục.
+- Tự giới hạn trang đang chọn khi người tham gia rời phòng làm số trang giảm.
+- Không thay đổi API hoặc backend.
+
+## File thay đổi
+
+- `frontend/src/features/meeting/components/MeetingRoom.tsx`
+- `frontend/src/features/meeting/components/MeetingMediaLayout.tsx`
+- `frontend/src/features/meeting/meeting-theme.css`
+- `frontend/src/styles.css`
+- `docs/work-logs/2026-11-23-02-phase-05-meeting-participant-pagination.mdx`
+- `docs/plans/phase-05-livekit-poc.mdx`
+- `docs/plans/master-plan.mdx`
+- `docs/dev/session-log.mdx`
+- `docs/CHANGELOG.mdx`
+- `docs/docs.json`
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `git diff --check` | Passed | Không có lỗi whitespace trong diff |
+| Frontend tests/build/typecheck | Skipped | Không chạy theo phạm vi phiên này |
+| Backend | Skipped | Không có thay đổi backend |
+
+## Quyết định và giới hạn
+
+Phân trang ở phía frontend trên mảng participant và track hiện có; mọi người vẫn được cập nhật qua LiveKit như trước.
+
+## Bước tiếp theo
+
+Kiểm tra trực quan điều hướng trang khi phòng có trên 10 participant. Phase 05 vẫn In Progress, còn nghiệm thu LiveKit thật.

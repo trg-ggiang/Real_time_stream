@@ -13,6 +13,7 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
   const [transferStatus, setTransferStatus] = useState<'pending' | 'failed' | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [recovering, setRecovering] = useState(false);
   const current = useRef<JoinedSession | null>(null);
   const departure = useRef<Pick<JoinedSession, 'meetingId' | 'sessionId' | 'attendanceId'> | null>(null);
   const reloadDeparture = useRef<typeof departure.current>(null);
@@ -42,7 +43,7 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
     if (current.current) departure.current = current.current;
     current.current = null;
     setDeviceChoice(null); setTransferStatus(null);
-    setActive(null); setWaiting(null); setBusy(false); setError(message);
+    setActive(null); setWaiting(null); setBusy(false); setRecovering(false); setError(message);
     try { await recordDeparture(); }
     catch (cause) {
       if (cause instanceof UnauthorizedError) { onUnauthorized(); return; }
@@ -138,9 +139,11 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
     reloadDeparture.current = session;
     current.current = null;
     forgetMeeting();
+    setRecovering(true);
     setActive(null);
     setTransferStatus(null);
-    await join(code, session.meetingId, session.sessionId, 'add');
+    try { await join(code, session.meetingId, session.sessionId, 'add'); }
+    finally { if (mounted.current) setRecovering(false); }
   }, [join, leave]);
 
   const resumed = useRef(false);
@@ -209,8 +212,8 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
     setBusy(false);
     forgetMeeting();
     current.current = null; departure.current = null;
-    setActive(null); setWaiting(null); setDeviceChoice(null); setTransferStatus(null); setError('Buổi họp đã kết thúc.');
+    setActive(null); setWaiting(null); setDeviceChoice(null); setTransferStatus(null); setRecovering(false); setError('Buổi họp đã kết thúc.');
   }, []);
   const cancelDeviceChoice = useCallback(() => { setDeviceChoice(null); setError(''); }, []);
-  return { active, waiting, deviceChoice, transferStatus, busy, error, join, leave, ended, sessionEnded, report, cancelDeviceChoice, transferDevice, onConnected, reconnect };
+  return { active, recovering, waiting, deviceChoice, transferStatus, busy, error, join, leave, ended, sessionEnded, report, cancelDeviceChoice, transferDevice, onConnected, reconnect };
 }

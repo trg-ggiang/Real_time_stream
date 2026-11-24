@@ -34,7 +34,7 @@ it('keeps each independent signed-in session when opening the meeting link in it
     fireEvent.change(email, { target: { value: user.email } });
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'password123' } });
     fireEvent.submit(email.closest('form')!);
-    await waitFor(() => expect(JSON.parse(sessionStorage.getItem('rts.auth-session.v1') ?? 'null')?.access_token).toBe(token));
+    await waitFor(() => expect(JSON.parse(localStorage.getItem('rts.auth-session.v1') ?? 'null')?.access_token).toBe(token));
     login.unmount();
 
     history.replaceState(null, '', invite);

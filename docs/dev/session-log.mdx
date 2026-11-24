@@ -3,6 +3,54 @@ title: Code change logs
 description: Reserved for completed code changes only.
 ---
 
+## Menu tin nhắn và chỉnh sửa trong ô soạn (2026-11-23)
+
+Menu ba chấm nằm cạnh bong bóng. Chỉnh sửa dùng lại ô soạn và giữ bản nháp tin mới. Phase 04 In Progress. [Work log](/work-logs/2026-11-23-11-phase-04-channel-message-menu).
+
+## Thao tác tin nhắn trong kênh CLB (2026-11-23)
+
+Tin đã gửi có thể sửa trong 5 phút hoặc thu hồi. Xóa phía tôi áp dụng cho tài khoản thực hiện. Phase 04 In Progress. [Work log](/work-logs/2026-11-23-10-phase-04-channel-message-actions).
+
+## Thu nhỏ cuộc họp và Picture-in-Picture (2026-11-23)
+
+Người dùng có thể thu nhỏ cuộc họp để nhắn tin trong workspace, mở lại cùng phiên hoặc dùng Picture-in-Picture trên trình duyệt hỗ trợ. Nút PiP của camera và màn hình chia sẻ dùng chung cho chủ phòng, điều hành và thành viên. [Work log](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture).
+
+## Tinh chỉnh roster và quản lý cuộc họp (2026-11-23)
+
+Roster nhận diện chủ phòng ở cả giao diện participant; khu vực quản lý, phòng chờ, mời thành viên và duyệt được thiết kế lại. Chưa chạy tests/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-08-phase-05-meeting-member-management-visual-refinement).
+
+## Camera của mình chỉ ghim ở trang đầu (2026-11-23)
+
+Camera local chỉ nằm trên trang camera đầu tiên; các trang tiếp theo hiển thị camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-07-phase-05-self-camera-first-page).
+
+## Chat và thành viên dùng panel riêng (2026-11-23)
+
+Mở Chat đóng Thành viên/quản lý; mở Thành viên/quản lý đóng Chat. Nút panel hiện tại vẫn đóng panel đó. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-06-phase-05-exclusive-chat-roster-panels).
+
+## Chat chiếm hết chiều cao stage (2026-11-23)
+
+Khung chat trong cuộc gọi lấp đầy chiều cao vùng stage; danh sách tin nhắn co giãn và ô nhập giữ ở đáy. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-05-phase-05-meeting-chat-full-height).
+
+## Hiển thị camera của mình khi chia sẻ (2026-11-23)
+
+Khôi phục ô camera local trong sidebar cạnh màn hình chia sẻ; phân trang tiếp tục áp dụng cho camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-04-phase-05-meeting-self-camera-sidebar).
+
+## Kích thước ô camera khi ít người (2026-11-23)
+
+Giữ ba hàng kích thước cố định cho dải camera desktop để 1–2 participant không bị kéo giãn kín sidebar; mobile giữ độ rộng tile cố định. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-03-phase-05-meeting-camera-tile-sizing).
+
+## Phân trang thành viên tham gia cuộc họp (2026-11-23)
+
+Danh sách tên hiển thị tối đa 10 người mỗi trang; dải camera cạnh màn hình chia sẻ hiển thị tối đa 3 ô mỗi trang thay cho cuộn dọc. Trang tự điều chỉnh nếu participant rời phòng. Chỉ sửa frontend; `git diff --check` đạt, chưa chạy test/build. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-02-phase-05-meeting-participant-pagination).
+
+## Thiết kế lại bố cục phòng họp (2026-11-23)
+
+Sắp video lớn bên trái, sidebar thành viên/quản lý bên phải và thanh điều khiển phía dưới; sidebar đóng/mở được. Giữ các thao tác cuộc họp frontend hiện có, không đổi backend. `git diff --check` đạt; chưa chạy test/build hay kiểm tra trình duyệt. Phase 05 In Progress. [Work log](/work-logs/2026-11-23-01-phase-05-meeting-room-layout).
+
+## Thông báo tự ẩn trong phòng họp (2026-11-22)
+
+Đồng bộ popup cho lỗi và phản hồi ngắn ở sảnh và trong phòng. [Kiểm tra](/work-logs/2026-11-22-24-phase-05-meeting-notifications).
+
 ## Quyền kết thúc họp và gỡ thành viên CLB (2026-11-22)
 
 Chỉ host/moderator được kết thúc buổi họp. Gỡ thành viên CLB thu hồi quyền họp và ngắt các thiết bị của người đó trong các cuộc họp thuộc CLB; frontend thoát cuộc gọi khi bị ngắt hoặc mất quyền. Không đổi schema. Phase 04/05 vẫn **In Progress**; chờ nghiệm thu LiveKit thật. [Work log](/work-logs/2026-11-22-01-phase-05-meeting-permissions-club-removal).

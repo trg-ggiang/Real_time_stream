@@ -1,0 +1,51 @@
+---
+title: Tinh chỉnh khu vực thành viên cuộc họp
+description: Cập nhật roster, quản lý người tham gia và yêu cầu duyệt trong phòng họp.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-08
+- Thời gian bắt đầu/kết thúc: Không ghi nhận thời gian bắt đầu; kết thúc 2026-11-23 Asia/Saigon
+- Agent: Codex
+- Phase: 05 — Tích hợp LiveKit Cloud
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Tinh chỉnh thanh thành viên cuộc họp theo ảnh tham khảo: hiển thị vai trò chủ phòng cho mọi người, làm gọn danh sách quản lý host và yêu cầu duyệt, đồng bộ khu vực quản lý cuộc họp với phong cách sáng xanh.
+
+## Công việc hoàn thành
+
+- Thêm `hostUserId` vào thông tin join để roster của thành viên nhận diện được chủ phòng.
+- Cập nhật roster và danh sách quản lý thành viên với avatar, badge vai trò, trạng thái kết nối và thao tác mic/loại.
+- Thiết kế lại yêu cầu duyệt với avatar, trạng thái chờ và nút Duyệt/Từ chối.
+- Tinh chỉnh tiêu đề quản lý, cài đặt phòng chờ và form mời thành viên.
+- Files: `backend/src/meetings/meetings.service.ts`, `frontend/src/features/meeting/types.ts`, `frontend/src/features/meeting/components/MeetingRoom.tsx`, `frontend/src/features/meeting/components/MeetingManagement.tsx`, `frontend/src/features/meeting/meeting-theme.css`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| Frontend tests/build/browser | Skipped | Chưa chạy trong phiên này. |
+| Backend tests | Skipped | Chưa chạy trong phiên này. |
+
+## Quyết định và lý do
+
+Roster participant nhận diện chủ phòng từ `hostUserId` do endpoint join trả về, không phụ thuộc API danh sách participant vốn chỉ dành cho host.
+
+## Blocker và việc chưa hoàn thành
+
+Chưa kiểm tra trực quan trên browser hoặc chạy test/build.
+
+## Bước tiếp theo
+
+Mở phòng bằng tài khoản host và participant để kiểm tra badge chủ phòng, form mời, trạng thái phòng chờ và bố cục duyệt ở desktop/mobile.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log và changelog
+- [x] Trang work log thuộc navigation hiện có; không cần sửa docs.json
+- [ ] Ghi kết quả kiểm tra browser/build khi thực hiện

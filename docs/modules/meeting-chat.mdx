@@ -43,14 +43,16 @@ Frontend:
 
 ## Luồng xử lý
 
-1. JWT ứng dụng gọi GET /api/meeting-sessions, backend chỉ trả session ongoing mà user đã admitted và chưa removed.
-2. POST /api/livekit/token?sessionId=UUID kiểm tra lại quyền, ký token vào đúng room của session và trả sessionId. Không có query thì giữ room PoC, không được dùng chat với credentials đó.
+1. Với JWT ứng dụng, `MeetingPage` gọi `GET /api/meetings/:code/sessions` để đọc thông tin và chọn buổi.
+2. Khi người dùng tham gia, `POST /api/meetings/:code/join` kiểm tra quyền của đúng buổi. Sau khi được duyệt, backend trả credentials LiveKit, `sessionId` và `attendanceId`. Chat dùng định danh phiên này.
 3. LiveKitRoom connected thì chat client mở WSS/WS namespace /chat, transport path /socket.io. Handshake gồm token, sessionId, participantIdentity.
 4. Backend xác minh JWT/user, mapping member/session và participant thực tế qua LiveKit. Client không thể tự khai senderId hoặc tự tham gia session không có quyền.
 5. Client đăng ký listener trước khi connect. Sau connect tải 50 tin gần nhất; mỗi 3 giây, khi socket hoạt động, đọc history sau checkpoint qua gateway tới Supabase và đi hết mọi trang. Reconnect cũng tải bù; merge theo ID tránh trùng với broadcast live.
 6. chat:send nhận clientMessageId/content. Backend xác thực payload/quyền, lưu DB trước, rồi phát chat:message và ACK. Recipient bị removed/phiên ended/đã rời LiveKit bị chặn trước delivery.
 7. Timeout không đồng nghĩa DB chưa lưu. Outbox giữ nội dung và nút thử lại; retry cùng ID đọc lại tin cũ, khác content với ID cũ trả 409. Không yêu cầu quyền UPDATE/DELETE.
 8. Rời media hoặc logout hủy socket/listeners, không ngắt media chỉ vì chat lỗi. Khi LiveKit reconnect, chat kết nối lại theo lifecycle và tải bù.
+
+Khi thu nhỏ cuộc họp để vào kênh CLB, kết nối chat của phiên họp vẫn chạy. Tin gửi trong kênh CLB được ghi theo kênh, còn tin của cuộc họp theo `sessionId`. Chat họp tải bù sau khi kết nối lại. Nếu mỗi máy dùng một backend local riêng, sự kiện phát của một backend không tới socket của backend kia dù cùng Supabase. Chat kênh có thêm lượt tải bù định kỳ. [Luồng thu nhỏ](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture).
 
 ## Hợp đồng sự kiện
 

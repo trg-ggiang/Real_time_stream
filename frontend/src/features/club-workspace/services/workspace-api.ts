@@ -86,7 +86,7 @@ export interface WorkspaceAttention {
 export interface ChannelMessage {
   message_id: string; channel_id: string; sender_membership_id: string; content: string;
   sender: string; avatar_url: string | null; created_at: string; edited_at: string | null;
-  deleted_at: string | null; mine: boolean; client_message_id?: string;
+  deleted_at: string | null; mine: boolean; client_message_id?: string; hidden?: boolean;
   attachments?: ChannelAttachment[];
 }
 export interface ChannelAttachment {

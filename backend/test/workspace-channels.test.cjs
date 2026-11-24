@@ -6,8 +6,10 @@ const { WorkspaceChannels } = require('../dist/workspace/workspace-channels.serv
 const { WorkspaceAccess } = require('../dist/workspace/workspace-access.service');
 const { MeetingsService } = require('../dist/meetings/meetings.service');
 
-function fixture({ allowed = true, role = 'chairperson', outsider = false, duplicate = false } = {}) {
+function fixture({ allowed = true, role = 'chairperson', outsider = false, duplicate = false, expired = false } = {}) {
   const calls = [];
+  const events = [];
+  const hides = new Set();
   const row = { message_id: 'message', channel_id: 'channel', sender_membership_id: 'membership',
     client_message_id: 'client-key', content: 'Hello', created_at: '2026-11-19T00:00:00Z', deleted_at: null,
     club_memberships: { users: { display_name: 'Name', avatar_url: null } } };
@@ -22,16 +24,55 @@ function fixture({ allowed = true, role = 'chairperson', outsider = false, dupli
     if (table === 'clubspace_mark_channel_read') return Response.json(null);
     if (table === 'channel_messages') {
       if (options.method === 'POST') return duplicate ? Response.json({ code: '23505' }, { status: 409 }) : Response.json(row);
+      if (options.method === 'PATCH') {
+        if (expired && !body.deleted_at) return Response.json({ code: 'PT409' }, { status: 409 });
+        Object.assign(row, body.deleted_at ? { deleted_at: body.deleted_at } : { content: body.content, edited_at: new Date().toISOString() });
+        return Response.json([row]);
+      }
       if (url.searchParams.has('client_message_id')) return Response.json([row]);
-      return Response.json([row, { ...row, message_id: 'deleted', content: 'SECRET DELETED', deleted_at: '2026-11-19T00:01:00Z', sender_membership_id: 'another' }]);
+      const rows = [{ ...row, hides: hides.has(url.searchParams.get('hides.user_id')) ? [{ message_id: row.message_id }] : [] },
+        { ...row, message_id: 'deleted', content: 'SECRET DELETED', deleted_at: '2026-11-19T00:01:00Z', sender_membership_id: 'another' }];
+      return Response.json(rows.filter(item => !url.searchParams.has('message_id') || url.searchParams.get('message_id') === 'eq.' + item.message_id));
     }
+    if (table === 'channel_message_hides') { hides.add('eq.' + body.user_id); return new Response(null, { status: 201 }); }
     if (table === 'meetings') return Response.json({ ...body, meeting_id: 'meeting' });
     if (table === 'meeting_members') return Response.json([]);
     throw new Error('Unexpected fake request ' + table);
   } } });
   const access = new WorkspaceAccess({ client });
-  return { service: new WorkspaceChannels(access), client, calls, row };
+  return { service: new WorkspaceChannels(access, { publish: event => events.push(event) }), client, calls, events };
 }
+
+test('personal hides survive history reads and remain private to the actor', async () => {
+  const f = fixture();
+  const { item } = await f.service.changeMessage('actor', 'club', 'channel', 'message', { action: 'hide' });
+  assert.equal(item.hidden, true);
+  assert.equal(item.content, '');
+  assert.deepEqual(f.events, []);
+  assert.equal((await f.service.history('actor', 'club', 'channel')).items.find(x => x.message_id === 'message').hidden, true);
+  assert.equal((await f.service.history('other', 'club', 'channel')).items.find(x => x.message_id === 'message').content, 'Hello');
+});
+
+test('edit and recall require the sender; the database cutoff rejects late edits but allows recall', async () => {
+  const f = fixture();
+  for (const action of ['edit', 'recall']) {
+    await assert.rejects(f.service.changeMessage('actor', 'club', 'channel', 'deleted', { action, content: 'x' }), e => e.getStatus() === 403);
+  }
+  assert.equal(f.calls.some(c => c.method === 'PATCH'), false);
+  const edited = await f.service.changeMessage('actor', 'club', 'channel', 'message', { action: 'edit', content: ' New text ' });
+  assert.equal(edited.item.content, 'New text');
+  const update = f.calls.find(c => c.method === 'PATCH');
+  assert.equal(update.query.get('sender_membership_id'), 'eq.membership');
+  assert.equal(update.query.get('deleted_at'), 'is.null');
+  assert.equal(f.events[0].message.content, 'New text');
+  const late = fixture({ expired: true });
+  await assert.rejects(late.service.changeMessage('actor', 'club', 'channel', 'message', { action: 'edit', content: 'x' }), e => e.getStatus() === 409);
+  const recalled = await late.service.changeMessage('actor', 'club', 'channel', 'message', { action: 'recall' });
+  assert.ok(recalled.item.deleted_at);
+  assert.equal(recalled.item.content, '');
+  assert.deepEqual(recalled.item.attachments, []);
+  assert.equal(late.events[0].message.content, '');
+});
 
 test('channel list uses the DB permission function, including for chairperson', async () => {
   const denied = fixture({ allowed: false });

@@ -3,11 +3,51 @@ title: Phase 05 — Tích hợp LiveKit Cloud
 description: Theo dõi Module 1 trong phạm vi đã được giao.
 ---
 
+## Thu nhỏ cuộc họp và Picture-in-Picture (2026-11-23)
+
+Người dùng có thể thu nhỏ cuộc họp để nhắn tin trong workspace, mở lại cùng phiên hoặc dùng Picture-in-Picture trên trình duyệt hỗ trợ. Nút PiP của camera và màn hình chia sẻ dùng chung cho chủ phòng, điều hành và thành viên. Build và 204 test frontend đạt. Chrome với API, Socket.IO và video mô phỏng đã kiểm tra gửi tin kênh khi thu nhỏ, mở lại cùng phiên, dùng Back và chuyển tab khi có PiP. Phase 05 vẫn **In Progress**, chờ nghiệm thu media và tình huống kết thúc phiên trên hai thiết bị thật. [Work log](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture).
+
+## Giao diện thành viên và quản lý cuộc họp (2026-11-23)
+
+Roster hiển thị vai trò chủ phòng cho mọi participant; danh sách quản lý, duyệt và form mời được tinh chỉnh theo ảnh tham khảo. Backend join trả thêm `hostUserId`. Chưa chạy tests/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-08-phase-05-meeting-member-management-visual-refinement).
+
+## Camera local ở trang đầu (2026-11-23)
+
+Camera của người dùng được ghim ở trang đầu; các trang sau chỉ hiện camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-07-phase-05-self-camera-first-page).
+
+## Chat và thành viên dùng panel riêng (2026-11-23)
+
+Chat và panel Thành viên/quản lý không mở đồng thời; chọn một panel sẽ đóng panel còn lại. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-06-phase-05-exclusive-chat-roster-panels).
+
+## Chat chiếm hết chiều cao stage (2026-11-23)
+
+Khung chat lấp đầy chiều cao cột chat, khu vực tin nhắn co giãn và composer nằm ở đáy. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-05-phase-05-meeting-chat-full-height).
+
+## Camera local khi chia sẻ màn hình (2026-11-23)
+
+Thêm camera của người chia sẻ vào sidebar; camera local luôn giữ vị trí, phân trang chỉ áp dụng cho camera remote. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-04-phase-05-meeting-self-camera-sidebar).
+
+## Kích thước ô camera khi ít người (2026-11-23)
+
+Dải camera dùng ba hàng cố định để 1–2 participant không bị kéo giãn kín sidebar; mobile giữ độ rộng tile cố định. Không đổi backend. `git diff --check` đạt; chưa chạy test/build/browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-03-phase-05-meeting-camera-tile-sizing).
+
+## Phân trang thành viên tham gia cuộc họp (2026-11-23)
+
+Dải camera participant cạnh màn hình chia sẻ phân trang 3 ô mỗi trang; sidebar tên thành viên hiển thị 10 người mỗi trang. Trang tự điều chỉnh nếu số participant giảm. Không đổi backend. `git diff --check` đạt; chưa chạy test/build. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-02-phase-05-meeting-participant-pagination).
+
+## Thiết kế lại bố cục phòng họp (2026-11-23)
+
+Video chiếm cột chính, sidebar thành viên và quản lý nằm bên phải, thanh điều khiển ở dưới; sidebar đóng/mở được và xếp dọc trên màn hình hẹp. Giữ các thao tác frontend hiện có, không đổi backend. `git diff --check` đạt; chưa chạy test/build hoặc kiểm tra browser. Phase 05 vẫn In Progress. [Work log](/work-logs/2026-11-23-01-phase-05-meeting-room-layout).
+
 ## Quyền kết thúc họp và gỡ thành viên CLB (2026-11-22)
 
 Chỉ host/moderator được kết thúc buổi họp. Gỡ thành viên CLB thu hồi quyền họp và ngắt các thiết bị của người đó trong các cuộc họp thuộc CLB; frontend thoát cuộc gọi khi bị ngắt hoặc mất quyền. Không đổi schema. Phase 04/05 vẫn **In Progress**; chờ nghiệm thu LiveKit thật. [Work log](/work-logs/2026-11-22-01-phase-05-meeting-permissions-club-removal).
 
 Trạng thái: In Progress. Bắt đầu: 2026-10-19 (Asia/Saigon).
+
+## Thông báo tự ẩn trong phòng họp (2026-11-22)
+
+Phản hồi ngắn ở sảnh và trong phòng dùng popup tự ẩn sau 5 giây. [Work log](/work-logs/2026-11-22-24-phase-05-meeting-notifications).
 
 ## Chuyển thiết bị trong buổi họp (2026-11-21)
 
@@ -36,7 +76,7 @@ Người dùng đã điền env LiveKit và xác nhận nghe/thấy giữa nhi�
 
 ## Bước tiếp theo
 
-Tải lại frontend, thử Join và thực hiện checklist nghiệm thu hai thiết bị trong tài liệu Module 1. Ghi bằng chứng trước khi đóng phase.
+Thử Join và kiểm tra media hai chiều trên hai thiết bị. Sau đó chạy các ca thu nhỏ, gửi tin trong kênh, chuyển tab với PiP và kết thúc phiên khi có thành viên đang ở khung nhỏ. Ghi kết quả trước khi đóng phase. [Checklist hai thiết bị](/modules/https-tunnel).
 
 ## Cập nhật kết nối cục bộ
 

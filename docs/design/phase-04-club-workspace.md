@@ -2,7 +2,7 @@
 
 > Image and confirmation update: existing image URL inputs now use file selection/upload; confirmations use the shared asynchronous popup. [Implementation and verification](../work-logs/2026-11-20-12-phase-04-popups-image-upload.mdx).
 
-> Realtime update 2026-11-20: club messages use Socket.IO `/workspace-chat`; history uses HTTP only on connection/reconnection/pagination. Meeting messages use `/chat`. Older polling/meeting-overview descriptions below are historical; see [current transport and room decisions](../work-logs/2026-11-20-11-phase-04-realtime-chat-room-cleanup.mdx). Meetings still open as a separate full-page view; only the duplicate overview was removed.
+> Hiện trạng 23/11/2026. Chat kênh dùng Socket.IO `/workspace-chat` và HTTP để đồng bộ lịch sử, phân trang và tải bù khoảng mỗi 3 giây khi tab hiển thị. Chat họp dùng namespace `/chat`. Người đang họp có thể thu nhỏ phòng, quay về kênh CLB để nhắn tin rồi mở lại cùng phiên. [Work log](../work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture.mdx).
 
 **Bàn giao 20/11/2026** · Phase 04 kỹ thuật vẫn **In Progress**. Tài liệu này mô tả workspace sau tích hợp kênh, chat và họp gắn CLB. Xem [log tích hợp](../work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx) và [log rà soát](../work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx).
 
@@ -48,7 +48,9 @@ Hoạt động có thời gian bắt đầu/kết thúc, hình thức onsite/onl
 
 ## Luồng chat và họp
 
-- **Chat CLB.** NestJS lấy `club_channels` và lọc qua `clubspace_can_read_channel`. Kênh Chung và kênh ban mở dùng chung cho membership active. Kênh private dành cho thành viên trong ban hoặc người được cấp quyền riêng. Quyền chủ nhiệm không tự mở kênh private. Tin lưu theo kênh trong `channel_messages`, tải 50 tin mỗi lượt, polling khoảng 3 giây khi tab hiển thị. Backend dùng UUID do client gửi để chống ghi trùng khi thử lại.
+- **Thao tác tin nhắn.** Nút ba chấm hiện khi rê chuột hoặc dùng bàn phím, và luôn hiện trên thiết bị cảm ứng. Tin gửi có Chỉnh sửa và Thu hồi. Tin nhận có Xóa phía tài khoản hiện tại. Chỉnh sửa dùng lại ô soạn và giữ bản nháp tin mới.
+
+- **Chat CLB.** NestJS lấy `club_channels` và lọc qua `clubspace_can_read_channel`. Kênh Chung và kênh ban mở dùng chung cho membership active. Kênh private dành cho thành viên trong ban hoặc người được cấp quyền riêng. Quyền chủ nhiệm không tự mở kênh private. Tin được gửi qua Socket.IO và lưu theo kênh trong `channel_messages`. HTTP tải lịch sử 50 tin mỗi lượt và kiểm tra tin thiếu khoảng mỗi 3 giây khi tab hiển thị. Backend dùng UUID do client gửi để chống ghi trùng khi thử lại.
 - **Giao diện.** Navy sáng mặc định, nút Sáng/Tối ở cột thông tin và lưu lựa chọn trên trình duyệt. Có bong bóng tin gửi/nhận, nhóm theo người gửi, Enter gửi, Shift+Enter xuống dòng và nút mặt cười chèn emoji Unicode vào ô soạn. Link HTTP/HTTPS trong tin được gạch chân và bấm trực tiếp.
 - **Họp CLB.** Workspace liệt kê cuộc họp theo `clubId`, gửi `clubId` khi tạo và truyền mã/ID buổi sang module meeting. Với họp gắn CLB, API danh sách buổi, join và trạng thái chờ đều kiểm tra membership active trước khi áp dụng quyền riêng của cuộc họp. Mỗi buổi có link mời và phòng LiveKit riêng. Chat phiên họp đi qua Socket.IO riêng.
 
@@ -91,6 +93,7 @@ Tất cả dưới `/api/workspace/:clubId`, yêu cầu JWT và profile hoàn ch
 | GET / | Club context và role của người gọi |
 | GET /channels | Danh sách kênh người gọi được phép đọc |
 | GET/POST /channels/:channelId/messages | Đọc lịch sử và gửi tin văn bản/emoji |
+| PATCH /channels/:channelId/messages/:messageId | Sửa, ẩn theo tài khoản hoặc thu hồi tin |
 | POST /channels/:channelId/messages/attachments | Gửi ảnh/tệp qua multipart, có thể kèm chú thích |
 | GET /channels/:channelId/attachments/:attachmentId | Cấp URL xem ảnh hoặc tải tệp sau khi kiểm tra quyền |
 | GET /meetings | Danh sách phòng và buổi họp gắn CLB |

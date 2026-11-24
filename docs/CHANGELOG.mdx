@@ -1,4 +1,4 @@
-## Đồng bộ popup xác nhận (2026-11-22)
+﻿## Đồng bộ popup xác nhận (2026-11-22)
 
 Popup xác nhận dùng chung kiểu sáng/tối. Bổ sung xác nhận khi ngừng ban, gỡ ban khỏi bản nháp và xóa câu hỏi. Typecheck và 119 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-20-phase-04-confirmation-dialogs).
 
@@ -974,6 +974,14 @@ Sửa nháy toàn màn hình khi chuyển CLB: giữ rail/sidebar/main và theme
 ## 21/11/2026 — Xóa URL cũ khi đăng xuất
 
 Logout đưa về `/?mode=login` và xóa session; đăng nhập tài khoản khác không giữ workspace/trang cá nhân cũ, admin về `/admin`. Refresh sau logout vẫn mở form. Ba regression tái hiện trước sửa, 43 auth/redirect tests và frontend build đạt; chưa thử tài khoản thật trên browser. Phase 04 In Progress. [Work log](/work-logs/2026-11-21-04-phase-04-logout-account-url).
-## �?ng b? DB cho chat cu?c h?p (2026-11-24)
+## Đồng bộ DB cho chat cuộc họp (2026-11-24)
 
-Gi? Socket.IO d? ph�t nhanh trong c�ng backend v� b? sung d?c b� Supabase history m?i 3 gi�y qua cursor, t? g?p b?n tin tr�ng v?i broadcast; th�m test polling. Phase 06 v?n In Progress; chua th? ghi DB th?t/hai thi?t b?. [Work log](/work-logs/2026-11-24-01-phase-06-meeting-chat-db-sync).
+Gi? Socket.IO d? ph�t nhanh trong c�ng backend v� b? sung d?c b� Supabase history m?i 3 gi�y qua cursor, t? g?p b?n tin tr�ng v?i broadcast; th�m test polling. Phase 06 v?n In Progress; chua th? ghi DB th?t/hai thi?t b?. [Work log](/work-logs/2026-11-24-01-phase-06-meeting-chat-db-sync).
+
+
+
+## Dùng chung đăng nhập giữa các tab (22/11/2026)
+
+Phiên đăng nhập hợp lệ lưu trong localStorage cùng origin; link họp ở tab mới dùng lại phiên còn hạn. Phiên sessionStorage cũ được chuyển khi mở lại ứng dụng. Đăng xuất xóa phiên chung và phiên cũ; tab khác tải lại khi tài khoản hoặc trạng thái đăng nhập thay đổi. Khác origin/trình duyệt vẫn cần đăng nhập riêng. Frontend 198 tests và build đạt; chưa nghiệm thu hai tab bằng tài khoản thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-23-phase-04-shared-auth-tabs).
+
+

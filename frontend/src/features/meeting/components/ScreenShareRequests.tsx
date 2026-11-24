@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParticipantAttribute, useParticipants } from '@livekit/components-react';
 import type { Participant } from 'livekit-client';
 import { meetingRequest } from '../services/meetings-api';
+import { MeetingNotification } from './MeetingNotification';
 
 function Request({ participant, accessToken, path }: { participant: Participant; accessToken: string; path: string }) {
   const status = useParticipantAttribute('screenShareRequest', { participant });
@@ -16,7 +17,7 @@ function Request({ participant, accessToken, path }: { participant: Participant;
   }
   return <div className="screen-share-request"><span>{participant.name || 'Thành viên'} muốn chia sẻ màn hình</span>
     <div><button disabled={busy} onClick={() => void decide(true)}>Cho chia sẻ</button><button disabled={busy} onClick={() => void decide(false)}>Từ chối</button></div>
-    {error && <p role="alert">{error}</p>}
+    <MeetingNotification kind="error" message={error} />
   </div>;
 }
 

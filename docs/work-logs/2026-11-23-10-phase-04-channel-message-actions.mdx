@@ -1,0 +1,54 @@
+---
+title: Thao tác tin nhắn trong kênh CLB
+description: Sửa trong 5 phút, xóa cho tài khoản hiện tại và thu hồi cho cả kênh.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-23-10
+- Thời gian: 2026-11-23, múi giờ Asia/Saigon. Không ghi giờ bắt đầu.
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Thêm thao tác sửa tin trong 5 phút từ lúc gửi, xóa tin phía tài khoản thực hiện và thu hồi tin cho cả kênh.
+
+## Công việc hoàn thành
+
+- `workspace-channels.controller.ts` và `workspace-channels.service.ts` xác thực quyền đọc kênh và giới hạn sửa, thu hồi theo người gửi. API dùng Socket.IO hiện có để phát tin đã sửa hoặc thu hồi.
+- `20261123000100_channel_message_actions.sql` lưu xóa cá nhân theo tài khoản và kiểm tra hạn sửa bằng thời gian PostgreSQL.
+- `WorkspaceChat.tsx`, `workspace-api.ts` và `workspace-theme.css` cung cấp thao tác theo từng tin, hiện nhãn sửa hoặc thu hồi và bỏ qua bản tin cũ đến muộn. Lượt đối chiếu HTTP cập nhật cả những trang cũ đang mở.
+- `workspace-channels.test.cjs` và `Workspace.test.tsx` kiểm tra quyền, dữ liệu xóa riêng, sửa, thu hồi và Socket.IO đến muộn.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd test` | Passed | 115 backend và 205 frontend |
+| `npm.cmd --workspace frontend run build` | Passed | Vite cảnh báo kích thước chunk |
+| Fixture giao diện | Passed | React/Vitest với API và Socket.IO mô phỏng |
+| Trình duyệt thật | Skipped | Chưa kiểm tra trực quan ngoài fixture |
+| Supabase chỉ đọc và end-to-end | Skipped | Chưa áp dụng migration và chưa dùng dữ liệu thật. Docker cục bộ không hoạt động. |
+
+## Quyết định và lý do
+
+Xóa cá nhân lưu theo tài khoản để có hiệu lực qua lần tải lại và trên thiết bị khác. Thu hồi giữ vị trí của tin, ẩn nội dung và tệp đính kèm, đồng thời chặn cấp URL đính kèm mới. URL đã cấp trước đó có thời hạn tối đa 120 giây theo cơ chế hiện hành.
+
+## Blocker và việc chưa hoàn thành
+
+Ứng dụng và migration đã có trong repo. Việc áp dụng migration và nghiệm thu trên Supabase chưa thực hiện.
+
+## Bước tiếp theo
+
+Áp dụng migration trên môi trường nghiệm thu đã chọn rồi kiểm tra ba thao tác với hai tài khoản trong cùng kênh, gồm trường hợp tải lại và tin quá 5 phút.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và tài liệu workspace
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

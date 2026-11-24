@@ -51,3 +51,7 @@ Valid auth sessions persist in tab-scoped sessionStorage; logout/expiry clears t
 ## Full frontend theme audit (2026-11-09)
 
 Unified semantic light/dark colors for auth, forms, settings, dialogs and LiveKit controls; fixed device selection styling, gear click handling and theme persistence across logout/reload. Build and 38 frontend tests passed; 40 browser states had zero measured text-contrast/overflow failures. UI simulation used; physical media acceptance remains pending. Phase 04/05 In Progress. [Work log](/work-logs/2026-11-09-05-phase-04-theme-audit).
+
+## Dùng chung đăng nhập giữa các tab (22/11/2026)
+
+Phiên đăng nhập hợp lệ lưu trong localStorage cùng origin; link họp ở tab mới dùng lại phiên còn hạn. Phiên sessionStorage cũ được chuyển khi mở lại ứng dụng. Đăng xuất xóa phiên chung và phiên cũ; tab khác tải lại khi tài khoản hoặc trạng thái đăng nhập thay đổi. Khác origin/trình duyệt vẫn cần đăng nhập riêng. Frontend 198 tests và build đạt; chưa nghiệm thu hai tab bằng tài khoản thật. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-23-phase-04-shared-auth-tabs).

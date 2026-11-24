@@ -1,4 +1,5 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, Optional, ServiceUnavailableException } from '@nestjs/common';
+import { isUUID } from 'class-validator';
 import { WorkspaceAccess } from './workspace-access.service';
 import { attachmentBucket, prepareChannelAttachments, type ChannelUpload } from './channel-attachments';
 import { WorkspaceChannelEvents } from './workspace-channel-events';
@@ -54,9 +55,10 @@ export class WorkspaceChannels {
   }
 
   private publicMessage(row: Record<string, any>, membershipId: string) {
-    const { club_memberships, client_message_id, attachments, ...message } = row;
-    return { ...message, content: row.deleted_at ? '' : row.content,
-      attachments: row.deleted_at ? [] : (attachments ?? []).slice().sort((a: { position: number }, b: { position: number }) => a.position - b.position),
+    const { club_memberships, client_message_id, attachments, hides, ...message } = row;
+    const hidden = !!hides?.length;
+    return { ...message, ...(hidden ? { hidden } : {}), content: row.deleted_at || hidden ? '' : row.content,
+      attachments: row.deleted_at || hidden ? [] : (attachments ?? []).slice().sort((a: { position: number }, b: { position: number }) => a.position - b.position),
       sender: club_memberships?.users?.display_name || 'Thành viên',
       avatar_url: club_memberships?.users?.avatar_url ?? null,
       mine: row.sender_membership_id === membershipId,
@@ -65,10 +67,18 @@ export class WorkspaceChannels {
     };
   }
 
-  async history(userId: string, clubId: string, channelId: string, before?: string, beforeId?: string) {
+  async history(userId: string, clubId: string, channelId: string, before?: string, beforeId?: string, ids?: string) {
     const context = await this.authorize(userId, clubId, channelId);
     if (!!before !== !!beforeId) throw new BadRequestException('Thiếu thông tin phân trang tin nhắn.');
-    const query = this.db.from('channel_messages').select(messageFields).eq('channel_id', channelId);
+    const query = this.db.from('channel_messages').select(`${messageFields},hides:channel_message_hides(message_id)`)
+      .eq('channel_id', channelId).eq('hides.user_id', userId);
+    if (ids !== undefined) {
+      const messageIds = ids.split(',');
+      if (before || messageIds.length > 50 || messageIds.some(id => !isUUID(id))) {
+        throw new BadRequestException('Danh sách tin nhắn không hợp lệ.');
+      }
+      query.in('message_id', messageIds);
+    }
     if (before && beforeId) {
       const time = new Date(before).toISOString();
       query.or(`created_at.lt.${time},and(created_at.eq.${time},message_id.lt.${beforeId})`);
@@ -80,6 +90,41 @@ export class WorkspaceChannels {
     return { items: rows.reverse().map(row => this.publicMessage(row, context.membership.membership_id)),
       hasMore: (result.data?.length ?? 0) > 50,
       cursor: last ? { before: last.created_at, before_id: last.message_id } : null };
+  }
+
+  async changeMessage(userId: string, clubId: string, channelId: string, messageId: string,
+    body: { action: 'edit' | 'hide' | 'recall'; content?: string }) {
+    const context = await this.authorize(userId, clubId, channelId);
+    const membershipId = context.membership.membership_id;
+    const current = await this.db.from('channel_messages').select(messageFields)
+      .eq('channel_id', channelId).eq('message_id', messageId).maybeSingle();
+    this.access.check(current.error);
+    if (!current.data) throw new NotFoundException('Không tìm thấy tin nhắn trong kênh này.');
+
+    if (body.action === 'hide') {
+      const hidden = await this.db.from('channel_message_hides').upsert({ message_id: messageId, user_id: userId },
+        { onConflict: 'message_id,user_id', ignoreDuplicates: true });
+      this.access.check(hidden.error);
+      return { item: this.publicMessage({ ...current.data, hides: [true] }, membershipId) };
+    }
+    if (current.data.sender_membership_id !== membershipId) {
+      throw new ForbiddenException('Bạn chỉ có thể sửa hoặc thu hồi tin nhắn của mình.');
+    }
+    if (current.data.deleted_at && body.action === 'recall') return { item: this.publicMessage(current.data, membershipId) };
+
+    const content = body.content?.trim() ?? '';
+    if (body.action === 'edit' && ([...content].length > 2000 || (!content && !current.data.attachments?.length))) {
+      throw new BadRequestException('Tin nhắn cần có nội dung hoặc tệp đính kèm. Nội dung tối đa 2000 ký tự.');
+    }
+    const changes = body.action === 'edit' ? { content, updated_by: userId }
+      : { deleted_at: new Date().toISOString(), deleted_by: userId, updated_by: userId };
+    const result = await this.db.from('channel_messages').update(changes)
+      .eq('channel_id', channelId).eq('message_id', messageId).eq('sender_membership_id', membershipId)
+      .is('deleted_at', null).select(messageFields).maybeSingle();
+    if (result.error?.code === 'PT409') throw new ConflictException('Đã quá 5 phút kể từ lúc gửi. Bạn không thể sửa tin nhắn này.');
+    this.access.check(result.error);
+    if (!result.data) throw new ConflictException('Tin nhắn đã được thu hồi.');
+    return this.saved(clubId, channelId, this.publicMessage(result.data, membershipId));
   }
 
   async send(userId: string, clubId: string, channelId: string, body: { client_message_id: string; content: string }) {
