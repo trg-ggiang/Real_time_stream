@@ -100,6 +100,19 @@ it('recovers every missed page on reconnect without duplicating live or latest-p
   expect(mocks.request.mock.calls.filter(([, , payload]) => payload.after)).toHaveLength(3);
 });
 
+it('polls persisted history every three seconds and merges messages missed by socket broadcast', async () => {
+  mocks.request.mockResolvedValue({ messages: [], hasMore: false });
+  const { result } = renderHook(() => useMeetingChat('token', 'room-a', 'me:device', true, false));
+  await waitFor(() => expect(result.current.syncing).toBe(false));
+  const persisted = message('room-a', 'persisted-message', 'other');
+  mocks.request.mockImplementation(async (_socket, event, payload) => event === 'chat:history'
+    ? { messages: [persisted], hasMore: false }
+    : { messages: [], hasMore: false });
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 3100)); });
+  expect(result.current.messages.map(item => item.id)).toContain('persisted-message');
+  expect(result.current.unread).toBe(1);
+});
+
 it('supports reconnecting after a connection error and synchronizes history again', async () => {
   const { result } = renderHook(() => useMeetingChat('token', 'room-a', 'me:device', true, true));
   await waitFor(() => expect(result.current.syncing).toBe(false));

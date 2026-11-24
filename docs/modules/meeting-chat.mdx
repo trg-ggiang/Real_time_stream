@@ -5,7 +5,7 @@ description: Cấu hình, luồng dữ liệu, quyền và giới hạn của ch
 
 ## Phạm vi hiện tại
 
-Chat văn bản chung theo meeting session, lịch sử Supabase, gửi lại cùng client ID, tải tin cũ, reconnect tải bù, số tin chưa đọc và giới hạn gửi. Không nhắn riêng, file, reaction, sửa/xóa, xác nhận đã đọc hoặc giao diện host quản lý thành viên. Những người đã được admitted đều có cùng quyền chat.
+Chat văn bản chung theo meeting session, lịch sử Supabase, gửi lại cùng client ID, tải tin cũ, reconnect tải bù, đồng bộ lịch sử mỗi 3 giây, số tin chưa đọc và giới hạn gửi. Socket.IO phát tin nhanh trong cùng backend process; polling history theo cursor đối chiếu Supabase để bù broadcast không tới từ process khác. Không nhắn riêng, file, reaction, sửa/xóa, xác nhận đã đọc hoặc giao diện host quản lý thành viên. Những người đã được admitted đều có cùng quyền chat.
 
 Không tự tạo meeting/session, không chuyển status, không tự admitted thành viên và không ghi attendance. Database của nhóm không bị thay đổi trong kiểm thử phiên triển khai; chỉ được đọc metadata/lịch sử. Người dùng trước đó xác nhận migration meeting_messages và các constraint/grants/RLS đã áp dụng.
 
@@ -38,7 +38,7 @@ Frontend:
 - MeetingPage: giữ sảnh giao diện mới, mở mã/link, chọn buổi và join bằng useSessionFlow; truyền sessionId và JWT ứng dụng cho chat trong MeetingRoom.
 - token-api/useMeetingSession: chỉ còn là đường tương thích, không dùng làm giao diện sảnh chính. Token session dùng lại logic join hiện tại để giữ quyền theo role.
 - chat/services/chat-socket: socket cùng origin, auth ở handshake, timeout ACK 10 giây; chỉ emit khi connected để tránh gửi ngầm ngoài ý muốn.
-- chat/hooks/use-meeting-chat: merge theo message ID, outbox gửi lỗi, retry cùng ID, cursor cũ/mới và checkpoint tải bù nếu một trang giữa chừng thất bại; cleanup listeners/socket khi rời phòng.
+- chat/hooks/use-meeting-chat: merge theo message ID, outbox gửi lỗi, retry cùng ID, cursor cũ/mới và checkpoint tải bù nếu một trang giữa chừng thất bại; polling history mỗi 3 giây khi socket hoạt động để đối chiếu DB, cleanup timer/listeners/socket khi rời phòng.
 - chat/components/MeetingChat: panel mở/đóng, unread, composer Enter gửi và Shift+Enter xuống dòng, không tự kéo xuống khi đang đọc tin cũ. React hiển thị plain text, không dựng HTML từ content.
 
 ## Luồng xử lý
@@ -47,7 +47,7 @@ Frontend:
 2. POST /api/livekit/token?sessionId=UUID kiểm tra lại quyền, ký token vào đúng room của session và trả sessionId. Không có query thì giữ room PoC, không được dùng chat với credentials đó.
 3. LiveKitRoom connected thì chat client mở WSS/WS namespace /chat, transport path /socket.io. Handshake gồm token, sessionId, participantIdentity.
 4. Backend xác minh JWT/user, mapping member/session và participant thực tế qua LiveKit. Client không thể tự khai senderId hoặc tự tham gia session không có quyền.
-5. Client đăng ký listener trước khi connect. Sau connect tải 50 tin gần nhất; reconnect tải bù từng trang sau checkpoint, merge với sự kiện live để tránh trùng/thiếu trong lúc tải.
+5. Client đăng ký listener trước khi connect. Sau connect tải 50 tin gần nhất; mỗi 3 giây, khi socket hoạt động, đọc history sau checkpoint qua gateway tới Supabase và đi hết mọi trang. Reconnect cũng tải bù; merge theo ID tránh trùng với broadcast live.
 6. chat:send nhận clientMessageId/content. Backend xác thực payload/quyền, lưu DB trước, rồi phát chat:message và ACK. Recipient bị removed/phiên ended/đã rời LiveKit bị chặn trước delivery.
 7. Timeout không đồng nghĩa DB chưa lưu. Outbox giữ nội dung và nút thử lại; retry cùng ID đọc lại tin cũ, khác content với ID cũ trả 409. Không yêu cầu quyền UPDATE/DELETE.
 8. Rời media hoặc logout hủy socket/listeners, không ngắt media chỉ vì chat lỗi. Khi LiveKit reconnect, chat kết nối lại theo lifecycle và tải bù.
@@ -76,7 +76,7 @@ Handshake: token string, sessionId UUID, participantIdentity string. Không truy
 - Chưa thử INSERT thật vào Supabase, hai thiết bị/hai mạng hoặc media thiết bị thật. Cần người dùng thử phiên development thực tế để nghiệm thu persistence.
 - Không xây lifecycle scheduled/ongoing/ended, waiting room, quản trị role hoặc đồng bộ attendance. Chỉ status ongoing được phép join/chat; started_at/scheduled_start_at không tự đổi status.
 - Backend xác minh LiveKit qua mạng cho mọi thao tác và từng recipient. Phù hợp nhóm nhỏ; phòng lớn tốn nhiều request/độ trễ. Mất dịch vụ xác minh thì fail closed và có thể phải kết nối lại chat.
-- Rate limits/socket routing ở một process; chưa Redis adapter hoặc nhiều backend. Không bảo đảm exactly-once delivery/broadcast bền vững; DB unique chống trùng bản ghi, history/retry bù lỗi kết nối. Chưa transactional outbox hay sequence commit nghiêm ngặt.
+- Rate limits/socket routing ở một process; chưa Redis adapter hoặc nhiều backend. Broadcast nhanh chỉ tới socket cùng process, còn client đang kết nối sẽ tự hòa giải từ DB tối đa khoảng 3 giây một lần. Khi socket/API không kết nối được, polling này không chạy cho đến khi kết nối lại. Không bảo đảm exactly-once delivery/broadcast bền vững; DB unique chống trùng bản ghi, history/retry bù lỗi kết nối. Chưa transactional outbox hay sequence commit nghiêm ngặt.
 - History cursor là thứ tự created_at/id, không cam kết thứ tự transaction commit giữa nhiều sender. Đọc lại trang gần nhất giúp bù overlap; các trường hợp cực đoan cần cơ chế ordering/outbox riêng nếu yêu cầu cao hơn.
 - Lịch sử/outbox đang trong memory của tab; reload mất draft chưa xác nhận, JWT và lựa chọn. Tin đã lưu vẫn có thể tải lại sau login/join. Message list chưa virtualize/giới hạn tổng bộ nhớ.
 - Gửi tin trước/sau cuộc họp, file/DM/edit/delete/read receipts chưa hỗ trợ. Table append-only đúng grants hiện tại.

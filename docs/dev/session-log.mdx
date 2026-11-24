@@ -728,3 +728,13 @@ Các nơi chọn ban chỉ nhận ban đang hoạt động. Chủ nhiệm vẫn 
 ## Đồng bộ popup xác nhận (2026-11-22)
 
 Popup xác nhận dùng chung kiểu sáng/tối. Bổ sung xác nhận khi ngừng ban, gỡ ban khỏi bản nháp và xóa câu hỏi. Typecheck và 119 test đạt. Phase 04 In Progress. [Work log](/work-logs/2026-11-22-20-phase-04-confirmation-dialogs).
+
+## �?ng b? DB cho chat cu?c h?p (2026-11-24)
+
+- Phase: 06 � Chat trong meeting
+- K?t qu?: Completed; Phase 06 v?n In Progress.
+- Th�m reconciliation history Supabase m?i 3 gi�y qua Socket.IO history ACK. Cursor/checkpoint hi?n c� d�ng d? t?i b� tu?n t?, b?n tr�ng du?c g?p theo ID; Socket.IO live broadcast v?n ho?t d?ng.
+- Th�m test frontend cho tin d� luu nhung b? l? broadcast.
+- Ki?m tra: `npm.cmd --workspace frontend run typecheck` Passed; `npm.cmd --workspace frontend run test -- chat/hooks/use-meeting-chat.test.tsx --maxWorkers=1` Passed (8 tests); `git diff --check` Passed.
+- Chua x�c minh: Supabase ghi th?t, nhi?u backend/thiet b? qua m?ng; kh�ng c� thay d?i schema.
+- Bu?c ti?p: ki?m tra hai t�i kho?n admitted tr�n hai thi?t b?, g?i tin v� d?i chi?u persistence tr�n m�i tru?ng development.

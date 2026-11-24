@@ -1,0 +1,45 @@
+﻿---
+title: Đồng bộ DB cho chat cuộc họp
+description: Bổ sung tải bù lịch sử Supabase định kỳ cho meeting chat.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-24-01
+- Thời gian: 2026-11-24, không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 06 — Chat trong meeting
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Điều tra vì sao chat channel ổn định hơn chat cuộc gọi và đồng bộ meeting chat với dữ liệu DB mỗi 3 giây theo cách channel đang reconciliation.
+
+## Công việc hoàn thành
+
+- Xác nhận channel dùng Socket.IO để phát nhanh và HTTP history từ NestJS/Supabase mỗi 3 giây; meeting trước đó chỉ tải history khi connect/reconnect hoặc người dùng tải tin cũ.
+- Bổ sung meeting chat polling history mỗi 3 giây qua gateway, dùng cursor để chỉ tải tin mới và xử lý nhiều trang; merge theo ID với live broadcast.
+- Bổ sung frontend test cho trường hợp DB có tin nhưng Socket.IO broadcast bị lỡ.
+- Cập nhật hướng dẫn meeting chat và trạng thái Phase 06. Không thay đổi schema hoặc DB từ xa.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run typecheck` | Passed | TypeScript |
+| `npm.cmd --workspace frontend run test -- chat/hooks/use-meeting-chat.test.tsx --maxWorkers=1` | Passed | 8 tests |
+| `git diff --check` | Passed | Không whitespace errors |
+| Supabase ghi thật/hai thiết bị | Skipped | Chưa chạy E2E trên môi trường development |
+
+## Quyết định và lý do
+
+Giữ Socket.IO là đường nhận nhanh. Polling qua socket history ACK truy vấn Supabase, không đưa secret DB về browser và không thêm endpoint quyền mới. DB là nguồn chuẩn; cursor microsecond-preserving hiện có tránh tải lại lịch sử toàn bộ.
+
+## Blocker và việc chưa hoàn thành
+
+Polling chỉ hoạt động khi Socket.IO kết nối được; nếu socket mất hẳn thì đồng bộ tiếp tục khi socket reconnect. Chưa nghiệm thu DB thật hoặc nhiều backend/thiết bị.
+
+## Bước tiếp theo
+
+Thử hai tài khoản admitted trên hai thiết bị qua HTTPS, xác nhận tin lưu trong Supabase và xuất hiện trong vòng một chu kỳ polling.

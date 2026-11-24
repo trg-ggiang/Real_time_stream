@@ -54,6 +54,9 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
     socketRef.current = socket;
     let generation = 0;
     let disposed = false;
+    let pollTimer: ReturnType<typeof setTimeout> | undefined;
+    let pollBusy = false;
+    let pollRequested = false;
     const valid = (run: number) => !disposed && socket.connected && run === generation;
 
     async function synchronize() {
@@ -88,13 +91,48 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
       } finally { if (valid(run)) setSyncing(false); }
     }
 
+    // Socket.IO provides low-latency delivery within a backend process. Poll the
+    // persisted history as a recovery path for messages saved by another process.
+    async function pollHistory() {
+      if (disposed) return;
+      pollRequested = false;
+      if (synchronizing.current) { pollRequested = true; return; }
+      if (socket.connected && !pollBusy && !synchronizing.current) {
+        pollBusy = true;
+        try {
+          let cursor = checkpoint.current;
+          let more = true;
+          while (more && !disposed && socket.connected) {
+            const page = await chatRequest<HistoryPage>(socket, 'chat:history', cursor ? { after: cursor } : {});
+            if (disposed || !socket.connected) return;
+            accept(page.messages, true);
+            more = page.hasMore && page.messages.length > 0;
+            if (page.messages.length) {
+              cursor = messageCursor(page.messages[page.messages.length - 1]);
+              checkpoint.current = cursor;
+            }
+          }
+        } catch {
+          // Keep the current transcript and retry on the next polling tick.
+        } finally {
+          pollBusy = false;
+        }
+      }
+      if (!disposed) pollTimer = setTimeout(() => { pollTimer = undefined; void pollHistory(); }, 3000);
+    }
+
     socket.on('chat:message', (message: ChatMessage) => {
       if (!disposed && socket.connected && message.sessionId === sessionId) {
         accept([message], true);
         if (!synchronizing.current && messageRef.current.length) checkpoint.current = messageCursor(messageRef.current[messageRef.current.length - 1]);
       }
     });
-    socket.on('connect', () => { void synchronize(); });
+    socket.on('connect', () => {
+      void synchronize().finally(() => {
+        if (pollRequested && !disposed) void pollHistory();
+      });
+      if (!pollTimer) pollTimer = setTimeout(() => { pollTimer = undefined; void pollHistory(); }, 3000);
+    });
     socket.on('disconnect', () => {
       sending.current.clear();
       generation++; setStatus('offline'); setSyncing(false);
@@ -108,7 +146,7 @@ export function useMeetingChat(accessToken: string, sessionId: string | undefine
       socket.disconnect();
     });
     setStatus('connecting'); socket.connect();
-    return () => { disposed = true; generation++; olderBusy.current = false; setLoadingOlder(false); socket.removeAllListeners(); socket.disconnect(); socketRef.current = null; };
+    return () => { disposed = true; generation++; if (pollTimer) clearTimeout(pollTimer); olderBusy.current = false; setLoadingOlder(false); socket.removeAllListeners(); socket.disconnect(); socketRef.current = null; };
   }, [accessToken, sessionId, participantIdentity, active, accept]);
 
   const send = useCallback(async (content: string, clientMessageId: string = crypto.randomUUID()): Promise<boolean> => {
