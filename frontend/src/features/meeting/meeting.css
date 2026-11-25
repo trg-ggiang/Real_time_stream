@@ -1,4 +1,4 @@
-:root:has(.meeting-app:not(.meeting-app--compact)) { color-scheme: dark; }
+:root:has(.meeting-app:not(.meeting-app--background)) { color-scheme: dark; }
 .meeting-app {
   --meeting-bg: #1a1a1e;
   --meeting-surface: #222226;

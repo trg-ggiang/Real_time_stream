@@ -39,8 +39,11 @@ export function useSessionFlow(accessToken: string, onUnauthorized: () => void) 
 
   const leave = useCallback(async (message = '') => {
     forgetMeeting();
+    const interruptedRecovery = request.current && !current.current && !reloadCleanupPending.current
+      ? reloadDeparture.current : null;
     request.current?.abort(); request.current = null;
-    if (current.current) departure.current = current.current;
+    if (current.current || interruptedRecovery) departure.current = current.current ?? interruptedRecovery;
+    if (interruptedRecovery) reloadDeparture.current = null;
     current.current = null;
     setDeviceChoice(null); setTransferStatus(null);
     setActive(null); setWaiting(null); setBusy(false); setRecovering(false); setError(message);

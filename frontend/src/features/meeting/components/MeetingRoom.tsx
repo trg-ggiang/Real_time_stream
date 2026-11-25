@@ -136,7 +136,7 @@ function MeetingParticipantTile({ onPictureInPicture }: { onPictureInPicture: Op
   );
 }
 
-function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, onLeave, management, isHost, credentials, accessToken, onShare, initialSpeaker, preferredMedia, transferPending, restoreTransferMedia, compact, title, theme, onExpand }: {
+function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, onLeave, management, isHost, credentials, accessToken, onShare, initialSpeaker, preferredMedia, transferPending, restoreTransferMedia, background, title, theme, onExpand }: {
   credentials: JoinCredentials;
   accessToken: string;
   onDeviceError: (failure: MediaDeviceFailure | undefined, kind?: MediaDeviceKind) => void;
@@ -150,7 +150,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
   preferredMedia: ReturnType<typeof readMediaPreferences>;
   transferPending: boolean;
   restoreTransferMedia: boolean;
-  compact: boolean;
+  background: boolean;
   title: string;
   theme: string;
   onExpand?: () => void;
@@ -197,27 +197,24 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
     onMediaError(kind: 'audioinput' | 'videoinput', error: Error) {
       onDeviceError(MediaDeviceFailure.getFailure(error), kind);
     },
-    onExpand() { onExpand?.(); },
   };
   return (
     <>
-      {compact && <MeetingFloatingView {...cameraControls} showVideo={!pip.pictureWindow}
-        onPictureInPicture={pip.supportsWindow ? () => void pip.open() : undefined} />}
       {pip.pictureWindow && createPortal(<div className="meeting-pip-document" data-theme={theme}>
         <style>{floatingStyle}</style>
         <MeetingFloatingView {...cameraControls} selection={pip.selection}
           onExpand={() => { pip.closeWindow(); window.focus(); onExpand?.(); }} />
       </div>, pip.pictureWindow.document.body)}
       <MeetingNotification kind="error" message={pip.error} onClose={pip.dismissError} />
-      <div className="room-status" hidden={compact}>
+      <div className="room-status">
         {!connected && <span className="meeting-connection" role="status" data-connected={false}>{connectionLabels[state]}</span>}
       </div>
       {isHost && management?.sessionId ? <ScreenShareRequests accessToken={management.accessToken} meetingId={management.overview.meeting.meetingId} sessionId={management.sessionId} /> : null}
       <RoomAudioRenderer volume={audioMuted || transferPending ? 0 : 1} />
       <StartAudio label="Bật âm thanh từ phòng" />
-      <div className="meeting-call-layout" hidden={compact} data-sidebar-open={showManagement} data-chat-open={chatOpen}>
+      <div className="meeting-call-layout" data-sidebar-open={showManagement} data-chat-open={chatOpen}>
         <div className="meeting-call-stage">
-          <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen && !compact} onUnreadChange={setChatUnread}>
+          <MeetingChat credentials={credentials} accessToken={accessToken} open={chatOpen && !background} onUnreadChange={setChatUnread}>
             <MeetingMediaLayout onPictureInPicture={pip.open}><MeetingParticipantTile onPictureInPicture={pip.open} /></MeetingMediaLayout>
           </MeetingChat>
         </div>
@@ -247,7 +244,7 @@ function RoomContent({ onDeviceError, onDeviceEnabled, onMediaPreferenceChange, 
             showSessionMembers onPendingCountChange={setPendingCount} />}
         </aside>}
       </div>
-      <div className="meeting-controls-row" hidden={compact}>
+      <div className="meeting-controls-row">
       <div className="meeting-controls">
         <fieldset className="meeting-device-controls" disabled={!canUseDevices} aria-label="Thiết bị">
         <div className="meeting-device-group">
@@ -309,7 +306,7 @@ export function MeetingRoom({
   management,
   onShare,
   audioSelection,
-  compact = false,
+  background = false,
   title = 'Cuộc họp',
   theme = 'light',
   onExpand,
@@ -324,7 +321,7 @@ export function MeetingRoom({
   management?: ManagementProps;
   onShare?: () => void;
   audioSelection?: AudioSelection;
-  compact?: boolean;
+  background?: boolean;
   title?: string;
   theme?: string;
   onExpand?: () => void;
@@ -396,7 +393,7 @@ export function MeetingRoom({
           <MeetingNotification kind="error" message={message} key={kind} /> : null)}
         <RoomContent credentials={credentials} accessToken={accessToken} onDeviceError={handleDeviceError} onDeviceEnabled={handleDeviceEnabled} onLeave={onLeave} management={management} isHost={credentials.role === 'host'}
           initialSpeaker={audioSelection?.speaker ?? readSpeakerPreference()} onShare={onShare}
-          compact={compact} title={title} theme={theme} onExpand={onExpand}
+          background={background} title={title} theme={theme} onExpand={onExpand}
           preferredMedia={preferredMedia} onMediaPreferenceChange={handleMediaPreferenceChange}
           transferPending={transferStatus === 'pending'} restoreTransferMedia={transferStatus === null && credentials.transferAfterConnect === true} />
       </LiveKitRoom>

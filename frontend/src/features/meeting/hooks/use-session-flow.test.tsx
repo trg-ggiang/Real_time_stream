@@ -206,6 +206,32 @@ it('rejoins the same meeting once after losing the connection and closes only th
   expect(JSON.parse(fetch.mock.calls[2][1].body)).toEqual({ attendanceId: 'attendance' });
 });
 
+it('leaves the previous attendance when the user cancels an in-flight recovery', async () => {
+  let finishJoin!: (result: ReturnType<typeof response>) => void;
+  const delayedJoin = new Promise<ReturnType<typeof response>>(resolve => { finishJoin = resolve; });
+  const fetch = vi.fn().mockResolvedValueOnce(response(credentials))
+    .mockReturnValueOnce(delayedJoin)
+    .mockResolvedValue(response({ status: 'left' }));
+  vi.stubGlobal('fetch', fetch);
+  const { result } = renderHook(() => useSessionFlow('jwt', vi.fn()));
+  await act(async () => { await result.current.join('ABCDEFGHIJ', 'meeting', 'session'); });
+  let recovering!: Promise<void>;
+  await act(async () => { recovering = result.current.reconnect('ABCDEFGHIJ', 'attendance'); });
+  expect(result.current.recovering).toBe(true);
+
+  await act(async () => { await result.current.leave(); });
+  expect(result.current.recovering).toBe(false);
+  expect(fetch.mock.calls[1][1].signal.aborted).toBe(true);
+  expect(JSON.parse(fetch.mock.calls[2][1].body)).toEqual({ attendanceId: 'attendance' });
+
+  await act(async () => {
+    finishJoin(response({ ...credentials, attendanceId: 'replacement' }));
+    await recovering;
+  });
+  expect(result.current.active).toBeNull();
+  expect(JSON.parse(fetch.mock.calls[3][1].body)).toEqual({ attendanceId: 'replacement' });
+});
+
 it('stops automatic recovery when the replacement connection fails before connecting', async () => {
   const fetch = vi.fn().mockResolvedValueOnce(response(credentials))
     .mockResolvedValueOnce(response({ ...credentials, attendanceId: 'replacement' }))

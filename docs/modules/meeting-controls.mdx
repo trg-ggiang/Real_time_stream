@@ -3,14 +3,14 @@ title: Backend điều khiển meeting
 description: API tạo meeting, session, duyệt người tham gia và mute micro.
 ---
 
-## Thu nhỏ và Picture-in-Picture
+## Về Không gian CLB và Picture-in-Picture
 
-- **Thu nhỏ cuộc họp** đưa bạn về ứng dụng trong cùng tab. Bạn có thể mở kênh CLB để nhắn tin, giữ nguyên mic, camera và chia sẻ đang chạy. **Mở lại phòng** trở về đúng phiên mà không tạo lượt tham gia mới.
+- **Về Không gian CLB** đưa bạn về workspace trong cùng tab, giữ nguyên cuộc gọi và trạng thái mic/camera. Thanh **Đang trong cuộc họp** cho phép **Mở lại phòng** hoặc **Rời cuộc họp** ngay cả khi trình duyệt không hỗ trợ PiP.
 - **Picture-in-Picture** trên thanh điều khiển mở cửa sổ nổi khi trình duyệt hỗ trợ Document PiP. Bấm nút trên ô camera hoặc màn hình chia sẻ để chọn đúng video. Với trình duyệt chỉ hỗ trợ API PiP video, dùng nút trên từng ô đang có video. Chủ phòng, điều hành và thành viên có cùng thao tác PiP. Quyền bắt đầu chia sẻ màn hình vẫn theo cấu hình cuộc họp.
-- Mở PiP bằng thao tác bấm trước khi đổi tab. Đóng cửa sổ PiP chỉ đóng khung nổi. Dùng **Rời cuộc họp** để ngắt kết nối của thiết bị hiện tại. Nếu phiên kết thúc hoặc thiết bị bị ngắt khỏi phòng, khung và cửa sổ PiP sẽ đóng.
+- Mở PiP bằng thao tác bấm trước khi về Không gian CLB hoặc đổi tab. PiP là cửa sổ duy nhất hiển thị video ngoài phòng. Khi đóng PiP, bạn vẫn có thể điều khiển việc mở lại hoặc rời phòng từ thanh trạng thái. Phiên kết thúc hoặc thiết bị bị ngắt khỏi phòng sẽ đóng cả thanh trạng thái và cửa sổ PiP.
 - Phản hồi ngắn như timeout, lỗi thiết bị và cảnh báo token tự ẩn sau 5 giây. Lỗi trong hộp thoại xác nhận vẫn hiện cạnh thao tác. Khi cần sao chép link thủ công, popup giữ link cho đến khi đóng.
 
-[Kiểm thử thu nhỏ và PiP](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture) · [Kiểm thử thông báo](/work-logs/2026-11-22-24-phase-05-meeting-notifications).
+[Kiểm thử thanh trạng thái và PiP](/work-logs/2026-11-25-01-phase-05-meeting-call-status) · [Kiểm thử thông báo](/work-logs/2026-11-22-24-phase-05-meeting-notifications).
 
 ## Quy tắc nghiệp vụ
 

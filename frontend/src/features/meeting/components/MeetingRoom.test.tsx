@@ -233,10 +233,9 @@ it.each(['host', 'moderator', 'participant'] as const)('offers the same Picture-
     { source: Track.Source.Camera, participant: { identity: 'guest', name: 'Camera thành viên' }, publication: { track: {}, isMuted: false, trackSid: 'camera' } },
   ];
   roster.people = media.tracks.map(track => track.participant);
-  const onExpand = vi.fn();
   const props = {
     credentials: { token: 'room', serverUrl: 'wss://unit.invalid', roomName: 'room', participantIdentity: 'u', role },
-    accessToken: 'jwt', onLeave: vi.fn(), onEnded: vi.fn(), onExpand,
+    accessToken: 'jwt', onLeave: vi.fn(), onEnded: vi.fn(),
   };
   const { rerender, unmount } = render(<MeetingRoom {...props} />);
   const instance = screen.getByTestId('livekit-room');
@@ -247,15 +246,16 @@ it.each(['host', 'moderator', 'participant'] as const)('offers the same Picture-
   expect(overlay.getByRole('button', { name: 'Mở lại phòng' })).toBeTruthy();
   expect(requestWindow).toHaveBeenCalledOnce();
 
-  rerender(<MeetingRoom {...props} compact />);
+  rerender(<MeetingRoom {...props} background />);
   expect(screen.getByTestId('livekit-room')).toBe(instance);
-  expect(screen.getByRole('region', { name: 'Cuộc họp thu nhỏ' })).toBeTruthy();
+  expect(overlay.getByTestId('floating-video').getAttribute('data-identity')).toBe('guest');
+  expect(screen.queryByTestId('floating-video')).toBeNull();
   expect(screen.getByTestId('room-volume').getAttribute('data-volume')).toBe('1');
   act(() => { target.dispatchEvent(new Event('pagehide')); });
   expect(overlay.queryByTestId('floating-video')).toBeNull();
-  expect(screen.getByTestId('floating-video').getAttribute('data-identity')).toBe('presenter');
-  fireEvent.click(screen.getByRole('button', { name: 'Mở lại phòng' }));
-  expect(onExpand).toHaveBeenCalledOnce();
+  expect(screen.queryByTestId('floating-video')).toBeNull();
+  expect(props.onLeave).not.toHaveBeenCalled();
+  rerender(<MeetingRoom {...props} />);
   fireEvent.click(screen.getByRole('button', { name: 'Mở Picture-in-Picture' }));
   expect((await overlay.findByTestId('floating-video')).getAttribute('data-identity')).toBe('presenter');
 
