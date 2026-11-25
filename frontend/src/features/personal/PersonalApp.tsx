@@ -1,26 +1,22 @@
 import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { Link, Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { SquaresFour } from "@phosphor-icons/react/dist/csr/SquaresFour";
 import { Users } from "@phosphor-icons/react/dist/csr/Users";
 import { Heart } from "@phosphor-icons/react/dist/csr/Heart";
 import { CalendarCheck } from "@phosphor-icons/react/dist/csr/CalendarCheck";
 import { UserCircle } from "@phosphor-icons/react/dist/csr/UserCircle";
 import { Compass } from "@phosphor-icons/react/dist/csr/Compass";
-import { VideoCamera } from "@phosphor-icons/react/dist/csr/VideoCamera";
 import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
 import { GearSix } from "@phosphor-icons/react/dist/csr/GearSix";
 import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
 import { ProfileForm } from "../profile/ProfileForm";
-import { PersonalActivitiesPage, PersonalLists, PersonalOverview } from "./pages/PersonalLists";
+import { PersonalActivitiesPage, PersonalLists } from "./pages/PersonalLists";
 import { ClubRequestDetail, NewClubRequest } from "./pages/ClubRequestPages";
 import type { DiscoveryViewer } from "../discovery/DiscoveryApp";
 import "./personal.css";
-import "./personal-dashboard.css";
 import "./personal-layout.css";
 import { MyRecruitmentApplication,MyRecruitmentApplications } from '../recruitment/PublicRecruitment';
 const nav = [
-  ["/me", "Tổng quan", SquaresFour],
   ["/me/clubs", "CLB tham gia", Users],
   ["/me/follows", "Đang quan tâm", Heart],
   ["/me/registrations", "Hoạt động đã đăng ký", CalendarCheck],
@@ -31,7 +27,6 @@ export function PersonalApp({
   viewer,
   accessToken,
   role,
-  onMeeting,
   onLogout,
 }: DiscoveryViewer) {
   const location = useLocation();
@@ -52,7 +47,7 @@ export function PersonalApp({
   }, []);
   if (!viewer || !accessToken) return null;
   return (
-    <div className={`ps-app ps-student-shell${location.pathname === "/me" ? " ps-dashboard" : ""}`}>
+    <div className="ps-app ps-student-shell">
       <a className="ps-skip" href="#personal-content">
         Đến nội dung
       </a>
@@ -86,7 +81,6 @@ export function PersonalApp({
               <NavLink
                 key={path}
                 to={path}
-                end={path === "/me"}
                 className={({ isActive }) =>
                   isActive ||
                   (path === "/me/clubs" &&
@@ -102,9 +96,6 @@ export function PersonalApp({
           </nav>
           <div className="ps-sidebar-bottom">
             <Link to="/"><Compass size={18} aria-hidden="true" />Khám phá công khai</Link>
-            <button onClick={onMeeting} data-leave-account>
-              <VideoCamera size={18} aria-hidden="true" />Mở phòng họp
-            </button>
             {role === "admin" && <Link to="/admin"><GearSix size={18} aria-hidden="true" />Quản trị hệ thống</Link>}
             <button className="ps-logout" onClick={onLogout} data-leave-account>
               <SignOut size={18} aria-hidden="true" />Đăng xuất
@@ -121,15 +112,7 @@ export function PersonalApp({
           <Routes>
             <Route path="/me/recruitment-applications" element={<MyRecruitmentApplications token={accessToken} />} />
             <Route path="/me/recruitment-applications/:applicationId" element={<MyRecruitmentApplication token={accessToken} />} />
-            <Route
-              path="/me"
-              element={
-                <PersonalOverview
-                  token={accessToken}
-                  displayName={viewer.displayName}
-                />
-              }
-            />
+            <Route path="/me" element={<Navigate replace to="/me/registrations" />} />
             <Route path="/me/clubs" element={<Navigate replace to="/workspace" />} />
             <Route
               path="/me/registrations"
@@ -171,7 +154,7 @@ export function PersonalApp({
               element={
                 <>
                   <h1>Trang chưa khả dụng</h1>
-                  <Link to="/me">Về tổng quan →</Link>
+                  <Link to="/workspace">Về Không gian CLB →</Link>
                 </>
               }
             />
