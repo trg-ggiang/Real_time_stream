@@ -72,7 +72,12 @@ export function SignedInApp({ session, onLogout }: { session: AuthSession; onLog
   }
 
   function showApp() {
-    if (hasCall) callHref.current = meetingHref() ?? callHref.current;
+    if (hasCall) {
+      callHref.current = meetingHref() ?? callHref.current;
+      const outside = outsideHref.current;
+      navigate(/^\/workspace(?:[/?#]|$)/.test(outside) ? outside : '/workspace');
+      return;
+    }
     navigate(outsideHref.current);
   }
 
@@ -82,13 +87,13 @@ export function SignedInApp({ session, onLogout }: { session: AuthSession; onLog
     setHasCall(active);
   }, []);
 
-  return <>
+  return <div className="signed-in-app">
+    {entry && <MeetingPage key={entry} entrySearch={new URL(entry, window.location.origin).search}
+      accessToken={session.access_token} displayName={session.user.displayName} onLogout={onLogout}
+      expanded={expanded} onBack={showApp} onExpand={restoreMeeting} onCallChange={onCallChange} />}
     <div hidden={expanded}>
       <GuestLanding viewer={session.user} role={session.user.role} accessToken={session.access_token}
         onMeeting={openMeeting} onLogout={onLogout} />
     </div>
-    {entry && <MeetingPage key={entry} entrySearch={new URL(entry, window.location.origin).search}
-      accessToken={session.access_token} displayName={session.user.displayName} onLogout={onLogout}
-      expanded={expanded} onBack={showApp} onExpand={restoreMeeting} onCallChange={onCallChange} />}
-  </>;
+  </div>;
 }

@@ -8,6 +8,7 @@ import { ShareNetwork } from '@phosphor-icons/react/dist/csr/ShareNetwork';
 import { ScheduleSessionForm } from './components/MeetingForms';
 import { MeetingManagement } from './components/MeetingManagement';
 import { MeetingDeviceChoice } from './components/MeetingDeviceChoice';
+import { MeetingCallStatus } from './components/MeetingCallStatus';
 import { useSessionFlow } from './hooks/use-session-flow';
 import { canManageSessions, copyMeetingInvite, formatMeetingDate, meetingRequest, MeetingApiError, parseMeetingCode, roleLabels, type DeviceJoinMode, type Member, type MeetingOverview, type MeetingShareResult } from './services/meetings-api';
 import './meeting.css';
@@ -154,11 +155,13 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack, onExpa
     if (flow.active && overview?.sessions.find(session => session.session_id === flow.active?.sessionId)?.status === 'ended') flow.sessionEnded();
   }, [flow.active, overview, flow.sessionEnded]);
 
-  return <div className={`meeting-app meeting-room-page${!expanded ? ' meeting-app--compact' : flow.active ? ' meeting-app--incall' : ''}`} data-theme={theme}>
+  return <div className={`meeting-app meeting-room-page${!expanded ? ' meeting-app--background' : flow.active ? ' meeting-app--incall' : ''}`} data-theme={theme}>
     <MeetingNotificationTarget>
+    {!expanded && hasCall && onExpand && <MeetingCallStatus title={overview?.meeting.title} reconnecting={flow.recovering}
+      onExpand={onExpand} onLeave={() => void flow.leave()} />}
     <a className="meeting-skip" href="#meeting-main" hidden={!expanded}>Đến nội dung chính</a>
     <header className="meeting-topbar" hidden={!expanded}><div className="meeting-brand"><UniCircleLogo /></div>
-      {onBack && <button className="meeting-home-link" type="button" onClick={() => { if (!hasCall) void flow.leave(); onBack(); }}><ArrowLeft size={17} aria-hidden="true" />{hasCall ? 'Thu nhỏ cuộc họp' : 'Trang chủ'}</button>}
+      {onBack && <button className="meeting-home-link" type="button" onClick={() => { if (!hasCall) void flow.leave(); onBack(); }}><ArrowLeft size={17} aria-hidden="true" />{hasCall ? 'Về Không gian CLB' : 'Trang chủ'}</button>}
       {flow.active && overview ? <h1 className="meeting-topbar-title" title={overview.meeting.title}>{overview.meeting.title}</h1> : null}
       <div className="meeting-account"><span className="meeting-account-name" title={name}>{name}</span><span className="meeting-avatar-small" aria-hidden="true">{initials}</span><MeetingThemeToggle theme={theme} onChange={setTheme} /></div>
     </header>
@@ -172,7 +175,7 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack, onExpa
       void flow.join(pendingJoin.code, pendingJoin.meetingId, pendingJoin.sessionId, pendingJoin.deviceMode);
       setPendingJoin(null);
     }} />}
-    <div id="meeting-main" ref={main} className="meeting-main" role={expanded ? 'main' : undefined} tabIndex={expanded ? -1 : undefined}>
+    <div id="meeting-main" ref={main} className="meeting-main" hidden={!expanded} role={expanded ? 'main' : undefined} tabIndex={expanded ? -1 : undefined}>
       <MeetingNotification kind="error" message={error} />
       <MeetingNotification kind="error" message={deviceChoice ? '' : flow.error} />
       <MeetingNotification kind="success" message={notice} onClose={dismissNotice} />
@@ -193,13 +196,13 @@ export function MeetingPage({ accessToken, displayName, onLogout, onBack, onExpa
         </div> : null}
         <Suspense fallback={<div className="meeting-loading" role="status">Đang tải phòng họp…</div>}>
           <MeetingRoom key={flow.active.attendanceId} credentials={flow.active} accessToken={accessToken} audioSelection={audioSelection}
-            compact={!expanded} title={overview.meeting.title} theme={theme} onExpand={onExpand}
+            background={!expanded} title={overview.meeting.title} theme={theme} onExpand={onExpand}
             onShare={() => void copyLink(flow.active?.sessionId)} onLeave={() => void flow.leave()} onEnded={onRoomEnded}
             onReconnect={() => { if (code && flow.active) void flow.reconnect(code, flow.active.attendanceId); }}
             onConnected={flow.onConnected} transferStatus={flow.transferStatus}
             management={{ accessToken, overview, sessionId: flow.active.sessionId, knownMembers: people[overview.meeting.meetingId] || [], onMembersChanged, onChanged: refresh, onError: reportAdmin, onSessionEnded }} />
         </Suspense>
-      </> : !expanded ? (flow.recovering ? <p className="meeting-compact-reconnecting" role="status">Đang kết nối lại cuộc họp…</p> : null) : code ? <>
+      </> : expanded && code ? <>
         {loading ? <p role="status" className="meeting-loading">Đang tải cuộc họp…</p> : overview ? <>
           <div className="workspace-detail-heading"><div>{overview.membership ? <span className="workspace-role">{roleLabels[overview.membership.role]}</span> : null}<h1>{overview.meeting.title}</h1></div><button className="workspace-icon meeting-share-button" type="button" title="Chia sẻ đường dẫn" aria-label="Chia sẻ đường dẫn" disabled={!!requestedSessionId && !selected} onClick={() => void copyLink(selected?.session_id)}><ShareNetwork size={22} aria-hidden="true" /></button></div>
           {requestedSessionId && !selected ? <p role="status">Buổi họp trong đường dẫn không còn khả dụng. Hãy kiểm tra link hoặc chọn một buổi bên dưới.</p> : null}

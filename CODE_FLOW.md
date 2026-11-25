@@ -1,6 +1,6 @@
 # Real-time Stream — luồng hoạt động của hệ thống
 
-> Hiện trạng 23/11/2026. Chat kênh CLB dùng Socket.IO `/workspace-chat` và đồng bộ qua HTTP khoảng mỗi 3 giây khi tab hiển thị. Chat phiên họp dùng `/chat` và tải bù khi socket kết nối lại. Cuộc gọi có thể thu nhỏ khi điều hướng trong uniCircle.
+> Hiện trạng 25/11/2026. Chat kênh CLB dùng Socket.IO `/workspace-chat` và đồng bộ qua HTTP khoảng mỗi 3 giây khi tab hiển thị. Chat phiên họp dùng `/chat` và lấy bù lịch sử qua `chat:history`. Người đang họp có thể về Không gian CLB với phiên họp vẫn hoạt động.
 
 Tài liệu này mô tả luồng đang có trong source: ứng dụng React/Vite, API NestJS,
 Supabase và LiveKit Cloud. Đây là hướng dẫn đọc code, không phải thiết kế cho các
@@ -247,14 +247,14 @@ không relay audio/video. SDK quản lý signaling, track và participant state.
   permission của đúng LiveKit identity.
 - Browser cần secure context (HTTPS hoặc localhost) để truy cập media.
 
-### Thu nhỏ, Picture-in-Picture và thông báo
+### Về Không gian CLB, Picture-in-Picture và thông báo
 
-1. `SignedInApp` giữ `MeetingPage` khi người dùng quay về workspace qua nút **Thu nhỏ cuộc họp** hoặc nút Back nội bộ. Mở lại phòng hiển thị cùng `MeetingRoom`, cùng `sessionId` và `attendanceId`. Việc đổi bố cục không gọi API join/leave. Chat trong phòng vẫn theo phiên, còn chat CLB theo kênh đã chọn.
-2. `MeetingFloatingView` hiển thị video từ cùng kết nối LiveKit, ưu tiên màn hình đang chia sẻ rồi đến camera. Khung nội bộ trên mobile hiển thị các nút điều khiển gọn để chừa chỗ nhắn tin. `use-meeting-picture-in-picture` chọn video từ thanh điều khiển hoặc từ ô người dùng bấm. Trình duyệt hỗ trợ Document PiP mở cửa sổ kèm nút điều khiển. Nếu chỉ hỗ trợ API PiP video, nút trên từng ô mở riêng video đó.
-3. Đóng PiP giữ nguyên cuộc gọi. Bấm **Rời cuộc họp**, đăng xuất, hết phiên hoặc bị ngắt khỏi phòng sẽ dọn khung họp và cửa sổ PiP. Khi tải lại trang, dùng luồng khôi phục của phiên thay vì giữ nguyên kết nối cũ.
+1. `SignedInApp` giữ `MeetingPage` khi người dùng bấm **Về Không gian CLB** hoặc dùng Back nội bộ. `MeetingCallStatus` hiện trạng thái cùng nút **Mở lại phòng** và **Rời cuộc họp**. Mở lại phòng hiển thị cùng `MeetingRoom`, `sessionId` và `attendanceId`. Điều hướng không gọi API join/leave.
+2. Video nổi chỉ xuất hiện trong cửa sổ Picture-in-Picture. `MeetingFloatingView` dùng các track từ kết nối LiveKit hiện tại và ưu tiên màn hình chia sẻ rồi đến camera khi mở từ thanh điều khiển. Nút trên từng ô chọn đúng nguồn đang xem. Document PiP có các nút điều khiển trong cửa sổ. API PiP video mở riêng video từ ô được chọn.
+3. Đóng PiP giữ nguyên cuộc gọi. Bấm **Rời cuộc họp**, đăng xuất, hết phiên hoặc bị ngắt khỏi phòng sẽ đóng thanh trạng thái và cửa sổ PiP. Khi tải lại trang, dùng luồng khôi phục của phiên thay vì giữ nguyên kết nối cũ.
 4. `MeetingNotification` hiển thị phản hồi ngắn như timeout, lỗi thiết bị và cảnh báo token. Popup tự ẩn sau 5 giây. Popup chứa link cần sao chép thủ công giữ ô nhập đến khi người dùng đóng. Lỗi cần xử lý trong biểu mẫu hoặc hộp thoại vẫn hiện ngay tại thao tác.
 
-[Work log thu nhỏ và PiP](docs/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture.mdx) · [Work log thông báo](docs/work-logs/2026-11-22-24-phase-05-meeting-notifications.mdx).
+[Work log thanh trạng thái và PiP](docs/work-logs/2026-11-25-01-phase-05-meeting-call-status.mdx) · [Work log thông báo](docs/work-logs/2026-11-22-24-phase-05-meeting-notifications.mdx).
 
 ### Rời, kết thúc và khôi phục
 

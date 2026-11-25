@@ -1,0 +1,28 @@
+---
+title: Thanh trạng thái cuộc họp trong Không gian CLB
+description: Đưa video nổi về Picture-in-Picture và giữ cuộc gọi khi điều hướng.
+---
+
+## Thông tin phiên
+
+- Mã phiên `2026-11-25-01`, ngày 25/11/2026, UTC+07:00.
+- Agent Codex. Kết quả phiên Completed. Phase 05 vẫn In Progress.
+
+## Công việc hoàn thành
+
+- `SignedInApp` đưa người đang họp về workspace và giữ `MeetingPage` khi điều hướng. `MeetingCallStatus` hiển thị **Đang trong cuộc họp**, **Mở lại phòng** và **Rời cuộc họp**. Workspace dành chiều cao cho thanh này để các nút nhắn tin vẫn dùng được.
+- `MeetingRoom` giữ kết nối và audio renderer hiện tại. Video nổi chỉ còn trong PiP. Nút theo ô camera và màn hình chia sẻ vẫn dùng cùng cơ chế cho chủ phòng, điều hành và thành viên. Đóng PiP chỉ đóng cửa sổ video.
+- Khi người dùng bấm rời trong lúc đang kết nối lại, hook hủy lượt join đang chờ và gửi yêu cầu rời cho attendance trước đó. Nếu backend đã trả một attendance mới cho lượt join bị hủy, client cũng gửi yêu cầu rời cho lượt đó.
+
+## Kiểm tra
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| `npm --workspace frontend run test` | Đạt 207 test ở 32 file. Có kiểm tra mở lại cùng phiên, giữ PiP, rời khi đang reconnect và fallback trên trình duyệt không có Document PiP. |
+| `npm --workspace frontend run build` | Đạt. Vite báo cảnh báo các gói JavaScript vượt 500 kB. |
+| Chrome với API, Socket.IO và video mô phỏng | Thử ở 1440, 768, 390 và 320 px. PiP vẫn mở khi về CLB. Đóng PiP, gửi tin kênh, mở lại phòng và dùng Back không phát sinh join/leave. Bấm rời tạo đúng một yêu cầu leave. Lặp lại luồng với các API PiP bị tắt. |
+| LiveKit Cloud trên hai thiết bị thật | Chờ xác nhận camera, mic, chia sẻ màn hình và việc đóng PiP khi phiên kết thúc. |
+
+## Bước tiếp theo
+
+Dùng cùng link và cùng buổi họp trên hai thiết bị. Kiểm tra media hai chiều, chuyển về kênh CLB, đóng PiP và cho chủ phòng kết thúc phiên. Ghi kết quả vào checklist nghiệm thu Phase 05. [Checklist qua tunnel](/modules/https-tunnel).

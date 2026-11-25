@@ -1,4 +1,5 @@
 .cw-app {
+  --cw-viewport-height: calc(100dvh - var(--meeting-call-status-height, 0px));
   --dc-ground: #f0f4f9;
   --dc-ink: #152c50;
   --dc-muted: #53647b;
@@ -6,7 +7,7 @@
   --dc-line: #dce4ee;
   display: grid;
   grid-template-columns: 72px 268px minmax(0, 1fr);
-  min-height: 100dvh;
+  min-height: var(--cw-viewport-height);
   background: #f3f6fa;
   color: #152c50;
   font:
@@ -16,7 +17,7 @@
   overflow-wrap: anywhere;
 }
 .cw-eyebrow { display: block; color: #285fba; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px; }
-.cw-club-rail { background: #172b49; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; gap: 13px; position: sticky; top: 0; height: 100dvh; overflow-y: auto; }
+.cw-club-rail { background: #172b49; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; gap: 13px; position: sticky; top: var(--meeting-call-status-height, 0px); height: var(--cw-viewport-height); overflow-y: auto; }
 .cw-club-rail a { color: white; flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; background: #344967; font-size: 23px; font-weight: 600; transition: border-radius .2s, background .2s; }
 .cw-club-rail a:hover, .cw-club-rail a.is-current { background: #285fba; border-radius: 12px; text-decoration: none; }
 .cw-club-rail a.is-current::before { content: ""; position: absolute; left: 0; width: 4px; height: 34px; border-radius: 0 4px 4px 0; background: #b9d5ff; }
@@ -37,7 +38,7 @@
 .cw-entry-state h1 { margin-bottom: 17px; }
 .cw-entry-state .cw-actions { align-items: center; }
 .cw-entry-state .cw-link { margin: 0; }
-.cw-channel-view { display: flex; flex-direction: column; min-height: calc(100dvh - 175px); border: 1px solid #dce4ee; border-radius: 10px; background: white; overflow: hidden; }
+.cw-channel-view { display: flex; flex-direction: column; min-height: calc(var(--cw-viewport-height) - 175px); border: 1px solid #dce4ee; border-radius: 10px; background: white; overflow: hidden; }
 .cw-channel-header { display: flex; align-items: center; gap: 18px; padding: 16px 25px; border-bottom: 1px solid #e4eaf2; }
 .cw-channel-header h1 { font-size: 20px; }
 .cw-channel-header .cw-eyebrow { margin: 0; font-size: 10px; }
@@ -176,8 +177,8 @@
   border-right: 1px solid #e0e7ef;
   min-width: 0;
   position: sticky;
-  top: 0;
-  height: 100dvh;
+  top: var(--meeting-call-status-height, 0px);
+  height: var(--cw-viewport-height);
   overflow-y: auto;
   align-self: start;
 }
@@ -897,7 +898,7 @@
 .cw-overview-quick a:hover { color: #285fba; text-decoration: none; }
 
 /* A channel uses the entire content pane; it is not a card. */
-.cw-app--channel .cw-workspace { min-width: 0; height: 100dvh; }
+.cw-app--channel .cw-workspace { min-width: 0; height: var(--cw-viewport-height); }
 .cw-app--channel main.cw-channel-main { width: 100%; max-width: none; height: 100%; margin: 0; padding: 0; }
 .cw-channel { display: flex; flex-direction: column; height: 100%; min-height: 0; background: #fff; }
 .cw-channel-header { flex: none; min-height: 72px; display: flex; align-items: center; gap: 14px; padding: 15px 28px; border-bottom: 1px solid #e2e9f2; }
@@ -946,7 +947,7 @@
 .cw-channel-composer span { flex: none; font-size: 11px; color: #73859b; }
 
 /* Keep the club and channel switchers visible; only the navigation list scrolls. */
-.cw-sidebar { height: 100dvh; overflow: hidden; }
+.cw-sidebar { height: var(--cw-viewport-height); overflow: hidden; }
 .cw-club-identity { flex: none; padding: 13px 8px; }
 .cw-club-identity strong { line-height: 1.35; }
 .cw-club-identity small { margin-top: 2px; }
@@ -1015,7 +1016,7 @@
 .cw-rail-account-menu strong { display: block; padding: 8px 10px 10px; font-size: 12px; overflow-wrap: anywhere; }
 .cw-club-rail .cw-rail-account-menu a, .cw-app .cw-rail-account-menu button { display: block; width: 100%; height: auto; padding: 9px 10px; border: 0; border-radius: 6px; color: #304863; background: transparent; box-shadow: none; font-size: 13px; text-align: left; font-weight: 500; }
 .cw-club-rail .cw-rail-account-menu a:hover, .cw-app .cw-rail-account-menu button:hover { background: #edf3fb; text-decoration: none; }
-.cw-quick-panel { position: sticky; top: 0; height: 100dvh; overflow-y: auto; padding: 22px 18px; border-left: 1px solid #dbe5f1; background: #fbfcff; scrollbar-width: thin; }
+.cw-quick-panel { position: sticky; top: var(--meeting-call-status-height, 0px); height: var(--cw-viewport-height); overflow-y: auto; padding: 22px 18px; border-left: 1px solid #dbe5f1; background: #fbfcff; scrollbar-width: thin; }
 .cw-quick-header { padding-bottom: 17px; border-bottom: 1px solid #e0e8f2; }
 .cw-quick-header span { display: block; color: #193b69; font-size: 15px; font-weight: 700; }
 .cw-quick-header time { display: block; margin-top: 3px; color: #71829a; font-size: 11px; text-transform: capitalize; }
@@ -1058,7 +1059,7 @@
   .cw-overview-quick { padding: 0; border-left: 0; border-top: 1px solid #dce4ee; padding-top: 25px; }
   .cw-overview-hero { padding: 24px; }
   .cw-app--channel .cw-workspace { height: auto; }
-  .cw-app--channel main.cw-channel-main { height: min(70dvh, 650px); min-height: 430px; padding: 0; }
+  .cw-app--channel main.cw-channel-main { height: min(calc(70dvh - var(--meeting-call-status-height, 0px)), 650px); min-height: 430px; padding: 0; }
   .cw-channel-header { padding: 12px 18px; }
   .cw-channel-club { display: none; }
   .cw-channel-history { padding: 23px 20px; }
@@ -1069,7 +1070,7 @@
 .cw-share-notice { overflow-wrap: anywhere; }
 
 /* Let the long club information form scroll within the content column. */
-.cw-app--information .cw-workspace { display: flex; flex-direction: column; height: 100dvh; min-height: 0; }
+.cw-app--information .cw-workspace { display: flex; flex-direction: column; height: var(--cw-viewport-height); min-height: 0; }
 .cw-app--information .cw-workspace > main { flex: 1; min-height: 0; overflow-y: auto; margin: 0 auto; }
 @media (max-width: 700px) {
   .cw-app--information .cw-workspace { display: block; height: auto; }

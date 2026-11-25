@@ -1,0 +1,72 @@
+.signed-in-app:has(.meeting-call-status) { --meeting-call-status-height: 52px; }
+body:has(.meeting-call-status) { min-width: 0; }
+.meeting-app.meeting-app--background { display: contents; }
+.meeting-app--background [hidden] { display: none !important; }
+.meeting-app--background .meeting-notification-stack {
+  inset-block-start: calc(var(--meeting-call-status-height, 0px) + max(12px, env(safe-area-inset-top)));
+}
+
+.meeting-call-status {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--meeting-call-status-height, 52px);
+  padding-inline: clamp(12px, 3vw, 28px);
+  border-bottom: 1px solid var(--meeting-line);
+  background: var(--meeting-surface);
+  color: var(--meeting-text);
+  font: 500 13px/1.4 'Be Vietnam Pro', system-ui, sans-serif;
+}
+.meeting-call-status-detail,
+.meeting-call-status-actions { display: flex; align-items: center; gap: 8px; }
+.meeting-call-status-detail { min-width: 0; }
+.meeting-call-status-detail > svg { flex: none; color: var(--meeting-accent); }
+.meeting-call-status-detail strong { flex: none; font-weight: 600; }
+.meeting-call-status-title {
+  min-width: 0;
+  padding-inline-start: 8px;
+  border-inline-start: 1px solid var(--meeting-line);
+  color: var(--meeting-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.meeting-app[data-theme] .meeting-call-status button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: none;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--meeting-line);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.meeting-app[data-theme] .meeting-call-status .meeting-call-status-leave {
+  color: var(--theme-danger-text);
+  background: var(--theme-danger-soft);
+}
+.meeting-app[data-theme] .meeting-call-status .meeting-call-status-leave:hover {
+  background: color-mix(in srgb, var(--theme-danger-soft) 78%, var(--theme-danger));
+}
+@media (max-width: 580px) {
+  .meeting-call-status { font-size: 12px; gap: 8px; }
+  .meeting-call-status-title,
+  .meeting-call-status-leave > span { display: none; }
+  .meeting-call-status-detail,
+  .meeting-call-status-actions { gap: 6px; }
+  .meeting-app[data-theme] .meeting-call-status button { min-height: 44px; }
+  .meeting-app[data-theme] .meeting-call-status .meeting-call-status-leave { width: 44px; padding: 0; }
+}
+@media (max-width: 350px) {
+  .meeting-call-status { padding-inline: 8px; }
+  .meeting-call-status-detail > svg,
+  .meeting-call-status-actions button:first-child > svg { display: none; }
+}
