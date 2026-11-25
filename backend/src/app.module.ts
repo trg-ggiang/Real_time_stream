@@ -14,6 +14,7 @@ import { WorkspaceModule } from "./workspace/workspace.module";
 import { AdminModule } from "./admin/admin.module";
 import { RecruitmentModule } from "./recruitment/recruitment.module";
 import { MediaModule } from './media/media.module';
+import { SupportModule } from './support/support.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MediaModule } from './media/media.module';
     AdminModule,
     RecruitmentModule,
     MediaModule,
+    SupportModule,
   ],
   controllers: [HealthController],
 })

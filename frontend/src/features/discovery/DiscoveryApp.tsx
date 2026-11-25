@@ -14,9 +14,8 @@ import { X } from "@phosphor-icons/react/dist/csr/X";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/csr/ArrowUpRight";
 import { HeadNotifications } from "./components/HeadNotifications";
 import { UserRectangle } from "@phosphor-icons/react/dist/csr/UserRectangle";
-import { Users } from "@phosphor-icons/react/dist/csr/Users";
-import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
-import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
+import { Question } from "@phosphor-icons/react/dist/csr/Question";
+import { Flag } from "@phosphor-icons/react/dist/csr/Flag";
 import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
 import { GearSix } from "@phosphor-icons/react/dist/csr/GearSix";
 import { DiscoveryHome } from "./pages/DiscoveryHome";
@@ -28,6 +27,10 @@ import { AdminApp } from "../admin/AdminApp";
 import { WorkspaceApp } from "../club-workspace/WorkspaceApp";
 import { WorkspaceHub } from "../club-workspace/WorkspaceHub";
 import { RecruitmentApply,RecruitmentPublicDetail,RecruitmentPublicList } from '../recruitment/PublicRecruitment';
+import { HelpPage } from '../support/HelpPage';
+import { ReportIssuePage } from '../support/ReportIssuePage';
+import { MyReportsPage } from '../support/MyReportsPage';
+import '../support/support.css';
 import "@fontsource/be-vietnam-pro/400.css";
 import "@fontsource/be-vietnam-pro/500.css";
 import "@fontsource/be-vietnam-pro/600.css";
@@ -82,11 +85,13 @@ export function DiscoveryApp({
   }, []);
   useEffect(() => {
     setMenu(false);
+    if (accountMenu.current) accountMenu.current.open = false;
+    if (notifications.current) notifications.current.open = false;
     window.scrollTo(0, 0);
     main.current?.focus({ preventScroll: true });
   }, [location.pathname, location.search]);
   useEffect(() => {
-    document.title = `${location.pathname.startsWith("/admin") ? "Quản trị hệ thống" : location.pathname.startsWith("/clubs") ? "Câu lạc bộ" : location.pathname.startsWith("/activities") ? "Hoạt động" : location.pathname.startsWith("/posts") ? "Bài viết" : "Khám phá"} · uniCircle`;
+    document.title = `${location.pathname.startsWith("/admin") ? "Quản trị hệ thống" : location.pathname === '/report-issue' ? 'Báo cáo sự cố' : location.pathname.startsWith('/help/reports') ? 'Báo cáo của tôi' : location.pathname === '/help' ? 'Trợ giúp và hỗ trợ' : location.pathname.startsWith("/clubs") ? "Câu lạc bộ" : location.pathname.startsWith("/activities") ? "Hoạt động" : location.pathname.startsWith("/posts") ? "Bài viết" : "Khám phá"} · uniCircle`;
   }, [location.pathname]);
   const authUrl = (mode: "login" | "register") =>
     authFormHref(mode, `${location.pathname}${location.search}${location.hash}`);
@@ -200,9 +205,8 @@ export function DiscoveryApp({
                 <div className="dc-account-menu">
                   <p className="dc-account-heading">Sinh viên · {viewer.displayName}</p>
                   <Link to="/me"><UserRectangle size={18} aria-hidden="true" />Không gian của tôi</Link>
-                  <Link to="/workspace"><Users size={18} aria-hidden="true" />CLB của tôi</Link>
-                  <button onClick={startRequest}><Plus size={18} aria-hidden="true" />Tạo CLB</button>
-                  <button onClick={onMeeting}><CalendarBlank size={18} aria-hidden="true" />Cuộc họp</button>
+                  <Link to="/help"><Question size={18} aria-hidden="true" />Trợ giúp và hỗ trợ</Link>
+                  <Link to="/report-issue" state={{ pagePath: location.pathname }}><Flag size={18} aria-hidden="true" />Báo cáo sự cố</Link>
                   {role === "admin" && (
                     <Link to="/admin"><GearSix size={18} aria-hidden="true" />Quản trị hệ thống</Link>
                   )}
@@ -245,6 +249,10 @@ export function DiscoveryApp({
       <main id="public-content" ref={main} tabIndex={-1}>
         <Routes>
           <Route path="/" element={<DiscoveryHome />} />
+          <Route path="/help" element={<HelpPage signedIn={!!viewer} />} />
+          <Route path="/report-issue" element={<ReportIssuePage token={accessToken} displayName={viewer?.displayName} />} />
+          <Route path="/help/reports" element={<MyReportsPage token={accessToken} />} />
+          <Route path="/help/reports/:id" element={<MyReportsPage token={accessToken} />} />
           <Route path="/recruitments" element={<RecruitmentPublicList />} />
           <Route path="/recruitments/:campaignId" element={<RecruitmentPublicDetail token={accessToken} />} />
           <Route path="/recruitments/:campaignId/apply" element={<RecruitmentApply token={accessToken} />} />

@@ -8,6 +8,7 @@ import { RequestDetailRoute } from "./pages/ClubRequestDetail";
 import { AdminLayout } from "./AdminLayout";
 import { AdminUsers } from './pages/AdminUsers';
 import { AdminContent } from './pages/AdminContent';
+import { AdminSupport, AdminSupportDetail } from './pages/AdminSupport';
 import "./admin.css";
 
 export function AdminApp({
@@ -60,6 +61,8 @@ export function AdminApp({
         <Route index element={<AdminOverview token={accessToken} />} />
         <Route path="users" element={<AdminUsers token={accessToken} />} />
         <Route path="content" element={<AdminContent token={accessToken} />} />
+        <Route path="support-reports" element={<AdminSupport token={accessToken} />} />
+        <Route path="support-reports/:id" element={<AdminSupportDetail token={accessToken} />} />
         <Route
           path="club-requests"
           element={<ClubList key="requests" token={accessToken} />}

@@ -9,6 +9,7 @@ import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
 import { UniCircleLogo } from "../../shared/components/UniCircleLogo";
 import { Users } from '@phosphor-icons/react/dist/csr/Users';
 import { Newspaper } from '@phosphor-icons/react/dist/csr/Newspaper';
+import { Flag } from '@phosphor-icons/react/dist/csr/Flag';
 import { Sun } from '@phosphor-icons/react/dist/csr/Sun';
 import { Moon } from '@phosphor-icons/react/dist/csr/Moon';
 import { ArrowSquareOut } from '@phosphor-icons/react/dist/csr/ArrowSquareOut';
@@ -19,6 +20,7 @@ const navigation = [
   { to: "/admin/clubs", label: "Danh sách CLB", Icon: UsersThree },
   { to: '/admin/users', label: 'Tài khoản', Icon: Users },
   { to: '/admin/content', label: 'Nội dung cộng đồng', Icon: Newspaper },
+  { to: '/admin/support-reports', label: 'Báo cáo sự cố', Icon: Flag },
 ] as const;
 
 export function AdminLayout({

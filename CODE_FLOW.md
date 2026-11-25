@@ -416,3 +416,11 @@ qua API kiểm quyền và signed URL. [Hướng dẫn](docs/modules/club-recrui
 ## Đăng xuất và đổi tài khoản — 21/11/2026
 
 `AuthApp.logout` xóa session và thay URL hiện tại bằng `/?mode=login`. Tài khoản mới đi tới trang mặc định theo role, không kế thừa URL riêng của tài khoản cũ. Đăng nhập trực tiếp từ link có returnTo hợp lệ vẫn giữ đích; nút quay lại từ cuộc họp dùng luồng riêng. [Work log](docs/work-logs/2026-11-21-04-phase-04-logout-account-url.mdx).
+
+
+## Trợ giúp và báo cáo sự cố — 25/11/2026
+
+- Header công khai giữ Không gian của tôi/Đăng xuất, mở Trợ giúp và hỗ trợ (`/help`), Báo cáo sự cố (`/report-issue`) và bỏ lối Cuộc họp trong menu avatar.
+- Help là nội dung tĩnh có tìm kiếm và nhóm chủ đề. Report form gọi `POST /api/support/reports` qua application JWT; backend gắn reporter_id từ CurrentUser, lưu `support_reports` và chỉ trả receipt sau khi DB xác nhận.
+- `/help/reports` và trang chi tiết đọc qua API có điều kiện reporter_id của người gọi. Admin có route riêng `/admin/support-reports`, kiểm tra role phía backend, phản hồi và đổi trạng thái bằng PATCH với expected_updated_at.
+- Bảng mới có RLS, chỉ service_role backend có SELECT/INSERT/UPDATE. Chạy migration mới trước khi nghiệm thu gửi báo cáo. [Hướng dẫn](docs/modules/help-support.mdx).

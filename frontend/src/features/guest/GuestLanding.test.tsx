@@ -5,15 +5,17 @@ import { GuestLanding } from './GuestLanding';
 import { safePublicUrl } from './public-content';
 
 afterEach(() => { cleanup(); history.replaceState(null, '', '/'); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
-it('shows the signed-in student landing and opens meetings only on request', async () => {
+it('shows the signed-in student landing without the removed meeting shortcut', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [], hasMore: false }) }));
   const onMeeting = vi.fn();
   render(<GuestLanding viewer={{ displayName: 'An' }} onMeeting={onMeeting} onLogout={vi.fn()} />);
   expect(screen.getByText('Sinh viên · An')).toBeTruthy();
   expect(screen.queryByRole('link', { name: 'Đăng nhập' })).toBeNull();
   expect(onMeeting).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', { name: 'Cuộc họp' }));
-  expect(onMeeting).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByLabelText('Menu tài khoản của An'));
+  expect(screen.queryByRole('button', { name: 'Cuộc họp' })).toBeNull();
+  expect(screen.getByRole('link', { name: 'Trợ giúp và hỗ trợ' }).getAttribute('href')).toBe('/help');
+  expect(onMeeting).not.toHaveBeenCalled();
 });
 it('closes the landing header panels when clicking outside or pressing Escape', async () => {
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});

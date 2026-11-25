@@ -1,0 +1,64 @@
+---
+title: Phase 04 — Trợ giúp và xử lý báo cáo sự cố
+description: Menu tài khoản mới, trang trợ giúp, gửi/theo dõi báo cáo và quản trị tiếp nhận/phản hồi.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-25-01
+- Thời gian: không có giờ bắt đầu chính xác; hoàn tất code và kiểm tra 2026-11-25T22:23:04+07:00 (Asia/Saigon).
+- Agent: Codex
+- Phase: 04 — API và React nền tảng
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Sửa menu avatar trang chủ: giữ Không gian của tôi/Đăng xuất, thay CLB của tôi bằng Trợ giúp và hỗ trợ, thay Tạo CLB bằng Báo cáo sự cố và bỏ Cuộc họp. Tạo trang trợ giúp và form phù hợp giao diện hiện có. Người dùng bổ sung yêu cầu lưu báo cáo trong hệ thống và có khu vực admin nhận/xử lý.
+
+## Công việc hoàn thành
+
+- `frontend/src/features/discovery/DiscoveryApp.tsx`: menu/route/title mới, đóng menu khi chọn liên kết; giữ handler logout, link không gian và lối quản trị sẵn có.
+- `frontend/src/features/support/`: HelpPage có tìm kiếm không phân biệt dấu và chủ đề; ReportIssuePage có validation, khóa gửi, UUID retry và receipt; MyReportsPage có lọc, phân trang, chi tiết và phản hồi. `support.css` dùng nền trắng/xanh, bố cục hai cột và breakpoint mobile, sử dụng biến màu admin cả sáng/tối.
+- `frontend/src/features/admin/pages/AdminSupport.tsx`, AdminApp/AdminLayout: thêm hàng đợi, tìm theo tiêu đề, bộ lọc, chi tiết và form cập nhật status/priority/phản hồi. Giữ nội dung đang soạn nếu 409, không báo thành công khi mutation lỗi.
+- `backend/src/support/`, `backend/src/app.module.ts`: API người gửi và admin, kiểm tra ownership/role, DTO giới hạn dữ liệu và trường cho phép, throttling gửi theo user, dữ liệu đọc private/no-store, idempotency bằng UUID và PATCH có phiên bản.
+- `supabase/migrations/202611250001_support_reports.sql`: một bảng hỗ trợ, FK users, constraint, index, RLS/grants và trigger updated_at; không sửa dữ liệu CLB/họp.
+- Test: `backend/test/support.test.cjs`, `support-db.cjs`, hai SQL fixture; Support.test.tsx/DiscoverySupport.test.tsx và cập nhật test GuestLanding bỏ kỳ vọng nút họp đã được yêu cầu xóa.
+- Cập nhật README, CODE_FLOW, hướng dẫn module, phase/master plan, session log, changelog và navigation. Giữ nguyên byte nội dung lịch sử session-log vốn có encoding lẫn lộn.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm --workspace backend run build` | Passed | Build sau khi sửa typing nhánh idempotency. |
+| Backend focused support tests | Passed | 7 test: ownership, admin, DTO, retry, version conflict và lỗi DB. |
+| Frontend focused support/discovery/admin tests | Passed | 16 test. |
+| `node backend/test/support-db.cjs` | Passed | PostgreSQL 17 tạm: migration/grants/RLS/index/constraint/trigger, không kết nối Supabase. |
+| `npm test` | Passed | 122 backend và 215 frontend. Vòng đầu phát hiện test GuestLanding còn kỳ vọng nút Cuộc họp; đã cập nhật đúng yêu cầu rồi chạy lại đạt toàn bộ. JSDOM có cảnh báo scrollTo. |
+| `npm run build` | Passed | Cả hai workspace; Vite còn cảnh báo chunk trên 500 kB. |
+| JSON/navigation/liên kết mới và `git diff --check` | Passed trong phạm vi thay đổi | JSON hợp lệ, hai trang mới đăng ký đúng một lần, mọi liên kết mới tồn tại; 11 mục navigation cũ bị thiếu đã có từ HEAD, không phát sinh thêm. |
+| Browser thực | Skipped | Đã thử Edge headless nhưng tiến trình kết thúc trước khi mở cổng debug; chưa có screenshot hoặc nghiệm thu responsive thực. |
+| Supabase thật / ghi end-to-end | Skipped | Không áp dụng migration hay ghi dữ liệu thật. |
+
+## Quyết định và lý do
+
+- Chỉ thêm một bảng `support_reports`, dùng lại public.users và cơ chế JWT/NestJS hiện có. Không thêm dependency hoặc env.
+- Báo cáo có bốn trạng thái new/in_progress/resolved/rejected. Khi đóng cần phản hồi; admin được mở lại nếu cần. Phản hồi hiển thị rõ cho người gửi.
+- Payload tạo không được tự gán người gửi hoặc trạng thái; đọc của sinh viên luôn scope ownership; admin role kiểm tra từ CurrentUser. Direct Supabase anon/authenticated không được truy cập bảng.
+- Giữ nguyên quyền auth và luồng họp/workspace; bỏ riêng shortcut họp trong dropdown theo yêu cầu.
+- Không commit/push và không tự áp dụng SQL lên Supabase.
+
+## Blocker và việc chưa hoàn thành
+
+Không có blocker code. Phase 04 vẫn In Progress. Cần chạy migration một lần trên đúng Supabase development, nghiệm thu bằng một tài khoản sinh viên và một admin. Chưa có bằng chứng trực quan browser thực cho màn hình mới.
+
+## Bước tiếp theo
+
+Chạy `supabase/migrations/202611250001_support_reports.sql` trong SQL Editor, restart backend và tải frontend mới. Sinh viên mở avatar → Báo cáo sự cố, gửi một báo cáo; admin mở Báo cáo sự cố → Xem và xử lý, chuyển Đang xử lý rồi Đã giải quyết kèm phản hồi; sinh viên vào Báo cáo của tôi, tải lại và mở chi tiết. Kiểm tra thêm bộ lọc, mobile và admin theme tối.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

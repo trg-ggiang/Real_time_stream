@@ -1,0 +1,71 @@
+---
+title: Trợ giúp và báo cáo sự cố
+description: Menu tài khoản, hướng dẫn sử dụng, báo cáo của người dùng và hàng đợi xử lý admin.
+---
+
+## Cài đặt
+
+Chạy một lần toàn bộ file `supabase/migrations/202611250001_support_reports.sql` trong Supabase SQL Editor trên đúng project development. Migration dùng `public.users` có sẵn, không dùng `auth.users`. File tạo một bảng `support_reports`, bốn index ngoài khóa chính, RLS và trigger cập nhật phiên bản. Không thay bảng CLB, họp hoặc tin nhắn.
+
+Nếu đã áp dụng, không chạy lại `CREATE TABLE`. Có thể kiểm tra chỉ đọc bằng:
+
+```sql
+SELECT to_regclass('public.support_reports');
+```
+
+Sau đó restart backend (`npm run dev:backend`) và frontend (`npm run dev:frontend`). Với bản preview/tunnel, build lại frontend và mở bản build mới. Không cần cài dependency hoặc thêm env.
+
+## Trang người dùng
+
+Menu avatar trên header công khai:
+
+1. Không gian của tôi → `/me`, giữ nguyên.
+2. Trợ giúp và hỗ trợ → `/help`.
+3. Báo cáo sự cố → `/report-issue`.
+4. Đăng xuất → handler hiện có.
+
+Lối Cuộc họp trong menu này đã bỏ; điều hướng họp trong workspace không thay đổi. Tài khoản admin giữ lối quản trị hiện có.
+
+`/help` có tìm kiếm không phân biệt dấu, nhóm chủ đề và câu hỏi mở rộng. Khách xem được hướng dẫn. Gửi báo cáo và xem lịch sử cần đăng nhập.
+
+Form báo cáo gồm nhóm sự cố, tiêu đề, mô tả, các bước lặp lại, đường dẫn trong website và mức độ ảnh hưởng. Tên người gửi lấy từ tài khoản, không lấy từ payload. Đường dẫn không nhận URL bên ngoài, query hoặc fragment. Không thu thập token, user agent hoặc mật khẩu tự động.
+
+Sau khi server xác nhận lưu, hiển thị mã báo cáo và liên kết theo dõi. `/help/reports` liệt kê báo cáo của đúng người gọi, lọc trạng thái, phân trang và tải lại. `/help/reports/:id` hiện nội dung cùng phản hồi admin. Nếu gửi lỗi, bản nháp và UUID được giữ để gửi lại không tạo trùng; kiểm tra lịch sử trước khi tạo một báo cáo khác khi kết nối gián đoạn.
+
+## Trang quản trị
+
+Vào **Quản trị → Báo cáo sự cố** tại `/admin/support-reports`.
+
+- Danh sách sắp mới nhất trước, tìm theo tiêu đề, lọc nhóm/trạng thái, phân trang và tải lại.
+- **Xem và xử lý** mở `/admin/support-reports/:id`, nội dung và người gửi bên trái, form xử lý bên phải.
+- Trạng thái: Mới tiếp nhận → Đang xử lý → Đã giải quyết hoặc Không tiếp nhận. Admin có thể mở lại báo cáo bằng cách chuyển về trạng thái chưa đóng.
+- Khi đóng, cần phản hồi ít nhất 10 ký tự. Phản hồi hiển thị cho người gửi.
+- Cập nhật dùng chính xác `updated_at` đã đọc. Hai admin cùng xử lý: người lưu bằng phiên bản cũ nhận 409, giữ nội dung đang soạn và được yêu cầu tải lại; không tự ghi đè.
+- Chỉ role hệ thống `admin` được đọc hàng đợi hoặc cập nhật, chủ nhiệm/trưởng ban CLB không có quyền này.
+
+Danh sách không tự polling; dùng Tải lại để lấy báo cáo/trạng thái mới.
+
+## API và quyền dữ liệu
+
+| API | Quyền |
+| --- | --- |
+| `POST /api/support/reports` | Tài khoản đăng nhập; tối đa 5 lần/phút/người gửi |
+| `GET /api/support/reports` | Báo cáo của chính người gọi |
+| `GET /api/support/reports/:id` | Báo cáo của chính người gọi, không trả dữ liệu người khác |
+| `GET /api/admin/support-reports` | Admin |
+| `GET /api/admin/support-reports/:id` | Admin |
+| `PATCH /api/admin/support-reports/:id` | Admin; kiểm tra phiên bản |
+
+Các GET trả private/no-store. DTO không nhận reporter/status/admin_response từ form tạo. PostgreSQL chặn truy cập trực tiếp của anon/authenticated; backend service_role chỉ được SELECT/INSERT/UPDATE, không có DELETE. Quyền người dùng và admin được kiểm tra ở NestJS do dự án dùng JWT riêng.
+
+## Kiểm tra và giới hạn
+
+```powershell
+npm test
+npm run build
+node backend/test/support-db.cjs
+```
+
+SQL regression tạo PostgreSQL tạm, kiểm tra migration, RLS/grants, constraint, FK, chống trùng và trigger phiên bản; không đọc .env hoặc kết nối Supabase. Có thể đổi đường dẫn PostgreSQL 17 bằng `SUPPORT_TEST_PG_BIN` khi chạy script.
+
+Chưa áp dụng migration lên Supabase thật hoặc nghiệm thu ghi với tài khoản thật. Trình duyệt Edge headless trong môi trường agent không mở được cổng debug nên chưa có xác minh trực quan desktop/mobile; giao diện đã được kiểm tra bằng React fixtures và build.

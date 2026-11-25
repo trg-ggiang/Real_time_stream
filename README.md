@@ -136,3 +136,8 @@ Chưa áp dụng migration hoặc nghiệm thu ghi trên DB development thật.
 ## Thông báo CLB đã quan tâm — 21/11/2026
 
 Chạy migration `supabase/migrations/202611210001_followed_club_notifications.sql` sau các migration trưởng ban/tuyển thành viên, rồi restart backend. Người đã quan tâm nhận thông báo khi CLB đăng bài viết công khai, hoạt động hoặc đợt tuyển; bấm chuông để xem và mở chi tiết. Không gửi bù bài cũ. Migration chưa áp dụng lên Supabase thật; xem [work log](docs/work-logs/2026-11-21-02-phase-04-followed-club-notifications.mdx).
+
+
+## Trợ giúp và báo cáo sự cố — 25/11/2026
+
+Menu avatar công khai mở `/help` và `/report-issue`; người gửi theo dõi tại `/help/reports`, admin xử lý tại `/admin/support-reports`. Chạy toàn bộ migration `supabase/migrations/202611250001_support_reports.sql` một lần trong Supabase SQL Editor, restart backend rồi dùng bản frontend mới. Migration chỉ thêm một bảng hỗ trợ, chưa được áp dụng trên Supabase thật trong phiên này. Xem [hướng dẫn](docs/modules/help-support.mdx) và [work log](docs/work-logs/2026-11-25-01-phase-04-help-support-reports.mdx).
