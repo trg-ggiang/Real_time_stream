@@ -21,8 +21,8 @@
   --theme-success: #116551; --theme-success-soft: #e5f4ef;
   --theme-shadow: #25252b1a; --theme-overlay: #25252b66; color-scheme: light;
 }
-:root:has(.meeting-app[data-theme='dark']:not(.meeting-app--compact)) { color-scheme: dark; background: #1a1a1e; }
-:root:has(.meeting-app[data-theme='light']:not(.meeting-app--compact)) { color-scheme: light; background: #ffffff; }
+:root:has(.meeting-app[data-theme='dark']:not(.meeting-app--background)) { color-scheme: dark; background: #1a1a1e; }
+:root:has(.meeting-app[data-theme='light']:not(.meeting-app--background)) { color-scheme: light; background: #ffffff; }
 .meeting-app[data-theme] { -webkit-tap-highlight-color: transparent; }
 .meeting-app[data-theme] button { background: var(--theme-control); color: var(--meeting-text); border-color: var(--meeting-line); }
 .meeting-app[data-theme] button:hover:not(:disabled) { background: var(--theme-control-hover); color: var(--meeting-text); }

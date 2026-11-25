@@ -1,27 +1,3 @@
-.meeting-app.meeting-app--compact {
-  position: fixed;
-  z-index: 90;
-  inset-inline-end: max(16px, env(safe-area-inset-right));
-  inset-block-end: max(88px, env(safe-area-inset-bottom));
-  width: min(304px, calc(100vw - 32px));
-  min-height: 0;
-  background: transparent;
-  pointer-events: none;
-}
-.meeting-app--compact [hidden] { display: none !important; }
-.meeting-room-page.meeting-app--compact[data-theme] .meeting-main { padding: 0; }
-.meeting-app--compact .meeting-room { border: 0; overflow: visible; }
-.meeting-room-page.meeting-app--compact[data-theme] .meeting-room [data-lk-theme] { background: transparent; padding: 0; }
-.meeting-app--compact .meeting-floating,
-.meeting-app--compact .meeting-compact-reconnecting,
-.meeting-app--compact .lk-start-audio-button { pointer-events: auto; }
-.meeting-app--compact .meeting-compact-reconnecting {
-  background: var(--meeting-surface);
-  border: 1px solid var(--meeting-line);
-  border-radius: 10px;
-  padding: 10px 12px;
-}
-
 .meeting-floating {
   display: flex;
   flex-direction: column;
@@ -33,7 +9,6 @@
   color: var(--meeting-text);
   font: 400 13px/1.4 'Be Vietnam Pro', system-ui, sans-serif;
 }
-.meeting-app--compact .meeting-floating { box-shadow: 0 8px 26px #101b323d; }
 .meeting-floating-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; padding: 6px 8px 6px 12px; }
 .meeting-floating-header > div { min-width: 0; }
 .meeting-floating-header strong,
@@ -69,8 +44,7 @@
   font-size: 11px;
 }
 .meeting-floating-controls { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 8px; }
-.meeting-floating button,
-.meeting-app[data-theme] .meeting-floating button {
+.meeting-floating button {
   display: inline-grid;
   place-items: center;
   flex: none;
@@ -83,14 +57,11 @@
   color: var(--meeting-text);
   cursor: pointer;
 }
-.meeting-floating button:hover:not(:disabled),
-.meeting-app[data-theme] .meeting-floating button:hover:not(:disabled) { background: var(--theme-control-hover); }
+.meeting-floating button:hover:not(:disabled) { background: var(--theme-control-hover); }
 .meeting-floating button:focus-visible { outline: 2px solid var(--meeting-accent); outline-offset: 2px; }
 .meeting-floating button:disabled { opacity: .55; cursor: not-allowed; }
-.meeting-floating button.meeting-floating-leave,
-.meeting-app[data-theme] .meeting-floating button.meeting-floating-leave { background: #ae2940; color: #fff; border-color: #ae2940; }
-.meeting-floating button.meeting-floating-leave:hover,
-.meeting-app[data-theme] .meeting-floating button.meeting-floating-leave:hover { background: #912238; }
+.meeting-floating button.meeting-floating-leave { background: #ae2940; color: #fff; border-color: #ae2940; }
+.meeting-floating button.meeting-floating-leave:hover { background: #912238; }
 
 .meeting-participant-tile { position: relative; }
 .meeting-app[data-theme] .meeting-tile-pip,
@@ -136,9 +107,7 @@
 .meeting-pip-document .meeting-floating { height: 100dvh; border: 0; border-radius: 0; }
 .meeting-pip-document .meeting-floating-media { flex: 1; min-height: 0; aspect-ratio: auto; }
 @media (max-width: 640px) {
-  .meeting-app.meeting-app--compact { inset-block: max(72px, env(safe-area-inset-top)) auto; width: min(252px, calc(100vw - 32px)); }
-  .meeting-app--compact .meeting-floating-media { display: none; }
-  .meeting-floating button, .meeting-app[data-theme] .meeting-floating button { min-width: 44px; min-height: 44px; }
+  .meeting-floating button { min-width: 44px; min-height: 44px; }
 }
 @media (max-width: 380px) {
   .meeting-tile-pip { inset: 4px 4px auto auto; }

@@ -52,7 +52,7 @@ Frontend:
 7. Timeout không đồng nghĩa DB chưa lưu. Outbox giữ nội dung và nút thử lại; retry cùng ID đọc lại tin cũ, khác content với ID cũ trả 409. Không yêu cầu quyền UPDATE/DELETE.
 8. Rời media hoặc logout hủy socket/listeners, không ngắt media chỉ vì chat lỗi. Khi LiveKit reconnect, chat kết nối lại theo lifecycle và tải bù.
 
-Khi thu nhỏ cuộc họp để vào kênh CLB, kết nối chat của phiên họp vẫn chạy. Tin gửi trong kênh CLB được ghi theo kênh, còn tin của cuộc họp theo `sessionId`. Chat họp tải bù sau khi kết nối lại. Nếu mỗi máy dùng một backend local riêng, sự kiện phát của một backend không tới socket của backend kia dù cùng Supabase. Chat kênh có thêm lượt tải bù định kỳ. [Luồng thu nhỏ](/work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture).
+Khi bấm **Về Không gian CLB**, kết nối chat cuộc họp vẫn theo phiên hiện tại. Tin gửi trong kênh CLB được ghi theo kênh, còn tin họp theo `sessionId`. [Luồng về Không gian CLB](/work-logs/2026-11-25-01-phase-05-meeting-call-status) · [Đồng bộ chat họp giữa các backend](/work-logs/2026-11-24-01-phase-06-meeting-chat-db-sync).
 
 ## Hợp đồng sự kiện
 

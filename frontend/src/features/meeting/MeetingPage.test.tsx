@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MeetingPage } from './MeetingPage';
 import { SignedInApp } from '../auth/SignedInApp';
@@ -8,11 +8,10 @@ vi.mock('../guest/GuestLanding', () => ({ GuestLanding: () =>
   <main><label>Tin nhắn kênh CLB<input /></label></main>,
 }));
 
-vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected, onEnded, compact, onExpand, onLeave }: any) =>
+vi.mock('./components/MeetingRoom', () => ({ MeetingRoom: ({ credentials, accessToken, audioSelection, onConnected, onEnded, background, onLeave }: any) =>
   <div data-testid="joined-room" data-session={credentials.sessionId} data-auth={accessToken}
-    data-microphone={audioSelection?.microphone} data-camera={audioSelection?.camera} data-compact={String(compact)}>
+    data-microphone={audioSelection?.microphone} data-camera={audioSelection?.camera} data-background={String(background)}>
     <button onClick={() => onConnected?.()}>Connected</button>
-    {compact && <button onClick={onExpand}>Mở lại phòng</button>}
     <button onClick={onLeave}>Rời cuộc họp</button>
     <button onClick={() => onEnded?.('Thiết bị này đã bị ngắt khỏi phòng họp.', true)}>Server removed</button>
   </div> }));
@@ -262,7 +261,7 @@ it.each([null, { role: 'participant', invitedAt: '2026-11-22' }])('does not poll
   expect(fetch.mock.calls.some(([url]) => url.endsWith('/join-requests'))).toBe(false);
 });
 
-it('preserves the live attendance while minimizing, navigating to club chat, and restoring', async () => {
+it('preserves live attendance and exposes a status bar without PiP while browsing club chat', async () => {
   vi.stubGlobal('isSecureContext', true);
   Object.defineProperty(navigator, 'mediaDevices', { value: {}, configurable: true });
   const invite = '/?view=meeting&meeting=ABCDEFGHIJ&session=s';
@@ -286,10 +285,14 @@ it('preserves the live attendance while minimizing, navigating to club chat, and
   fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục tham gia' }));
   const room = await screen.findByTestId('joined-room');
 
-  fireEvent.click(screen.getByRole('button', { name: 'Thu nhỏ cuộc họp' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Về Không gian CLB' }));
   expect(location.pathname).toBe('/workspace');
   expect(screen.getByTestId('joined-room')).toBe(room);
-  expect(room.getAttribute('data-compact')).toBe('true');
+  expect(room.getAttribute('data-background')).toBe('true');
+  const statusBar = screen.getByRole('region', { name: 'Trạng thái cuộc họp' });
+  expect(within(statusBar).getByRole('status').textContent).toBe('Đang trong cuộc họp');
+  expect(statusBar.querySelector('video')).toBeNull();
+  expect(room.closest('[hidden]')).toBeTruthy();
 
   const channel = '/workspace/club-1/channels/general';
   act(() => {
@@ -297,21 +300,23 @@ it('preserves the live attendance while minimizing, navigating to club chat, and
     dispatchEvent(new PopStateEvent('popstate'));
   });
   fireEvent.change(screen.getByRole('textbox', { name: 'Tin nhắn kênh CLB' }), { target: { value: 'Tin nhắn khi đang họp' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Mở lại phòng' }));
+  fireEvent.click(within(statusBar).getByRole('button', { name: 'Mở lại phòng' }));
   expect(location.pathname + location.search).toBe(invite);
   expect(screen.getByTestId('joined-room')).toBe(room);
-  expect(room.getAttribute('data-compact')).toBe('false');
+  expect(room.getAttribute('data-background')).toBe('false');
+  expect(screen.queryByRole('region', { name: 'Trạng thái cuộc họp' })).toBeNull();
 
   act(() => {
     history.replaceState(history.state, '', channel);
     dispatchEvent(new PopStateEvent('popstate'));
   });
-  expect(room.getAttribute('data-compact')).toBe('true');
+  expect(room.getAttribute('data-background')).toBe('true');
   expect((screen.getByRole('textbox', { name: 'Tin nhắn kênh CLB' }) as HTMLInputElement).value).toBe('Tin nhắn khi đang họp');
   expect(fetcher.mock.calls.filter(([url]) => url.endsWith('/join'))).toHaveLength(1);
   expect(fetcher.mock.calls.filter(([url]) => url.endsWith('/leave'))).toHaveLength(0);
 
-  fireEvent.click(screen.getByRole('button', { name: 'Rời cuộc họp' }));
+  fireEvent.click(within(screen.getByRole('region', { name: 'Trạng thái cuộc họp' })).getByRole('button', { name: 'Rời cuộc họp' }));
   await waitFor(() => expect(fetcher.mock.calls.filter(([url]) => url.endsWith('/sessions/s/leave'))).toHaveLength(1));
   expect(screen.queryByTestId('joined-room')).toBeNull();
+  expect(screen.queryByRole('region', { name: 'Trạng thái cuộc họp' })).toBeNull();
 });

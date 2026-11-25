@@ -2,7 +2,7 @@
 
 > Image and confirmation update: existing image URL inputs now use file selection/upload; confirmations use the shared asynchronous popup. [Implementation and verification](../work-logs/2026-11-20-12-phase-04-popups-image-upload.mdx).
 
-> Hiện trạng 23/11/2026. Chat kênh dùng Socket.IO `/workspace-chat` và HTTP để đồng bộ lịch sử, phân trang và tải bù khoảng mỗi 3 giây khi tab hiển thị. Chat họp dùng namespace `/chat`. Người đang họp có thể thu nhỏ phòng, quay về kênh CLB để nhắn tin rồi mở lại cùng phiên. [Work log](../work-logs/2026-11-23-09-phase-05-meeting-picture-in-picture.mdx).
+> Hiện trạng 23/11/2026. Chat kênh dùng Socket.IO `/workspace-chat` và HTTP để đồng bộ lịch sử, phân trang và tải bù khoảng mỗi 3 giây khi tab hiển thị. Chat họp dùng namespace `/chat`. Người đang họp có thể bấm **Về Không gian CLB** để nhắn tin. Thanh trạng thái cho phép mở lại hoặc rời cùng phiên. [Work log](../work-logs/2026-11-25-01-phase-05-meeting-call-status.mdx).
 
 **Bàn giao 20/11/2026** · Phase 04 kỹ thuật vẫn **In Progress**. Tài liệu này mô tả workspace sau tích hợp kênh, chat và họp gắn CLB. Xem [log tích hợp](../work-logs/2026-11-19-04-phase-04-workspace-handoff.mdx) và [log rà soát](../work-logs/2026-11-19-07-phase-04-workspace-chat-enter.mdx).
 
