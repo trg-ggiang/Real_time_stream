@@ -18,6 +18,8 @@ export function MeetingCalendar({ meetings, onOpen, onShare }: {
     const date = new Date(session.scheduled_start_at);
     return Number.isFinite(date.getTime()) ? [{ meeting, session, date }] : [];
   })).sort((a, b) => a.date.getTime() - b.date.getTime()), [meetings]);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const selectedEntries = entries.filter(entry => keyOf(entry.date) === keyOf(selected));
   const start = new Date(month.getFullYear(), month.getMonth(), 1);
   const offset = (start.getDay() + 6) % 7;
@@ -40,7 +42,7 @@ export function MeetingCalendar({ meetings, onOpen, onShare }: {
       <div className="cw-calendar-toolbar"><h2>Lịch họp</h2><div><button type="button" aria-label="Tháng trước" onClick={() => changeMonth(-1)}>‹</button><strong>{month.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })}</strong><button type="button" aria-label="Tháng sau" onClick={() => changeMonth(1)}>›</button></div></div>
       <div className="cw-calendar-grid" role="grid" aria-label="Lịch họp theo tháng">
         {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(day => <span className="cw-calendar-weekday" key={day}>{day}</span>)}
-        {days.map(date => { const count = entries.filter(entry => keyOf(entry.date) === keyOf(date)).length; return <button type="button" key={keyOf(date)} className={`${date.getMonth() === month.getMonth() ? '' : 'is-outside'} ${keyOf(date) === keyOf(selected) ? 'is-selected' : ''}`} aria-label={`${dayLabel(date)}${count ? `, ${count} buổi họp` : ''}`} aria-pressed={keyOf(date) === keyOf(selected)} onClick={() => { setSelected(date); if (date.getMonth() !== month.getMonth()) setMonth(new Date(date.getFullYear(), date.getMonth(), 1)); }}><span>{date.getDate()}</span>{count > 0 && <i aria-hidden="true" />}</button>; })}
+        {days.map(date => { const dayEntries = entries.filter(entry => keyOf(entry.date) === keyOf(date)); const hasUpcoming = date >= today && dayEntries.some(entry => entry.session.status !== 'ended'); return <button type="button" key={keyOf(date)} className={`${date.getMonth() === month.getMonth() ? '' : 'is-outside'} ${keyOf(date) === keyOf(selected) ? 'is-selected' : ''}`} aria-label={`${dayLabel(date)}${dayEntries.length ? `, ${dayEntries.length} buổi họp` : ''}`} aria-pressed={keyOf(date) === keyOf(selected)} onClick={() => { setSelected(date); if (date.getMonth() !== month.getMonth()) setMonth(new Date(date.getFullYear(), date.getMonth(), 1)); }}><span>{date.getDate()}</span>{hasUpcoming && <i aria-hidden="true" />}</button>; })}
       </div>
     </div>
     <aside className="cw-calendar-day"><h3>{dayLabel(selected)}</h3>{selectedEntries.length ? <ul>{selectedEntries.map(renderEntry)}</ul> : <p>Không có buổi họp.</p>}</aside>

@@ -50,6 +50,7 @@ export async function meetingRequest<T>(accessToken: string, path: string, optio
       INVALID_SCHEDULE_TIME: 'Giờ bắt đầu phải ở tương lai và giờ kết thúc phải sau giờ bắt đầu. Hãy chọn lại thời gian.',
       SINGLE_SESSION_EXISTS: 'Cuộc họp không lặp này đã có một buổi. Hãy tạo cuộc họp mới nếu muốn đặt lịch khác.',
     };
+    if (data?.code === 'EARLY_JOIN_SCHEMA_REQUIRED') throw new MeetingApiError('Tùy chọn vào phòng trước giờ họp chưa sẵn sàng trên máy chủ. Hãy tắt tùy chọn này hoặc liên hệ quản trị viên cập nhật cơ sở dữ liệu.', response.status);
     const messages: Record<number, string> = {
       400: 'Thông tin chưa hợp lệ. Kiểm tra biểu mẫu rồi thử lại.',
       403: 'Bạn chưa có quyền thực hiện thao tác này hoặc quyền vào buổi họp đã hết hạn.',

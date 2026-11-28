@@ -71,7 +71,7 @@ export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }
     try {
       if (pending.current) throw new Error('Phòng trước đã được tạo. Hãy xử lý lịch chưa lưu trước khi tạo phòng khác.');
       const meeting = await meetingRequest<ClubMeeting>(token, quick ? '/quick' : '', { method: 'POST', body: {
-        title: values.title, waitingRoomEnabled: values.waitingRoomEnabled, clubId,
+        title: values.title, waitingRoomEnabled: values.waitingRoomEnabled, allowEarlyJoin: values.allowEarlyJoin, clubId,
         ...(!quick ? { recurrenceRule: values.recurrenceRule } : {}),
       } });
       if (!quick) { pending.current = { id: meeting.meeting_id, code: meeting.meeting_code, values }; await schedulePending(); }
@@ -91,11 +91,11 @@ export function WorkspaceMeetings({ recurring = false }: { recurring?: boolean }
   const undated = state.data?.items.flatMap(meeting => meeting.meeting_sessions
     .filter(session => !session.scheduled_start_at)
     .map(session => ({ meeting, session }))) ?? [];
-  return <div className="cw-meetings">
+  return <div className={`cw-meetings${recurring ? ' cw-meetings--scheduled' : ''}`}>
     <div className="cw-meeting-hero"><div><span className="cw-eyebrow">Không gian {club.name}</span><h1>{recurring ? 'Họp theo lịch' : 'Phòng họp CLB'}</h1></div><button type="button" className="cw-meeting-hero-hint" aria-expanded={inviteOpen} aria-controls="cw-meeting-invite" onClick={() => { setInviteOpen(value => !value); if (!inviteOpen) requestAnimationFrame(() => inviteInputRef.current?.focus()); }}>Mã hoặc đường dẫn mời</button>{inviteOpen && <div id="cw-meeting-invite" className="cw-meeting-invite-popover"><button type="button" className="cw-invite-close" aria-label="Đóng nhập mã mời" onClick={() => setInviteOpen(false)}>×</button><JoinMeetingByInvite onMeeting={onMeeting} inputRef={inviteInputRef} /></div>}</div>
     <div className="cw-meeting-actions-grid">
       <section className="cw-panel cw-meeting-create-panel">
-        <CreateMeetingForm busy={busy || !!pending.current} initialKind={recurring ? 'scheduled' : 'quick'} onCreate={create} />
+        <CreateMeetingForm busy={busy || !!pending.current} kind={recurring ? 'scheduled' : 'quick'} onCreate={create} />
         {error && <p role="alert" className="cw-error">{error}</p>}
         {pending.current && <div role="status"><p>Phòng {pending.current.code} đã tồn tại; lịch chưa được xác nhận.</p><button className="cw-link" disabled={busy} onClick={() => void retrySchedule()}>Kiểm tra và lưu lại lịch</button><button className="cw-link" disabled={!onMeeting} onClick={() => openClubMeeting(pending.current!.code, undefined, onMeeting)}>Mở phòng để kiểm tra</button></div>}
       </section>

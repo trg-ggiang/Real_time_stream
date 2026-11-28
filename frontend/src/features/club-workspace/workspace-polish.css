@@ -98,9 +98,6 @@
 .cw-app main .cw-home-grid{gap:22px}
 .cw-app main .cw-home-grid>.cw-panel{margin:0;padding:28px}
 .cw-app main .cw-home-grid .cw-link{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:24px 0 0;font-size:12px;font-weight:600}
-.cw-app main .cw-meetings .workspace-mode{width:max-content;max-width:100%;background:#edf2f9;border:0;padding:5px;gap:5px;border-radius:10px;margin-top:20px}
-.cw-app main .cw-meetings .workspace-mode button{font-size:12px;min-height:37px;border:0;background:transparent;color:#59708d;box-shadow:none}
-.cw-app main .cw-meetings .workspace-mode button[aria-pressed=true]{background:#fff;color:var(--cw-accent);box-shadow:0 2px 5px #172e4d0a}
 .cw-app main .cw-meetings .workspace-form-row{gap:22px}
 .cw-app main .cw-meetings .workspace-form{margin-top:25px}
 .cw-app main .cw-meetings .workspace-form button[type=submit]{border-radius:9px;min-height:44px;font-weight:600}
@@ -276,10 +273,12 @@
 /* Meeting workspace: compact creation beside a calendar and day agenda. */
 .cw-app main:has(> .cw-meetings){max-width:none;width:100%;padding:20px 18px 24px}
 .cw-app main .cw-meetings{grid-template-columns:minmax(245px,3fr) minmax(0,7fr);align-items:stretch;gap:18px}
+.cw-app main .cw-meetings--scheduled{grid-template-columns:minmax(300px,1fr) minmax(0,2fr)}
 .cw-app main .cw-meeting-hero{margin-bottom:0}
 .cw-app main .cw-meeting-actions-grid,.cw-app main .cw-meeting-list-panel{min-height:calc(100dvh - 135px);height:calc(100dvh - 135px)}
 .cw-app main .cw-meeting-actions-grid>.cw-panel,.cw-app main .cw-meeting-list-panel{background:transparent;border:0;border-radius:0;box-shadow:none;padding:14px 0}
 .cw-app main .cw-meeting-actions-grid{border-right:1px solid var(--cw-line);padding-right:18px}
+.cw-app main .cw-meetings--scheduled .cw-meeting-actions-grid{overflow-y:auto;scrollbar-width:thin}
 .cw-app main .cw-meeting-list-panel{max-height:none;overflow-y:auto;display:block;margin:0}
 .cw-app main .cw-meeting-invite-popover{top:calc(100% + 7px)}
 .cw-app main .cw-invite-close{position:absolute;right:10px;top:9px;z-index:2;min-height:28px;width:28px;padding:0;border:0;background:transparent;color:#536981;font-size:22px;line-height:1;cursor:pointer}
@@ -314,8 +313,9 @@
 .cw-app[data-theme="dark"] main .cw-calendar-grid button{color:#dceaff}
 .cw-app[data-theme="dark"] main .cw-calendar-grid button.is-selected{background:#4070bb;color:#fff}
 .cw-app[data-theme="dark"] main .cw-calendar-grid button:hover:not(.is-selected){background:#344664}
-@media(max-width:1150px){.cw-app main .cw-calendar-layout{grid-template-columns:1fr}.cw-app main .cw-calendar-day{border-left:0;border-top:1px solid var(--cw-line);padding:12px 0 0;min-height:0}}
+@container (max-width:530px){.cw-app main .cw-calendar-layout{grid-template-columns:1fr}.cw-app main .cw-calendar-day{border-left:0;border-top:1px solid var(--cw-line);padding:12px 0 0;min-height:0}}
 @media(max-width:760px){.cw-app main:has(> .cw-meetings){padding:18px}.cw-app main .cw-meeting-actions-grid,.cw-app main .cw-meeting-list-panel{height:auto;min-height:0}.cw-app main .cw-meeting-actions-grid{border-right:0;border-bottom:1px solid var(--cw-line);padding:0 0 12px}.cw-app main .cw-calendar-agenda{grid-template-columns:1fr}.cw-app main .cw-meeting-list-panel{overflow:visible}}
+@media(max-width:900px){.cw-app main .cw-meetings--scheduled{grid-template-columns:1fr}.cw-app main .cw-meetings--scheduled .cw-meeting-actions-grid{height:auto;min-height:0;overflow:visible;border-right:0;border-bottom:1px solid var(--cw-line);padding-right:0}.cw-app main .cw-meetings--scheduled .cw-meeting-list-panel{height:auto;overflow:visible}}
 /* Meeting pages use the available viewport, with only the agenda list scrolling. */
 .cw-app--meetings .cw-workspace{background:#f8fafc}
 .cw-app--meetings main{background:#f8fafc}
@@ -323,11 +323,12 @@
 .cw-app--meetings main .cw-meeting-actions-grid,.cw-app--meetings main .cw-meeting-list-panel{height:calc(100dvh - 86px);min-height:0}
 .cw-app--meetings main .cw-meeting-list-panel{overflow:hidden}
 .cw-app--meetings main .cw-calendar-layout{height:100%;grid-template-rows:auto minmax(0,1fr);align-content:start;gap:14px}
-.cw-app--meetings main .cw-calendar-main{max-width:340px}
+.cw-app--meetings main .cw-calendar-layout{grid-template-columns:minmax(0,356px) minmax(0,1fr)}
+.cw-app--meetings main .cw-calendar-main{border-right:1px solid var(--cw-line);padding-right:16px}
 .cw-app--meetings main .cw-calendar-toolbar{margin-bottom:5px}
 .cw-app--meetings main .cw-calendar-grid{gap:2px}
 .cw-app--meetings main .cw-calendar-grid button{min-height:34px;font-size:11px}
-.cw-app--meetings main .cw-calendar-day{min-height:0}
+.cw-app--meetings main .cw-calendar-day{min-height:0;border-left:0;padding-left:0}
 .cw-app--meetings main .cw-calendar-agenda{display:flex;flex-direction:column;min-height:0;gap:10px;padding-top:12px}
 .cw-app--meetings main .cw-calendar-agenda-tabs{display:flex;gap:6px;flex:none}
 .cw-app--meetings main .cw-calendar-agenda-tabs button{min-height:32px;padding:5px 10px;border:0;border-radius:8px;background:transparent;color:#657891;font-size:12px}
@@ -336,6 +337,7 @@
 .cw-app--meetings main .cw-calendar-agenda-scroll{min-height:0;overflow-y:auto;padding-right:5px;scrollbar-width:thin}
 .cw-app[data-theme="dark"].cw-app--meetings .cw-workspace,.cw-app[data-theme="dark"].cw-app--meetings main{background:var(--cw-night-ground)}
 .cw-app[data-theme="dark"].cw-app--meetings main .cw-calendar-agenda-tabs button[aria-pressed="true"]{background:#344664;color:#dceaff}
+@container (max-width:530px){.cw-app--meetings main .cw-calendar-layout{grid-template-columns:1fr}.cw-app--meetings main .cw-calendar-main{border-right:0;padding-right:0}.cw-app--meetings main .cw-calendar-day{border-top:1px solid var(--cw-line);padding-top:12px}}
 @media(max-width:760px){.cw-app--meetings main .cw-meeting-actions-grid,.cw-app--meetings main .cw-meeting-list-panel{height:auto}.cw-app--meetings main .cw-calendar-layout{height:auto;display:block}.cw-app--meetings main .cw-calendar-agenda{height:220px;margin-top:14px}.cw-app--meetings main .cw-calendar-day{margin-top:14px}}
 .cw-app[data-theme="dark"] .cw-voice-link svg{color:#9bb4d4}
 .cw-app[data-theme="dark"] .cw-voice-link--pending svg{color:#8dbbff}
@@ -398,3 +400,14 @@
   outline-offset: 2px;
 }
 .cw-app .cw-club-rail :is(a, summary):focus-visible { outline-color: #9ac3ff; }
+.cw-app main .cw-meetings--scheduled .workspace-form{margin-top:8px}
+.cw-app main .cw-meetings--scheduled .workspace-form fieldset{gap:10px}
+.cw-app main .cw-meetings--scheduled .workspace-form label{gap:5px}
+.cw-app main .cw-meetings--scheduled .workspace-form input:not([type=checkbox]):not([type=radio]){min-height:36px;padding:7px 9px}
+.cw-app main .cw-meetings--scheduled :is(.workspace-schedule-dates,.workspace-schedule-time){gap:8px}
+.cw-app main .cw-meetings--scheduled .workspace-field-title{margin:3px 0 0}
+.cw-app main .cw-meetings--scheduled .workspace-repeat-options label{padding:5px 8px;font-size:11px}
+.cw-app main .cw-meetings--scheduled .workspace-meeting-advanced{padding:7px 10px}
+.cw-app main .cw-meetings--scheduled .workspace-help{margin:0;font-size:11px}
+.cw-app--meetings main .cw-calendar-day{max-height:275px;overflow-y:auto;scrollbar-width:thin;padding-right:5px}
+@media(max-width:900px){.cw-app--meetings main .cw-meetings--scheduled .cw-meeting-actions-grid,.cw-app--meetings main .cw-meetings--scheduled .cw-meeting-list-panel{height:auto;min-height:0;overflow:visible}}

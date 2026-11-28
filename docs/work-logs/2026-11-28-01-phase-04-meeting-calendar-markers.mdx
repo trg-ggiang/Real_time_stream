@@ -1,0 +1,66 @@
+---
+title: Tinh chỉnh lịch và bộ đếm họp CLB
+description: Căn lịch, cấu hình lặp và đếm buổi họp hôm nay.
+---
+
+## Thông tin phiên
+
+- Session ID: 2026-11-28-01
+- Thời gian: 2026-11-28 +07:00; không ghi nhận thời điểm bắt đầu chính xác
+- Agent: Codex
+- Phase: 04 — Không gian sinh hoạt
+- Kết quả phiên: Completed
+- Trạng thái phase sau phiên: In Progress
+
+## Mục tiêu và phạm vi được giao
+
+Chỉnh lịch phòng họp trong mỗi CLB: thanh chia sát cạnh lịch và không kéo dài theo danh sách nhiệm vụ; ngày họp đã qua không còn dấu chấm, ngày còn lịch họp vẫn có dấu.
+
+## Công việc hoàn thành
+
+- Chuyển viền chia sang khối lịch tháng, cố định độ rộng cột lịch trên desktop; màn hình hẹp dùng thanh ngang.
+- Dấu chấm chỉ hiện cho ngày từ hôm nay trở đi có buổi chưa kết thúc. Chi tiết lịch cũ vẫn xem được khi chọn ngày.
+- Form lặp dùng ngày kết thúc thay số buổi. Với chu kỳ hàng tuần, người dùng chọn một hoặc nhiều thứ, gồm thứ của buổi đầu. Giờ bắt đầu/kết thúc áp dụng cho mọi buổi.
+- Form tạo lịch đặt ngày tổ chức và ngày kết thúc trong cùng hàng, hai giờ trong hàng riêng. Với lịch không lặp, ngày kết thúc khác dùng cho buổi họp qua ngày; với lịch lặp, ngày kết thúc lịch là ngày dừng tạo buổi. Bỏ ô “Lặp lại đến” trùng nghĩa.
+- Quy tắc lặp hàng tuần không có BYDAY vẫn giữ đúng thứ của buổi đầu, cách nhau bảy ngày. Backend chặn quá 5000 buổi ngay khi tạo danh sách.
+- Nhãn Phòng họp CLB dùng số buổi có giờ bắt đầu trong ngày hiện tại theo múi giờ trình duyệt, gồm cả buổi đã kết thúc hôm nay. Tổng thông báo vẫn tính các buổi đang diễn ra và sắp tới.
+- Bỏ cặp nút Họp ngay/Lên lịch trong form. Hai mục sidebar quyết định chế độ; mỗi trang chỉ hiện form tương ứng. Xóa CSS cũ của nút chuyển chế độ.
+- Theo ảnh tham khảo, chu kỳ lặp là nhóm chọn trực tiếp. Thu gọn khoảng cách và trường nhập. Cài đặt nâng cao mở rộng trong cùng cột, có xác nhận tham gia và tùy chọn vào phòng sớm tối đa 15 phút. Backend lưu lựa chọn và chỉ mở phiên trước giờ khi được bật.
+- Cột form đặt lịch thu còn khoảng một phần ba vùng chính, lịch và danh sách ngày nhận phần còn lại. Danh sách buổi trong ngày cuộn riêng; bố cục lịch đổi theo độ rộng vùng lịch. Nhóm lặp chỉ còn Không lặp, Hàng ngày, Hàng tuần.
+- Backend tương thích với schema chưa có `allow_early_join`: họp thường tự dùng trường cũ, còn khi bật vào sớm trả lỗi có hướng dẫn cập nhật DB thay vì 503 chung. Đọc cuộc họp cũ cũng dùng fallback khi cột chưa có.
+- Sửa `MeetingCalendar.tsx`, `WorkspaceMeetings.tsx`, `MeetingForms.tsx`, `WorkspaceApp.tsx`, `use-workspace-attention.ts`, `workspace-api.ts`, các CSS workspace/meeting, `meetings.service.ts`, `workspace-attention.service.ts`, `workspace.controller.ts`, DTO và kiểm thử liên quan. Thêm migration `202611280001_meeting_early_join.sql`.
+
+## Kiểm tra
+
+| Lệnh hoặc kiểm tra | Kết quả | Ghi chú |
+| --- | --- | --- |
+| `npm.cmd --workspace frontend run typecheck` | Passed | TypeScript frontend |
+| `npm.cmd run typecheck` | Passed | Backend và frontend |
+| `npm.cmd --workspace backend run build`; `node --test backend/test/meeting-schedule.test.cjs` | Passed | 5 test, gồm ca chọn nhiều thứ đến ngày kết thúc |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 19 test |
+| `node --test backend/test/workspace-attention.test.cjs` | Passed | Bộ đếm hôm nay và tổng thông báo |
+| `npm.cmd --workspace frontend test -- Workspace.test.tsx WorkspaceRail.test.tsx` | Passed | 20 test |
+| `npm.cmd --workspace frontend run typecheck`; `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | Tách ngày/giờ, 19 test |
+| `npm.cmd --workspace frontend run typecheck`; `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | Nhãn và nhóm trường mới, 19 test |
+| `npm.cmd --workspace frontend run typecheck`; `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | Sidebar quyết định form, 19 test |
+| `npm.cmd --workspace frontend run typecheck`; `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | Form theo ảnh, nhóm lặp và Cài đặt nâng cao; 19 test |
+| `npm.cmd --workspace frontend run build` | Passed | Vite cảnh báo chunk lớn hiện có |
+| `npm.cmd run typecheck`; `npm.cmd --workspace backend run build`; `node --test backend/test/meetings-roles.test.cjs`; `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 17 test backend và 19 test frontend, gồm vào sớm 15 phút |
+| `npm.cmd --workspace frontend run build`; docs navigation/JSON | Passed | Build sau khi thu gọn form; Vite cảnh báo chunk lớn hiện có |
+| `npm.cmd --workspace frontend run typecheck`; `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | Hai hàng ngày/giờ, ngày kết thúc lịch dùng chung, 19 test |
+| `npm.cmd run typecheck`; `npm.cmd --workspace backend run build`; `node --test backend/test/meetings-roles.test.cjs`; `npm.cmd --workspace frontend test -- Workspace.test.tsx` | Passed | 19 test backend, 19 test frontend; gồm fallback thiếu cột |
+| Đọc schema Supabase qua kết nối local | Blocked | Môi trường thực thi không kết nối được mạng; chưa xác nhận lỗi 503 thực tế trên DB |
+| Supabase migration/live end-to-end | Skipped | Chưa áp dụng migration trên DB development hoặc thử LiveKit thật |
+| `git diff --check` | Passed | Không có lỗi khoảng trắng |
+| Browser/live end-to-end | Skipped | Chưa kiểm tra trực quan với dữ liệu CLB thật |
+
+## Bước tiếp theo
+
+Để bật vào phòng sớm, áp dụng migration `202611280001_meeting_early_join.sql` lên môi trường development. Sau đó kiểm tra trực quan form trên desktop/mobile và thử vào phòng ở mốc trước 15 phút, trong 15 phút và sau giờ họp. Muốn thêm mô tả, phòng, đối tượng hoặc nhắc lịch như ảnh cần thiết kế hợp đồng API và nơi lưu tương ứng.
+
+## Checklist đóng phiên
+
+- [x] Cập nhật phase page và master plan
+- [x] Cập nhật session log, changelog và docs liên quan
+- [x] Đăng ký trang mới trong docs.json
+- [x] Ghi kết quả kiểm tra và giới hạn xác minh

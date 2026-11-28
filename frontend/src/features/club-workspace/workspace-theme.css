@@ -100,9 +100,9 @@
   border-color: #78879d;
 }
 .cw-app[data-theme="dark"] main :is(input, textarea)::placeholder { color: var(--cw-secondary-ink); }
-.cw-app[data-theme="dark"] main :is(.cw-tabs, .cw-meetings .workspace-mode) { background: var(--cw-night-hover); }
-.cw-app[data-theme="dark"] main :is(.cw-tabs a, .cw-meetings .workspace-mode button) { color: var(--cw-navy); }
-.cw-app[data-theme="dark"] main :is(.cw-tabs a[aria-current="page"], .cw-meetings .workspace-mode button[aria-pressed="true"]) {
+.cw-app[data-theme="dark"] main .cw-tabs { background: var(--cw-night-hover); }
+.cw-app[data-theme="dark"] main .cw-tabs a { color: var(--cw-navy); }
+.cw-app[data-theme="dark"] main .cw-tabs a[aria-current="page"] {
   background: var(--cw-active-surface);
   color: var(--cw-navy);
 }

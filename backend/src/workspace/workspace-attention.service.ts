@@ -6,7 +6,7 @@ import { WorkspaceChannels } from './workspace-channels.service';
 export class WorkspaceAttention {
   constructor(private readonly access: WorkspaceAccess, private readonly channels: WorkspaceChannels) {}
 
-  async summary(userId: string, clubId: string) {
+  async summary(userId: string, clubId: string, dayStart?: string, dayEnd?: string) {
     const context = await this.access.require(userId, clubId);
     const db = this.access.supabase.client;
     const visible = await this.channels.list(userId, clubId);
@@ -45,9 +45,17 @@ export class WorkspaceAttention {
     const meetingCount = (meetings.data ?? []).reduce((count, meeting) => count +
       (meeting.meeting_sessions ?? []).filter(session => session.status === 'ongoing' ||
         (session.status === 'scheduled' && !!session.scheduled_start_at && Date.parse(session.scheduled_start_at) >= now)).length, 0);
+    const start = dayStart ? Date.parse(dayStart) : NaN;
+    const end = dayEnd ? Date.parse(dayEnd) : NaN;
+    const utcStart = new Date(); utcStart.setUTCHours(0, 0, 0, 0);
+    const todayStart = Number.isFinite(start) && Number.isFinite(end) && end > start && end - start <= 25 * 3600000 ? start : utcStart.getTime();
+    const todayEnd = Number.isFinite(start) && Number.isFinite(end) && end > start && end - start <= 25 * 3600000 ? end : todayStart + 86400000;
+    const meetingsToday = (meetings.data ?? []).reduce((count, meeting) => count +
+      (meeting.meeting_sessions ?? []).filter(session => !!session.scheduled_start_at &&
+        Date.parse(session.scheduled_start_at) >= todayStart && Date.parse(session.scheduled_start_at) < todayEnd).length, 0);
     const review = (postsReview.count ?? 0) + (activitiesReview.count ?? 0);
     const revisions = (postsMine.count ?? 0) + (activitiesMine.count ?? 0);
-    return { channels, meetings: meetingCount, review, revisions, postRevisions: postsMine.count ?? 0, activityRevisions: activitiesMine.count ?? 0,
+    return { channels, meetings: meetingCount, meetingsToday, review, revisions, postRevisions: postsMine.count ?? 0, activityRevisions: activitiesMine.count ?? 0,
       total: channels.reduce((sum, channel) => sum + channel.unread, 0) + meetingCount + review + revisions };
   }
 }

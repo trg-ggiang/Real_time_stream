@@ -33,7 +33,7 @@
 .meeting-app[data-theme] :is(.workspace-welcome > span, .workspace-help, .workspace-empty, .workspace-session time, .workspace-session p, .workspace-person-info > span, .meeting-call-intro > span, .meeting-camera-label, .screen-share-message, .workspace-setting p) { color: var(--meeting-muted); }
 .meeting-app[data-theme] :is(.workspace-code, .workspace-code-actions code, .workspace-section-title > svg, .meeting-room-title > svg) { color: var(--meeting-accent); }
 .meeting-app[data-theme] :is(.workspace-person, .workspace-join) { border-color: var(--meeting-line); }
-.meeting-app[data-theme] :is(.meeting-brand-symbol, .meeting-avatar-small, .workspace-mode, .workspace-role, .workspace-session-status, .workspace-waiting-symbol, .workspace-icon) { background: var(--theme-control); color: var(--meeting-text); border-color: var(--meeting-line); }
+.meeting-app[data-theme] :is(.meeting-brand-symbol, .meeting-avatar-small, .workspace-role, .workspace-session-status, .workspace-waiting-symbol, .workspace-icon) { background: var(--theme-control); color: var(--meeting-text); border-color: var(--meeting-line); }
 .meeting-app[data-theme] .workspace-session-status--ongoing { color: var(--theme-success); background: var(--theme-success-soft); }
 .meeting-app[data-theme] .workspace-session-status--ended { color: var(--meeting-muted); background: var(--theme-control); }
 .meeting-app[data-theme] .workspace-session[data-selected='true'] { border-color: var(--meeting-accent); }
@@ -41,9 +41,7 @@
 .meeting-app[data-theme] .workspace-form input::placeholder { color: var(--meeting-muted); opacity: 1; }
 .meeting-app[data-theme] .workspace-form :is(input, select):focus-visible { outline-color: var(--meeting-accent); }
 .meeting-app[data-theme] .workspace-check input { accent-color: var(--theme-button); }
-.meeting-app[data-theme] .workspace-mode { border-color: var(--meeting-line); }
-.meeting-app[data-theme] .workspace-mode button { background: transparent; color: var(--meeting-muted); }
-.meeting-app[data-theme] :is(.workspace-form button, .workspace-session-actions > button:first-child, .workspace-schedule-toggle, .meeting-join-button, .workspace-mode button[aria-pressed='true'], .screen-share-request button, .workspace-waiting > button:not(.workspace-text-button)) { background: var(--theme-button); color: var(--theme-button-text); border-color: var(--theme-button); }
+.meeting-app[data-theme] :is(.workspace-form button, .workspace-session-actions > button:first-child, .workspace-schedule-toggle, .meeting-join-button, .screen-share-request button, .workspace-waiting > button:not(.workspace-text-button)) { background: var(--theme-button); color: var(--theme-button-text); border-color: var(--theme-button); }
 .meeting-app[data-theme] :is(.workspace-form button, .workspace-session-actions > button:first-child, .workspace-schedule-toggle, .meeting-join-button, .screen-share-request button, .workspace-waiting > button:not(.workspace-text-button)):hover:not(:disabled) { background: var(--theme-button-hover); color: var(--theme-button-text); }
 .meeting-app[data-theme] :is(.workspace-back, .workspace-text-button) { background: transparent; color: var(--meeting-accent); border-color: transparent; }
 .meeting-app[data-theme] :is(.workspace-back, .workspace-text-button):hover:not(:disabled) { background: var(--theme-control); color: var(--meeting-accent); }

@@ -77,6 +77,7 @@ export interface ClubChannel {
 export interface WorkspaceAttention {
   channels: { channel_id: string; unread: number }[];
   meetings: number;
+  meetingsToday?: number;
   review: number;
   revisions: number;
   postRevisions: number;

@@ -9,16 +9,29 @@
 .workspace-section-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
 .workspace-section-title > svg { color: #dddde1; flex: 0 0 auto; }
 .workspace-section-title h2 { font-size: 19px; line-height: 1.5; font-weight: 500; flex: 1; letter-spacing: -.6px; }
-.workspace-mode { display: flex; padding: 5px; border: 1px solid #5a5a5e; background: #1e1e22; border-radius: 10px; margin-bottom: 26px; gap: 5px; }
-.meeting-app .workspace-mode button { display: flex; justify-content: center; align-items: center; gap: 9px; flex: 1; padding: 10px; color: #d5d5d9; background: transparent; border-radius: 6px; font-size: 12px; }
-.meeting-app .workspace-mode button[aria-pressed='true'] { background: #d6d6da; color: #2b2b2f; }
 .workspace-form, .workspace-form fieldset { display: grid; gap: 20px; }
 .workspace-form fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
 .workspace-form label { display: grid; gap: 8px; color: #e7e7eb; font-size: 12px; min-width: 0; }
-.workspace-form :is(input:not([type='checkbox']), select) { width: 100%; min-width: 0; min-height: 46px; padding: 11px 12px; color: #f9f9fd; background: #202024; border: 1px solid #7a7a7e; border-radius: 8px; font: inherit; }
+.workspace-form :is(input:not([type='checkbox']):not([type='radio']), select) { width: 100%; min-width: 0; min-height: 46px; padding: 11px 12px; color: #f9f9fd; background: #202024; border: 1px solid #7a7a7e; border-radius: 8px; font: inherit; }
 .workspace-form input::placeholder { color: #b5b5b9; }
 .workspace-form input:focus-visible { outline: 3px solid #dcdce0; outline-offset: 3px; }
 .workspace-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.workspace-weekdays { display: flex; flex-wrap: wrap; gap: 10px; border: 0; padding: 0; margin: 0; }
+.workspace-weekdays legend { width: 100%; margin-bottom: 4px; }
+.workspace-weekdays label { display: inline-flex; align-items: center; gap: 5px; width: auto; }
+.workspace-weekdays input { width: 16px; height: 16px; margin: 0; accent-color: #285fba; }
+.workspace-schedule-dates, .workspace-schedule-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.workspace-schedule-other-date { min-width: 0; }
+.workspace-form .workspace-schedule-other-date .workspace-check { min-height: 20px; margin: 0 0 5px; }
+.workspace-field-title { margin: 14px 0 8px; font-size: 12px; font-weight: 700; }
+.workspace-repeat-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #7a7a7e; border-radius: 8px; overflow: hidden; }
+.workspace-form .workspace-repeat-options label { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 5px; border-right: 1px solid #7a7a7e; cursor: pointer; white-space: nowrap; }
+.workspace-repeat-options label:last-child { border-right: 0; }
+.workspace-repeat-options label:has(input:checked) { background: #d6d6da; color: #2b2b2f; }
+.workspace-repeat-options input { width: 14px; height: 14px; margin: 0; accent-color: #285fba; flex: none; }
+.workspace-meeting-advanced { border: 1px solid #7a7a7e; border-radius: 8px; padding: 10px 12px; }
+.workspace-meeting-advanced summary { cursor: pointer; font-weight: 700; }
+.workspace-meeting-advanced .workspace-check { margin-top: 12px; }
 .workspace-form .workspace-check { display: flex; align-items: center; gap: 10px; min-height: 32px; cursor: pointer; }
 .workspace-check input { width: 18px; height: 18px; accent-color: #d6d6da; margin: 0; }
 .workspace-check input:focus-visible { outline: 3px solid #dcdce0; outline-offset: 4px; }

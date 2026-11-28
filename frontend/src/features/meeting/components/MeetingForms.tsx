@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react';
-import { CalendarBlank } from '@phosphor-icons/react/dist/csr/CalendarBlank';
 import { VideoCamera } from '@phosphor-icons/react/dist/csr/VideoCamera';
 
-export type CreateValues = { title: string; waitingRoomEnabled: boolean; recurrenceRule: string | null; scheduledStartAt?: string; scheduledEndAt?: string };
+export type CreateValues = { title: string; waitingRoomEnabled: boolean; allowEarlyJoin: boolean; recurrenceRule: string | null; scheduledStartAt?: string; scheduledEndAt?: string };
 
-function readSchedule(form: HTMLFormElement) {
+function readSchedule(form: HTMLFormElement, recurring = false) {
   const values = new FormData(form);
-  const start = new Date(String(values.get('start'))), end = new Date(String(values.get('end')));
+  const startText = values.has('firstDate') ? `${values.get('firstDate')}T${values.get('startTime')}` : String(values.get('start'));
+  const endText = values.has('firstDate') ? `${recurring ? values.get('firstDate') : values.get('endDate') || values.get('firstDate')}T${values.get('endTime')}` : String(values.get('end'));
+  const start = new Date(startText), end = new Date(endText);
   if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || start.getTime() <= Date.now() || end <= start) {
     throw new Error('Chọn giờ bắt đầu trong tương lai và giờ kết thúc sau giờ bắt đầu.');
   }
@@ -20,8 +21,10 @@ function ScheduleFields() {
   </div>;
 }
 
-export function CreateMeetingForm({ busy, onCreate, initialKind = 'quick' }: { busy: boolean; onCreate: (values: CreateValues, quick: boolean) => Promise<void>; initialKind?: 'quick' | 'scheduled' }) {
-  const [kind, setKind] = useState<'quick' | 'scheduled'>(initialKind);
+export function CreateMeetingForm({ busy, onCreate, kind }: { busy: boolean; onCreate: (values: CreateValues, quick: boolean) => Promise<void>; kind: 'quick' | 'scheduled' }) {
+  const [frequency, setFrequency] = useState('');
+  const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [differentEndDate, setDifferentEndDate] = useState(false);
   const [error, setError] = useState('');
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (busy) return;
@@ -29,26 +32,65 @@ export function CreateMeetingForm({ busy, onCreate, initialKind = 'quick' }: { b
     try {
       const title = String(data.get('title')).trim();
       if (!title) { (form.elements.namedItem('title') as HTMLInputElement).focus(); throw new Error('Nhập tên cuộc họp.'); }
-      const frequency = String(data.get('frequency') || '');
-      const count = Number(data.get('count') || 1);
-      const values: CreateValues = { title, waitingRoomEnabled: data.get('waiting') === 'on',
-        recurrenceRule: kind === 'scheduled' && frequency ? `FREQ=${frequency};COUNT=${count}` : null,
-        ...(kind === 'scheduled' ? readSchedule(form) : {}),
+      const schedule = kind === 'scheduled' ? readSchedule(form, !!frequency) : null;
+      let recurrenceRule: string | null = null;
+      if (schedule && frequency) {
+        const untilDate = String(data.get('endDate') || '');
+        const until = new Date(`${untilDate}T23:59:59.999`);
+        if (!untilDate || !Number.isFinite(until.getTime()) || until < new Date(schedule.scheduledStartAt)) {
+          throw new Error('Chọn ngày kết thúc lịch không trước ngày tổ chức.');
+        }
+        const untilUtc = until.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+        recurrenceRule = `FREQ=${frequency};UNTIL=${untilUtc}`;
+        if (frequency === 'WEEKLY') {
+          const firstDay = new Date(schedule.scheduledStartAt).getDay();
+          if (!weekdays.length || !weekdays.includes(firstDay)) throw new Error('Chọn ít nhất một thứ, gồm thứ của buổi đầu tiên.');
+          const codes = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+          recurrenceRule += `;BYDAY=${weekdays.map(day => codes[day]).join(',')}`;
+        }
+      }
+      const values: CreateValues = { title, waitingRoomEnabled: data.get('waiting') === 'on', allowEarlyJoin: kind === 'scheduled' && data.get('allowEarlyJoin') === 'on',
+        recurrenceRule,
+        ...(schedule ?? {}),
       };
       setError(''); await onCreate(values, kind === 'quick');
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Kiểm tra thông tin rồi thử lại.'); }
   }
   return <section className="workspace-create" aria-labelledby="create-title">
-    <div className="workspace-section-title"><VideoCamera size={25} aria-hidden="true" /><h2 id="create-title">Bắt đầu một cuộc gặp</h2></div>
-    <div className="workspace-mode" role="group" aria-label="Loại cuộc họp">
-      <button type="button" aria-pressed={kind === 'quick'} disabled={busy} onClick={() => setKind('quick')}><VideoCamera size={17} aria-hidden="true" />Họp ngay</button>
-      <button type="button" aria-pressed={kind === 'scheduled'} disabled={busy} onClick={() => setKind('scheduled')}><CalendarBlank size={17} aria-hidden="true" />Lên lịch</button>
-    </div>
+    <div className="workspace-section-title"><VideoCamera size={25} aria-hidden="true" /><h2 id="create-title">{kind === 'quick' ? 'Tạo cuộc họp ngay' : 'Lên lịch cuộc họp'}</h2></div>
     <form onSubmit={event => void submit(event)} className="workspace-form" aria-busy={busy}>
       <fieldset disabled={busy}>
-        <label>Tên cuộc họp<input name="title" required maxLength={160} autoComplete="off" /></label>
-        {kind === 'scheduled' ? <><ScheduleFields /><div className="workspace-form-row"><label>Lặp lại<select name="frequency" aria-label="Lặp lại"><option value="">Không lặp</option><option value="DAILY">Hàng ngày</option><option value="WEEKLY">Hàng tuần</option><option value="MONTHLY">Hàng tháng</option><option value="YEARLY">Hàng năm</option></select></label><label>Số buổi (nếu lặp)<input name="count" type="number" min={1} max={100} defaultValue={4} required inputMode="numeric" /></label></div><p className="workspace-help">Múi giờ: {Intl.DateTimeFormat().resolvedOptions().timeZone}</p></> : null}
-        <label className="workspace-check"><input name="waiting" type="checkbox" defaultChecked /><span>Duyệt khách trước khi vào phòng</span></label>
+        <label>Tiêu đề cuộc họp *<input name="title" required maxLength={160} autoComplete="off" placeholder="VD: Họp định kỳ ban kỹ thuật" /></label>
+        {kind === 'scheduled' ? <>
+          <div className="workspace-schedule-dates">
+            <label>Ngày tổ chức *<input name="firstDate" type="date" required onChange={event => {
+              if (frequency === 'WEEKLY' && event.target.value) setWeekdays([new Date(`${event.target.value}T00:00`).getDay()]);
+            }} /></label>
+            <div className="workspace-schedule-other-date">
+              {frequency ? <label>Đến ngày *<input name="endDate" type="date" required /></label> : <>
+                <label className="workspace-check"><input type="checkbox" checked={differentEndDate} onChange={event => setDifferentEndDate(event.target.checked)} /><span>Kết thúc ngày khác</span></label>
+                {differentEndDate && <label>Ngày kết thúc<input name="endDate" type="date" required /></label>}
+              </>}
+            </div>
+          </div>
+          <div className="workspace-schedule-time">
+            <label>Bắt đầu *<input name="startTime" type="time" required /></label>
+            <label>Kết thúc *<input name="endTime" type="time" required /></label>
+          </div>
+          <p className="workspace-field-title">Lặp lại</p>
+          <div className="workspace-repeat-options" role="radiogroup" aria-label="Lặp lại">
+            {([['', 'Không lặp'], ['DAILY', 'Hàng ngày'], ['WEEKLY', 'Hàng tuần']] as const).map(([value, label]) => <label key={label}><input type="radio" name="frequency" value={value} checked={frequency === value} onChange={event => {
+              setFrequency(value);
+              if (value === 'WEEKLY') {
+                const start = (event.currentTarget.form?.elements.namedItem('firstDate') as HTMLInputElement)?.value;
+                setWeekdays(start ? [new Date(`${start}T00:00`).getDay()] : []);
+              }
+            }} />{label}</label>)}
+          </div>
+          {frequency === 'WEEKLY' && <fieldset className="workspace-weekdays"><legend>Vào thứ</legend>{['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((label, day) => <label key={label}><input type="checkbox" checked={weekdays.includes(day)} onChange={() => setWeekdays(current => current.includes(day) ? current.filter(value => value !== day) : [...current, day])} />{label}</label>)}</fieldset>}
+          <p className="workspace-help">{frequency ? 'Các buổi giữ cùng giờ và thời lượng đến ngày kết thúc lịch. ' : ''}Múi giờ: {Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
+        </> : null}
+        <details className="workspace-meeting-advanced"><summary>Cài đặt nâng cao</summary><label className="workspace-check"><input name="waiting" type="checkbox" defaultChecked /><span>Yêu cầu xác nhận tham gia</span></label>{kind === 'scheduled' && <label className="workspace-check"><input name="allowEarlyJoin" type="checkbox" /><span>Cho phép vào phòng trước giờ họp 15 phút</span></label>}</details>
         {error ? <p className="notice error" role="alert">{error}</p> : null}
         <button className="meeting-join-button" type="submit">{busy ? 'Đang tạo…' : kind === 'quick' ? 'Tạo cuộc họp ngay' : 'Tạo cuộc họp và lịch hẹn'}</button>
       </fieldset>

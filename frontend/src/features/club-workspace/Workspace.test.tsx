@@ -87,7 +87,25 @@ it('uses persisted channels, shows chair tools by club, and opens the existing s
   const nav = screen.getByRole('navigation', { name: 'Điều hướng CLB' });
   fireEvent.click(within(nav).getByRole('link', { name: 'Họp theo lịch' }));
   await screen.findByRole('heading', { name: 'Họp theo lịch' });
-  expect(screen.getByLabelText('Lặp lại')).toBeTruthy();
+  expect(screen.getByRole('radiogroup', { name: 'Lặp lại' })).toBeTruthy();
+  expect(screen.queryByRole('radio', { name: 'Hàng tháng' })).toBeNull();
+  expect(screen.queryByRole('radio', { name: 'Hàng năm' })).toBeNull();
+  expect(screen.getByLabelText('Ngày tổ chức *')).toBeTruthy();
+  expect(screen.getByLabelText('Bắt đầu *')).toBeTruthy();
+  expect(screen.getByLabelText('Kết thúc *')).toBeTruthy();
+  fireEvent.click(screen.getByLabelText('Kết thúc ngày khác'));
+  expect(screen.getByLabelText('Ngày tổ chức *').closest('.workspace-schedule-dates')?.contains(screen.getByLabelText('Ngày kết thúc'))).toBe(true);
+  expect(screen.getByLabelText('Bắt đầu *').closest('.workspace-schedule-time')?.contains(screen.getByLabelText('Kết thúc *'))).toBe(true);
+  const advanced = screen.getByText('Cài đặt nâng cao').closest('details');
+  expect(advanced?.open).toBe(false);
+  fireEvent.click(screen.getByText('Cài đặt nâng cao'));
+  expect(advanced?.open).toBe(true);
+  expect(within(advanced!).getByLabelText('Yêu cầu xác nhận tham gia')).toBeTruthy();
+  expect(screen.queryByRole('group', { name: 'Loại cuộc họp' })).toBeNull();
+  fireEvent.click(within(nav).getByRole('link', { name: 'Phòng họp CLB' }));
+  await screen.findByRole('heading', { name: 'Phòng họp CLB' });
+  expect(screen.queryByRole('radiogroup', { name: 'Lặp lại' })).toBeNull();
+  expect(screen.getByRole('button', { name: 'Tạo cuộc họp ngay' })).toBeTruthy();
   expect(fetcher.mock.calls.every(([, options]) => options?.method !== 'POST')).toBe(true);
 });
 
@@ -423,10 +441,14 @@ it('binds scheduled meetings to the club and retries a failed schedule without r
     if (url === '/api/meetings' && options?.method === 'POST') {
       rooms++;
       expect(JSON.parse(String(options.body)).clubId).toBe('beta');
+      expect(JSON.parse(String(options.body)).allowEarlyJoin).toBe(true);
+      expect(JSON.parse(String(options.body)).recurrenceRule).toMatch(/^FREQ=WEEKLY;UNTIL=.*;BYDAY=/);
       return { ok: true, json: async () => ({ meeting_id: 'room', meeting_code: 'CODE' }) };
     }
     if (url === '/api/meetings/room/sessions' && options?.method === 'POST') {
       schedules++;
+      const scheduled = JSON.parse(String(options.body));
+      expect(new Date(scheduled.scheduledEndAt).getTime() - new Date(scheduled.scheduledStartAt).getTime()).toBe(3600000);
       if (schedules === 1) throw new TypeError('Network unavailable');
       return { ok: true, json: async () => ({ sessions: [] }) };
     }
@@ -434,11 +456,19 @@ it('binds scheduled meetings to the club and retries a failed schedule without r
   });
   history.replaceState(null, '', '/workspace/beta/recurring-meetings');
   render(<GuestLanding viewer={{ displayName: 'An' }} accessToken="session" onMeeting={vi.fn()} />);
-  const title = await screen.findByRole('textbox', { name: 'Tên cuộc họp' });
+  const title = await screen.findByRole('textbox', { name: 'Tiêu đề cuộc họp *' });
   fireEvent.change(title, { target: { value: 'Họp CLB' } });
-  fireEvent.change(screen.getByLabelText('Bắt đầu'), { target: { value: new Date(Date.now() + 172800000).toISOString().slice(0, 16) } });
-  fireEvent.change(screen.getByLabelText('Kết thúc'), { target: { value: new Date(Date.now() + 176400000).toISOString().slice(0, 16) } });
-  fireEvent.change(screen.getByLabelText('Lặp lại'), { target: { value: 'WEEKLY' } });
+  const first = new Date(Date.now() + 172800000);
+  const last = new Date(first.getTime() + 3600000);
+  const localDate = (value: Date) => `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+  const localTime = (value: Date) => `${String(value.getHours()).padStart(2, '0')}:${String(value.getMinutes()).padStart(2, '0')}`;
+  fireEvent.change(screen.getByLabelText('Ngày tổ chức *'), { target: { value: localDate(first) } });
+  fireEvent.change(screen.getByLabelText('Bắt đầu *'), { target: { value: localTime(first) } });
+  fireEvent.change(screen.getByLabelText('Kết thúc *'), { target: { value: localTime(last) } });
+  fireEvent.click(screen.getByRole('radio', { name: 'Hàng tuần' }));
+  fireEvent.change(screen.getByLabelText('Đến ngày *'), { target: { value: localDate(new Date(Date.now() + 30 * 86400000)) } });
+  fireEvent.click(screen.getByText('Cài đặt nâng cao'));
+  fireEvent.click(screen.getByLabelText('Cho phép vào phòng trước giờ họp 15 phút'));
   fireEvent.submit(title.closest('form')!);
   await screen.findByText(/Phòng CODE đã tồn tại/);
   fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra và lưu lại lịch' }));

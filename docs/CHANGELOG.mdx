@@ -1,3 +1,8 @@
+
+## Lịch phòng họp CLB (2026-11-28)
+
+Thanh chia bám theo lịch tháng; ngày họp đã qua không còn dấu chấm. Cột form thu gọn, ngày và giờ chia hai hàng; lịch lặp dùng ngày kết thúc chung và chỉ còn hàng ngày/hàng tuần. Cài đặt nâng cao có vào sớm 15 phút. Backend dùng fallback cho schema chưa có cột mới để họp thường vẫn hoạt động, báo rõ khi bật vào sớm mà thiếu migration. Typecheck, backend build, 19 test vai trò họp và 19 test workspace đạt; chưa xác minh DB thật do kết nối mạng bị chặn. Phase 04 In Progress. [Work log](/work-logs/2026-11-28-01-phase-04-meeting-calendar-markers).
+
 ﻿## Thanh trạng thái cuộc họp trong Không gian CLB (2026-11-25)
 
 Thay khung video trong trang bằng thanh **Đang trong cuộc họp**. Người dùng có thể về Không gian CLB, mở lại hoặc rời cùng phiên. Picture-in-Picture là cửa sổ video nổi. Frontend đạt 207 test, build và kiểm thử Chrome với video mô phỏng. Phase 05 In Progress, chờ nghiệm thu LiveKit Cloud trên hai thiết bị. [Work log](/work-logs/2026-11-25-01-phase-05-meeting-call-status).

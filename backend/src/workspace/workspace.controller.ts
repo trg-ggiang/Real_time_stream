@@ -48,7 +48,8 @@ export class WorkspaceController {
   ) {}
   @Get('attention') @Header('Cache-Control', 'private, no-store') attentionSummary(
     @CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string,
-  ) { return this.attention.summary(u.userId, clubId); }
+    @Query('dayStart') dayStart?: string, @Query('dayEnd') dayEnd?: string,
+  ) { return this.attention.summary(u.userId, clubId, dayStart, dayEnd); }
   @Get('meetings') @Header('Cache-Control', 'private, no-store') async meetings(
     @CurrentUser() u: User, @Param('clubId', ParseUUIDPipe) clubId: string, @Query() q: WorkspacePage,
   ) {

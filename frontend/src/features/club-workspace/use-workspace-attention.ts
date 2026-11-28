@@ -9,8 +9,12 @@ export function useWorkspaceAttention(token: string, clubIds: string[]) {
     const controller = new AbortController();
     const clubs = ids.split(',');
     async function refresh() {
+      const today = new Date();
+      const dayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const dayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+      const dayQuery = `attention?dayStart=${encodeURIComponent(dayStart.toISOString())}&dayEnd=${encodeURIComponent(dayEnd.toISOString())}`;
       const results = await Promise.allSettled(clubs.map(async clubId => ({
-        clubId, value: await workspaceRequest<WorkspaceAttention>(token, clubId, 'attention', { signal: controller.signal }),
+        clubId, value: await workspaceRequest<WorkspaceAttention>(token, clubId, dayQuery, { signal: controller.signal }),
       })));
       if (controller.signal.aborted) return;
       setSummaries(previous => {

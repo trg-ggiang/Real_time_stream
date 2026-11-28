@@ -23,6 +23,7 @@ type Meeting = {
   title: string;
   recurrence_rule: string | null;
   waiting_room_enabled: boolean;
+  allow_early_join: boolean;
 };
 
 type Session = {
@@ -47,10 +48,15 @@ type Member = {
 };
 
 const MEMBER_SELECT = 'meeting_member_id,meeting_id,user_id,role,admission_status,invited_at,removed_at';
-const MEETING_SELECT = 'meeting_id,club_id,created_by,meeting_code,title,recurrence_rule,waiting_room_enabled';
+const MEETING_SELECT = 'meeting_id,club_id,created_by,meeting_code,title,recurrence_rule,waiting_room_enabled,allow_early_join';
+const LEGACY_MEETING_SELECT = 'meeting_id,club_id,created_by,meeting_code,title,recurrence_rule,waiting_room_enabled';
+function missingEarlyJoinColumn(error: { code?: string; message?: string } | null): boolean {
+  return !!error && ['42703', 'PGRST204'].includes(error.code ?? '') && (error.message ?? '').includes('allow_early_join');
+}
 const SESSION_SELECT = 'session_id,meeting_id,livekit_room_name,status,scheduled_start_at,scheduled_end_at,started_at,ended_at';
 const ADMISSION_RETRY_LIMIT = 3;
 const ADMISSION_COOLDOWN_MS = 30 * 60 * 1000;
+const EARLY_JOIN_WINDOW_MS = 15 * 60 * 1000;
 
 type RecurrenceRule = {
   frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
@@ -148,7 +154,7 @@ function recurrenceMatches(rule: RecurrenceRule, start: Date, candidate: Date): 
   if (rule.frequency === 'WEEKLY') {
     const mondayOffset = (date: Date) => (date.getUTCDay() + 6) % 7;
     const startWeek = Math.floor((dayDifference + mondayOffset(start)) / 7);
-    return startWeek % rule.interval === 0 && weekdayMatches;
+    return startWeek % rule.interval === 0 && (rule.weekdays ? weekdayMatches : candidate.getUTCDay() === start.getUTCDay());
   }
   const monthDifference = (candidate.getUTCFullYear() - start.getUTCFullYear()) * 12 + candidate.getUTCMonth() - start.getUTCMonth();
   const yearDifference = candidate.getUTCFullYear() - start.getUTCFullYear();
@@ -184,6 +190,7 @@ function expandRecurrence(startAt: Date, endAt: Date, rule: RecurrenceRule): Arr
     if (rule.until !== undefined && candidate.getTime() > rule.until) break;
     if (offset > 0 && !recurrenceMatches(rule, startAt, candidate)) continue;
     occurrences.push({ startAt: candidate.toISOString(), endAt: new Date(candidate.getTime() + duration).toISOString() });
+    if (occurrences.length > 5000) throw new BadRequestException('recurrenceRule generates too many sessions (maximum 5000).');
     if (rule.count !== undefined && occurrences.length >= rule.count) return occurrences;
   }
   if (rule.count !== undefined && occurrences.length < rule.count) {
@@ -249,16 +256,20 @@ export class MeetingsService {
   }
 
   private async getMeetingByCode(code: string): Promise<Meeting> {
-    const { data, error } = await this.supabase.from('meetings').select(MEETING_SELECT)
+    let { data, error } = await this.supabase.from('meetings').select(MEETING_SELECT)
       .eq('meeting_code', code.trim()).maybeSingle();
+    if (missingEarlyJoinColumn(error)) ({ data, error } = await this.supabase.from('meetings').select(LEGACY_MEETING_SELECT)
+      .eq('meeting_code', code.trim()).maybeSingle());
     if (error) throw new ServiceUnavailableException('Could not load meeting.');
     if (!data) throw new NotFoundException('Meeting not found.');
     return data as Meeting;
   }
 
   private async getMeetingById(meetingId: string): Promise<Meeting> {
-    const { data, error } = await this.supabase.from('meetings').select(MEETING_SELECT)
+    let { data, error } = await this.supabase.from('meetings').select(MEETING_SELECT)
       .eq('meeting_id', meetingId).maybeSingle();
+    if (missingEarlyJoinColumn(error)) ({ data, error } = await this.supabase.from('meetings').select(LEGACY_MEETING_SELECT)
+      .eq('meeting_id', meetingId).maybeSingle());
     if (error) throw new ServiceUnavailableException('Could not load meeting.');
     if (!data) throw new NotFoundException('Meeting not found.');
     return data as Meeting;
@@ -327,21 +338,28 @@ export class MeetingsService {
     if (!membership.data || !club.data) throw new ForbiddenException('Chỉ thành viên đang hoạt động được truy cập cuộc họp nội bộ của CLB.');
   }
 
-  private async insertMeeting(owner: User, title: string, waitingRoomEnabled: boolean, recurrenceRule: string | null, clubId?: string) {
+  private async insertMeeting(owner: User, title: string, waitingRoomEnabled: boolean, recurrenceRule: string | null, clubId?: string, allowEarlyJoin = false) {
     await this.requireClubMeetingAccess(owner.userId, clubId);
     const cleanTitle = title.trim();
     if (!cleanTitle) throw new BadRequestException('Meeting title cannot be empty.');
     const meetingId = randomUUID();
     const meetingCode = randomUUID().replaceAll('-', '').slice(0, 10).toUpperCase();
-    const { data: meeting, error } = await this.supabase.from('meetings').insert({
+    const values = {
       meeting_id: meetingId,
       created_by: owner.userId,
       meeting_code: meetingCode,
       title: cleanTitle,
       recurrence_rule: recurrenceRule,
       waiting_room_enabled: waitingRoomEnabled,
+      allow_early_join: allowEarlyJoin,
       ...(clubId ? { club_id: clubId } : {}),
-    }).select(MEETING_SELECT).single();
+    };
+    let { data: meeting, error } = await this.supabase.from('meetings').insert(values).select(MEETING_SELECT).single();
+    if (missingEarlyJoinColumn(error)) {
+      if (allowEarlyJoin) throw new ServiceUnavailableException({ code: 'EARLY_JOIN_SCHEMA_REQUIRED', message: 'Cần cập nhật cơ sở dữ liệu để bật vào phòng trước giờ họp.' });
+      const { allow_early_join: _unused, ...legacyValues } = values;
+      ({ data: meeting, error } = await this.supabase.from('meetings').insert(legacyValues).select(LEGACY_MEETING_SELECT).single());
+    }
     if (error || !meeting) {
       if (error?.code === '23505') throw new ConflictException('Could not allocate a unique meeting link; please retry.');
       throw new ServiceUnavailableException('Could not create meeting.');
@@ -360,9 +378,9 @@ export class MeetingsService {
     return meeting as Meeting;
   }
 
-  async createMeeting(owner: User, body: { title: string; waitingRoomEnabled?: boolean; recurrenceRule?: string | null; clubId?: string }) {
+  async createMeeting(owner: User, body: { title: string; waitingRoomEnabled?: boolean; allowEarlyJoin?: boolean; recurrenceRule?: string | null; clubId?: string }) {
     if (body.recurrenceRule?.trim()) parseRecurrenceRule(body.recurrenceRule);
-    return this.insertMeeting(owner, body.title, body.waitingRoomEnabled !== false, body.recurrenceRule?.trim() || null, body.clubId);
+    return this.insertMeeting(owner, body.title, body.waitingRoomEnabled !== false, body.recurrenceRule?.trim() || null, body.clubId, body.allowEarlyJoin === true);
   }
 
   async createQuickMeeting(owner: User, body: { title: string; waitingRoomEnabled?: boolean; clubId?: string }) {
@@ -387,7 +405,7 @@ export class MeetingsService {
     ]);
     if (error) throw new ServiceUnavailableException('Could not load meeting sessions.');
     return { meeting: { meetingId: meeting.meeting_id, title: meeting.title, meetingCode: meeting.meeting_code,
-      recurrenceRule: meeting.recurrence_rule, waitingRoomEnabled: meeting.waiting_room_enabled }, sessions: data ?? [],
+      recurrenceRule: meeting.recurrence_rule, waitingRoomEnabled: meeting.waiting_room_enabled, allowEarlyJoin: meeting.allow_early_join }, sessions: data ?? [],
       membership: member?.admission_status === 'admitted' ? {
         meetingMemberId: member.meeting_member_id, userId: member.user_id, role: member.role, invitedAt: member.invited_at,
       } : null };
@@ -493,11 +511,11 @@ export class MeetingsService {
     return data as Member;
   }
 
-  private async activateSession(session: Session): Promise<Session> {
+  private async activateSession(session: Session, allowEarlyJoin = false): Promise<Session> {
     if (session.status === 'ended') throw new ForbiddenException('This meeting session has ended.');
     if (session.status === 'ongoing') return session;
     const now = Date.now();
-    if (session.scheduled_start_at && new Date(session.scheduled_start_at).getTime() > now) {
+    if (session.scheduled_start_at && new Date(session.scheduled_start_at).getTime() > now + (allowEarlyJoin ? EARLY_JOIN_WINDOW_MS : 0)) {
       throw new ConflictException({ message: 'This meeting session has not started yet.', startsAt: session.scheduled_start_at });
     }
     const startedAt = new Date().toISOString();
@@ -515,7 +533,7 @@ export class MeetingsService {
     const meeting = await this.getMeetingByCode(code);
     await this.requireClubMeetingAccess(user.userId, meeting.club_id);
     let session = await this.getSession(meeting.meeting_id, sessionId);
-    session = await this.activateSession(session);
+    session = await this.activateSession(session, meeting.allow_early_join === true);
 
     let member = await this.getMember(meeting.meeting_id, user.userId);
     if (!member) {

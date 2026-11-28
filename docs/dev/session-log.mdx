@@ -2,6 +2,11 @@
 title: Code change logs
 description: Reserved for completed code changes only.
 ---
+## Lịch phòng họp CLB (2026-11-28)
+
+Thanh chia nằm sát lịch tháng; dấu chấm chỉ hiện ở ngày còn lịch. Cột form thu gọn, ngày và giờ chia hai hàng; lịch lặp dùng ngày kết thúc chung và chỉ còn hàng ngày/hàng tuần. Cài đặt nâng cao có vào sớm 15 phút. Backend dùng fallback cho schema chưa có cột mới để họp thường vẫn hoạt động, báo rõ khi bật vào sớm mà thiếu migration. Typecheck, backend build, 19 test vai trò họp và 19 test workspace đạt; chưa xác minh DB thật do kết nối mạng bị chặn. Phase 04 In Progress. [Work log](/work-logs/2026-11-28-01-phase-04-meeting-calendar-markers).
+
+
 
 ## Thanh trạng thái cuộc họp trong Không gian CLB (2026-11-25)
 

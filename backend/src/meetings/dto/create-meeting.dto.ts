@@ -12,6 +12,10 @@ export class CreateMeetingDto {
   waitingRoomEnabled?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  allowEarlyJoin?: boolean;
+
+  @IsOptional()
   @IsString()
   @MaxLength(1000)
   recurrenceRule?: string | null;

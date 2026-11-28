@@ -19,6 +19,39 @@ test('meeting creation uses the schema host role for the creator membership', as
   assert.equal(writes[1].values.role, 'host');
   assert.equal(writes[1].values.user_id, 'creator');
   assert.equal(writes[1].values.meeting_id, meeting.meeting_id);
+  assert.equal(writes[0].values.allow_early_join, false);
+});
+
+test('scheduled meeting creation stores the early-entry choice', async () => {
+  const writes=[];
+  const client={from(table){return {insert(values){writes.push({table,values});return table==='meetings'?{select:()=>({single:async()=>({data:values,error:null})})}:Promise.resolve({error:null});}};}};
+  const service=new MeetingsService({}, {client});
+  await service.createMeeting({userId:'creator'}, {title:'Schedule',allowEarlyJoin:true});
+  assert.equal(writes[0].values.allow_early_join,true);
+});
+
+test('creation without early entry works before the new database column is installed', async () => {
+  const writes=[];
+  const client={from(table){return {insert(values){writes.push({table,values});if(table==='meeting_members')return Promise.resolve({error:null});return {select:()=>({single:async()=>values.allow_early_join!==undefined
+    ? {data:null,error:{code:'PGRST204',message:"Could not find the 'allow_early_join' column"}}
+    : {data:values,error:null}})};}};}};
+  const service=new MeetingsService({}, {client});
+  const meeting=await service.createMeeting({userId:'creator'},{title:'Legacy meeting'});
+  assert.equal(meeting.title,'Legacy meeting');
+  assert.equal(writes.filter(write=>write.table==='meetings').length,2);
+  assert.equal('allow_early_join' in writes[1].values,false);
+  await assert.rejects(()=>service.createMeeting({userId:'creator'},{title:'Early meeting',allowEarlyJoin:true}),error=>error.getResponse().code==='EARLY_JOIN_SCHEMA_REQUIRED');
+});
+
+test('meeting lookup falls back when the early-entry column is absent', async () => {
+  const selects=[];
+  const client={from(){return {select(fields){selects.push(fields);return {eq(){return this;},async maybeSingle(){return fields.includes('allow_early_join')
+    ? {data:null,error:{code:'42703',message:'column meetings.allow_early_join does not exist'}}
+    : {data:{meeting_id:'legacy',title:'Legacy meeting'},error:null};}};}};}};
+  const service=new MeetingsService({}, {client});
+  assert.equal((await service.getMeetingByCode('CODE')).meeting_id,'legacy');
+  assert.equal((await service.getMeetingById('legacy')).meeting_id,'legacy');
+  assert.equal(selects.length,4);
 });
 
 test('quick meetings insert an ongoing session using the schema status', async () => {
@@ -45,6 +78,18 @@ test('scheduled sessions transition to ongoing and ongoing sessions remain joina
   assert.equal(activated.status,'ongoing');
   assert.equal(update.status,'ongoing');
   assert.equal(await service.activateSession(activated),activated);
+});
+
+test('early entry is blocked by default and opens a scheduled session when enabled', async () => {
+  const session={session_id:'session',meeting_id:'meeting',status:'scheduled',scheduled_start_at:new Date(Date.now()+10*60000).toISOString()};
+  let update;
+  const query={update(values){update=values;return query;},eq(){return query;},select(){return query;},async maybeSingle(){return {data:{...session,...update},error:null};}};
+  const service=new MeetingsService({}, {client:{from:()=>query}});
+  await assert.rejects(()=>service.activateSession(session), /not started yet/);
+  await assert.rejects(()=>service.activateSession({...session,scheduled_start_at:new Date(Date.now()+3600000).toISOString()},true), /not started yet/);
+  const opened=await service.activateSession(session,true);
+  assert.equal(opened.status,'ongoing');
+  assert.equal(update.status,'ongoing');
 });
 
 function serviceForMember(role, invitedAt = null) {

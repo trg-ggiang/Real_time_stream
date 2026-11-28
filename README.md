@@ -141,3 +141,7 @@ Chạy migration `supabase/migrations/202611210001_followed_club_notifications.s
 ## Trợ giúp và báo cáo sự cố — 25/11/2026
 
 Menu avatar công khai mở `/help` và `/report-issue`; người gửi theo dõi tại `/help/reports`, admin xử lý tại `/admin/support-reports`. Chạy toàn bộ migration `supabase/migrations/202611250001_support_reports.sql` một lần trong Supabase SQL Editor, restart backend rồi dùng bản frontend mới. Migration chỉ thêm một bảng hỗ trợ, chưa được áp dụng trên Supabase thật trong phiên này. Xem [hướng dẫn](docs/modules/help-support.mdx) và [work log](docs/work-logs/2026-11-25-01-phase-04-help-support-reports.mdx).
+
+## Vào phòng họp trước giờ — 28/11/2026
+
+Form lên lịch có tùy chọn trong Cài đặt nâng cao để vào phòng sớm tối đa 15 phút, mặc định tắt. Họp thường hoạt động với schema cũ. Để bật vào sớm trên môi trường development, áp dụng `supabase/migrations/202611280001_meeting_early_join.sql` để thêm cột `meetings.allow_early_join`, rồi restart backend. Migration chưa được áp dụng lên Supabase thật trong phiên này. [Work log](docs/work-logs/2026-11-28-01-phase-04-meeting-calendar-markers).
